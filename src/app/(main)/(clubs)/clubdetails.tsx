@@ -20,13 +20,13 @@ const ClubDetails = () => {
     }, [])
 
     const showMembers = (clubId: number) => router.push(`/(main)/(members)?clubId=${clubId}`)
-    const setClubAsDefault = async () => {
-        try {
-            clubDetails && await AsyncStorage.setItem('defaultClubId', clubDetails.id.toString());
-        } catch (e) {
-            console.log(e)
-        }
-    }
+    // const setClubAsDefault = async () => {
+    //     try {
+    //         clubDetails && await AsyncStorage.setItem('defaultClubId', clubDetails.id.toString());
+    //     } catch (e) {
+    //         console.log(e)
+    //     }
+    // }
     return (
         <GestureHandlerRootView>
             <ScrollView>
@@ -40,27 +40,10 @@ const ClubDetails = () => {
                 <View style={{ marginBottom: 20 }} />
                 <ThemedButton title="Show Members" opnPress={() => showMembers(Number(clubDetails?.id))} />
                 <View style={{ marginBottom: 20 }} />
-                <ThemedButton title="Set as default club" opnPress={setClubAsDefault} />
+                {/* <ThemedButton title="Set as default club" opnPress={setClubAsDefault} /> */}
             </ScrollView>
         </GestureHandlerRootView>
     )
 }
 
 export default ClubDetails
-
-
-const styles = StyleSheet.create({
-    photoContainer: {
-        minHeight: 150,
-        margin: 5,
-        padding: 10,
-        flex: 1,
-        width: 150,
-        borderRadius: 100,
-        borderColor: "#eee",
-        alignItems: "center",
-        justifyContent: "center",
-        alignSelf: "center",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-    }
-});

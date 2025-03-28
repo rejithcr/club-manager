@@ -20,7 +20,7 @@ const UpcomingEvents = (props: { memberId: number }) => {
             <View style={{ width: "15%", paddingRight: 10, alignItems: "center" }}>
               {getEventIcon(event)}
             </View>
-            <View style={{ marginBottom: 15, width: "80%", flexDirection: "row", flexWrap: "wrap" }}>
+            <View style={{ width: "80%", flexDirection: "row", flexWrap: "wrap" }}>
               <View style={{
                 flexDirection: "row", width: "100%", margin: 5,
                 justifyContent: "space-between", alignItems: "center"

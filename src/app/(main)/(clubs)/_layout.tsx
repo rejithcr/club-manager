@@ -7,7 +7,7 @@ export default function ClubLayout() {
       <Stack.Screen
         name="index" // This is the name of the page and must match the url from root
         options={{
-          title: 'Clubs',
+          title: 'My Clubs',
           headerShown:true
         }}
       />     

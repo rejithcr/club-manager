@@ -16,9 +16,9 @@ const ClubMain = () => {
   return (
     <>
       <ScrollView>
-        <UpcomingEvents memberId={1} />
         <UpcomingMatches memberId={1} />
         <FeeSummary memberId={1} />
+        <UpcomingEvents memberId={1} />
       </ScrollView>
       <FloatingMenu onPress={gotoClubs} />
     </>

@@ -8,13 +8,11 @@ import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const MemberItem = (props: {
-  showDetails: any;
-  firstName: string;
-  date: string;
-  amount: string;
-  dateOfBirth: string;
-  dues: number;
-  lastName: string;
+  showDetails?: any;
+  firstName: string | undefined;
+  dateOfBirth: string | undefined;
+  dues?: number;
+  lastName: string | undefined;
   id: number;
 }) => {
   return (
@@ -31,13 +29,13 @@ const MemberItem = (props: {
         </View>
         <View style={styles.amount}>
           <Text>
-            {props.dues == 0 ? (
+            {props?.dues && (props?.dues == 0 ? (
               <MaterialIcons style={styles.icon} name={"done-all"} size={32} />
-            ) : props.dues > 1000 ? (
-              "Dues Rs." + (props.dues / 1000).toString() + "K"
+            ) : props?.dues || 0 > 1000 ? (
+              "Dues Rs." + (props?.dues || 0 / 1000).toString() + "K"
             ) : (
-              "Dues Rs." + props.dues
-            )}
+              "Dues Rs." + props?.dues
+            ))}
           </Text>
         </View>
       </View>

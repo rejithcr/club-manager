@@ -6,10 +6,11 @@ const InputText = (props: {
   value?: string; 
   ref?: any; 
   onSubmitEditing?: any; 
+  onChangeText?: any;
   blurOnSubmit?: any }) => {
   return (
     <View>
-      <TextInput style={styles.input} {...props} />
+      <TextInput style={styles.input} {...props} onChangeText={props.onChangeText}/>
     </View>
   )
 }
