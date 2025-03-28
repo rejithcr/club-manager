@@ -6,7 +6,6 @@ import {
 } from "react-native";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const MemberItem = (props: {
   showDetails: any;

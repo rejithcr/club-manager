@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { camelCaseToWords } from '../utils/string'
 
 const KeyValueUI = (props: { data: any; hideKeys?: string[] }) => {

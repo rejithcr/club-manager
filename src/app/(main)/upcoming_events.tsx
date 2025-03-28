@@ -16,7 +16,7 @@ const UpcomingEvents = (props: { memberId: number }) => {
       <Text style={appStyles.title}>Upcoming Events</Text>
       {events.map((event) => {
         return (
-          <View key={event.id} style={{ ...appStyles.shadowBox, width: "80%" }}>
+          <View key={event.id} style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15}}>
             <View style={{ width: "15%", paddingRight: 10, alignItems: "center" }}>
               {getEventIcon(event)}
             </View>

@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const SimpleCard = (props: { id: number; name: string; showDetails?: any; }) => {
     return (

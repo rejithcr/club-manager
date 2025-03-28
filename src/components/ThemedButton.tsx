@@ -1,6 +1,5 @@
-import { StyleSheet, Text, Pressable, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const ThemedButton = (props: { title: string; opnPress: any }) => {
     return (

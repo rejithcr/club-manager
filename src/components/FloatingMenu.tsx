@@ -1,7 +1,6 @@
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const FloatingMenu = (props: { onPress: any; icon?: any }) => {
     return (
@@ -19,7 +18,7 @@ const styles = StyleSheet.create({
     container: {
         bottom: 30,
         left: 30,
-        position: 'fixed',
+        position: 'absolute',
     },
     button: {
         width: 60,
