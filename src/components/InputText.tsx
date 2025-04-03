@@ -4,6 +4,7 @@ import React from 'react'
 const InputText = (props: { 
   placeholder: string; 
   value?: string; 
+  keyboardType?: string;
   ref?: any; 
   onSubmitEditing?: any; 
   onChangeText?: any;

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function RootLayout() {
-  const [isLoggedIn, setLogin] = useState(true)
+  const [isLoggedIn, setLogin] = useState(false)
   return (
     <GestureHandlerRootView>
       <Stack screenOptions={{ headerShown: false }} />

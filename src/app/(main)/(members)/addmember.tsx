@@ -1,7 +1,7 @@
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
 import { useState } from 'react'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { StyleSheet, View } from 'react-native';
 import DatePicker from '@/src/components/DatePicker';
 import { getMemberByPhone, Member } from '@/src/helpers/member_helper';
@@ -35,6 +35,7 @@ const AddMember = () => {
     }
 
     return (        
+        <ScrollView>
         <GestureHandlerRootView>
             <InputText placeholder='Enter phone number' onChangeText={searchMemberChangeText}/>
             <ThemedButton title="Search" opnPress={searchMember} />  
@@ -55,6 +56,7 @@ const AddMember = () => {
             <ThemedButton title="Add Member" opnPress={addMember} />   
             </>}        
         </GestureHandlerRootView>
+        </ScrollView>
     )
 }
 
