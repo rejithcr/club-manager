@@ -20,5 +20,6 @@ export const appStyles = StyleSheet.create({
     centerItems: {
         flex: 1,
         justifyContent: "center"
-    }
+    },
+    centerify: {flex:1, alignItems:"center", justifyContent:"center"}
 })

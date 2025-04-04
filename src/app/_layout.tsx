@@ -1,13 +1,14 @@
-import { Redirect, router, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import React, { useState } from "react";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { AuthContext } from "../context/AuthContext";
 
 export default function RootLayout() {
-  const [isLoggedIn, setLogin] = useState(false)
+  const [userInfo, setUserInfo] = useState<UserInfo | undefined>(undefined)
   return (
-    <GestureHandlerRootView>
-      <Stack screenOptions={{ headerShown: false }} />
-      {isLoggedIn ? <Redirect href={"./(main)"} /> : <Redirect href={"./(auth)"} />}
-    </GestureHandlerRootView>
+    <AuthContext.Provider value={{ userInfo, setUserInfo }}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" options={{ title: "Init", headerShown: false }} />
+      </Stack>
+    </AuthContext.Provider>
   );
 }
