@@ -1,9 +1,10 @@
-import { View, FlatList } from 'react-native'
+import { View, FlatList, Text, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'expo-router/build/hooks';
 import FloatingMenu from '@/src/components/FloatingMenu';
 import { getClubs } from '@/src/helpers/club_helper';
-import SimpleCard from '@/src/components/SimpleCard';
+import TouchableCard from '@/src/components/TouchableCard';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const ClubMain = () => {
   const [clubs, setClubs] = useState<any>([]);
@@ -21,7 +22,15 @@ const ClubMain = () => {
         <FlatList
           data={clubs}
           renderItem={({ item }) => (
-            <SimpleCard key={item.id} {...item} showDetails={showDetails} />
+            <TouchableCard key={item.id} showDetails={showDetails} id={item.id}>
+              <View style={{
+                flexDirection: "row", width: "100%",
+                justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
+              }}>
+                <Text style={{ fontWeight: "bold" }}> {item.name}</Text>
+                <MaterialCommunityIcons  size={20} name={'chevron-right-circle'} />
+              </View>
+            </TouchableCard>
           )}
         />
       </View>
@@ -31,3 +40,9 @@ const ClubMain = () => {
 }
 
 export default ClubMain
+
+const styles = StyleSheet.create({
+  item: {
+    flex: 0.6,
+  },
+})

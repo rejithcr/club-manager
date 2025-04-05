@@ -1,13 +1,11 @@
-import { Text, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react'
 import { appStyles } from '@/src/utils/styles';
 import { Dues, getDuesGroupByMember } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { useSearchParams } from 'expo-router/build/hooks';
-import { MaterialCommunityIcons } from '@expo/vector-icons'
-import Checkbox from 'expo-checkbox';
-import { Member } from '@/src/helpers/member_helper';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const ClubDues = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -51,8 +49,8 @@ const MemberDue = (props: { member: any }) => {
         justifyContent: "space-between", alignItems: "center", flexWrap: "wrap",
         flexBasis: "auto"
       }}>
-        <MaterialCommunityIcons style={{ width: "5%" }} size={15} name={isShown ? 'chevron-down-circle' : 'chevron-right-circle'} />
-        <Text style={{ width: "70%", fontSize: 15, paddingLeft: 5 }}>{props?.member.name}</Text>
+        <MaterialCommunityIcons size={20} name={isShown ? 'chevron-down-circle' : 'chevron-right-circle'} />
+        <Text style={{ width: "65%", fontSize: 15, paddingLeft: 5 }}>{props?.member.name}</Text>
         <Text style={{ width: "25%", fontWeight: "bold", fontSize: 15 }}> Rs. {props?.member.total} </Text>
       </TouchableOpacity>
       {isShown && <DueItems dues={props?.member.dues} />}
@@ -62,13 +60,14 @@ const MemberDue = (props: { member: any }) => {
 }
 
 const DueItems = (props: { dues: Dues["dues"] }) => {
+  const [duesLocal, setDuesLocal] = useState<Dues["dues"]>()
   useEffect(() => {
-    console.log(props.dues)
+    setDuesLocal(props.dues)
   }, [])
   return (
     <>
       <Text>{JSON.stringify(props.dues)}</Text>
-      {props.dues.map((due) => {
+      {duesLocal?.map((due) => {
         <View style={appStyles.centerify}>
         <Text style={{width: "100%"}}key={due.id}>{due.amount}111</Text>
         </View>

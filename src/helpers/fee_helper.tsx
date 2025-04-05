@@ -27,9 +27,17 @@ const feeSummary: FeeSummary = {
 
 
 let fees: Fee[] = [
-    { "id": 1, "name": "Rejith", paid: true,  "type": "Joining", "period": "29-Mar-2025", "amount": 1500 },
-    { "id": 2, "name": "Some", paid: false,  "type": "Monthly", "period": "01-Feb-2025", "amount": 300 },
-    { "id": 3, "name": "Else", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 1, "name": "Rejith Ramakrishnan", paid: true,  "type": "Joining", "period": "29-Mar-2025", "amount": 300 },
+    { "id": 2, "name": "Kanaran", paid: false,  "type": "Monthly", "period": "01-Feb-2025", "amount": 300 },
+    { "id": 3, "name": "Paappan", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 250 },
+    { "id": 4, "name": "Thankachan", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 5, "name": "Akka", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 250 },
+    { "id": 6, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 7, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 8, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 9, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 11, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 12, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
 ]
 
 const duesByMember = [
@@ -105,7 +113,6 @@ export const getDuesGroupByMember = async (clubId: number) => {
     return duesGroupByMembers
 }
 
-export const getFeeByMember = async (clubId: number) => {
-    await sleep(3000)
-    return fees
+export const getFeeByMembers = async (clubId: number, periodValue:string|undefined) => {
+    return fees.sort((a,b) => a.paid == b.paid ? 1 : 0)
 }

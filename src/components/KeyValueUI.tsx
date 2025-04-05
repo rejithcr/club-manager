@@ -31,14 +31,15 @@ const styles = StyleSheet.create({
     item: {
         width: "100%",
         flexDirection: "row",
-        flexWrap: "wrap"
+        flexWrap: "wrap",
+        justifyContent: "space-between"
     },
     label: {
-        width: "30%",
+       // width: "30%",
         padding: 10,
     },
     value: {
-        width: "70%",
+       // width: "70%",
         padding: 10,
     },
     divider: {

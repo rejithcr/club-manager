@@ -13,7 +13,7 @@ const AddMember = () => {
     const [searchNumber, setSearchNumber] = useState<number>(0);
     const [date, setDate] = useState<Date>(new Date());
     const [memberDetails, setMemberDetails] = useState<Member>()
-  
+
     const addMember = () => {
         console.log("add player")
     }
@@ -21,11 +21,11 @@ const AddMember = () => {
     const searchMember = () => {
         const member = getMemberByPhone(searchNumber)
         if (member) {
-            setShowExistingPlayer(true); 
+            setShowExistingPlayer(true);
             setShowNewMemberForm(false)
             setMemberDetails(member)
         } else {
-            setShowExistingPlayer(false); 
+            setShowExistingPlayer(false);
             setShowNewMemberForm(true)
         }
     }
@@ -34,29 +34,29 @@ const AddMember = () => {
         setSearchNumber(phoneNumber)
     }
 
-    return (        
-        <ScrollView>
+    return (
         <GestureHandlerRootView>
-            <InputText placeholder='Enter phone number' onChangeText={searchMemberChangeText}/>
-            <ThemedButton title="Search" opnPress={searchMember} />  
-            <View style={{ marginTop: 25 }} />
-            {showExistingPlayer && <>
-            <MemberItem firstName={memberDetails?.firstName} dateOfBirth={memberDetails?.dateOfBirth} lastName={memberDetails?.lastName} id={0} />
-            <View style={{ marginTop: 25 }} />
-            <ThemedButton title="Add Member" opnPress={addMember} />   
-            </>}      
-        {showNewMemberForm && <>
-            <InputText placeholder='First Name'/>
-            <InputText placeholder='Last Name'/>
-            <InputText placeholder='Phone Number' />
-            <DatePicker date={date} setDate={setDate}/>
-            <InputText placeholder='Jersey Name' />
-            <InputText placeholder='Jersey Number' />
-            <View style={{ marginTop: 25 }} />
-            <ThemedButton title="Add Member" opnPress={addMember} />   
-            </>}        
+            <ScrollView>
+                <InputText placeholder='Enter phone number' onChangeText={searchMemberChangeText} />
+                <ThemedButton title="Search" onPress={searchMember} />
+                <View style={{ marginTop: 25 }} />
+                {showExistingPlayer && <>
+                    <MemberItem firstName={memberDetails?.firstName} dateOfBirth={memberDetails?.dateOfBirth} lastName={memberDetails?.lastName} id={0} />
+                    <View style={{ marginTop: 25 }} />
+                    <ThemedButton title="Add Member" onPress={addMember} />
+                </>}
+                {showNewMemberForm && <>
+                    <InputText placeholder='First Name' />
+                    <InputText placeholder='Last Name' />
+                    <InputText placeholder='Phone Number' />
+                    <DatePicker date={date} setDate={setDate} />
+                    <InputText placeholder='Jersey Name' />
+                    <InputText placeholder='Jersey Number' />
+                    <View style={{ marginTop: 25 }} />
+                    <ThemedButton title="Add Member" onPress={addMember} />
+                </>}
+            </ScrollView>
         </GestureHandlerRootView>
-        </ScrollView>
     )
 }
 

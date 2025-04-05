@@ -19,7 +19,7 @@ export default function FeesLayout() {
         }}
       />      
       <Stack.Screen
-        name="feebyperiod" // This is the name of the page and must match the url from root
+        name="payments" // This is the name of the page and must match the url from root
         options={{
           title: 'Fee Payment',
           headerShown:true

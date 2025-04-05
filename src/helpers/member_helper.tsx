@@ -30,6 +30,11 @@ export const getMemberDetails = (id: number) => {
     return members.find(member => member.id == id)
 }
 
+
+export const getMemberByPhone = (phone: number) => {
+    return members.find(member => member.phone == phone)
+}
+
 export const getMemberByEmail = (email: string) => {
     return members.find(member => member.email == email)
 }

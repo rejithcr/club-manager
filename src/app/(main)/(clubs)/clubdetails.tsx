@@ -1,13 +1,11 @@
-import { View, Text, StyleSheet, RefreshControl, GestureResponderEvent } from 'react-native'
+import { View, Text, GestureResponderEvent } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
 import { Club, getClubDetails } from '@/src/helpers/club_helper'
-import { MaterialIcons } from '@expo/vector-icons'
 import KeyValueUI from '@/src/components/KeyValueUI'
 import { appStyles } from '@/src/utils/styles'
 import ThemedButton from '@/src/components/ThemedButton'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import FloatingMenu from '@/src/components/FloatingMenu'
 import ClubFeeSummary from './(fees)/ClubFeeSummary'
 
@@ -32,7 +30,7 @@ const ClubDetails = () => {
         router.push(`/(main)/(clubs)/(fees)/clubdues?clubId=${clubDetails?.id}&clubName=${clubDetails?.name}`)
     }
     const showFeeByMember = (event: GestureResponderEvent): void => {
-        router.push(`/(main)/(clubs)/(fees)/feebyperiod?clubId=${clubDetails?.id}&clubName=${clubDetails?.name}`)
+        router.push(`/(main)/(clubs)/(fees)/payments?clubId=${clubDetails?.id}&clubName=${clubDetails?.name}`)
     }
     
     // const setClubAsDefault = async () => {
@@ -51,13 +49,14 @@ const ClubDetails = () => {
 
                 <Text style={appStyles.title}>{clubDetails?.name}</Text>
 
-                <KeyValueUI data={clubDetails} hideKeys={["id"]} />
-                <View style={{ marginBottom: 20 }} />
-                <ThemedButton title="Show Members" onPress={() => showMembers(Number(clubDetails?.id))} />
+                <KeyValueUI data={clubDetails} hideKeys={["id", "name", "createdDate"]} />
                 <View style={{ marginBottom: 20 }} />
                 {/* <ThemedButton title="Set as default club" opnPress={setClubAsDefault} /> */}
                     <ClubFeeSummary clubId={clubDetails?.id} clubName={clubDetails?.name} 
                     showClubDues={showClubDues} showFeeByMember={showFeeByMember}/>
+
+                <View style={{ marginBottom: 20 }} />
+                <ThemedButton title="Show Members" onPress={() => showMembers(Number(clubDetails?.id))} />
             </ScrollView>
             <FloatingMenu onPress={undefined} />
         </GestureHandlerRootView>
