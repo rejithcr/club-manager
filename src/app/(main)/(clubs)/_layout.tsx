@@ -25,6 +25,14 @@ export default function ClubLayout() {
           headerShown:true
         }}
       />        
+      
+      <Stack.Screen
+        name="(fees)" // This is the name of the page and must match the url from root
+        options={{
+          title: 'Fees',
+          headerShown:false
+        }}
+      />       
     </Stack>
   )
 }

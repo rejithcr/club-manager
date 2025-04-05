@@ -10,27 +10,23 @@ import { AuthContext } from '../../context/AuthContext';
 
 const ClubMain = () => {
   const { userInfo } = useContext(AuthContext)
+
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter()
 
   const gotoClubs = () => router.push(`/(main)/(clubs)`)
 
   const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000)
   };
 
   return (
-    <>    
-      <ScrollView
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-          <Text>{JSON.stringify(userInfo)}</Text>
-        <UpcomingMatches memberId={1} />
-        <FeeSummary memberId={1} />
-        <UpcomingEvents memberId={1} />
-      </ScrollView>
+    <>
+      {/* <FloatingProfileMenu photo={userInfo?.photo} /> */}
+      < ScrollView refreshControl={< RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        <UpcomingMatches memberEmail={userInfo?.email} />
+        <FeeSummary memberEmail={userInfo?.email} />
+        <UpcomingEvents memberEmail={userInfo?.email} />
+      </ScrollView >
       <FloatingMenu onPress={gotoClubs} />
     </>
   )

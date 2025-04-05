@@ -14,6 +14,6 @@ let events : Event[] = [
     { "id": 3, "type": "Birthday", "date": "01-Mar-2025", "name": "Navi"},
 ]
 
-export const getEvents = (memberId: number) => {
+export const getEvents = async (memberEmail: string) => {
     return events
 }

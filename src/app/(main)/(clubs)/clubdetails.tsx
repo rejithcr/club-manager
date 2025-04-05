@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, RefreshControl, GestureResponderEvent } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
 import { Club, getClubDetails } from '@/src/helpers/club_helper'
@@ -8,9 +8,11 @@ import { appStyles } from '@/src/utils/styles'
 import ThemedButton from '@/src/components/ThemedButton'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import FloatingMenu from '@/src/components/FloatingMenu'
+import ClubFeeSummary from './(fees)/ClubFeeSummary'
 
 const ClubDetails = () => {
-
+    const [refreshing, setRefreshing] = useState(false)
     const router = useRouter()
     const params = useSearchParams()
     const [clubDetails, setClubDetails] = useState<Club>()
@@ -20,6 +22,19 @@ const ClubDetails = () => {
     }, [])
 
     const showMembers = (clubId: number) => router.push(`/(main)/(members)?clubId=${clubId}`)
+
+    const onRefresh = () => {
+        setRefreshing(true)
+        throw new Error('Function not implemented.')
+    }
+
+    const showClubDues = (event: GestureResponderEvent): void => {
+        router.push(`/(main)/(clubs)/(fees)/clubdues?clubId=${clubDetails?.id}&clubName=${clubDetails?.name}`)
+    }
+    const showFeeByMember = (event: GestureResponderEvent): void => {
+        router.push(`/(main)/(clubs)/(fees)/feebyperiod?clubId=${clubDetails?.id}&clubName=${clubDetails?.name}`)
+    }
+    
     // const setClubAsDefault = async () => {
     //     try {
     //         clubDetails && await AsyncStorage.setItem('defaultClubId', clubDetails.id.toString());
@@ -36,12 +51,15 @@ const ClubDetails = () => {
 
                 <Text style={appStyles.title}>{clubDetails?.name}</Text>
 
-                <KeyValueUI data={clubDetails} hideKeys={["id"]}/>
+                <KeyValueUI data={clubDetails} hideKeys={["id"]} />
                 <View style={{ marginBottom: 20 }} />
-                <ThemedButton title="Show Members" opnPress={() => showMembers(Number(clubDetails?.id))} />
+                <ThemedButton title="Show Members" onPress={() => showMembers(Number(clubDetails?.id))} />
                 <View style={{ marginBottom: 20 }} />
                 {/* <ThemedButton title="Set as default club" opnPress={setClubAsDefault} /> */}
+                    <ClubFeeSummary clubId={clubDetails?.id} clubName={clubDetails?.name} 
+                    showClubDues={showClubDues} showFeeByMember={showFeeByMember}/>
             </ScrollView>
+            <FloatingMenu onPress={undefined} />
         </GestureHandlerRootView>
     )
 }

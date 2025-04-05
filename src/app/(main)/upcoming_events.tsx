@@ -4,19 +4,26 @@ import { appStyles } from '@/src/utils/styles';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getEvents, Event } from '@/src/helpers/events_helper';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Zocial from '@expo/vector-icons/Zocial';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
 
-const UpcomingEvents = (props: { memberId: number }) => {
+
+const UpcomingEvents = (props: { memberEmail: string }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [events, setEvents] = useState<Event[]>([]);
 
-  useEffect(() => setEvents(getEvents(props.memberId)), [])
+  useEffect(() => {
+    getEvents(props.memberEmail)
+      .then(data => { setEvents(data); setIsLoading(false) })
+      .catch(error => { console.error(error); setIsLoading(false) });
+  }, [])
 
   return (
     <View>
       <Text style={appStyles.title}>Upcoming Events</Text>
-      {events.map((event) => {
+      {isLoading && <LoadingSpinner />}
+      {!isLoading && events.map((event) => {
         return (
-          <View key={event.id} style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15}}>
+          <View key={event.id} style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15 }}>
             <View style={{ width: "15%", paddingRight: 10, alignItems: "center" }}>
               {getEventIcon(event)}
             </View>

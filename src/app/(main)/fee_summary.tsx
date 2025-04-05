@@ -2,14 +2,23 @@ import { View, Text, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { appStyles } from '@/src/utils/styles';
 import { getDues } from '@/src/helpers/fee_helper';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
 
-const FeeSummary = (props: { memberId: number }) => {
+const FeeSummary = (props: { memberEmail: string }) => {
+  const [isLoading, setIsLoading] = useState(true);
   const [dues, setDues] = useState<any>([]);
-  useEffect(() => setDues(getDues(props.memberId)), [])
+
+  useEffect(() => {
+    getDues(props.memberEmail)
+      .then(data => { setDues(data); setIsLoading(false) })
+      .catch(error => { console.error(error); setIsLoading(false) });
+  }, [])
+
   return (
     <View>
       <Text style={appStyles.title}>Dues Summary</Text>
-      {dues.map((club: any) => {
+      {isLoading && <LoadingSpinner />}
+      {!isLoading && dues.map((club: any) => {
         return (
           <View key={club.club} style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15 }}>
             <View style={{

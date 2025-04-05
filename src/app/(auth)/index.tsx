@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ActivityIndicator, View } from 'react-native'
 import { appStyles } from '@/src/utils/styles'
 import { AuthContext } from '../../context/AuthContext';
+import { ANDROID_CLIENT_ID, WEB_CLIENT_ID } from '@/src/utils/keys'
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -15,13 +16,16 @@ const AuthHome = () => {
 
   const [isLoading, setLoading] = useState(true)
   const [_, response, promptAsyc] = Google.useAuthRequest({
-    androidClientId: "586660286227-diu8vq5k4tm6c7b9bueeqn8cuimnsl41.apps.googleusercontent.com",
+    //scopes: ['https://www.googleapis.com/auth/user.phonenumbers.read'],
+    androidClientId: ANDROID_CLIENT_ID,
     iosClientId: "",
-    webClientId: "586660286227-ss63b55mb5l82s7q6skocr4f8tc3v1ql.apps.googleusercontent.com",
+    webClientId: WEB_CLIENT_ID,
   })
   const router = useRouter()
 
   useEffect(() => {
+    setUserInfo({"email": "rejithramakrishnan@gmail.co"})
+    router.replace('/(main)')
     validateLogin()
   }, [response])
 
@@ -62,7 +66,7 @@ const AuthHome = () => {
 
   return (
     <View style={appStyles.centerify}>
-      {isLoading ? <ActivityIndicator size="large" color={"black"} /> : <ThemedButton title="Sign in with Google" opnPress={() => promptAsyc()} />}
+      {isLoading ? <ActivityIndicator size="large" color={"black"} /> : <ThemedButton title="Sign in with Google" onPress={() => promptAsyc()} />}
     </View>
   )
 }

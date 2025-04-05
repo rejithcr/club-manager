@@ -1,4 +1,4 @@
-import { View, StyleSheet, FlatList } from 'react-native'
+import { View, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'expo-router/build/hooks';
 import FloatingMenu from '@/src/components/FloatingMenu';

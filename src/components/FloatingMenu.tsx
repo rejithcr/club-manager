@@ -26,7 +26,8 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         backgroundColor: 'black',
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        boxShadow: "2px 4px 4px rgba(0, 0, 0, 0.2)",
     }
 
 })

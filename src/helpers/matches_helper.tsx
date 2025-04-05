@@ -1,3 +1,5 @@
+import { sleep } from "../utils/common";
+
 export interface Match {
     id: number;
     name: string;
@@ -13,6 +15,7 @@ export let matches : Match[] = [
     { "id": 3, "name": "Akme Cup 2025", "date": "12-Apr-2025", "time": "8am", "ground": "FISAT","club": "Crick-IT"},
 ]
 
-export const getMatches = (memberId: number) => {
+export const getMatches = async (memberEmail: string) => {
+    await sleep(5000)
     return matches
 }

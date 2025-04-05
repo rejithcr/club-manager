@@ -4,6 +4,7 @@ export interface Member {
     firstName: string;
     lastName?: string;
     phone?: number;
+    email?: string;
     dateOfBirth?: string;
     jerseyNumber?: string;
     jerseyName?: string;
@@ -29,6 +30,6 @@ export const getMemberDetails = (id: number) => {
     return members.find(member => member.id == id)
 }
 
-export const getMemberByPhone = (phoneNumber: number) => {
-    return members.find(member => member.phone == phoneNumber)
+export const getMemberByEmail = (email: string) => {
+    return members.find(member => member.email == email)
 }
