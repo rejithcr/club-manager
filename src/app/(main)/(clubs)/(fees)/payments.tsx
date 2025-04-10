@@ -2,13 +2,14 @@ import { View, Text, FlatList, TouchableOpacity, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { Fee, getFeeByMembers } from '@/src/helpers/fee_helper';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
 import Checkbox from 'expo-checkbox';
 import ThemedButton from '@/src/components/ThemedButton';
 import { Picker } from '@react-native-picker/picker';
 import Modal from 'react-native-modal';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +45,7 @@ const Payments = () => {
     return (
         <GestureHandlerRootView>
             <Text style={appStyles.title}>{params.get("clubName")}</Text>
-            <View style={{ height: "75%", alignItems: "flex-end" }}>                            
+            <View style={{ height: "78%", alignItems: "flex-end" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <FlatList style={{ width: "100%" }}
@@ -58,13 +59,21 @@ const Payments = () => {
                     />}
             </View>
             <Modal isVisible={isConfirmVisible}>
-                <View style={{backgroundColor:"white"}}>
-                    <Text>{JSON.stringify(paymentStatusUpdates)}</Text>
-                    <Button title="Hide modal" onPress={() => setIsConfirmVisible(false)} />
-                </View>
+                <ScrollView>
+                    <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
+                        <Text style={appStyles.heading}>Confirm Updates</Text>
+                        {paymentStatusUpdates.map((item) => {
+                            return <PaymentUpdates {...item} />
+                        })}
+                        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                            <ThemedButton title="Update" onPress={() => setIsConfirmVisible(false)} />
+                            <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
+                        </View>
+                    </View>
+                </ScrollView>
             </Modal>
             <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
-                <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
+                <ThemedButton title='Update Status' onPress={() => updatePaymentStatus()} />
                 <Picker style={{ width: 155 }}
                     selectedValue={periodValue}
                     onValueChange={(itemValue, itemIndex) => setPeriodValue(itemValue)}>
@@ -119,5 +128,20 @@ const MemberFeeItem = (props: {
                 <Text style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</Text>
             </View>
         </TouchableOpacity>
+    )
+}
+
+
+const PaymentUpdates = (props: { id: number | undefined; name?: string | null | undefined; paid: boolean | undefined; }) => {
+    return (
+        <View style={{
+            ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap",
+            flexBasis: "auto"
+        }}>
+            <Text numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.name}</Text>
+            {props?.paid ?
+                <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-marked' /> :
+                <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-blank-outline' />}
+        </View>
     )
 }

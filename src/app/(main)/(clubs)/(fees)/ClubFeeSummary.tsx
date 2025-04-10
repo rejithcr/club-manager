@@ -36,8 +36,8 @@ const ClubFeeSummary = (props: {
               }}>
                 <Text style={{ fontWeight: "bold", fontSize: 15 }}>Fund Balance</Text>
                 <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-                <Text style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {feeSummary.fundBalance} </Text>
-                <View style={{width:20}}/>
+                  <Text style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {feeSummary.fundBalance} </Text>
+                  <View style={{ width: 20 }} />
                 </View>
               </View>
               <View style={styles.divider} />
@@ -57,6 +57,16 @@ const ClubFeeSummary = (props: {
                 justifyContent: "space-between", flexWrap: "wrap"
               }}>
                 <Text style={{ fontSize: 15 }}>Fee Payments</Text>
+                <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                  <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
+                </View>
+              </TouchableOpacity> 
+              <View style={styles.divider} />
+              <TouchableOpacity onPress={props.showFeeByMember} style={{
+                flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
+                justifyContent: "space-between", flexWrap: "wrap"
+              }}>
+                <Text style={{ fontSize: 15 }}>Adhoc Payments</Text>
                 <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
                   <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
                 </View>

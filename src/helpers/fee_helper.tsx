@@ -157,7 +157,7 @@ export const getNextPeriodFee = async (clubId: number) => {
     return [
         {
             memberId: 1,
-            name: "Rejith RamakrishnanRamakrishnanRamakrishnanRamakrishnan",
+            name: "Rejith Ramakrishnan",
             amount: 300,
             exemption: null,            
         },{

@@ -2,7 +2,7 @@ import { View, Text, FlatList, TouchableOpacity, Button } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { Fee, getNextPeriodFee } from '@/src/helpers/fee_helper';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, Pressable } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
 import Checkbox from 'expo-checkbox';
@@ -41,10 +41,21 @@ const StartNextPeriod = () => {
         }
     }
 
+    const skipPeriod = () => { console.log("presses skip")} 
+
     return (
         <GestureHandlerRootView>
-            <Text style={appStyles.title}>{params.get("clubName")}</Text>
-            <View style={{ height: "75%", alignItems: "flex-end" }}>
+            <View style={{
+                flexDirection: "row", width: "80%", height: 75, justifyContent: "space-between",
+                alignSelf: "center"
+            }}>
+                <Text numberOfLines={1} style={{
+                    ...appStyles.title, lineHeight: 80,
+                    width: "75%", textAlign: "left", marginLeft: 0
+                }}>{params.get("clubName")}</Text>
+                <Text style={{ width: "35%", lineHeight: 80, fontWeight: "bold", textAlign: "right" }}>2025 MAR</Text>
+            </View>
+            <View style={{ height: "78%", alignItems: "flex-end" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <FlatList style={{ width: "100%" }}
@@ -65,14 +76,11 @@ const StartNextPeriod = () => {
             </Modal>
             <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
                 <ThemedButton title='Start Collection' onPress={() => updatePaymentStatus()} />
-                <Picker style={{ width: 155 }}
-                    selectedValue={periodValue}
-                    onValueChange={(itemValue, itemIndex) => setPeriodValue(itemValue)}>
-                    <Picker.Item label="2025 MAR" value="mar" />
-                    <Picker.Item label="2025 FEB" value="feb" />
-                    <Picker.Item label="2024 Q4" value="q4" />
-                    <Picker.Item label="2023" value="2023" />
-                </Picker>
+                <TouchableOpacity onPress={() => skipPeriod()}
+                    style={{ flexDirection: "row", alignItems: "center" }}>
+                    <Text style={{ textAlign: "right", fontWeight: "bold" }}>SKIP</Text>
+                    <MaterialCommunityIcons size={50} name='skip-next' />
+                </TouchableOpacity>
             </View>
         </GestureHandlerRootView>
     )
@@ -87,21 +95,30 @@ const MemberFeeItem = (props: {
     exemption: string
 }) => {
 
-    return (
-        <View style={{
-            ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap",
-            flexBasis: "auto"
-        }}>
-            <Text numberOfLines={1} style={{ width: "70%", fontSize: 15, paddingLeft: 5, textAlign: "left", textOverflow: "ellipsis" }}>{props?.name}</Text>
+    const editFee = () => {
+        console.log("Presed edit")
+    }
 
-            <Text style={{ width: "20%", fontSize: 15, textAlign: "right" }}>{props?.amount}</Text>
-            <MaterialCommunityIcons style={{ width: "10%", fontSize: 15, textAlign: "right" }} name='square-edit-outline' />
-            {/* <View style={{ width: "30%", flexDirection: "row", flexBasis: "auto", justifyContent: "flex-end" }}>
+    return (
+
+        <TouchableOpacity onPress={editFee}>
+            <View style={{
+                ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap",
+                flexBasis: "auto"
+            }}>
+                <Text numberOfLines={1} style={{ width: "70%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.name}</Text>
+
+                <Text style={{ width: "20%", fontSize: 15, textAlign: "right" }}>{props?.amount}</Text>
+
+                <MaterialCommunityIcons style={{ width: "10%", fontSize: 15, textAlign: "right" }} name='square-edit-outline' />
+
+                {/* <View style={{ width: "30%", flexDirection: "row", flexBasis: "auto", justifyContent: "flex-end" }}>
             </View> */}
-            {/* <Picker selectedValue={"leave"} style={{ width: "60%", margin:0, padding:0 }}>
+                {/* <Picker selectedValue={"leave"} style={{ width: "60%", margin:0, padding:0 }}>
                 <Picker.Item label="Leave (300)" value="leave" />
                 <Picker.Item label="Injury (50)" value="injury" />
             </Picker> */}
-        </View>
+            </View>
+        </TouchableOpacity>
     )
 }
