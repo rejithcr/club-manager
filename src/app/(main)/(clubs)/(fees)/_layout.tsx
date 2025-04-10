@@ -25,6 +25,13 @@ export default function FeesLayout() {
           headerShown:true
         }}
       />     
+      <Stack.Screen
+        name="startcollection" // This is the name of the page and must match the url from root
+        options={{
+          title: 'Start Collection',
+          headerShown:true
+        }}
+      />     
     </Stack>
   )
 }

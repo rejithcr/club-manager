@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import { MaterialIcons } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -17,12 +17,12 @@ const DatePicker = (props: { date: Date; setDate: any }) => {
 
     return (
         <>
-            <TouchableOpacity onPress={() => showDatepicker()}>
+            <Pressable onPress={() => showDatepicker()}>
                 <View style={styles.container}>
                     <Text>{props.date.toLocaleDateString()} </Text>
                     <MaterialIcons name={"edit-calendar"} size={32} />
                 </View>
-            </TouchableOpacity>
+            </Pressable>
             {show && (
                 <DateTimePicker
                     testID="dateTimePicker"

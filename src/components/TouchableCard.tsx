@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { ReactNode } from 'react'
 
 const TouchableCard = (props: {
@@ -29,4 +29,5 @@ const styles = StyleSheet.create({
         alignItems: "center",
         alignSelf: "center",
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+        borderRadius: 5
     }});

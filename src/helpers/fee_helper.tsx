@@ -26,20 +26,6 @@ const feeSummary: FeeSummary = {
 }
 
 
-let fees: Fee[] = [
-    { "id": 1, "name": "Rejith Ramakrishnan", paid: true,  "type": "Joining", "period": "29-Mar-2025", "amount": 300 },
-    { "id": 2, "name": "Kanaran", paid: false,  "type": "Monthly", "period": "01-Feb-2025", "amount": 300 },
-    { "id": 3, "name": "Paappan", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 250 },
-    { "id": 4, "name": "Thankachan", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
-    { "id": 5, "name": "Akka", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 250 },
-    { "id": 6, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
-    { "id": 7, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
-    { "id": 8, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
-    { "id": 9, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
-    { "id": 11, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
-    { "id": 12, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
-]
-
 const duesByMember = [
     {
         "club": "TCS Kochi Cricket Club",
@@ -113,6 +99,77 @@ export const getDuesGroupByMember = async (clubId: number) => {
     return duesGroupByMembers
 }
 
+
+
+let feesFeb: Fee[] = [
+    { "id": 1, "name": "Rejith Ramakrishnan", paid: true,  "type": "Joining", "period": "29-Mar-2025", "amount": 300 },
+    { "id": 2, "name": "Kanaran", paid: false,  "type": "Monthly", "period": "01-Feb-2025", "amount": 300 },
+    { "id": 3, "name": "Paappan", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 250 },
+    { "id": 4, "name": "Thankachan", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 5, "name": "Akka", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 250 },
+    { "id": 6, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 7, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 8, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 9, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 11, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 12, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+]
+
+
+
+let feesMar: Fee[] = [
+    { "id": 1, "name": "Rejith Ramakrishnan", paid: false,  "type": "Joining", "period": "29-Mar-2025", "amount": 300 },
+    { "id": 2, "name": "Kanaran", paid: false,  "type": "Monthly", "period": "01-Feb-2025", "amount": 300 },
+    { "id": 3, "name": "Paappan", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 250 },
+]
 export const getFeeByMembers = async (clubId: number, periodValue:string|undefined) => {
-    return fees.sort((a,b) => a.paid == b.paid ? 1 : 0)
+    if (periodValue == 'mar')
+        return feesMar
+    else
+        return feesFeb
+}
+
+
+export const getFeeStructure = async (clubId: number) =>{
+    return {
+        "Fee Period": "MONTHLY",
+        "Fee": "300",            
+    }
+}
+
+
+export const getFeeExemptions = async (clubId: number) =>{
+    return {
+        "Injury": "250",   
+        "Leave": "0",        
+    }
+}
+
+
+export const getAdhocFees = async (clubId: number) =>{
+    return {
+        "Joining": "1500",   
+        "Re - Joining": "1000",        
+    }
+}
+
+export const getNextPeriodFee = async (clubId: number) => {
+    return [
+        {
+            memberId: 1,
+            name: "Rejith RamakrishnanRamakrishnanRamakrishnanRamakrishnan",
+            amount: 300,
+            exemption: null,            
+        },{
+            memberId: 2,
+            name: "Anoop",
+            amount: 0,
+            exemption: "Leave",            
+        },{
+            memberId: 3,
+            name: "Kiran",
+            amount: 50,
+            exemption: "Injury",            
+        }
+    ]
 }

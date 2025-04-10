@@ -1,8 +1,8 @@
-import { RefreshControl, ScrollView, Text } from 'react-native'
+import { RefreshControl, ScrollView, Text, View } from 'react-native'
 import { useRouter } from 'expo-router/build/hooks';
 import FloatingMenu from '@/src/components/FloatingMenu';
 import UpcomingMatches from './upcoming_matches';
-import FeeSummary from './fee_summary';
+import FeeSummary from './dues';
 import { useContext, useState } from 'react';
 import UpcomingEvents from './upcoming_events';
 import { AuthContext } from '../../context/AuthContext';
@@ -22,12 +22,13 @@ const ClubMain = () => {
   return (
     <>
       {/* <FloatingProfileMenu photo={userInfo?.photo} /> */}
+      <View style={{ marginTop: 25 }} />
       < ScrollView refreshControl={< RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <UpcomingMatches memberEmail={userInfo?.email} />
         <FeeSummary memberEmail={userInfo?.email} />
         <UpcomingEvents memberEmail={userInfo?.email} />
       </ScrollView >
-      <FloatingMenu onPress={gotoClubs} />
+      <FloatingMenu onPress={gotoClubs} icon={"assured-workload"}/>
     </>
   )
 }

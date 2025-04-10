@@ -4,17 +4,11 @@ import React from "react";
 export default function ClubLayout() {
   return (
     <Stack>
-      <Stack.Screen
-        name="index" // This is the name of the page and must match the url from root
-        options={{
-          title: 'My Clubs',
-          headerShown:true
-        }}
-      />     
+      <Stack.Screen name="index" options={{title: 'My Clubs', headerShown:true}}/>     
       <Stack.Screen
         name="clubdetails" // This is the name of the page and must match the url from root
         options={{
-          title: 'Clubs details',
+          title: `Club details`,
           headerShown:true
         }}
       />     
@@ -31,7 +25,14 @@ export default function ClubLayout() {
           title: 'Fees',
           headerShown:false
         }}
-      />       
+      />               
+      <Stack.Screen
+        name="(attendance)" // This is the name of the page and must match the url from root
+        options={{
+          title: 'Attendance',
+          headerShown:false
+        }}
+      />   
     </Stack>
   )
 }

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 
 const ThemedButton = (props: { title: string; onPress: any; disabled?: boolean; styles?: any}) => {
@@ -17,7 +17,8 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        padding: 15
+        padding: 15,
+        borderRadius: 5
     },
     text: {
         color: "white",

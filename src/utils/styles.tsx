@@ -8,6 +8,13 @@ export const appStyles = StyleSheet.create({
         width: "80%",
         alignSelf: "center",
     },
+    heading: {
+        margin: 15,
+        fontWeight: "bold",
+        fontSize: 20,
+        width: "80%",
+        alignSelf: "center",
+    },
     shadowBox: {
         padding: 10,
         flexDirection: "row",
@@ -16,6 +23,7 @@ export const appStyles = StyleSheet.create({
         alignItems: "center",
         flexWrap:"wrap",
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+        borderRadius: 5
     },
     centerItems: {
         flex: 1,

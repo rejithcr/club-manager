@@ -16,6 +16,5 @@ export let matches : Match[] = [
 ]
 
 export const getMatches = async (memberEmail: string) => {
-    await sleep(5000)
     return matches
 }

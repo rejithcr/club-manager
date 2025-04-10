@@ -33,8 +33,8 @@ const ClubMain = () => {
             </TouchableCard>
           )}
         />
-      </View>
-      <FloatingMenu onPress={showCreateClub} />
+      </View>      
+      <FloatingMenu onPress={showCreateClub} icon={"add"}/>
     </>
   )
 }

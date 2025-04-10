@@ -8,7 +8,7 @@ export interface Club {
 }
 
 export let clubs : Club[] = [
-    { "id": 1, "name": "TCS Kochi", "createdDate": "01-Jan-2024", "admin": "Rejith", "captian": "Rejith"},
+    { "id": 1, "name": "TCS Kochi Cricket Club", "createdDate": "01-Jan-2024", "admin": "Rejith", "captian": "Rejith"},
     { "id": 2, "name": "Crick-IT", "createdDate": "01-Jan-2024", "admin": "Navaneeth", "captian": "Navaneeth"},
     { "id": 3, "name": "Guts n Glory", "createdDate": "01-Jan-2024", "admin": "Jaish","captian": "Vimal"},
     

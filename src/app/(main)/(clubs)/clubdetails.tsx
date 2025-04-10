@@ -6,8 +6,11 @@ import KeyValueUI from '@/src/components/KeyValueUI'
 import { appStyles } from '@/src/utils/styles'
 import ThemedButton from '@/src/components/ThemedButton'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import FloatingMenu from '@/src/components/FloatingMenu'
+import { FloatingAction } from "react-native-floating-action";
 import ClubFeeSummary from './(fees)/ClubFeeSummary'
+import { FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
+import { Colors } from 'react-native/Libraries/NewAppScreen'
+import { router } from 'expo-router'
 
 const ClubDetails = () => {
     const [refreshing, setRefreshing] = useState(false)
@@ -32,7 +35,7 @@ const ClubDetails = () => {
     const showFeeByMember = (event: GestureResponderEvent): void => {
         router.push(`/(main)/(clubs)/(fees)/payments?clubId=${clubDetails?.id}&clubName=${clubDetails?.name}`)
     }
-    
+
     // const setClubAsDefault = async () => {
     //     try {
     //         clubDetails && await AsyncStorage.setItem('defaultClubId', clubDetails.id.toString());
@@ -52,15 +55,44 @@ const ClubDetails = () => {
                 <KeyValueUI data={clubDetails} hideKeys={["id", "name", "createdDate"]} />
                 <View style={{ marginBottom: 20 }} />
                 {/* <ThemedButton title="Set as default club" opnPress={setClubAsDefault} /> */}
-                    <ClubFeeSummary clubId={clubDetails?.id} clubName={clubDetails?.name} 
-                    showClubDues={showClubDues} showFeeByMember={showFeeByMember}/>
+                <ClubFeeSummary clubId={clubDetails?.id} clubName={clubDetails?.name}
+                    showClubDues={showClubDues} showFeeByMember={showFeeByMember} />
 
                 <View style={{ marginBottom: 20 }} />
                 <ThemedButton title="Show Members" onPress={() => showMembers(Number(clubDetails?.id))} />
             </ScrollView>
-            <FloatingMenu onPress={undefined} />
+            <FloatingAction actions={actions} position={"left"} color='black' tintColor='red'
+                floatingIcon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
+                onPressItem={name => handleMenuPress(name, clubDetails?.id, clubDetails?.name)}
+            />
         </GestureHandlerRootView>
     )
 }
 
+const handleMenuPress = (name: string | undefined, clubId: number | undefined, clubBame: string | undefined) => {
+    if (name == "define_fees") {
+        router.push(`/(main)/(clubs)/(fees)?clubId=${clubId}&clubName=${clubBame}`)
+    } else if (name == "attendance") {
+        router.push(`/(main)/(clubs)/(attendance)?clubId=${clubId}&clubBame=${clubBame}`)
+    } else {
+        throw ("Error")
+    }
+}
+
+const actions = [
+    {
+        color: "black",
+        text: "Define Fee",
+        icon: <FontAwesome6 name={"cash-register"} size={15} color={"white"} />,
+        name: "define_fees",
+        position: 2
+    },
+    {
+        color: "black",
+        text: "Attendance",
+        icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
+        name: "attendance",
+        position: 1
+    },
+];
 export default ClubDetails

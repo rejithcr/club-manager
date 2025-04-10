@@ -27,6 +27,7 @@ const styles = StyleSheet.create({
         width: "80%",
         alignSelf: "center",
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+        borderRadius: 5
     },
     item: {
         width: "100%",
