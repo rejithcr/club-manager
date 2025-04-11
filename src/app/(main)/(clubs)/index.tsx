@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router/build/hooks';
 import FloatingMenu from '@/src/components/FloatingMenu';
 import { getClubs } from '@/src/helpers/club_helper';
 import TouchableCard from '@/src/components/TouchableCard';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 const ClubMain = () => {
   const [clubs, setClubs] = useState<any>([]);
@@ -28,13 +28,15 @@ const ClubMain = () => {
                 justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
               }}>
                 <Text style={{ fontWeight: "bold" }}> {item.name}</Text>
-                <MaterialCommunityIcons  size={20} name={'chevron-right-circle'} />
+                <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
               </View>
             </TouchableCard>
           )}
         />
-      </View>      
-      <FloatingMenu onPress={showCreateClub} icon={"add"}/>
+      </View>
+      <FloatingMenu onPressMain={showCreateClub}
+        icon={<MaterialIcons name={"add"} size={32} color={"white"} />} 
+        />
     </>
   )
 }

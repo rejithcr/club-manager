@@ -108,11 +108,19 @@ let feesFeb: Fee[] = [
     { "id": 4, "name": "Thankachan", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
     { "id": 5, "name": "Akka", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 250 },
     { "id": 6, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
-    { "id": 7, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 7, "name": "Test", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
     { "id": 8, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
-    { "id": 9, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 9, "name": "Why M", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
     { "id": 11, "name": "Akachi", paid: false,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
     { "id": 12, "name": "Mohavalli", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 13, "name": "Diya", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 14, "name": "Sobha", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 15, "name": "George", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 16, "name": "Another Person", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 17, "name": "Cycle", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 18, "name": "Amma", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 19, "name": "Eva", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
+    { "id": 20, "name": "YP", paid: true,  "type": "Monthly", "period": "01-Mar-2025", "amount": 300 },
 ]
 
 

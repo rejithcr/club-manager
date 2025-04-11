@@ -6,6 +6,7 @@ import FeeSummary from './dues';
 import { useContext, useState } from 'react';
 import UpcomingEvents from './upcoming_events';
 import { AuthContext } from '../../context/AuthContext';
+import { MaterialIcons } from '@expo/vector-icons';
 
 
 const ClubMain = () => {
@@ -28,7 +29,10 @@ const ClubMain = () => {
         <FeeSummary memberEmail={userInfo?.email} />
         <UpcomingEvents memberEmail={userInfo?.email} />
       </ScrollView >
-      <FloatingMenu onPress={gotoClubs} icon={"assured-workload"}/>
+      <FloatingMenu
+        onPressMain={gotoClubs}
+        icon={<MaterialIcons name={"assured-workload"} size={32} color={"white"} />}        
+      />
     </>
   )
 }

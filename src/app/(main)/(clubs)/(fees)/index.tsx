@@ -8,6 +8,7 @@ import { getFeeStructure, getFeeExemptions, getAdhocFees } from '@/src/helpers/f
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import FloatingMenu from '@/src/components/FloatingMenu'
 import { router } from 'expo-router'
+import { MaterialIcons } from '@expo/vector-icons'
 
 const Fees = () => {
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
@@ -58,7 +59,9 @@ const Fees = () => {
         {!isLoadingAdhoc && <KeyValueUI data={adhocFees} />}
         <View style={{ marginBottom: 20 }} />
       </ScrollView>
-      <FloatingMenu onPress={() => gotoFeeCollection()} icon={"add"}/>
+      <FloatingMenu onPressMain={() => gotoFeeCollection()} 
+        icon={<MaterialIcons name={"add"} size={32} color={"white"} />}
+      />
     </GestureHandlerRootView>
   )
 }

@@ -50,10 +50,10 @@ const StartNextPeriod = () => {
                 alignSelf: "center"
             }}>
                 <Text numberOfLines={1} style={{
-                    ...appStyles.title, lineHeight: 80,
+                    ...appStyles.title, 
                     width: "75%", textAlign: "left", marginLeft: 0
                 }}>{params.get("clubName")}</Text>
-                <Text style={{ width: "35%", lineHeight: 80, fontWeight: "bold", textAlign: "right" }}>2025 MAR</Text>
+                <Text style={{ width: "25%", textAlignVertical:"center", fontWeight: "bold" }}>2025 MAR</Text>
             </View>
             <View style={{ height: "78%", alignItems: "flex-end" }}>
                 {isLoading && <LoadingSpinner />}

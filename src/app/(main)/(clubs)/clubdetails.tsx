@@ -11,6 +11,7 @@ import ClubFeeSummary from './(fees)/ClubFeeSummary'
 import { FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { Colors } from 'react-native/Libraries/NewAppScreen'
 import { router } from 'expo-router'
+import FloatingMenu from '@/src/components/FloatingMenu'
 
 const ClubDetails = () => {
     const [refreshing, setRefreshing] = useState(false)
@@ -61,9 +62,9 @@ const ClubDetails = () => {
                 <View style={{ marginBottom: 20 }} />
                 <ThemedButton title="Show Members" onPress={() => showMembers(Number(clubDetails?.id))} />
             </ScrollView>
-            <FloatingAction actions={actions} position={"left"} color='black' tintColor='red'
-                floatingIcon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-                onPressItem={name => handleMenuPress(name, clubDetails?.id, clubDetails?.name)}
+            <FloatingMenu actions={actions} position={"left"} color='black' 
+                icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
+                onPressItem={(name: string | undefined) => handleMenuPress(name, clubDetails?.id, clubDetails?.name)}
             />
         </GestureHandlerRootView>
     )

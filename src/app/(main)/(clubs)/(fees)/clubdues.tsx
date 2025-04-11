@@ -66,11 +66,12 @@ const DueItems = (props: { dues: Dues["dues"] }) => {
   }, [])
   return (
     <>
-      <Text>{JSON.stringify(props.dues)}</Text>
       {duesLocal?.map((due) => {
-        <View style={appStyles.centerify}>
-        <Text style={{width: "100%"}}key={due.id}>{due.amount}111</Text>
-        </View>
+        return (
+          <View style={appStyles.centerify}>
+            <Text style={{ width: "100%" }} key={due.id}>{due.amount}</Text>
+          </View>
+        )
       })}
     </>
   )

@@ -63,7 +63,7 @@ const Payments = () => {
                     <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
                         <Text style={appStyles.heading}>Confirm Updates</Text>
                         {paymentStatusUpdates.map((item) => {
-                            return <PaymentUpdates {...item} />
+                            return <PaymentUpdates key={item.id} {...item} />
                         })}
                         <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
                             <ThemedButton title="Update" onPress={() => setIsConfirmVisible(false)} />
