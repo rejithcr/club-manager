@@ -1,7 +1,8 @@
-import { View, TextInput, StyleSheet } from 'react-native'
+import { View, TextInput, Text, StyleSheet } from 'react-native'
 import React from 'react'
 
 const InputText = (props: { 
+  label?: string; 
   placeholder: string; 
   value?: string; 
   keyboardType?: any;
@@ -10,7 +11,8 @@ const InputText = (props: {
   onChangeText?: any;
   blurOnSubmit?: any }) => {
   return (
-    <View>
+    <View style={styles.container}>
+      <Text style={styles.label}>{props.label || props.placeholder }</Text>
       <TextInput style={styles.input} {...props} onChangeText={props.onChangeText}/>
     </View>
   )
@@ -19,14 +21,19 @@ const InputText = (props: {
 export default InputText
 
 const styles = StyleSheet.create({
-  input: {
+  container:{
     width: "80%",
-    fontSize: 15,
-    height: 40,
+    alignSelf: "center",
     borderBottomColor: "grey",
     borderBottomWidth: 1,
-    alignSelf: "center",
-    margin: 10,
-    paddingLeft: 5
+    margin: 10
+  },
+  label:{
+    fontSize: 10
+  },
+  input: {
+    width: "100%",
+    fontSize: 15,
+    height: 35,
   }
 })

@@ -9,7 +9,7 @@ import { ScrollView } from 'react-native-gesture-handler';
 
 const ClubFeeSummary = (props: {
   clubId: number | undefined;
-  clubName: string | undefined;
+  clubName: string | null | undefined;
   showClubDues: any | undefined;
   showFeeByMember: any | undefined
 }) => {
@@ -25,10 +25,10 @@ const ClubFeeSummary = (props: {
   return (
     <ScrollView>
       <View>
-        <Text style={appStyles.title}>Fee Summary</Text>
+        {/* <Text style={appStyles.title}>Fee Summary</Text> */}
         {isLoading && <LoadingSpinner />}
         {!isLoading && feeSummary &&
-          <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15 }}>
+          <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 5 }}>
             <View style={{ width: "100%", flexDirection: "row", flexWrap: "wrap" }}>
               <View style={{
                 flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
@@ -60,13 +60,13 @@ const ClubFeeSummary = (props: {
                 <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
                   <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
                 </View>
-              </TouchableOpacity> 
+              </TouchableOpacity>
               <View style={styles.divider} />
               <TouchableOpacity onPress={props.showFeeByMember} style={{
                 flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
                 justifyContent: "space-between", flexWrap: "wrap"
               }}>
-                <Text style={{ fontSize: 15 }}>Adhoc Payments</Text>
+                <Text style={{ fontSize: 15 }}>Adhoc Fee Payments</Text>
                 <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
                   <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
                 </View>

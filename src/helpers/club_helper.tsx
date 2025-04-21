@@ -18,6 +18,11 @@ export const getClubs = () => {
     return clubs
 }
 
+export const createClub = (club: {name: string; admin: string}) => {
+    clubs.push({id: clubs.length + 1, "name": club.name, admin: club.admin})
+    return clubs
+}
+
 export const getClubDetails = (id: number) => {
     return clubs.find(clubs => clubs.id == id)
 }

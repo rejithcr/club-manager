@@ -45,7 +45,7 @@ const Payments = () => {
     return (
         <GestureHandlerRootView>
             <Text style={appStyles.title}>{params.get("clubName")}</Text>
-            <View style={{ height: "78%", alignItems: "flex-end" }}>
+            <View style={{ height: "78%" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <FlatList style={{ width: "100%" }}

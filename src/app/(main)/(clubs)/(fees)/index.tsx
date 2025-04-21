@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from 'react-native'
+import { View, Text, ScrollView, GestureResponderEvent } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import KeyValueUI from '@/src/components/KeyValueUI'
@@ -9,6 +9,7 @@ import LoadingSpinner from '@/src/components/LoadingSpinner'
 import FloatingMenu from '@/src/components/FloatingMenu'
 import { router } from 'expo-router'
 import { MaterialIcons } from '@expo/vector-icons'
+import ClubFeeSummary from './ClubFeeSummary'
 
 const Fees = () => {
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
@@ -40,12 +41,21 @@ const Fees = () => {
 
   }, [])
 
-  const gotoFeeCollection =  () => router.push(`/(main)/(clubs)/(fees)/startcollection?clubId=${params.get("clubId")}&clubName=${params.get("clubName")}`)
-
+  const gotoFeeCollection = () => router.push(`/(main)/(clubs)/(fees)/startcollection?clubId=${params.get("clubId")}&clubName=${params.get("clubName")}`)
+  const showClubDues = (_: GestureResponderEvent): void => {
+    router.push(`/(main)/(clubs)/(fees)/clubdues?clubId=${params.get("clubId")}&clubName=${params.get("clubName")}`)
+  }
+  const showFeeByMember = (_: GestureResponderEvent): void => {
+    router.push(`/(main)/(clubs)/(fees)/payments?clubId=${params.get("clubId")}&clubName=${params.get("clubName")}`)
+  }
   return (
     <GestureHandlerRootView>
       <ScrollView>
         <Text style={appStyles.title}>{params.get("clubName")}</Text>
+        {/* <ThemedButton title="Set as default club" opnPress={setClubAsDefault} /> */}
+        <ClubFeeSummary clubId={Number(params.get("clubId"))} clubName={params.get("clubName")}
+          showClubDues={showClubDues} showFeeByMember={showFeeByMember} />
+
         <Text style={appStyles.heading}>Current Fee</Text>
         {isLoadingCurrent && <LoadingSpinner />}
         {!isLoadingCurrent && <KeyValueUI data={currentFeeStructure} />}
@@ -53,13 +63,13 @@ const Fees = () => {
         {isLoadingExemptions && <LoadingSpinner />}
         {!isLoadingExemptions && <KeyValueUI data={feeExemptions} />}
         <View style={{ marginBottom: 20 }} />
-        
+
         <Text style={appStyles.heading}>Adhoc Fees</Text>
         {isLoadingAdhoc && <LoadingSpinner />}
         {!isLoadingAdhoc && <KeyValueUI data={adhocFees} />}
         <View style={{ marginBottom: 20 }} />
       </ScrollView>
-      <FloatingMenu onPressMain={() => gotoFeeCollection()} 
+      <FloatingMenu onPressMain={() => gotoFeeCollection()}
         icon={<MaterialIcons name={"add"} size={32} color={"white"} />}
       />
     </GestureHandlerRootView>

@@ -55,7 +55,7 @@ const StartNextPeriod = () => {
                 }}>{params.get("clubName")}</Text>
                 <Text style={{ width: "25%", textAlignVertical:"center", fontWeight: "bold" }}>2025 MAR</Text>
             </View>
-            <View style={{ height: "78%", alignItems: "flex-end" }}>
+            <View style={{ height: "78%" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <FlatList style={{ width: "100%" }}

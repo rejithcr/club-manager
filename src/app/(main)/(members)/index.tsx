@@ -5,6 +5,7 @@ import MemberItem from "@/src/components/MemberItem";
 import { useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import { useSearchParams } from "expo-router/build/hooks";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export default function Home() {
   const [members, setMembers] = useState<any>([]);
@@ -32,7 +33,7 @@ export default function Home() {
         )}
       />
     </View>
-    <FloatingMenu onPress={showAddMember} icon={"add"}/>
+    <FloatingMenu onPressMain={showAddMember} icon={<MaterialIcons name={"add"} size={32} color={"white"} />}/>
     </>
   );
 }

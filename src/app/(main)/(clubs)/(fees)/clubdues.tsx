@@ -1,11 +1,13 @@
-import { Text, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text, StyleSheet, TouchableOpacity, View, FlatList } from 'react-native';
 import React, { useEffect, useState } from 'react'
 import { appStyles } from '@/src/utils/styles';
-import { Dues, getDuesGroupByMember } from '@/src/helpers/fee_helper';
+import { Dues, Fee, getDuesGroupByMember } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { useSearchParams } from 'expo-router/build/hooks';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import ThemedButton from '@/src/components/ThemedButton';
+import Checkbox from 'expo-checkbox';
 
 const ClubDues = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +34,7 @@ const ClubDues = () => {
             <MemberDue key={member.memberId} member={member} />
           )}
         </View>
+        <ThemedButton title='Mark as paid' onPress={() => null} />
       </ScrollView>
     </GestureHandlerRootView>
   )
@@ -53,32 +56,37 @@ const MemberDue = (props: { member: any }) => {
         <Text style={{ width: "65%", fontSize: 15, paddingLeft: 5 }}>{props?.member.name}</Text>
         <Text style={{ width: "25%", fontWeight: "bold", fontSize: 15 }}> Rs. {props?.member.total} </Text>
       </TouchableOpacity>
-      {isShown && <DueItems dues={props?.member.dues} />}
+      {isShown &&
+        props?.member.dues.map((item: { id: number; type: string; amount: number; }) =>
+          <MemberFeeItem {...item} key={item.id} />
+        )
+      }
       <View style={styles.divider} />
     </View>
   )
 }
 
-const DueItems = (props: { dues: Dues["dues"] }) => {
-  const [duesLocal, setDuesLocal] = useState<Dues["dues"]>()
-  useEffect(() => {
-    setDuesLocal(props.dues)
-  }, [])
-  return (
-    <>
-      {duesLocal?.map((due) => {
-        return (
-          <View style={appStyles.centerify}>
-            <Text style={{ width: "100%" }} key={due.id}>{due.amount}</Text>
-          </View>
-        )
-      })}
-    </>
-  )
-}
-
 export default ClubDues
 
+const MemberFeeItem = (props: {
+  id: number;
+  type: string;
+  amount: number;
+}) => {
+
+  return (
+    <TouchableOpacity onPress={undefined}>
+      <View style={{
+        ...appStyles.shadowBox, width: "90%", marginBottom: 15, flexWrap: "wrap",
+        flexBasis: "auto"
+      }}>
+        <View style={{ width: "5%" }}><Checkbox value={false} color={"black"} /></View>
+        <Text style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.type}</Text>
+        <Text style={{ width: "25%", fontSize: 15, textAlign: "right" }}>{props?.amount}</Text>
+      </View>
+    </TouchableOpacity>
+  )
+}
 
 const styles = StyleSheet.create({
   item: {

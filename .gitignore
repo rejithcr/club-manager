@@ -42,3 +42,8 @@ app-example
 google/
 troubleshooting.txt
 **/keys.tsx
+
+#backend
+backend/build
+backend/.env
+backend/__pycache__

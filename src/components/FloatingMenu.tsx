@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, GestureResponderEvent } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, GestureResponderEvent, Pressable } from 'react-native'
 import React, { useState } from 'react'
 
 
@@ -18,16 +18,23 @@ const FloatingMenu = (props: {
         setActionItems(props.actions)
         setIsActionsVisible(prev => !prev)
     }
+    const onActionItemsPress = (actionName: string | undefined) => {
+        setIsActionsVisible(prev => !prev)
+        props.onPressItem(actionName)
+    }
     return (
+        <>
+        {isActionsVisible && <Pressable style={styles.backdrop} onPress={()=>  setIsActionsVisible(prev => !prev)}
+            />}
         <View style={styles.container}>
             {
                 !props?.onPressMain && isActionsVisible && actionsItems?.map(
                     (action: { icon: any | undefined; text: string | undefined; name: string | undefined}) => {
                         return (
-                            <TouchableOpacity 
+                            <TouchableOpacity
                                 key={action.name}    
                                 style={styles.menuItem} 
-                                onPress={() => props.onPressItem(action?.name)}>
+                                onPress={() => onActionItemsPress(action?.name)}>
                                 <View style={styles.menuIcon} >
                                     { action.icon }
                                 </View>
@@ -41,12 +48,19 @@ const FloatingMenu = (props: {
                 {props.icon}
             </TouchableOpacity>
         </View>
+        </>
     )
 }
 
 export default FloatingMenu
 
 const styles = StyleSheet.create({
+    backdrop:{
+        position: "absolute",
+        backgroundColor: "rgba(0, 0, 0, 0.25)",
+        width: "100%",
+        height: "100%"
+    },
     container: {
         bottom: 30,
         left: 30,
