@@ -1,11 +1,12 @@
 import json
+import os
 
 import db
 import factory
 
 def handler(event, context):
 
-    if event["headers"].get("auth-token") != "1eHiGVThUpRVGI8Xr4Qw4I7WDvIzsFTLWmAWf2ZMgtzWHqLQLOFeiO01DUhdawIk":
+    if event["headers"].get("auth-token") != os.environ.get('AUTH_TOKEN'):
         return { "code": 400, "status": "ERROR", "message": "Unauthorized. Please pass valid token" }
 
     params = factory.get_params(event)

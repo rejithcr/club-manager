@@ -1,8 +1,9 @@
+import os
 import main
 
 payload = {
         "headers": {
-            "auth-token": "1eHiGVThUpRVGI8Xr4Qw4I7WDvIzsFTLWmAWf2ZMgtzWHqLQLOFeiO01DUhdawIk"
+            "auth-token": os.environ.get('AUTH_TOKEN')
         },
         "isBase64Encoded": False,
         "rawPath": "/club",
