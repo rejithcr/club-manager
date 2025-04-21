@@ -3,11 +3,15 @@ import queries_club
 import queries_member
 
 class ClubService():
-    
+
     def get(self, conn, params):
         club_id = params.get('clubId')
+        member_id = params.get('memberId')        
         try:
-            return db.fetch(conn, queries_club.GET_CLUB, (club_id,))
+            if member_id: 
+                return db.fetch(conn, queries_club.GET_CLUBS_BY_MEMBER, (member_id,))
+            else:        
+                return db.fetch(conn, queries_club.GET_CLUB, (club_id,))
         except Exception as e:
             return str(e)
         

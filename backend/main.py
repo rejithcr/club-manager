@@ -5,7 +5,7 @@ import factory
 
 def handler(event, context):
 
-    if event["headers"].get("auth-token") != "test-token":
+    if event["headers"].get("auth-token") != "1eHiGVThUpRVGI8Xr4Qw4I7WDvIzsFTLWmAWf2ZMgtzWHqLQLOFeiO01DUhdawIk":
         return { "code": 400, "status": "ERROR", "message": "Unauthorized. Please pass valid token" }
 
     params = factory.get_params(event)

@@ -2,7 +2,7 @@ import main
 
 payload = {
         "headers": {
-            "auth-token": ""
+            "auth-token": "1eHiGVThUpRVGI8Xr4Qw4I7WDvIzsFTLWmAWf2ZMgtzWHqLQLOFeiO01DUhdawIk"
         },
         "isBase64Encoded": False,
         "rawPath": "/club",
