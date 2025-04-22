@@ -4,12 +4,8 @@ import { useRouter, useSearchParams } from 'expo-router/build/hooks'
 import { Club, getClubDetails } from '@/src/helpers/club_helper'
 import KeyValueUI from '@/src/components/KeyValueUI'
 import { appStyles } from '@/src/utils/styles'
-import ThemedButton from '@/src/components/ThemedButton'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import { FloatingAction } from "react-native-floating-action";
-import ClubFeeSummary from './(fees)/ClubFeeSummary'
 import { FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
-import { Colors } from 'react-native/Libraries/NewAppScreen'
 import { router } from 'expo-router'
 import FloatingMenu from '@/src/components/FloatingMenu'
 

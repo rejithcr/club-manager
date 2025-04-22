@@ -23,10 +23,10 @@ payload = {
             "clubId": "8"
         },
        # "body": "{\"clubName\": \"TCS Kochi\", \"memberId\": 1, \"email\": \"rejith.cr\"}",
-      #  "body": "{\"firstName\": \"Rejith\", \"lastName\": \"CR\", \"phone\": \"8281478847\",\"email\": \"rejith.cr@gmail.com\"}",
+       # "body": "{\"firstName\": \"Rejith\", \"lastName\": \"CR\", \"phone\": \"8281478847\",\"email\": \"rejith.cr@gmail.com\"}",
         "version": "2.0",
         "rawQueryString": ""
     }
 
 
-print(main.handler(payload, None))
+#print(main.handler(payload, None))

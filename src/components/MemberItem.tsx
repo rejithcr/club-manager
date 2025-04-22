@@ -13,10 +13,10 @@ const MemberItem = (props: {
   dateOfBirth: string | undefined;
   dues?: number;
   lastName: string | undefined;
-  id: number;
+  memberId: number;
 }) => {
   return (
-    <TouchableOpacity onPress={()=> props.showDetails(props.id)}>
+    <TouchableOpacity onPress={()=> props.showDetails(props.memberId)}>
       <View style={styles.container}>
         <MaterialIcons style={styles.icon} name={"account-circle"} size={32} />
         <View style={styles.spend}>

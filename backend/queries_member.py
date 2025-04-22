@@ -4,6 +4,11 @@ GET_MEMBER = """
    where member_id = %s
 """
 
+GET_MEMBER_BY_EMAIL = """
+   select member_id, first_name, last_name, email, phone
+   from member
+   where email = %s
+"""
 
 SAVE_MEMBER = """
    insert into member (member_id, first_name, last_name, email, phone, created_by, updated_by) values

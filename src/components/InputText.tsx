@@ -4,7 +4,7 @@ import React from 'react'
 const InputText = (props: { 
   label?: string; 
   placeholder: string; 
-  value?: string; 
+  value?: any; 
   keyboardType?: any;
   ref?: any; 
   onSubmitEditing?: any; 
@@ -34,6 +34,6 @@ const styles = StyleSheet.create({
   input: {
     width: "100%",
     fontSize: 15,
-    height: 35,
+    height: 40
   }
 })

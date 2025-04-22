@@ -6,13 +6,17 @@ import { useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import { useSearchParams } from "expo-router/build/hooks";
 import { MaterialIcons } from "@expo/vector-icons";
+import { getClubMembers } from "@/src/helpers/club_helper";
 
 export default function Home() {
   const [members, setMembers] = useState<any>([]);
   const params = useSearchParams()
   const router = useRouter()
   useEffect(() => {
-    setMembers(getMembers(Number(params.get("clubId"))));
+    getClubMembers(params.get("clubId"))
+    .then( response => {
+      setMembers(response.data)
+    })
   }, []); 
 
   const showDetails = (memberId: number)=> router.push(`/(main)/(members)/memberdetails?id=${memberId}`)
@@ -29,7 +33,7 @@ export default function Home() {
         //onEndReached={fetchNextPage}
         //onEndReachedThreshold={0.5}
         renderItem={({ item }) => (
-          <MemberItem {...item} key={item.id} showDetails={showDetails}/>
+          <MemberItem {...item} key={item.member_id} showDetails={showDetails}/>
         )}
       />
     </View>

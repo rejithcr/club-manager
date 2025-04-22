@@ -8,11 +8,13 @@ import { ActivityIndicator, View } from 'react-native'
 import { appStyles } from '@/src/utils/styles'
 import { AuthContext } from '../../context/AuthContext';
 import { ANDROID_CLIENT_ID, WEB_CLIENT_ID } from '@/src/utils/keys'
+import { getMemberByEmail } from '@/src/helpers/member_helper'
+
 
 WebBrowser.maybeCompleteAuthSession()
 
 const AuthHome = () => {
-  const {setUserInfo} = useContext(AuthContext)
+  const { setUserInfo } = useContext(AuthContext)
 
   const [isLoading, setLoading] = useState(true)
   const [_, response, promptAsyc] = Google.useAuthRequest({
@@ -24,37 +26,51 @@ const AuthHome = () => {
   const router = useRouter()
 
   useEffect(() => {
-    setUserInfo({"email": "rejithramakrishnan@gmail.co"})
-    router.replace('/(main)')
     validateLogin()
   }, [response])
 
-  const validateLogin = async () => {
-    const userInfo = await AsyncStorage.getItem("userInfo");
+  const validateLogin = () => {
+    //const userInfo = await AsyncStorage.getItem("userInfo");
+    const userInfo = "{\"email\": \"rejithramakrishnan@gmail.com\"}"
+    console.log(userInfo)
     if (userInfo) {
       setUserInfo(JSON.parse(userInfo))
-      router.replace('/(main)')
+      registerMember(JSON.parse(userInfo).email)
     } else {
       gettUserInfo()
     }
   }
+
+  const registerMember = async (email: string) => {
+    getMemberByEmail(email).then( async response => {
+      const userInfoFromCache = await AsyncStorage.getItem("userInfo");
+      let ui = JSON.parse(userInfoFromCache || '{}')
+      if (response.data) {
+        ui.memberId = response.data.member_id
+        setUserInfo(ui) 
+        router.replace('/(main)')
+      } else {
+        setUserInfo(ui) 
+        router.replace(`/(main)/(members)/addmember?createMember=true&name=${ui.name}`)
+      }
+    })
+  }
+
   const gettUserInfo = async () => {
     const url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
     try {
       if (response?.type == "success") {
         const userInfoResponse = await fetch(url + response?.authentication?.accessToken);
-        const userInfoJson = await userInfoResponse.json();
-        console.log(userInfoJson)
+        const userInfoJson = await userInfoResponse.json();        
         const userInfo = {
-          email: userInfoJson?.email, 
+          email: userInfoJson?.email,
           name: userInfoJson?.name,
           photo: userInfoJson?.picture,
-          phone: undefined 
+          phone: undefined
         }
         await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo))
-        setUserInfo(userInfo)        
-        router.replace('/(main)')
-      } else {
+        registerMember(userInfo.email)
+      } else if (response) {
         throw "Authentication error. Try again. " + JSON.stringify(response)
       }
     } catch (error) {

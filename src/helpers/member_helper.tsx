@@ -1,6 +1,8 @@
+import { get, post } from '@/src/utils/api'
+
 export interface Member {
     id: number;
-    clubs: number[];
+    clubs?: number[];
     firstName: string;
     lastName?: string;
     phone?: number;
@@ -23,7 +25,7 @@ export let members : Member[] = [
 ]
 
 export const getMembers = (clubId: number) => {
-    return members.filter(member => member.clubs.includes(clubId))
+    return members.filter(member => member.clubs?.includes(clubId))
 }
 
 export const getMemberDetails = (id: number) => {
@@ -36,5 +38,9 @@ export const getMemberByPhone = (phone: number) => {
 }
 
 export const getMemberByEmail = (email: string) => {
-    return members.find(member => member.email == email)
+    return get("/member", {email: email})
+}
+
+export const addMember = async (member: any) => {
+    return post("/member", null, member)
 }

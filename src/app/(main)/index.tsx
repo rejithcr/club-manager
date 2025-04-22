@@ -7,6 +7,8 @@ import { useContext, useState } from 'react';
 import UpcomingEvents from './upcoming_events';
 import { AuthContext } from '../../context/AuthContext';
 import { MaterialIcons } from '@expo/vector-icons';
+import ThemedButton from '@/src/components/ThemedButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const ClubMain = () => {
@@ -19,6 +21,11 @@ const ClubMain = () => {
 
   const onRefresh = () => {
   };
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("userInfo")
+    router.replace("/(auth)")
+  }
 
   return (
     <>
@@ -33,6 +40,7 @@ const ClubMain = () => {
         onPressMain={gotoClubs}
         icon={<MaterialIcons name={"assured-workload"} size={32} color={"white"} />}        
       />
+      <ThemedButton onPress={logout} title={'Logout'} />
     </>
   )
 }
