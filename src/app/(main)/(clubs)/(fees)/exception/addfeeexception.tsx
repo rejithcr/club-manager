@@ -28,12 +28,7 @@ const AddFeeException = () => {
         if (validate(exceptionType, exceptionAmount)) {
             setIsLoading(true)
             addExceptionType(clubFeeTypeId, exceptionType, exceptionAmount, exceptionMembers, userInfo.email)
-                .then(_response => {
-                    router.dismissTo({
-                        pathname: "/(main)/(clubs)/(fees)/feetypedetails",
-                        params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName") }
-                    })
-                })
+                .then(() => router.back())
                 .catch((error) => alert(error?.message))
                 .finally(() => setIsLoading(false))
         }
@@ -80,10 +75,9 @@ const AddFeeException = () => {
 
     return (
         <View>
-            <Text style={{ ...appStyles.heading }}>Add Exception</Text>
             <View style={{ marginBottom: 20 }}>
                 <InputText label='Exception Type' onChangeText={setExceptionType} />
-                <InputText label='Amount' keyboardType={"numeric"} onChangeText={setExceptionAmount} editable={false}/>
+                <InputText label='Amount' keyboardType={"numeric"} onChangeText={setExceptionAmount}/>
             </View>
             <Text style={{ ...appStyles.heading }}>Select Members</Text>
             {isLoading && <LoadingSpinner />}

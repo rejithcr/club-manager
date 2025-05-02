@@ -51,9 +51,16 @@ export default function FeesLayout() {
         }}
       />     
       <Stack.Screen
-        name="addfeeexception" // This is the name of the page and must match the url from root
+        name="exception/addfeeexception" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Fee Exception"} clubName={params.get("clubName")} />,
+          headerTitle: (props) => <FeeHeader header={"Add Fee Exception"} clubName={params.get("clubName")} />,
+          headerShown:true
+        }}
+      />     
+      <Stack.Screen
+        name="exception/editfeeexception" // This is the name of the page and must match the url from root
+        options={{
+          headerTitle: (props) => <FeeHeader header={"Edit Fee Exception"} clubName={params.get("clubName")} />,
           headerShown:true
         }}
       />     

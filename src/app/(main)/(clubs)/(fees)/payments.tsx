@@ -1,20 +1,19 @@
 import { View, Text, FlatList, TouchableOpacity, Button } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
-import { Fee, getFeePayments, saveFeePayments } from '@/src/helpers/fee_helper';
+import { getFeePayments, saveFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
 import Checkbox from 'expo-checkbox';
 import ThemedButton from '@/src/components/ThemedButton';
-import { Picker } from '@react-native-picker/picker';
 import Modal from 'react-native-modal';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AuthContext } from '@/src/context/AuthContext';
+import { router } from 'expo-router';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [reload, setReload] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
     const [feeByMembers, setFeeByMembers] = useState<any | undefined>(undefined);
     const [paymentStatusUpdates, setPaymentStatusUpdates] = useState<{
@@ -33,7 +32,7 @@ const Payments = () => {
             .then(response => { console.log(response.data); setFeeByMembers(response.data) })
             .catch(error => console.error(error))
             .finally(() => setIsLoading(false));
-    }, [reload])
+    }, [])
 
     const updatePaymentStatus = () => {
         if (paymentStatusUpdates.length == 0) {
@@ -47,7 +46,7 @@ const Payments = () => {
         setIsLoading(true)
         setIsConfirmVisible(false)
         saveFeePayments(paymentStatusUpdates, "true", userInfo.email)
-            .then(() => setReload(prev => !prev))
+            .then(() => router.back())
             .catch(error => console.error(error))
             .finally(() => setIsLoading(false));
     }
@@ -60,8 +59,6 @@ const Payments = () => {
                     <FlatList style={{ width: "100%" }}
                         data={feeByMembers}
                         initialNumToRender={8}
-                        //onEndReached={fetchNextPage}
-                        //onEndReachedThreshold={0.5}
                         renderItem={({ item }) => (
                             <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
                         )}

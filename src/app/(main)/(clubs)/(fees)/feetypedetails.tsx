@@ -61,10 +61,7 @@ const FeeTypeDetails = () => {
     );
 
     useEffect(() => {
-        console.log(userInfo)
         setFee(feeObj)
-        setIsLoading(true)
-        setExceptionTypesValue()
     }, [])
 
     const showStartCollectionPage = () => {
@@ -79,9 +76,15 @@ const FeeTypeDetails = () => {
             params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName"), clubFeeCollectionId }
         })
     }
-    const gotoFeeExceptions = (clubFeeTypeExceptionId: string) => {
+    const gotoAddFeeExceptions = () => {
         router.push({
-            pathname: "/(main)/(clubs)/(fees)/addfeeexception",
+            pathname: "/(main)/(clubs)/(fees)/exception/addfeeexception",
+            params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName"), clubFeeTypeId: fee.clubFeeTypeId }
+        })
+    }
+    const gotoEditFeeExceptions = (clubFeeTypeExceptionId: string) => {
+        router.push({
+            pathname: "/(main)/(clubs)/(fees)/exception/editfeeexception",
             params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName"), clubFeeTypeId: fee.clubFeeTypeId, clubFeeTypeExceptionId }
         })
     }
@@ -103,28 +106,28 @@ const FeeTypeDetails = () => {
                 </View>
             </ShadowBox>
             <View>
-
                 <View style={{
                     flexDirection: "row", width: "80%", alignItems: "center",
-                    justifyContent: "flex-start", alignSelf: "center",
+                    justifyContent: "space-between", alignSelf: "center",
                 }}>
-                    <TouchableOpacity onPress={() => setShowAddException(!showAddException)}>
+                    <TouchableOpacity onPress={() => setShowAddException(!showAddException)}
+                        style={{ flexDirection: "row", width: "80%", justifyContent:"flex-start",alignItems: "center"}}>
                         <MaterialCommunityIcons size={25} name={showAddException ? 'chevron-down-circle' : 'chevron-right-circle'} />
+                        <Text style={appStyles.heading}>Exceptions</Text>
                     </TouchableOpacity>
-                    <Text style={appStyles.heading}>Exceptions</Text>
-                    <TouchableOpacity onPress={() => gotoFeeExceptions("false")}>
+                    <TouchableOpacity style={{width:50, alignItems: "center"}} onPress={() => gotoAddFeeExceptions()}>
                         <MaterialCommunityIcons size={25} name={'plus-circle'} />
                     </TouchableOpacity>
                 </View>
                 {showAddException && <View style={{ width: "90%", alignSelf: "center" }}>
                     {(!exceptionTypes?.length || exceptionTypes?.length < 1) && <Text style={{ alignSelf: "center" }}>No exceptions present for this fee type</Text>}
                     {exceptionTypes?.map((et: any) =>
-                        <KeyValueTouchableBox edit key={et.clubFeeTypeExceptionId} onPress={() => gotoFeeExceptions(et.clubFeeTypeExceptionId)} 
+                        <KeyValueTouchableBox edit key={et.clubFeeTypeExceptionId} onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
                             keyName={et.clubFeeTypeExceptionReason} keyValue={`Rs. ${et.clubFeeExceptionAmount}`} />
                     )}
                 </View>
                 }
-                {!showAddException && <ThemedButton title='Start new collection' onPress={showStartCollectionPage} />}
+                <ThemedButton title='Start new collection' onPress={showStartCollectionPage} />
             </View>
             <View style={{ height: 450 }}>
                 <Text style={appStyles.heading}>Collections</Text>
@@ -136,7 +139,8 @@ const FeeTypeDetails = () => {
                         //onEndReached={fetchNextPage}
                         //onEndReachedThreshold={0.5}
                         renderItem={({ item }) => (
-                            <KeyValueTouchableBox onPress={() => gotoPayments(item.clubFeeCollectionId)} keyName={item.clubFeeTypePeriod} keyValue={`${item.collected}`} />
+                            <KeyValueTouchableBox onPress={() => gotoPayments(item.clubFeeCollectionId)} keyName={item.clubFeeTypePeriod} 
+                                keyValue={`${Math.round(item.collected/item.total*100)}%`} />
                         )}
                     />
                 }

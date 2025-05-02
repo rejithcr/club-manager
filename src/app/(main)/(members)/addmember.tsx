@@ -170,7 +170,7 @@ const AddMember = () => {
             {!isLoading && <ScrollView>
                 {showPhoneSearch &&
                     <>
-                        <InputText placeholder='Enter phone number' onChangeText={setSearchNumber} value={searchNumber} keyboardType="numeric" />
+                        <InputText placeholder='Enter phone number' onChangeText={setSearchNumber} defaultValue={searchNumber} keyboardType="numeric" />
                         <ThemedButton title="Search" onPress={searchMember} />
                         <View style={{ marginTop: 25 }} />
                     </>
@@ -181,10 +181,10 @@ const AddMember = () => {
                     <ThemedButton title="Add Member" onPress={() => addMemberToClub(memberDetails)} />
                 </>}
                 {(showRegisterForm || showAddNewMemberForm) && <>
-                    <InputText label="First Name" onChangeText={setFirstName} value={firstName} />
-                    <InputText label="Last Name" onChangeText={setLastName} value={lastName} />
-                    <InputText label="Phone" onChangeText={setPhone} value={phone} />
-                    {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} value={email} />}
+                    <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
+                    <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
+                    <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} />
+                    {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} />}
                     {/* <DatePicker date={date} setDate={setDate} />
                     <InputText placeholder='Jersey Name' />
                     <InputText placeholder='Jersey Number' /> */}

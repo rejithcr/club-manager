@@ -46,7 +46,7 @@ const DefineFee = () => {
                     <InputText
                         onChangeText={(text: string) => setFeeType(text)}
                         label={`Fee Type`}
-                        value={feeType}
+                        defaultValue={feeType}
                     />
                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "80%" }}>
                         <Text style={{ width: "40%" }}>Select Period</Text>
@@ -63,7 +63,7 @@ const DefineFee = () => {
                         onChangeText={(text: string) => setFeeAmount(text)}
                         label={`Fee Amount`}
                         keyboardType={'numeric'}
-                        value={feeAmount}
+                        defaultValue={feeAmount}
                     />
                    
                     <View style={{ marginBottom: 40 }} />

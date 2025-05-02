@@ -4,7 +4,7 @@ import React from 'react'
 const InputText = (props: { 
   label?: string; 
   placeholder?: string; 
-  value?: any; 
+  defaultValue?: any; 
   keyboardType?: any;
   ref?: any; 
   onSubmitEditing?: any; 

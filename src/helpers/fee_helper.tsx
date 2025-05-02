@@ -1,4 +1,4 @@
-import { get, post } from "../utils/api";
+import { get, post, put } from "../utils/api";
 import { getMonth, getQuarter, getYear } from "../utils/common";
 import { PERIOD_MONTHLY, PERIOD_QUATERLY } from "../utils/constants";
 
@@ -192,4 +192,12 @@ export const getFeePayments = async (feeCollectionId: string | null, listPayment
 
 export const saveFeePayments = (paymentStatusUpadtes: any | undefined, updatePaymentStatus: string | undefined, email: string) => {
     return post("/fee/collection", null, { paymentStatusUpadtes, updatePaymentStatus, email })
+}
+
+export const getExceptionDetails = (clubFeeTypeExceptionId: string | null) => {
+    return get("/fee/exception", { clubFeeTypeExceptionId })
+}
+
+export const updateExceptionType = (feeTypeExceptionId: string | null, exceptionType: string | undefined, exceptionAmount: string | undefined, exceptionMembers: any, email: string) => {
+    return put("/fee/exception", null , { feeTypeExceptionId, exceptionType, exceptionAmount, exceptionMembers, email })
 }

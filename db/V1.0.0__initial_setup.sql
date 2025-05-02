@@ -98,7 +98,7 @@ create table club_fee_type_exception_member (
     updated_ts timestamp  default now(),
     FOREIGN KEY (club_fee_type_exception_id) REFERENCES club_fee_type_exception(club_fee_type_exception_id),
     FOREIGN KEY (membership_id) REFERENCES membership(membership_id),
-    CONSTRAINT unique_club_fee_type_exception_member UNIQUE (club_fee_type_exception_id, membership_id)
+    CONSTRAINT unique_club_fee_type_exception_member UNIQUE (club_fee_type_exception_id, membership_id, end_date)
 );
 CREATE SEQUENCE club_fee_type_exception_member_id_seq START 1;
 

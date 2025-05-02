@@ -47,7 +47,7 @@ const StartNextPeriod = () => {
             .then(() =>
                 router.dismissTo({
                     pathname: "/(main)/(clubs)/(fees)/feetypedetails",
-                    params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName"), refreshCollections: "true"}
+                    params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName")}
                 })
             )
             .catch((error: any) => alert(error))

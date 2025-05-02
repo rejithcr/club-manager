@@ -25,3 +25,15 @@ export const post = (path, queryParams, payload) => {
   });
   return response;
 };
+
+
+export const put = (path, queryParams, payload) => {
+  console.log("PUT",BASE_URL + path, payload, queryParams);
+  const response = axios.put(BASE_URL + path, payload, {
+    params: { ...queryParams },
+    headers: {
+      "auth-token": AUTH_TOKEN,
+    },
+  });
+  return response;
+};
