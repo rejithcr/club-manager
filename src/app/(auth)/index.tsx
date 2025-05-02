@@ -29,7 +29,7 @@ const AuthHome = () => {
     validateLogin()
   }, [response])
 
-  const validateLogin = () => {
+  const validateLogin = async() => {
     //const userInfo = await AsyncStorage.getItem("userInfo");
     const userInfo = "{\"email\": \"rejithramakrishnan@gmail.com\"}"
     console.log(userInfo)
@@ -42,18 +42,20 @@ const AuthHome = () => {
   }
 
   const registerMember = async (email: string) => {
-    getMemberByEmail(email).then( async response => {
-      const userInfoFromCache = await AsyncStorage.getItem("userInfo");
-      let ui = JSON.parse(userInfoFromCache || '{}')
-      if (response.data) {
-        ui.memberId = response.data.member_id
-        setUserInfo(ui) 
-        router.replace('/(main)')
-      } else {
-        setUserInfo(ui) 
-        router.replace(`/(main)/(members)/addmember?createMember=true&name=${ui.name}`)
-      }
-    })
+    console.log("insede register", email)
+    getMemberByEmail(email)
+      .then(async response => {
+        const userInfoFromCache = await AsyncStorage.getItem("userInfo");
+        let ui = JSON.parse(userInfoFromCache || '{}')        
+        if (response.data?.memberId) {
+          console.log(response.data)
+          setUserInfo({...ui,...response.data})
+          router.replace('/(main)')
+        } else {
+          setUserInfo(ui)
+          router.replace(`/(main)/(members)/addmember?createMember=true&name=${ui.name}`)
+        }
+      })
   }
 
   const gettUserInfo = async () => {
@@ -61,7 +63,7 @@ const AuthHome = () => {
     try {
       if (response?.type == "success") {
         const userInfoResponse = await fetch(url + response?.authentication?.accessToken);
-        const userInfoJson = await userInfoResponse.json();        
+        const userInfoJson = await userInfoResponse.json();
         const userInfo = {
           email: userInfoJson?.email,
           name: userInfoJson?.name,

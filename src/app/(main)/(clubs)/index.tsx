@@ -6,45 +6,53 @@ import { getClubs } from '@/src/helpers/club_helper';
 import TouchableCard from '@/src/components/TouchableCard';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { AuthContext } from '@/src/context/AuthContext';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
 
 const ClubMain = () => {
   const [clubs, setClubs] = useState<any>([]);
+  const [isLoading, setIsLoading] = useState(true)
   const { userInfo } = useContext(AuthContext)
-  
+
   const router = useRouter()
+
   useEffect(() => {
     getClubs(userInfo.memberId)
-    .then( response => {
-      const memberClubs = response.data
-      console.log(memberClubs)
-      setClubs(memberClubs);
-  })
+      .then(response => {
+        const memberClubs = response.data
+        console.log(memberClubs)
+        setClubs(memberClubs);
+        setIsLoading(false)
+      })
   }, []);
 
   const showCreateClub = () => router.push("/(main)/(clubs)/createclub")
-  const showDetails = (clubId: number) => router.push(`/(main)/(clubs)/clubdetails?id=${clubId}`)
+  const showDetails = (clubId: number, role: string) => router.push(`/(main)/(clubs)/clubdetails?clubId=${clubId}&role=${role}`)
+
   return (
     <>
       <View style={{ marginTop: 25 }} />
       <View>
-        <FlatList
-          data={clubs}
-          renderItem={({ item }) => (
-            <TouchableCard key={item.club_id} showDetails={showDetails} id={item.club_id}>
-              <View style={{
-                flexDirection: "row", width: "100%",
-                justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
-              }}>
-                <Text style={{ fontWeight: "bold" }}> {item.club_name}</Text>
-                <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
-              </View>
-            </TouchableCard>
-          )}
-        />
+        {isLoading && <LoadingSpinner />}
+        {!isLoading &&
+          <FlatList
+            data={clubs}
+            renderItem={({ item }) => (
+              <TouchableCard key={item.clubId} showDetails={() => showDetails(item.clubId, item.roleName)} id={item.clubId}>
+                <View style={{
+                  flexDirection: "row", width: "100%",
+                  justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
+                }}>
+                  <Text style={{ fontWeight: "bold" }}>{item.clubName}</Text>
+                  <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
+                </View>
+              </TouchableCard>
+            )}
+          />
+        }
       </View>
       <FloatingMenu onPressMain={showCreateClub}
-        icon={<MaterialIcons name={"add"} size={32} color={"white"} />} 
-        />
+        icon={<MaterialIcons name={"add"} size={32} color={"white"} />}
+      />
     </>
   )
 }

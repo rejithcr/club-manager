@@ -1,7 +1,7 @@
 import { View, Text, FlatList, TouchableOpacity, Button } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
-import { Fee, getFeeByMembers } from '@/src/helpers/fee_helper';
+import { Fee, getFeePayments, saveFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
@@ -10,29 +10,30 @@ import ThemedButton from '@/src/components/ThemedButton';
 import { Picker } from '@react-native-picker/picker';
 import Modal from 'react-native-modal';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { AuthContext } from '@/src/context/AuthContext';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
+    const [reload, setReload] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
-    const [periodValue, setPeriodValue] = useState("mar");
-    const [feeByMembers, setFeeByMembers] = useState<Fee[] | undefined>(undefined);
+    const [feeByMembers, setFeeByMembers] = useState<any | undefined>(undefined);
     const [paymentStatusUpdates, setPaymentStatusUpdates] = useState<{
-        id: number;
+        clubFeePaymentId: number;
         paid: boolean;
-        name?: string
+        firstName?: string
     }[]>([])
+    const { userInfo } = useContext(AuthContext)
 
     const params = useSearchParams()
 
     useEffect(() => {
         setIsLoading(true)
-        setFeeByMembers(undefined)
         setPaymentStatusUpdates([]);
-        getFeeByMembers(Number(params.get("clubId")), periodValue)
-            .then(data => { setFeeByMembers(data); setIsLoading(false) })
+        getFeePayments(params.get("clubFeeCollectionId"), "true")
+            .then(response => { console.log(response.data); setFeeByMembers(response.data) })
             .catch(error => console.error(error))
             .finally(() => setIsLoading(false));
-    }, [periodValue])
+    }, [reload])
 
     const updatePaymentStatus = () => {
         if (paymentStatusUpdates.length == 0) {
@@ -42,10 +43,18 @@ const Payments = () => {
         }
     }
 
+    const savePaymentUpdates = () => {
+        setIsLoading(true)
+        setIsConfirmVisible(false)
+        saveFeePayments(paymentStatusUpdates, "true", userInfo.email)
+            .then(() => setReload(prev => !prev))
+            .catch(error => console.error(error))
+            .finally(() => setIsLoading(false));
+    }
+
     return (
         <GestureHandlerRootView>
-            <Text style={appStyles.title}>{params.get("clubName")}</Text>
-            <View style={{ height: "78%" }}>
+            <View style={{ height: "88%", marginTop: 20 }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <FlatList style={{ width: "100%" }}
@@ -54,7 +63,7 @@ const Payments = () => {
                         //onEndReached={fetchNextPage}
                         //onEndReachedThreshold={0.5}
                         renderItem={({ item }) => (
-                            <MemberFeeItem {...item} key={item.id} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
+                            <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
                         )}
                     />}
             </View>
@@ -63,10 +72,10 @@ const Payments = () => {
                     <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
                         <Text style={appStyles.heading}>Confirm Updates</Text>
                         {paymentStatusUpdates.map((item) => {
-                            return <PaymentUpdates key={item.id} {...item} />
+                            return <PaymentUpdates key={item.clubFeePaymentId} {...item} />
                         })}
                         <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                            <ThemedButton title="Update" onPress={() => setIsConfirmVisible(false)} />
+                            <ThemedButton title="Update" onPress={() => savePaymentUpdates()} />
                             <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
                         </View>
                     </View>
@@ -74,14 +83,7 @@ const Payments = () => {
             </Modal>
             <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
                 <ThemedButton title='Update Status' onPress={() => updatePaymentStatus()} />
-                <Picker style={{ width: 155 }}
-                    selectedValue={periodValue}
-                    onValueChange={(itemValue, itemIndex) => setPeriodValue(itemValue)}>
-                    <Picker.Item label="2025 MAR" value="mar" />
-                    <Picker.Item label="2025 FEB" value="feb" />
-                    <Picker.Item label="2024 Q4" value="q4" />
-                    <Picker.Item label="2023" value="2023" />
-                </Picker>
+                <Text>PERIOD-TBD</Text>
             </View>
         </GestureHandlerRootView>
     )
@@ -90,28 +92,27 @@ const Payments = () => {
 export default Payments
 
 const MemberFeeItem = (props: {
-    id: number; name: string | undefined;
-    paid: boolean; amount: number; setPaymentStatusUpdates: any;
-    feeByMembers: Fee[] | undefined
+    clubFeePaymentId: number; firstName: string | undefined;
+    paid: number; amount: number; setPaymentStatusUpdates: any;
+    feeByMembers: any | undefined
 }) => {
-    const [isSelected, setIsSelected] = useState(props?.paid)
+    const [isSelected, setIsSelected] = useState(props?.paid != 0)
 
     const selectItem = () => {
+        setIsSelected(prev => !prev)
 
-        setIsSelected(!isSelected)
+        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined })[]) => {
 
-        props.setPaymentStatusUpdates((prev: ({ id: number; paid: Boolean; name?: string | undefined })[]) => {
-
-            let item = prev.find(item => item.id == props.id)
-            const initialPaymentStatus = props.feeByMembers?.find((item: { id: number; }) => item.id == props.id)
+            let item = prev.find(item => item.clubFeePaymentId == props.clubFeePaymentId)
+            const initialPaymentStatus = props.feeByMembers?.find((item: { clubFeePaymentId: number; }) => item.clubFeePaymentId == props.clubFeePaymentId)
             if (item) {
                 item.paid = !isSelected
             } else {
-                item = { id: props.id, paid: !isSelected, name: props.name }
+                item = { clubFeePaymentId: props.clubFeePaymentId, paid: !isSelected, firstName: props.firstName }
                 prev.push(item)
             }
             if (initialPaymentStatus?.paid == !isSelected) {
-                return prev.filter(item => item.id != initialPaymentStatus.id)
+                return prev.filter(item => item.clubFeePaymentId != initialPaymentStatus.clubFeePaymentId)
             }
             return prev
         })
@@ -119,12 +120,11 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <View style={{
-                ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap",
-                flexBasis: "auto"
-            }}>
-                <View style={{ width: "5%" }}><Checkbox value={isSelected} color={"black"} /></View>
-                <Text style={{ width: "75%", fontSize: 15, paddingLeft: 15 }}>{props?.name}</Text>
+            <View style={{...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap"}}>
+                <View style={{ width: "5%" }}>
+                    <Checkbox value={isSelected} color={"black"} /> 
+                </View>
+                <Text style={{ width: "75%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</Text>
                 <Text style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</Text>
             </View>
         </TouchableOpacity>
@@ -132,13 +132,10 @@ const MemberFeeItem = (props: {
 }
 
 
-const PaymentUpdates = (props: { id: number | undefined; name?: string | null | undefined; paid: boolean | undefined; }) => {
+const PaymentUpdates = (props: { clubFeePaymentId: number | undefined; firstName?: string | null | undefined; paid: boolean | undefined; }) => {
     return (
-        <View style={{
-            ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap",
-            flexBasis: "auto"
-        }}>
-            <Text numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.name}</Text>
+        <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap"}}>
+            <Text numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName}</Text>
             {props?.paid ?
                 <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-marked' /> :
                 <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-blank-outline' />}

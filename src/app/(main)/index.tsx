@@ -20,6 +20,7 @@ const ClubMain = () => {
   const gotoClubs = () => router.push(`/(main)/(clubs)`)
 
   const onRefresh = () => {
+    console.log(userInfo)
   };
 
   const logout = async () => {

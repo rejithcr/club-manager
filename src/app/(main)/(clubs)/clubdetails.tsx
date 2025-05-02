@@ -8,15 +8,23 @@ import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler
 import { FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import FloatingMenu from '@/src/components/FloatingMenu'
+import LoadingSpinner from '@/src/components/LoadingSpinner'
 
 const ClubDetails = () => {
     const [refreshing, setRefreshing] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
     const router = useRouter()
     const params = useSearchParams()
-    const [clubDetails, setClubDetails] = useState<Club>()
+    const [clubDetails, setClubDetails] = useState<any>()
+
     useEffect(() => {
-        const club = getClubDetails(Number(params.get("id")));
-        setClubDetails(club);
+        setIsLoading(true)
+        getClubDetails(Number(params.get("clubId")))
+            .then(response => {
+                setClubDetails(response.data);
+            }).finally(() => {
+                setIsLoading(false)
+            })
     }, [])
 
     const showMembers = (clubId: number) => router.push(`/(main)/(members)?clubId=${clubId}`)
@@ -26,7 +34,7 @@ const ClubDetails = () => {
         throw new Error('Function not implemented.')
     }
 
-   
+
 
     // const setClubAsDefault = async () => {
     //     try {
@@ -37,33 +45,35 @@ const ClubDetails = () => {
     // }
     return (
         <GestureHandlerRootView>
-            <ScrollView>
+            {isLoading && <LoadingSpinner />}
+            {!isLoading && <ScrollView>
                 {/* <View style={styles.photoContainer}>
                     <MaterialIcons name={"star"} size={100} />
                 </View> */}
 
-                <Text style={appStyles.title}>{clubDetails?.name}</Text>
+                <Text style={appStyles.title}>{clubDetails?.clubName}</Text>
 
-                <KeyValueUI data={clubDetails} hideKeys={["id", "name", "createdDate"]} />
+                <KeyValueUI data={clubDetails} hideKeys={[]} />
                 <View style={{ marginBottom: 20 }} />
-                
+
                 <View style={{ marginBottom: 20 }} />
             </ScrollView>
-            <FloatingMenu actions={actions} position={"left"} color='black' 
+            }
+            <FloatingMenu actions={actions} position={"left"} color='black'
                 icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-                onPressItem={(name: string | undefined) => handleMenuPress(name, clubDetails?.id, clubDetails?.name)}
+                onPressItem={(name: string | undefined) => handleMenuPress(name, clubDetails?.clubId, clubDetails?.clubName, params.get("role"))}
             />
         </GestureHandlerRootView>
     )
 }
 
-const handleMenuPress = (name: string | undefined, clubId: number | undefined, clubBame: string | undefined) => {
+const handleMenuPress = (name: string | undefined, clubId: number | undefined, clubName: string | undefined, role: string | null) => {
     if (name == "fees") {
-        router.push(`/(main)/(clubs)/(fees)?clubId=${clubId}&clubName=${clubBame}`)
+        router.push(`/(main)/(clubs)/(fees)?clubId=${clubId}&clubName=${clubName}`)
     } else if (name == "attendance") {
-        router.push(`/(main)/(clubs)/(attendance)?clubId=${clubId}&clubBame=${clubBame}`)
-    }  else if (name == "members") {
-        router.push(`/(main)/(members)?clubId=${clubId}&clubBame=${clubBame}`)
+        router.push(`/(main)/(clubs)/(attendance)?clubId=${clubId}&clubName=${clubName}`)
+    } else if (name == "members") {
+        router.push(`/(main)/(members)?clubId=${clubId}&clubName=${clubName}&role=${role}`)
     } else {
         throw ("Error")
     }
@@ -92,4 +102,5 @@ const actions = [
         position: 1
     },
 ];
+
 export default ClubDetails

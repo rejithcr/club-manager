@@ -26,9 +26,8 @@ const ClubDues = () => {
   return (
     <GestureHandlerRootView>
       <ScrollView>
-        <Text style={appStyles.title}>{params.get("clubName")}</Text>
         {isLoading && <LoadingSpinner />}
-        <View style={{ ...appStyles.shadowBox, width: "90%", marginBottom: 15 }}>
+        <View style={{ ...appStyles.shadowBox, width: "90%", marginVertical: 15 }}>
 
           {!isLoading && duesByMembers?.map(member =>
             <MemberDue key={member.memberId} member={member} />

@@ -1,6 +1,8 @@
 import db
 import queries_club
 import queries_member
+import helper
+
 
 class ClubService():
 
@@ -9,9 +11,12 @@ class ClubService():
         member_id = params.get('memberId')        
 
         if member_id: 
-            return db.fetch(conn, queries_club.GET_CLUBS_BY_MEMBER, (member_id,))
+            clubs = db.fetch(conn, queries_club.GET_CLUBS_BY_MEMBER, (member_id,))   
+            return [helper.convert_to_camel_case(club) for club in clubs]         
         else:        
-            return db.fetch(conn, queries_club.GET_CLUB, (club_id,))
+            club = db.fetch_one(conn, queries_club.GET_CLUB, (club_id,))
+            return helper.convert_to_camel_case(club) if club else {}
+        
 
         
     def post(self, conn, params):

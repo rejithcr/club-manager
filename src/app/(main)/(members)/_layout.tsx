@@ -25,6 +25,13 @@ export default function RootLayout() {
           headerShown: true
         }}
       />
+      <Stack.Screen
+        name="memberattributes" // This is the name of the page and must match the url from root
+        options={{
+          title: 'Member Attributes',
+          headerShown: true
+        }}
+      />
     </Stack>
   )
 }

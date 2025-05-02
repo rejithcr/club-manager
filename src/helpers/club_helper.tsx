@@ -1,4 +1,4 @@
-import { get } from "../utils/api";
+import { get, post } from "../utils/api";
 
 export interface Club {
     id: number;
@@ -10,7 +10,7 @@ export interface Club {
 }
 
 export let clubs : Club[] = [
-    { "id": 8, "name": "TCS Kochi Cricket Club", "createdDate": "01-Jan-2024", "admin": "Rejith", "captian": "Rejith"},
+    { "id": 0, "name": "TCS Kochi Cricket Club", "createdDate": "01-Jan-2024", "admin": "Rejith", "captian": "Rejith"},
     { "id": 2, "name": "Crick-IT", "createdDate": "01-Jan-2024", "admin": "Navaneeth", "captian": "Navaneeth"},
     { "id": 3, "name": "Guts n Glory", "createdDate": "01-Jan-2024", "admin": "Jaish","captian": "Vimal"},
     
@@ -20,16 +20,24 @@ export const getClubs = (memberId: number) => {
     return get("/club", {memberId: memberId})
 }
 
-export const createClub = (club: {name: string; admin: string}) => {
-    clubs.push({id: clubs.length + 1, "name": club.name, admin: club.admin})
-    return clubs
+export const createClub = (clubName: string, memberId: string, email: string) => {
+    return post("/club", null, {clubName, memberId, email})
 }
 
-export const getClubDetails = (id: number) => {
-    return clubs.find(clubs => clubs.id == id)
+export const getClubDetails = (clubId: number) => {
+    return get("/club", {clubId: clubId})
 }
 
 
 export const getClubMembers = (clubId: string | null) => {
     return get("/club/member", {clubId: clubId})
+}
+
+
+export const addMemberAndAssignClub = async (member: any) => {
+    return post("/club/member", null, member)
+}
+
+export const addToClub = async (memberId: number, clubId: number, email: string) => {
+    return post("/club/member", null, {memberId, clubId, email})
 }

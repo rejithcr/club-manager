@@ -5,7 +5,7 @@ const BASE_URL =
   "https://n24tjyszxraupd5cuogxf377i40xiltl.lambda-url.ap-south-1.on.aws";
 
 export const get = (path, queryParams) => {
-  console.log(BASE_URL + path, queryParams);
+  console.log("GET",BASE_URL + path, queryParams);
   const response = axios.get(BASE_URL + path, {
     params: { ...queryParams },
     headers: {
@@ -16,6 +16,7 @@ export const get = (path, queryParams) => {
 };
 
 export const post = (path, queryParams, payload) => {
+  console.log("POST",BASE_URL + path, payload, queryParams);
   const response = axios.post(BASE_URL + path, payload, {
     params: { ...queryParams },
     headers: {

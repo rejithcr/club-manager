@@ -47,52 +47,107 @@ create table membership (
     updated_ts timestamp  default now(),
     FOREIGN KEY (club_id) REFERENCES club(club_id),
     FOREIGN KEY (member_id) REFERENCES member(member_id),
-    FOREIGN KEY (role_id) REFERENCES role(role_id)
+    FOREIGN KEY (role_id) REFERENCES role(role_id),
+    CONSTRAINT unique_membership UNIQUE (club_id,member_id)
 );
 CREATE SEQUENCE membership_id_seq START 1;
 
 create table club_fee_type (
     club_fee_type_id integer primary key,
     club_id integer not null,
-    club_fee_type varchar(50) not null, -- MEMBERSHIP, MAINTENANCE, JOINING, TOURNEY REG FEE
-    club_fee_type_period varchar(10) not null, -- REGULAR / OTO
-    club_fee_type_desc varchar(100) not null,
+    club_fee_type varchar(50) not null, -- MEMBERSHIP, MAINTENANCE, JOINING
+    club_fee_type_interval varchar(10) not null, -- MONTHLY / QUATERLY / YEARLY 
+    club_fee_is_active smallint not null, -- 1,0
+    club_fee_amount integer not null, -- 300
+    club_fee_type_desc varchar(100),
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
     updated_ts timestamp  default now(),
-    CONSTRAINT unique_fe_type UNIQUE (club_id,club_fee_type)
+    FOREIGN KEY (club_id) REFERENCES club(club_id),
+    CONSTRAINT unique_fee_type_period CHECK (club_fee_type_interval in ('MONTHLY','QUARTERLY','YEARLY')),
+    CONSTRAINT unique_fee_type UNIQUE (club_id,club_fee_type, club_fee_type_interval, club_fee_is_active)
 );
 CREATE SEQUENCE club_fee_type_id_seq START 1;
 
+
+create table club_fee_type_exception (
+    club_fee_type_exception_id integer primary key,
+    club_fee_type_id integer not null,
+    club_fee_type_exception_reason varchar(100) not null,
+    club_fee_exception_amount integer not null, -- 300
+	club_fee_exception_is_active smallint not null, -- 1,0
+    created_by varchar(100) not null,
+    created_ts timestamp  default now(),
+    updated_by varchar(100) not null,
+    updated_ts timestamp  default now(),
+    FOREIGN KEY (club_fee_type_id) REFERENCES club_fee_type(club_fee_type_id),
+    CONSTRAINT unique_fee_type_exception UNIQUE (club_fee_type_id, club_fee_type_exception_reason)
+);
+CREATE SEQUENCE club_fee_type_exception_id_seq START 1;
+
+create table club_fee_type_exception_member (
+	club_fee_type_exception_member_id integer primary key,
+    club_fee_type_exception_id integer not null,
+    membership_id integer not null,
+    start_date date not null,
+    end_date date,
+    created_by varchar(100) not null,
+    created_ts timestamp  default now(),
+    updated_by varchar(100) not null,
+    updated_ts timestamp  default now(),
+    FOREIGN KEY (club_fee_type_exception_id) REFERENCES club_fee_type_exception(club_fee_type_exception_id),
+    FOREIGN KEY (membership_id) REFERENCES membership(membership_id),
+    CONSTRAINT unique_club_fee_type_exception_member UNIQUE (club_fee_type_exception_id, membership_id)
+);
+CREATE SEQUENCE club_fee_type_exception_member_id_seq START 1;
+
+create table club_fee_collection (
+    club_fee_collection_id integer primary key,
+    club_fee_type_id integer not null,
+    club_fee_type_period varchar(20) not null, -- JAN, Q1, 2024 etc
+    club_fee_type_date date not null, -- day 1 of the period
+    created_by varchar(100) not null,
+    created_ts timestamp  default now(),
+    updated_by varchar(100) not null,
+    updated_ts timestamp  default now(),
+    FOREIGN KEY (club_fee_type_id) REFERENCES club_fee_type(club_fee_type_id),
+    CONSTRAINT unique_fee_type_collection_period UNIQUE (club_fee_type_id, club_fee_type_period),
+    CONSTRAINT unique_fee_type_collection_date UNIQUE (club_fee_type_id, club_fee_type_date)
+);
+
+CREATE SEQUENCE club_fee_collection_id_seq START 1;
 
 create table transaction (
     transaction_id BIGINT primary key,
     transaction_amount numeric not null,
     transcation_credit_debit varchar(6) not null, -- CREDIT/DEBIT
-    transaction_club_fee_type_id integer not null, -- FEE, TOURNAMENT REGISTRATION, OTHER
+    --transaction_club_fee_type_id integer not null, -- FEE, TOURNAMENT REGISTRATION, OTHER
     transaction_comment varchar(100) not null, -- Akme Cup
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
-    updated_ts timestamp  default now(),
-    FOREIGN KEY (transaction_club_fee_type_id) REFERENCES club_fee_type(club_fee_type_id)
+    updated_ts timestamp  default now()
+    --FOREIGN KEY (transaction_club_fee_type_id) REFERENCES club_fee_type(club_fee_type_id)
 );
 CREATE SEQUENCE transaction_id_seq START 1;
 
 
 create table club_fee_payment (
     club_fee_payment_id integer primary key,
-    club_fee_type_id integer not null,
+    club_fee_collection_id integer not null,
     membership_id integer not null,
-    transaction_id BIGINT null, 
     paid integer not null default 0,
+    transaction_id BIGINT null, 
+    club_fee_type_exception_member_id integer,
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
     updated_ts timestamp  default now(),
-    FOREIGN KEY (club_fee_type_id) REFERENCES club_fee_type(club_fee_type_id),
+    FOREIGN KEY (club_fee_collection_id) REFERENCES club_fee_collection(club_fee_collection_id),
     FOREIGN KEY (membership_id) REFERENCES membership(membership_id),
-    FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id)
+    FOREIGN KEY (club_fee_type_exception_member_id) REFERENCES club_fee_type_exception_member(club_fee_type_exception_member_id),
+    FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id),
+    CONSTRAINT unique_club_fee_payment UNIQUE (club_fee_collection_id, membership_id),
 );
 CREATE SEQUENCE club_fee_payment_id_seq START 1;

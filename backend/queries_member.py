@@ -10,6 +10,13 @@ GET_MEMBER_BY_EMAIL = """
    where email = %s
 """
 
+GET_MEMBER_BY_PHONE = """
+   select member_id, first_name, last_name, email, phone
+   from member
+   where phone = %s
+"""
+
+
 SAVE_MEMBER = """
    insert into member (member_id, first_name, last_name, email, phone, created_by, updated_by) values
     (nextval('member_id_seq'), %s, %s, %s, %s, %s, %s)

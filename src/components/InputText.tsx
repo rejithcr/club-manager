@@ -3,17 +3,18 @@ import React from 'react'
 
 const InputText = (props: { 
   label?: string; 
-  placeholder: string; 
+  placeholder?: string; 
   value?: any; 
   keyboardType?: any;
   ref?: any; 
   onSubmitEditing?: any; 
+  editable?: boolean;
   onChangeText?: any;
   blurOnSubmit?: any }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{props.label || props.placeholder }</Text>
-      <TextInput style={styles.input} {...props} onChangeText={props.onChangeText}/>
+      <TextInput style={styles.input} {...props} onChangeText={props.onChangeText} />
     </View>
   )
 }

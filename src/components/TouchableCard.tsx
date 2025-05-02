@@ -1,15 +1,17 @@
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import React, { ReactNode } from 'react'
+import ShadowBox from './ShadowBox';
 
 const TouchableCard = (props: {
     id: any;
+    styles?: any; 
     children: ReactNode | undefined; showDetails?: any; 
 }) => {
     return (
         <TouchableOpacity onPress={() => props.showDetails(props.id)}>
-            <View style={styles.container}>
+            <ShadowBox style={{...styles.container, ...props.styles}}>
                 {props.children}
-            </View>
+            </ShadowBox>
         </TouchableOpacity>
     )
 }
@@ -22,12 +24,6 @@ const styles = StyleSheet.create({
         minHeight: 50,
         margin: 5,
         padding: 10,
-        flex: 1,
         width: "80%",
         flexDirection: "row",
-        borderColor: "#eee",
-        alignItems: "center",
-        alignSelf: "center",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-        borderRadius: 5
     }});

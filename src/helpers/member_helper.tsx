@@ -33,14 +33,14 @@ export const getMemberDetails = (id: number) => {
 }
 
 
-export const getMemberByPhone = (phone: number) => {
-    return members.find(member => member.phone == phone)
+export const getMemberByPhone = (phone: string|undefined) => {
+    return get("/member", {phone: phone})
 }
 
 export const getMemberByEmail = (email: string) => {
     return get("/member", {email: email})
 }
 
-export const addMember = async (member: any) => {
+export const regirsterMember = async (member: any) => {
     return post("/member", null, member)
 }
