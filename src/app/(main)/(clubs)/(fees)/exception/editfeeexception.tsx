@@ -12,6 +12,7 @@ import { appStyles } from '@/src/utils/styles'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import ShadowBox from '@/src/components/ShadowBox'
 import { MaterialIcons } from '@expo/vector-icons'
+import { ClubContext } from '@/src/context/ClubContext'
 
 const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
@@ -22,6 +23,7 @@ const EditFeeException = () => {
     const [exceptionMembers, setExceptionMembers] = useState<any>([])
     const [members, setMembers] = useState<any>([]);
     const { userInfo } = useContext(AuthContext)
+    const { clubInfo } = useContext(ClubContext)
 
     const params = useSearchParams()
 
@@ -31,7 +33,7 @@ const EditFeeException = () => {
             setIsLoadingMembers(true)
             updateExceptionType(params.get("clubFeeTypeExceptionId"), exceptionType, exceptionAmount, changes, userInfo.email)
                 .then(()=> router.back())
-                .catch((error) => alert(error?.message))
+                .catch((error) => alert(error?.response?.data?.error))
                 .finally(() => setIsLoadingMembers(false))
         }
     }
@@ -48,7 +50,7 @@ const EditFeeException = () => {
                 setExceptionMembers(exceptionType.members)
                 setIsAmountEditable(exceptionType.isAmountEditable)
                 setIsLoadingMembers(true)
-                getClubMembers(params.get("clubId"))
+                getClubMembers(clubInfo.clubId)
                     .then(response => {
                         const members = response.data
                         console.log(members)
@@ -78,10 +80,10 @@ const EditFeeException = () => {
 
     const endException = (memberEdit: any) => {
         console.log(memberEdit.clubFeeTypeExceptionMemberId, memberEdit.memberId)
-        setExceptionMembers((prev: { memberId: number, endDateAdded: string, clubFeeTypeExceptionMemberId: number }[]) => {
+        setExceptionMembers((prev: { memberId: number, endDateAdded: string, clubFeeTypeExceptionMemberId: number, endDate: string }[]) => {
             if (memberEdit?.clubFeeTypeExceptionMemberId) {
-                return prev.map((member: { memberId: number, endDateAdded: string | null }) => {
-                    if (member.memberId === memberEdit.memberId) {
+                return prev.map((member: {memberId: number, endDateAdded: string | null, endDate: string}) => {
+                    if (member.memberId === memberEdit.memberId && !member.endDate) {
                         const endDateAdded = member.endDateAdded ? null : new Date().toISOString().split('T')[0]
                         return { ...member, endDateAdded }
                     }
@@ -98,6 +100,8 @@ const EditFeeException = () => {
         <ScrollView>
             <View style={{ marginBottom: 20 }}>
                 <InputText label='Exception Type' onChangeText={setExceptionType} defaultValue={exceptionType} />
+                {!isAmountEditable && <Text style={{alignSelf:"center", fontSize:10, color:"grey", width: "80%"}}>
+                        Amount not editable as some collections are already using this value</Text>}
                 <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setExceptionAmount} defaultValue={exceptionAmount.toString()} editable={isAmountEditable} />
             </View>
 
@@ -106,7 +110,7 @@ const EditFeeException = () => {
                 exceptionMembers?.map((member: {
                     memberId: number, lastName: string, firstName: string | undefined, startDate: string,
                     clubFeeTypeExceptionMemberId: number, endDate: string | undefined, endDateAdded: string | undefined
-                }) => <View key={member?.memberId?.toString() + member?.startDate}>
+                }) => <View key={member?.memberId?.toString() + member?.endDate}>
                         <ShadowBox style={{
                             flexDirection: "row", justifyContent: "space-between",
                             width: "70%", padding: 10, marginBottom: 15
@@ -122,7 +126,7 @@ const EditFeeException = () => {
                 )
             }
 
-            <Text style={{ ...appStyles.heading }}>Select Members</Text>
+            <Text style={{ ...appStyles.heading }}>Add Members</Text>
             {isLoadingMembers && <LoadingSpinner />}
             {!isLoadingMembers &&
                 members.map((item: any) =>

@@ -18,7 +18,7 @@ const Register = () => {
             <InputText placeholder='Jersey Name' />
             <InputText placeholder='Jersey Number' />
             <View style={{ marginTop: 25 }} />
-            <ThemedButton title="Register" opnPress={addMember} />
+            <ThemedButton title="Register" onPress={addMember} />
         </View>
     )
 }

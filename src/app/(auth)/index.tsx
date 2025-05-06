@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import * as Google from 'expo-auth-session/providers/google'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { ActivityIndicator, View } from 'react-native'
+import { ActivityIndicator, Alert, View } from 'react-native'
 import { appStyles } from '@/src/utils/styles'
 import { AuthContext } from '../../context/AuthContext';
 import { ANDROID_CLIENT_ID, WEB_CLIENT_ID } from '@/src/utils/keys'
@@ -16,7 +16,7 @@ WebBrowser.maybeCompleteAuthSession()
 const AuthHome = () => {
   const { setUserInfo } = useContext(AuthContext)
 
-  const [isLoading, setLoading] = useState(true)
+  const [isLoading, setLoading] = useState(false)
   const [_, response, promptAsyc] = Google.useAuthRequest({
     //scopes: ['https://www.googleapis.com/auth/user.phonenumbers.read'],
     androidClientId: ANDROID_CLIENT_ID,
@@ -29,36 +29,39 @@ const AuthHome = () => {
     validateLogin()
   }, [response])
 
-  const validateLogin = async() => {
-    //const userInfo = await AsyncStorage.getItem("userInfo");
-    const userInfo = "{\"email\": \"rejithramakrishnan@gmail.com\"}"
-    console.log(userInfo)
-    if (userInfo) {
-      setUserInfo(JSON.parse(userInfo))
-      registerMember(JSON.parse(userInfo).email)
+  const validateLogin = async () => {
+    //const userInfoFromCache = await AsyncStorage.getItem("userInfo");
+    const userInfoFromCache = "{\"email\": \"rejithramakrishnan@gmail.com\",\"name\": \"Rejith\"}"
+    console.log(userInfoFromCache)
+    if (userInfoFromCache) {
+      setUserInfo(JSON.parse(userInfoFromCache))
+      registerMember(JSON.parse(userInfoFromCache))
     } else {
+      console.log("going to google auth")
       gettUserInfo()
     }
   }
 
-  const registerMember = async (email: string) => {
-    console.log("insede register", email)
-    getMemberByEmail(email)
-      .then(async response => {
-        const userInfoFromCache = await AsyncStorage.getItem("userInfo");
-        let ui = JSON.parse(userInfoFromCache || '{}')        
+  const registerMember = (userInfoFromCache: any) => {
+    setLoading(true)
+    getMemberByEmail(userInfoFromCache.email)
+      .then(response => {
+        console.log(response.data)
         if (response.data?.memberId) {
           console.log(response.data)
-          setUserInfo({...ui,...response.data})
+          setUserInfo({...userInfoFromCache,...response.data})
           router.replace('/(main)')
         } else {
-          setUserInfo(ui)
-          router.replace(`/(main)/(members)/addmember?createMember=true&name=${ui.name}`)
+          setUserInfo(userInfoFromCache)
+          router.replace(`/(main)/(members)/addmember?createMember=true&name=${userInfoFromCache.name}&email=${userInfoFromCache.email}`)
         }
       })
+      .catch(error => Alert.alert("Error", error.response.data.error))
+      .finally(() => setLoading(false))
   }
 
   const gettUserInfo = async () => {
+    setLoading(true)
     const url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
     try {
       if (response?.type == "success") {
@@ -71,7 +74,7 @@ const AuthHome = () => {
           phone: undefined
         }
         await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo))
-        registerMember(userInfo.email)
+        registerMember(userInfo)
       } else if (response) {
         throw "Authentication error. Try again. " + JSON.stringify(response)
       }

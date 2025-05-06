@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import { View, FlatList, Text } from "react-native";
-import { getMembers } from "@/src/helpers/member_helper";
 import MemberItem from "@/src/components/MemberItem";
 import { router, useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
@@ -9,15 +8,16 @@ import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { getClubMembers } from "@/src/helpers/club_helper";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
+import { ClubContext } from "@/src/context/ClubContext";
 
 export default function Home() {
   const [members, setMembers] = useState<any>([]);
   const [isLoading, setIsLoading] = useState(true)
+  const { clubInfo } = useContext(ClubContext)
 
-  const params = useSearchParams()
   const router = useRouter()
   useEffect(() => {
-    getClubMembers(params.get("clubId"))
+    getClubMembers(clubInfo.clubId)
       .then(response => {
         setMembers(response.data)
         setIsLoading(false)
@@ -28,7 +28,7 @@ export default function Home() {
 
   return (
     <>
-      <Text style={{textAlign:"right",margin: 15}}>{params.get("clubName")}</Text>
+      <Text style={{textAlign:"right",margin: 15}}>{clubInfo.clubName}</Text>
       <View style={{ flex: 1, justifyContent: "center", alignContent: "center" }}>
         {isLoading && <LoadingSpinner />}
         {!isLoading &&
@@ -43,10 +43,10 @@ export default function Home() {
           />
         }
       </View>
-      {params.get("role") == ROLE_ADMIN &&
+      {clubInfo.role == ROLE_ADMIN &&
         <FloatingMenu
           actions={actions}
-          onPressItem={(name: string | undefined) => handleMenuPress(name, params.get("clubId"), params.get("clubName"), params.get("role"))}
+          onPressItem={(name: string | undefined) => handleMenuPress(name)}
           icon={<MaterialIcons name={"menu"} size={32} color={"white"} />} />
       }
     </>
@@ -54,11 +54,11 @@ export default function Home() {
 }
 
 
-const handleMenuPress = (name: string | undefined, clubId: string | null, clubName: string | null, role: string | null) => {
+const handleMenuPress = (name: string | undefined) => {
   if (name == "attributes") {
-    router.push(`/(main)/(members)/memberattributes?clubId=${clubId}&clubName=${clubName}`)
+    router.push(`/(main)/(members)/memberattributes`)
   } else if (name == "addMember") {
-    router.push(`/(main)/(members)/addmember?clubId=${clubId}&clubName=${clubName}`)
+    router.push(`/(main)/(members)/addmember`)
   } else {
     throw ("Error")
   }

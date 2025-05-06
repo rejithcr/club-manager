@@ -3,13 +3,13 @@ import React, { ReactNode } from 'react'
 import ShadowBox from './ShadowBox';
 
 const TouchableCard = (props: {
-    id: any;
-    styles?: any; 
+    id: any; 
+    style?: any;
     children: ReactNode | undefined; showDetails?: any; 
 }) => {
     return (
         <TouchableOpacity onPress={() => props.showDetails(props.id)}>
-            <ShadowBox style={{...styles.container, ...props.styles}}>
+            <ShadowBox style={{...styles.container, ...props.style}}>
                 {props.children}
             </ShadowBox>
         </TouchableOpacity>

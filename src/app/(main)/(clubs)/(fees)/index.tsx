@@ -1,23 +1,22 @@
-import { View, Text, ScrollView, GestureResponderEvent } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import KeyValueUI from '@/src/components/KeyValueUI'
 import { appStyles } from '@/src/utils/styles'
 import { useSearchParams } from 'expo-router/build/hooks'
-import { getFeeStructure, getFeeExemptions, getAdhocFees } from '@/src/helpers/fee_helper'
+import { getFeeStructure, getAdhocFees } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
-import FloatingMenu from '@/src/components/FloatingMenu'
 import { router, useFocusEffect } from 'expo-router'
-import { FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
-import ClubFeeSummary from './ClubFeeSummary'
+import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
 import TouchableCard from '@/src/components/TouchableCard'
+import { ClubContext } from '@/src/context/ClubContext'
 
 const Fees = () => {
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
   const [isLoadingAdhoc, setIsLoadingAdhoc] = useState(false);
   const [currentFeeStructure, setCurrentFeeStructure] = useState<any>([])
   const [adhocFees, setAdhocFees] = useState<{}>()
-  const params = useSearchParams()
+  const { clubInfo } = useContext(ClubContext)
 
   useFocusEffect(
     useCallback(() => {
@@ -29,13 +28,13 @@ const Fees = () => {
   const showFees = () => {
     setIsLoadingCurrent(true)
     setIsLoadingAdhoc(true)
-    
-    getFeeStructure(Number(params.get("clubId")))
+
+    getFeeStructure(Number(clubInfo.clubId))
       .then(response => { setCurrentFeeStructure(response.data); setIsLoadingCurrent(false) })
       .catch(error => console.error(error))
       .finally(() => setIsLoadingCurrent(false));
 
-    getAdhocFees(Number(params.get("clubId")))
+    getAdhocFees(Number(clubInfo.clubId))
       .then(data => { setAdhocFees(data); setIsLoadingAdhoc(false) })
       .catch(error => console.error(error))
       .finally(() => setIsLoadingAdhoc(false));
@@ -44,26 +43,25 @@ const Fees = () => {
     showFees()
   }, [])
 
-  const showClubDues = (_: GestureResponderEvent): void => {
-    router.push(`/(main)/(clubs)/(fees)/clubdues?clubId=${params.get("clubId")}&clubName=${params.get("clubName")}`)
-  }
-  const showFeeByMember = (_: GestureResponderEvent): void => {
-    router.push(`/(main)/(clubs)/(fees)/payments?clubId=${params.get("clubId")}&clubName=${params.get("clubName")}`)
-  }
   const showFeeTypeDetails = (fee: any) => {
     router.push({
       pathname: "/(main)/(clubs)/(fees)/feetypedetails",
-      params: { fee: JSON.stringify(fee), clubId: params.get("clubId"), clubName: params.get("clubName") }
+      params: { fee: JSON.stringify(fee) }
     })
   }
   return (
     <GestureHandlerRootView>
       <ScrollView>
-        <Text style={appStyles.heading}>Summary</Text>
-        <ClubFeeSummary clubId={Number(params.get("clubId"))} clubName={params.get("clubName")}
-          showClubDues={showClubDues} showFeeByMember={showFeeByMember} />
-
-        <Text style={appStyles.heading}>Active Fees</Text>
+        <View style={{
+          flexDirection: "row", alignItems: "center", width: "80%",
+          justifyContent: "space-between", alignSelf: "center",
+        }}>
+          <Text style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Active Fees</Text>
+          <TouchableOpacity style={{ width: "10%" }}
+            onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
+            <MaterialCommunityIcons size={25} name={'plus-circle'} />
+          </TouchableOpacity>
+        </View>
         {isLoadingCurrent && <LoadingSpinner />}
         {!isLoadingCurrent && currentFeeStructure?.length == 0 && <Text style={{ alignSelf: "center" }}>No fees defined</Text>}
         {!isLoadingCurrent && currentFeeStructure?.map((fee: any) => {
@@ -85,15 +83,23 @@ const Fees = () => {
           // <KeyValueUI data={fee} hideKeys={["clubId","clubFeeTypeId","clubFeeIsActive", "clubFeeTypeDesc"]}/>
         })}
 
-        <Text style={appStyles.heading}>Adhoc Fees</Text>
+        <View style={{
+          flexDirection: "row", alignItems: "center", width: "80%",
+          justifyContent: "space-between", alignSelf: "center",
+        }}>
+          <Text style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Adhoc Fees</Text>
+          <TouchableOpacity style={{ width: "10%" }}
+            onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
+            <MaterialCommunityIcons size={25} name={'plus-circle'} />
+          </TouchableOpacity>
+        </View>
         {isLoadingAdhoc && <LoadingSpinner />}
-        {!isLoadingAdhoc && <KeyValueUI data={adhocFees} />}
-        <View style={{ marginBottom: 20 }} />
+        {!isLoadingAdhoc && <Text style={{ alignSelf: "center" }}>No adhoc fees defined</Text>}
       </ScrollView>
-      <FloatingMenu actions={actions} position={"left"} color='black'
+      {/* <FloatingMenu actions={actions} position={"left"} color='black'
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
         onPressItem={(name: string | undefined) => handleMenuPress(name, params.get("clubId"), params.get("clubName"), params.get("role"))}
-      />
+      /> */}
     </GestureHandlerRootView>
   )
 }

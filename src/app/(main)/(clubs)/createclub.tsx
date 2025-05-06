@@ -1,14 +1,12 @@
-import React, { useContext, useReducer, useRef, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
-import { Picker } from '@react-native-picker/picker'
-import InputSelect from '@/src/components/InputSelect'
 import { createClub } from '@/src/helpers/club_helper'
 import { AuthContext } from '@/src/context/AuthContext'
-import { GestureHandlerRootView, TextInput } from 'react-native-gesture-handler'
 import { router } from 'expo-router'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
-import { View } from 'react-native'
+import { Alert, View } from 'react-native'
+import { isValidLength } from '@/src/utils/validators'
 
 const CreateClub = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -16,22 +14,33 @@ const CreateClub = () => {
   const { userInfo } = useContext(AuthContext)
 
   const submitCreateClub = () => {
-    setIsLoading(true)
-    createClub(clubName, userInfo.memberId, userInfo.email)
-      .then(response => router.replace(`/(main)/(clubs)/clubdetails?clubId=${response.data.clubId}&role=ADMIN`))
-      .catch(err => alert(err))
-      .finally(() => setIsLoading(false))
+    if (validate(clubName.trim())) {
+      setIsLoading(true)
+      createClub(clubName.trim(), userInfo.memberId, userInfo.email)
+        .then(response => router.replace(`/(main)/(clubs)/clubdetails?clubId=${response.data.clubId}&role=ADMIN`))
+        .catch(err => Alert.alert(err.response.data.message))
+        .finally(() => setIsLoading(false))
+    }
   }
   return (
     <>
       {isLoading && <LoadingSpinner />}
       {!isLoading &&
-        <View style={{flex:1, alignItems:"center", justifyContent:"center"}}>
+        <View style={{ alignItems: "center", marginTop:20}}>
           <InputText placeholder='Enter Club Name' label='Club Name' onChangeText={(text: string) => setClubName(text)} />
           <ThemedButton title="Create" onPress={submitCreateClub} />
-        </View>}
+        </View>
+      }
     </>
   )
 }
 
 export default CreateClub
+
+const validate = (clubName: string | null | undefined) => {
+  if (!isValidLength(clubName?.trim(), 2)) {
+    Alert.alert("Error", "Enter atleast 2 characters for club name")
+    return false
+  }
+  return true
+}

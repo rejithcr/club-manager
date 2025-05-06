@@ -1,9 +1,9 @@
 import { Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 
-const ThemedButton = (props: { title: string; onPress: any; disabled?: boolean; styles?: any}) => {
+const ThemedButton = (props: { title: string; onPress: any; disabled?: boolean; style?: any}) => {
     return (
-        <TouchableOpacity style={{...styles.button, ...styles, backgroundColor: props?.disabled ? "grey": "black"}} {...props}>
+        <TouchableOpacity style={{...styles.button, backgroundColor: props?.disabled ? "grey": "black", ...props.style}} onPress={props?.onPress}>
             <Text style={styles.text}>{props.title}</Text>
         </TouchableOpacity>
     )

@@ -1,4 +1,4 @@
-import { get, post, put } from "../utils/api";
+import { del, get, post, put } from "../utils/api";
 import { getMonth, getQuarter, getYear } from "../utils/common";
 import { PERIOD_MONTHLY, PERIOD_QUATERLY } from "../utils/constants";
 
@@ -159,12 +159,19 @@ export const getNextPeriodFeeMemberList = async (feeTypeId: string | null, listN
 
 
 export const addRegularFee = (clubId: string | null, feeType: any, feeTypeInterval: any, feeAmount: any, email: string) => {
-    console.log(clubId, feeType, feeTypeInterval, feeAmount, email)
     return post("/fee", { clubId, feeType, feeTypeInterval, feeAmount, email }, null)
 }
 
+export const editFee = (feeTypeId: string | null, feeType: any, feeTypeInterval: any, feeAmount: any, email: string) => {
+    return put("/fee", { feeTypeId, feeType, feeTypeInterval, feeAmount, email }, null)
+}
+
+export const deleteFee = (feeTypeId: string | null, email: string) => {
+    return del("/fee", { feeTypeId, email }, null)
+}
+
 export const addExceptionType = (feeTypeId: string | null, exceptionType: string | undefined, exceptionAmount: string | undefined, exceptionMembers: any, email: string) => {
-    return post("/fee/exception", null , { feeTypeId, exceptionType, exceptionAmount, exceptionMembers, email })
+    return post("/fee/exception", null, { feeTypeId, exceptionType, exceptionAmount, exceptionMembers, email })
 }
 
 export const getExceptionTypes = (feeTypeId: string | null) => {
@@ -172,26 +179,29 @@ export const getExceptionTypes = (feeTypeId: string | null) => {
 }
 
 export const getNextPeriods = (feeTypeId: string | null, listNextPeriods: string) => {
-    return get("/fee/collection", { feeTypeId, listNextPeriods})
+    return get("/fee/collection", { feeTypeId, listNextPeriods })
 }
 
-export const saveNextPeriodFeeCollection = (feeTypeId: string | null, nextPeriodFees: any | undefined, 
-                                    nextPeriodDate: string | undefined, nextPeriodLabel: string | undefined, email: string) => {
-    console.log(feeTypeId, nextPeriodFees, nextPeriodDate, nextPeriodLabel, email)
+export const saveNextPeriodFeeCollection = (feeTypeId: string | null, nextPeriodFees: any | undefined,
+    nextPeriodDate: string | undefined, nextPeriodLabel: string | undefined, email: string) => {
     return post("/fee/collection", null, { feeTypeId, nextPeriodFees, nextPeriodDate, nextPeriodLabel, email })
 }
 
+export const deleteFeeCollection = (clubFeeCollectionId: string | null, email: string) => {
+    return del("/fee/collection", { clubFeeCollectionId, email }, null)
+}
+
 export const getCollectionsOfFeeType = (feeTypeId: string | null, listCollectionsOfFeetType: string) => {
-    return get("/fee/collection", { feeTypeId, listCollectionsOfFeetType})
+    return get("/fee/collection", { feeTypeId, listCollectionsOfFeetType })
 }
 
 
 export const getFeePayments = async (feeCollectionId: string | null, listPayments: string) => {
-    return get("/fee/collection", {feeCollectionId, listPayments})
+    return get("/fee/collection", { feeCollectionId, listPayments })
 }
 
-export const saveFeePayments = (paymentStatusUpadtes: any | undefined, updatePaymentStatus: string | undefined, email: string) => {
-    return post("/fee/collection", null, { paymentStatusUpadtes, updatePaymentStatus, email })
+export const saveFeePayments = (paymentStatusUpadtes: any | undefined, clubId: string | null, updatePaymentStatus: string | undefined, email: string) => {
+    return post("/fee/collection", null, { paymentStatusUpadtes, clubId, updatePaymentStatus, email })
 }
 
 export const getExceptionDetails = (clubFeeTypeExceptionId: string | null) => {
@@ -199,5 +209,5 @@ export const getExceptionDetails = (clubFeeTypeExceptionId: string | null) => {
 }
 
 export const updateExceptionType = (feeTypeExceptionId: string | null, exceptionType: string | undefined, exceptionAmount: string | undefined, exceptionMembers: any, email: string) => {
-    return put("/fee/exception", null , { feeTypeExceptionId, exceptionType, exceptionAmount, exceptionMembers, email })
+    return put("/fee/exception", null, { feeTypeExceptionId, exceptionType, exceptionAmount, exceptionMembers, email })
 }

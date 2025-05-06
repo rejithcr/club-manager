@@ -20,7 +20,7 @@ export const getClubs = (memberId: number) => {
     return get("/club", {memberId: memberId})
 }
 
-export const createClub = (clubName: string, memberId: string, email: string) => {
+export const createClub = (clubName: string | null, memberId: string, email: string) => {
     return post("/club", null, {clubName, memberId, email})
 }
 
@@ -40,4 +40,8 @@ export const addMemberAndAssignClub = async (member: any) => {
 
 export const addToClub = async (memberId: number, clubId: number, email: string) => {
     return post("/club/member", null, {memberId, clubId, email})
+}
+
+export const getFundBalance = async (clubId: number | undefined) => {
+    return get("/club", {clubId, fundBalance: "true"})
 }

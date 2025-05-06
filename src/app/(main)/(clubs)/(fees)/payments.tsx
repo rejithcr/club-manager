@@ -1,7 +1,7 @@
-import { View, Text, FlatList, TouchableOpacity, Button } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity, Button, Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
-import { getFeePayments, saveFeePayments } from '@/src/helpers/fee_helper';
+import { deleteFeeCollection, getFeePayments, saveFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
@@ -11,6 +11,7 @@ import Modal from 'react-native-modal';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AuthContext } from '@/src/context/AuthContext';
 import { router } from 'expo-router';
+import { ClubContext } from '@/src/context/ClubContext';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +23,7 @@ const Payments = () => {
         firstName?: string
     }[]>([])
     const { userInfo } = useContext(AuthContext)
+    const { clubInfo } = useContext(ClubContext)
 
     const params = useSearchParams()
 
@@ -45,15 +47,35 @@ const Payments = () => {
     const savePaymentUpdates = () => {
         setIsLoading(true)
         setIsConfirmVisible(false)
-        saveFeePayments(paymentStatusUpdates, "true", userInfo.email)
+        saveFeePayments(paymentStatusUpdates, clubInfo.clubId, "true", userInfo.email)
             .then(() => router.back())
-            .catch(error => console.error(error))
+            .catch(error => Alert.alert("Error", error.response.data.error))
             .finally(() => setIsLoading(false));
     }
 
+    const deleteCollection = () => {
+        Alert.alert(
+            'Are you sure!',
+            'This will delete the transcations of this collecton. This cannot be recovered.',
+            [
+                {
+                    text: 'OK', onPress: () => {
+                        setIsLoading(true)
+                        deleteFeeCollection(params.get("clubFeeCollectionId"), userInfo.email)
+                            .then((response) => {Alert.alert("Success", response.data.message); router.back()})
+                            .catch(error => Alert.alert("Error", error.response.data.error))
+                            .finally(() => setIsLoading(false));
+                    }
+                },
+                { text: 'cancel', onPress: () => null},
+            ],
+            { cancelable: true },
+        );
+    }
     return (
         <GestureHandlerRootView>
-            <View style={{ height: "88%", marginTop: 20 }}>
+            <Text style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</Text>
+            <View style={{ height: "80%" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <FlatList style={{ width: "100%" }}
@@ -80,7 +102,7 @@ const Payments = () => {
             </Modal>
             <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
                 <ThemedButton title='Update Status' onPress={() => updatePaymentStatus()} />
-                <Text>PERIOD-TBD</Text>
+                <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} />
             </View>
         </GestureHandlerRootView>
     )
@@ -98,14 +120,14 @@ const MemberFeeItem = (props: {
     const selectItem = () => {
         setIsSelected(prev => !prev)
 
-        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined })[]) => {
+        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined; amount: number })[]) => {
 
             let item = prev.find(item => item.clubFeePaymentId == props.clubFeePaymentId)
             const initialPaymentStatus = props.feeByMembers?.find((item: { clubFeePaymentId: number; }) => item.clubFeePaymentId == props.clubFeePaymentId)
             if (item) {
                 item.paid = !isSelected
             } else {
-                item = { clubFeePaymentId: props.clubFeePaymentId, paid: !isSelected, firstName: props.firstName }
+                item = { clubFeePaymentId: props.clubFeePaymentId, paid: !isSelected, firstName: props.firstName, amount: props.amount }
                 prev.push(item)
             }
             if (initialPaymentStatus?.paid == !isSelected) {
@@ -117,9 +139,9 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <View style={{...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap"}}>
+            <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
                 <View style={{ width: "5%" }}>
-                    <Checkbox value={isSelected} color={"black"} /> 
+                    <Checkbox value={isSelected} color={"black"} />
                 </View>
                 <Text style={{ width: "75%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</Text>
                 <Text style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</Text>
@@ -131,7 +153,7 @@ const MemberFeeItem = (props: {
 
 const PaymentUpdates = (props: { clubFeePaymentId: number | undefined; firstName?: string | null | undefined; paid: boolean | undefined; }) => {
     return (
-        <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap"}}>
+        <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
             <Text numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName}</Text>
             {props?.paid ?
                 <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-marked' /> :

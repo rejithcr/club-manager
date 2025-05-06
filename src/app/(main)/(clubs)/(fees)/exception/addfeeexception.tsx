@@ -11,12 +11,14 @@ import { getClubMembers } from '@/src/helpers/club_helper'
 import Checkbox from 'expo-checkbox'
 import { appStyles } from '@/src/utils/styles'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
+import { ClubContext } from '@/src/context/ClubContext'
 
 const AddFeeException = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [exceptionType, setExceptionType] = useState<string>("")
     const [exceptionAmount, setExceptionAmount] = useState<string>("")
     const { userInfo } = useContext(AuthContext)
+    const { clubInfo } = useContext(ClubContext)
 
     const params = useSearchParams()
 
@@ -42,7 +44,7 @@ const AddFeeException = () => {
 
     useEffect(() => {
         setIsLoading(true)
-        getClubMembers(params.get("clubId"))
+        getClubMembers(clubInfo.clubId)
             .then(response => {
                 const memberItems = response.data.map((item: any) => ({
                     ...item,

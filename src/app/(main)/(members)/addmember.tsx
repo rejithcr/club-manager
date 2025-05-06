@@ -2,7 +2,7 @@ import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
 import { useContext, useEffect, useState } from 'react'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import { Text, View } from 'react-native';
+import { Alert, Text, View } from 'react-native';
 import DatePicker from '@/src/components/DatePicker';
 import { getMemberByPhone, Member, regirsterMember } from '@/src/helpers/member_helper';
 import MemberItem from '@/src/components/MemberItem';
@@ -12,6 +12,7 @@ import { router } from 'expo-router';
 import { isValidEmail, isValidPhoneNumber } from '@/src/utils/validators';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { addMemberAndAssignClub, addToClub } from '@/src/helpers/club_helper';
+import { ClubContext } from '@/src/context/ClubContext';
 
 const AddMember = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -28,6 +29,7 @@ const AddMember = () => {
     const [email, setEmail] = useState("")
 
     const { userInfo } = useContext(AuthContext)
+    const { clubInfo } = useContext(ClubContext)
     const params = useSearchParams()
 
     const clearForm = () => {
@@ -39,7 +41,7 @@ const AddMember = () => {
     }
 
     const addMemberToClub = (member: any | undefined) => {
-        addToClub(member.memberId, Number(params.get("clubId")), member.email)
+        addToClub(member.memberId, Number(params.get("clubId") || clubInfo.clubId), member.email)
             .then(response => {
                 alert(`${response?.data.message}`);
                 clearForm()
@@ -61,7 +63,7 @@ const AddMember = () => {
                 "lastName": lastName,
                 "email": email,
                 "phone": phone,
-                "clubId": params.get("clubId")
+                "clubId": params.get("clubId") || clubInfo.clubId
             }
             addMemberAndAssignClub(payload)
                 .then(response => {
@@ -121,7 +123,7 @@ const AddMember = () => {
                     router.replace('/(auth)')
                 })
                 .catch(error => {
-                    alert("Error while register" + error?.data )
+                    Alert.alert("Error", error.response.data.error)
                 }).finally(() => {
                     setIsLoading(false)
                 })
@@ -155,7 +157,7 @@ const AddMember = () => {
                     setShowExistingPlayer(false);
                     setShowAddNewMemberForm(true)
                 }
-            }).catch(_ => {
+            }).catch(() => {
                 setShowExistingPlayer(false);
                 setShowAddNewMemberForm(true)
             }).finally(() => {
@@ -165,7 +167,7 @@ const AddMember = () => {
 
     return (
         <GestureHandlerRootView>
-            <Text style={{textAlign:"right",margin: 15}}>{params.get("clubName")}</Text>
+            <Text style={{textAlign:"right",margin: 15}}>{params.get("clubName") || clubInfo.clubName}</Text>
             {isLoading && <LoadingSpinner />}
             {!isLoading && <ScrollView>
                 {showPhoneSearch &&
@@ -183,7 +185,7 @@ const AddMember = () => {
                 {(showRegisterForm || showAddNewMemberForm) && <>
                     <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
-                    <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} />
+                    <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"}/>
                     {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} />}
                     {/* <DatePicker date={date} setDate={setDate} />
                     <InputText placeholder='Jersey Name' />

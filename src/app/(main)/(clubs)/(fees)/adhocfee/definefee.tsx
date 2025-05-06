@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
-import React, { useContext, useRef, useState } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, Alert, FlatList } from 'react-native'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks'
 import InputText from '@/src/components/InputText'
 import { Picker } from '@react-native-picker/picker'
@@ -13,20 +13,32 @@ import { router } from 'expo-router'
 import { isNumeric, isValidLength } from '@/src/utils/validators'
 import { AuthContext } from '@/src/context/AuthContext'
 import { ClubContext } from '@/src/context/ClubContext'
+import { getMembers } from '@/src/helpers/member_helper'
+import { getClubMembers } from '@/src/helpers/club_helper'
+import Checkbox from 'expo-checkbox'
+import { appStyles } from '@/src/utils/styles'
 
 const DefineFee = () => {
     const [isLoading, setIsLoading] = useState(false);
-
-    const [feeType, setFeeType] = useState("");
-    const [feeTypeInterval, setFeeTypeInterval] = useState("MONTHLY");
+    const [isLoadingMembers, setIsLoadingMembers] = useState(false);
+    const [members, setMembers] = useState<any>([])
+    const [feeName, setFeeName] = useState("");
     const [feeAmount, setFeeAmount] = useState("");
+    const [feeDescription, setFeeDescription] = useState("")
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
 
+    useEffect(() => {
+        setIsLoadingMembers(true)
+        getClubMembers(clubInfo.clubId)
+            .then((response) => setMembers(response.data))
+            .catch(error => Alert.alert("Error", error.response.data.error))
+            .finally(() => setIsLoadingMembers(false))
+    }, [])
     const addFee = () => {
-        if (validate(feeType, feeAmount)) {
+        if (validate(feeName, feeAmount)) {
             setIsLoading(true)
-            addRegularFee(clubInfo.clubId, feeType, feeTypeInterval, feeAmount, userInfo.email)
+            addRegularFee(clubInfo.clubId, feeName, feeDescription, feeAmount, userInfo.email)
                 .then((response) => {
                     console.log(response.data)
                     Alert.alert("Success", "Fee added successfully")
@@ -40,26 +52,20 @@ const DefineFee = () => {
     }
     return (
         <GestureHandlerRootView>
-            <ScrollView>
+            <View>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <View style={{ alignItems: "center" }}>
                         <InputText
-                            onChangeText={(text: string) => setFeeType(text)}
-                            label={`Fee Type`}
-                            defaultValue={feeType}
+                            onChangeText={(text: string) => setFeeName(text)}
+                            label={`Fee Name`}
+                            defaultValue={feeName}
                         />
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "80%" }}>
-                            <Text style={{ width: "40%" }}>Select Period</Text>
-                            <Picker style={{ width: "60%", textAlign: "right" }}
-                                selectedValue={feeTypeInterval}
-                                onValueChange={(itemValue, _itemIndex) => setFeeTypeInterval(itemValue)}>
-                                <Picker.Item label="MONTHLY" value="MONTHLY" />
-                                <Picker.Item label="QUARTERLY" value="QUARTERLY" />
-                                <Picker.Item label="YEARLY" value="YEARLY" />
-                                <Picker.Item label="ADHOC" value="ADHOC" />
-                            </Picker>
-                        </View>
+                        <InputText
+                            onChangeText={(text: string) => setFeeDescription(text)}
+                            label={`Description`}
+                            defaultValue={feeDescription}
+                        />
                         <InputText
                             onChangeText={(text: string) => setFeeAmount(text)}
                             label={`Fee Amount`}
@@ -67,11 +73,26 @@ const DefineFee = () => {
                             defaultValue={feeAmount}
                         />
 
-                        <View style={{ marginBottom: 40 }} />
-                        <ThemedButton title='Add Fee' onPress={addFee} />
                     </View>
                 }
-            </ScrollView>
+            </View>
+            <Text style={appStyles.heading}>Select Members</Text>
+            <View style={{ height: "80%" }}>
+                {isLoadingMembers && <LoadingSpinner />}
+                {!isLoadingMembers &&
+                    <FlatList style={{ width: "80%", alignSelf: "center" }}
+                        data={members}
+                        initialNumToRender={8}
+                        renderItem={({ item }) => (
+                            <ShadowBox style={{ flexDirection: "row", padding: 15, alignItems: "center" }}>
+                                <Checkbox />
+                                <Text style={{ marginLeft: 10 }}>{item.firstName} {item.lastName}</Text>
+                            </ShadowBox>
+                        )}
+                    />}
+            </View>
+
+            <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 20 }} title='Start Collection' onPress={addFee} />
         </GestureHandlerRootView>
     )
 }

@@ -11,6 +11,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox';
 import { AuthContext } from '@/src/context/AuthContext';
 import { router } from 'expo-router';
+import { ClubContext } from '@/src/context/ClubContext';
 
 const StartNextPeriod = () => {
     const [isLoadingPeriods, setIsLoadingPeriods] = useState(false);
@@ -47,10 +48,10 @@ const StartNextPeriod = () => {
             .then(() =>
                 router.dismissTo({
                     pathname: "/(main)/(clubs)/(fees)/feetypedetails",
-                    params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName")}
+                    params: { fee: params.get('fee')}
                 })
             )
-            .catch((error: any) => alert(error))
+            .catch((error: any) => alert(error.response.data.message))
             .finally(() => setIsLoadingPeriods(false));
     }
 

@@ -17,6 +17,8 @@ import { router, useFocusEffect } from 'expo-router'
 import Modal from 'react-native-modal'
 import { Picker } from '@react-native-picker/picker'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
+import TouchableCard from '@/src/components/TouchableCard'
+import { ClubContext } from '@/src/context/ClubContext'
 
 const FeeTypeDetails = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -27,7 +29,6 @@ const FeeTypeDetails = () => {
     const [isFeeCollectionsLoading, setIsFeeCollectionsLoading] = useState(false)
 
     const params = useSearchParams()
-    const { userInfo } = useContext(AuthContext)
 
     const feeObj = JSON.parse(params.get('fee') || "")
 
@@ -62,39 +63,49 @@ const FeeTypeDetails = () => {
 
     useEffect(() => {
         setFee(feeObj)
+        console.log(feeObj)
     }, [])
 
     const showStartCollectionPage = () => {
         router.push({
             pathname: "/(main)/(clubs)/(fees)/startcollection",
-            params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName"), clubFeeTypeId: fee?.clubFeeTypeId }
+            params: { fee: params.get('fee'), clubFeeTypeId: fee?.clubFeeTypeId }
         })
     }
-    const gotoPayments = (clubFeeCollectionId: string) => {
+    const gotoPayments = (clubFeeCollectionId: string, clubFeeTypePeriod: string) => {
         router.push({
             pathname: "/(main)/(clubs)/(fees)/payments",
-            params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName"), clubFeeCollectionId }
+            params: { fee: params.get('fee'), clubFeeCollectionId, clubFeeTypePeriod }
         })
     }
     const gotoAddFeeExceptions = () => {
         router.push({
             pathname: "/(main)/(clubs)/(fees)/exception/addfeeexception",
-            params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName"), clubFeeTypeId: fee.clubFeeTypeId }
+            params: { fee: params.get('fee'), clubFeeTypeId: fee.clubFeeTypeId }
         })
     }
     const gotoEditFeeExceptions = (clubFeeTypeExceptionId: string) => {
         router.push({
             pathname: "/(main)/(clubs)/(fees)/exception/editfeeexception",
-            params: { fee: params.get('fee'), clubId: params.get("clubId"), clubName: params.get("clubName"), clubFeeTypeId: fee.clubFeeTypeId, clubFeeTypeExceptionId }
+            params: { fee: params.get('fee'), clubFeeTypeId: fee.clubFeeTypeId, clubFeeTypeExceptionId }
         })
     }
-
+    const editFeeType = () => {
+        router.push({
+            pathname: "/(main)/(clubs)/(fees)/editfeetype",
+            params: {
+                clubFeeTypeId: fee.clubFeeTypeId, clubFeeAmount: fee.clubFeeAmount, 
+                clubFeeType: fee.clubFeeType,clubFeeTypeInterval: fee.clubFeeTypeInterval,
+                isAmountEditable: feeCollections.length > 0 ? "false" : "true"
+            }
+        })
+    }
     return (
         <GestureHandlerRootView>
             <View style={{ marginVertical: 10 }} />
-            <ShadowBox style={{
-                flexDirection: "row", width: "80%", padding: 10,
-                justifyContent: "space-between", alignSelf: "center", flexWrap: "wrap"
+            <TouchableCard id={fee?.clubFeeTypeId} showDetails={editFeeType} style={{
+                flexDirection: "row",
+                justifyContent: "space-between", alignSelf: "center"
             }}>
                 <View>
                     <Text style={{ fontSize: 18, fontWeight: "bold" }}>{fee?.clubFeeType}</Text>
@@ -104,18 +115,18 @@ const FeeTypeDetails = () => {
                     <Text style={{ marginRight: 10 }}>Rs. {fee?.clubFeeAmount}</Text>
                     <MaterialCommunityIcons size={20} name={'square-edit-outline'} />
                 </View>
-            </ShadowBox>
+            </TouchableCard>
             <View>
                 <View style={{
-                    flexDirection: "row", width: "80%", alignItems: "center",
+                    flexDirection: "row", width: "70%", alignItems: "center",
                     justifyContent: "space-between", alignSelf: "center",
                 }}>
                     <TouchableOpacity onPress={() => setShowAddException(!showAddException)}
-                        style={{ flexDirection: "row", width: "80%", justifyContent:"flex-start",alignItems: "center"}}>
+                        style={{ flexDirection: "row", width: "80%", justifyContent: "flex-start", alignItems: "center" }}>
                         <MaterialCommunityIcons size={25} name={showAddException ? 'chevron-down-circle' : 'chevron-right-circle'} />
                         <Text style={appStyles.heading}>Exceptions</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={{width:50, alignItems: "center"}} onPress={() => gotoAddFeeExceptions()}>
+                    <TouchableOpacity style={{ width: 50, alignItems: "center" }} onPress={() => gotoAddFeeExceptions()}>
                         <MaterialCommunityIcons size={25} name={'plus-circle'} />
                     </TouchableOpacity>
                 </View>
@@ -127,11 +138,11 @@ const FeeTypeDetails = () => {
                     )}
                 </View>
                 }
-                <ThemedButton title='Start new collection' onPress={showStartCollectionPage} />
             </View>
             <View style={{ height: 450 }}>
                 <Text style={appStyles.heading}>Collections</Text>
                 {isFeeCollectionsLoading && <LoadingSpinner />}
+                {!isFeeCollectionsLoading && feeCollections.length ==0 && <Text style={{alignSelf:"center"}}>No collections present</Text>}
                 {!isFeeCollectionsLoading && feeCollections &&
                     <FlatList style={{ width: "100%" }}
                         data={feeCollections}
@@ -139,11 +150,14 @@ const FeeTypeDetails = () => {
                         //onEndReached={fetchNextPage}
                         //onEndReachedThreshold={0.5}
                         renderItem={({ item }) => (
-                            <KeyValueTouchableBox onPress={() => gotoPayments(item.clubFeeCollectionId)} keyName={item.clubFeeTypePeriod} 
-                                keyValue={`${Math.round(item.collected/item.total*100)}%`} />
+                            <KeyValueTouchableBox onPress={() => gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod)} keyName={item.clubFeeTypePeriod}
+                                keyValue={item.total != 0 ? `${Math.round(item.collected / item.total * 100)}%` : 'NA'} />
                         )}
                     />
                 }
+            </View>
+            <View style={{ position: "absolute", bottom: 30, alignSelf:"center" }} >
+            <ThemedButton title='Start new collection' onPress={showStartCollectionPage} />
             </View>
             {/*  <Modal isVisible={isSelectPeriodVisible}>
                 <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>

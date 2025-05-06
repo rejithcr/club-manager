@@ -1,4 +1,4 @@
-import { View, FlatList, Text, StyleSheet } from 'react-native'
+import { View, FlatList, Text, StyleSheet, Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'expo-router/build/hooks';
 import FloatingMenu from '@/src/components/FloatingMenu';
@@ -21,12 +21,13 @@ const ClubMain = () => {
         const memberClubs = response.data
         console.log(memberClubs)
         setClubs(memberClubs);
-        setIsLoading(false)
       })
+      .catch((error) => Alert.alert("Error", error.response.data.message))
+      .finally(() => setIsLoading(false))
   }, []);
 
   const showCreateClub = () => router.push("/(main)/(clubs)/createclub")
-  const showDetails = (clubId: number, role: string) => router.push(`/(main)/(clubs)/clubdetails?clubId=${clubId}&role=${role}`)
+  const showDetails = (clubId: number, clubName: string, role: string) => router.push(`/(main)/(clubs)/clubdetails?clubId=${clubId}&clubName=${clubName}&role=${role}`)
 
   return (
     <>
@@ -37,7 +38,7 @@ const ClubMain = () => {
           <FlatList
             data={clubs}
             renderItem={({ item }) => (
-              <TouchableCard key={item.clubId} showDetails={() => showDetails(item.clubId, item.roleName)} id={item.clubId}>
+              <TouchableCard key={item.clubId} showDetails={() => showDetails(item.clubId, item.clubName, item.roleName)} id={item.clubId}>
                 <View style={{
                   flexDirection: "row", width: "100%",
                   justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"

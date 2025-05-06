@@ -1,7 +1,7 @@
-import { View, Text, GestureResponderEvent } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View, Text, GestureResponderEvent, Alert } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
-import { Club, getClubDetails } from '@/src/helpers/club_helper'
+import { getClubDetails } from '@/src/helpers/club_helper'
 import KeyValueUI from '@/src/components/KeyValueUI'
 import { appStyles } from '@/src/utils/styles'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
@@ -9,71 +9,59 @@ import { FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vecto
 import { router } from 'expo-router'
 import FloatingMenu from '@/src/components/FloatingMenu'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
+import { ClubContext } from '@/src/context/ClubContext'
+import ClubFeeSummary from './(fees)/ClubFeeSummary'
 
 const ClubDetails = () => {
-    const [refreshing, setRefreshing] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const router = useRouter()
     const params = useSearchParams()
     const [clubDetails, setClubDetails] = useState<any>()
-
+    const { setClubInfo } = useContext(ClubContext)
     useEffect(() => {
         setIsLoading(true)
+        setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") })
         getClubDetails(Number(params.get("clubId")))
-            .then(response => {
-                setClubDetails(response.data);
-            }).finally(() => {
-                setIsLoading(false)
-            })
+            .then(response => setClubDetails(response.data))
+            .catch(error => Alert.alert("Error", error.response.data.error))
+            .finally(() => setIsLoading(false))
     }, [])
 
-    const showMembers = (clubId: number) => router.push(`/(main)/(members)?clubId=${clubId}`)
-
-    const onRefresh = () => {
-        setRefreshing(true)
-        throw new Error('Function not implemented.')
+    const showClubDues = (_: GestureResponderEvent): void => {
+        router.push(`/(main)/(clubs)/(fees)/clubdues`)
     }
 
-
-
-    // const setClubAsDefault = async () => {
-    //     try {
-    //         clubDetails && await AsyncStorage.setItem('defaultClubId', clubDetails.id.toString());
-    //     } catch (e) {
-    //         console.log(e)
-    //     }
-    // }
+    const showFeeByMember = (_: GestureResponderEvent): void => {
+        router.push(`/(main)/(clubs)/(fees)/payments`)
+    }
     return (
         <GestureHandlerRootView>
             {isLoading && <LoadingSpinner />}
             {!isLoading && <ScrollView>
-                {/* <View style={styles.photoContainer}>
-                    <MaterialIcons name={"star"} size={100} />
-                </View> */}
-
-                <Text style={appStyles.title}>{clubDetails?.clubName}</Text>
-
+                <MaterialIcons style={{alignSelf:"center", marginTop:20}} name="sports-cricket" size={100}/>
+                <Text style={{...appStyles.title, alignSelf:"center"}}>{clubDetails?.clubName}</Text>
                 <KeyValueUI data={clubDetails} hideKeys={[]} />
                 <View style={{ marginBottom: 20 }} />
-
-                <View style={{ marginBottom: 20 }} />
+                <Text style={appStyles.heading}>Summary</Text>
+                <ClubFeeSummary clubId={Number(params.get("clubId"))} clubName={params.get("clubName")}
+                    showClubDues={showClubDues} showFeeByMember={showFeeByMember} />
             </ScrollView>
             }
             <FloatingMenu actions={actions} position={"left"} color='black'
                 icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-                onPressItem={(name: string | undefined) => handleMenuPress(name, clubDetails?.clubId, clubDetails?.clubName, params.get("role"))}
+                onPressItem={(name: string | undefined) => handleMenuPress(name)}
             />
         </GestureHandlerRootView>
     )
 }
 
-const handleMenuPress = (name: string | undefined, clubId: number | undefined, clubName: string | undefined, role: string | null) => {
+const handleMenuPress = (name: string | undefined) => {
     if (name == "fees") {
-        router.push(`/(main)/(clubs)/(fees)?clubId=${clubId}&clubName=${clubName}`)
+        router.push(`/(main)/(clubs)/(fees)`)
     } else if (name == "attendance") {
-        router.push(`/(main)/(clubs)/(attendance)?clubId=${clubId}&clubName=${clubName}`)
+        router.push(`/(main)/(clubs)/(attendance)`)
     } else if (name == "members") {
-        router.push(`/(main)/(members)?clubId=${clubId}&clubName=${clubName}&role=${role}`)
+        router.push(`/(main)/(members)`)
     } else {
         throw ("Error")
     }
