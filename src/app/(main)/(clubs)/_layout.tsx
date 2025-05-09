@@ -32,6 +32,13 @@ export default function ClubLayout() {
           title: 'Attendance',
           headerShown:false
         }}
+      />              
+      <Stack.Screen
+        name="(transactions)" // This is the name of the page and must match the url from root
+        options={{
+          title: 'Transactions',
+          headerShown:false
+        }}
       />   
     </Stack>
   )

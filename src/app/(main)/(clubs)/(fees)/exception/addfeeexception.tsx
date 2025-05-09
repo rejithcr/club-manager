@@ -76,6 +76,7 @@ const AddFeeException = () => {
     };
 
     return (
+        <>
         <View>
             <View style={{ marginBottom: 20 }}>
                 <InputText label='Exception Type' onChangeText={setExceptionType} />
@@ -98,10 +99,13 @@ const AddFeeException = () => {
                     )}
                     keyExtractor={(item) => item.memberId}
                 />
-                <ThemedButton title='Add Exception' onPress={saveException} />
             </>
             }
         </View>
+        <View style={{ position: "absolute", bottom: 30, alignSelf:"center" }} >
+            <ThemedButton title='Add Exception' onPress={saveException} />
+        </View>
+        </>
     )
 }
 

@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
-import {  getExceptionDetails, updateExceptionType } from '@/src/helpers/fee_helper'
+import { getExceptionDetails, updateExceptionType } from '@/src/helpers/fee_helper'
 import { useSearchParams } from 'expo-router/build/hooks'
 import { AuthContext } from '@/src/context/AuthContext'
 import { isNumeric, isValidLength } from '@/src/utils/validators'
@@ -32,7 +32,7 @@ const EditFeeException = () => {
         if (validate(exceptionType, exceptionAmount)) {
             setIsLoadingMembers(true)
             updateExceptionType(params.get("clubFeeTypeExceptionId"), exceptionType, exceptionAmount, changes, userInfo.email)
-                .then(()=> router.back())
+                .then(() => router.back())
                 .catch((error) => alert(error?.response?.data?.error))
                 .finally(() => setIsLoadingMembers(false))
         }
@@ -82,7 +82,7 @@ const EditFeeException = () => {
         console.log(memberEdit.clubFeeTypeExceptionMemberId, memberEdit.memberId)
         setExceptionMembers((prev: { memberId: number, endDateAdded: string, clubFeeTypeExceptionMemberId: number, endDate: string }[]) => {
             if (memberEdit?.clubFeeTypeExceptionMemberId) {
-                return prev.map((member: {memberId: number, endDateAdded: string | null, endDate: string}) => {
+                return prev.map((member: { memberId: number, endDateAdded: string | null, endDate: string }) => {
                     if (member.memberId === memberEdit.memberId && !member.endDate) {
                         const endDateAdded = member.endDateAdded ? null : new Date().toISOString().split('T')[0]
                         return { ...member, endDateAdded }
@@ -97,49 +97,55 @@ const EditFeeException = () => {
             setMembers((prev: any) => [...prev, memberEdit])
     }
     return (
-        <ScrollView>
-            <View style={{ marginBottom: 20 }}>
-                <InputText label='Exception Type' onChangeText={setExceptionType} defaultValue={exceptionType} />
-                {!isAmountEditable && <Text style={{alignSelf:"center", fontSize:10, color:"grey", width: "80%"}}>
+        <>
+            <ScrollView>
+                <View style={{ marginBottom: 20 }}>
+                    <InputText label='Exception Type' onChangeText={setExceptionType} defaultValue={exceptionType} />
+                    {!isAmountEditable && <Text style={{ alignSelf: "center", fontSize: 10, color: "grey", width: "80%" }}>
                         Amount not editable as some collections are already using this value</Text>}
-                <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setExceptionAmount} defaultValue={exceptionAmount.toString()} editable={isAmountEditable} />
-            </View>
+                    <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setExceptionAmount} defaultValue={exceptionAmount.toString()} editable={isAmountEditable} />
+                </View>
 
-            {isLoadingException && <LoadingSpinner />}
-            {!isLoadingException && exceptionMembers && exceptionMembers.length > 0 && exceptionMembers[0].memberId &&
-                exceptionMembers?.map((member: {
-                    memberId: number, lastName: string, firstName: string | undefined, startDate: string,
-                    clubFeeTypeExceptionMemberId: number, endDate: string | undefined, endDateAdded: string | undefined
-                }) => <View key={member?.memberId?.toString() + member?.endDate}>
-                        <ShadowBox style={{
-                            flexDirection: "row", justifyContent: "space-between",
-                            width: "70%", padding: 10, marginBottom: 15
-                        }}>
-                            <View>
-                                <Text style={{ textDecorationLine: getStrikeOut(member.endDate || member.endDateAdded) }}>{member.firstName} {member.lastName}</Text>
-                                <Text style={{ fontSize: 10, marginTop: 5 }}>{member.startDate} {(member.endDate || member.endDateAdded) && " to "} {member.endDate || member.endDateAdded}</Text>
-                            </View>
-                            {!member.endDate && (member.endDateAdded ? <MaterialIcons name="undo" size={20} onPress={() => endException(member)} />
-                                : <MaterialIcons name="remove-circle" size={20} onPress={() => endException(member)} />)}
-                        </ShadowBox>
-                    </View>
-                )
-            }
-
-            <Text style={{ ...appStyles.heading }}>Add Members</Text>
-            {isLoadingMembers && <LoadingSpinner />}
-            {!isLoadingMembers &&
-                members.map((item: any) =>
-                    <TouchableOpacity key={item.memberId} onPress={() => addToException(item)}>
-                        <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
-                            <MaterialIcons name="add-circle" size={20} />
-                            <Text style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName}</Text>
+                {isLoadingException && <LoadingSpinner />}
+                {!isLoadingException && exceptionMembers && exceptionMembers.length > 0 && exceptionMembers[0].memberId &&
+                    exceptionMembers?.map((member: {
+                        memberId: number, lastName: string, firstName: string | undefined, startDate: string,
+                        clubFeeTypeExceptionMemberId: number, endDate: string | undefined, endDateAdded: string | undefined
+                    }) => <View key={member?.memberId?.toString() + member?.endDate}>
+                            <ShadowBox style={{
+                                flexDirection: "row", justifyContent: "space-between",
+                                width: "70%", padding: 10, marginBottom: 15
+                            }}>
+                                <View>
+                                    <Text style={{ textDecorationLine: getStrikeOut(member.endDate || member.endDateAdded) }}>{member.firstName} {member.lastName}</Text>
+                                    <Text style={{ fontSize: 10, marginTop: 5 }}>{member.startDate} {(member.endDate || member.endDateAdded) && " to "} {member.endDate || member.endDateAdded}</Text>
+                                </View>
+                                {!member.endDate && (member.endDateAdded ? <MaterialIcons name="undo" size={20} onPress={() => endException(member)} />
+                                    : <MaterialIcons name="remove-circle" size={20} onPress={() => endException(member)} />)}
+                            </ShadowBox>
                         </View>
-                    </TouchableOpacity>
-                )
-            }
-            <ThemedButton title='Update Exception' onPress={saveException} />
-        </ScrollView>
+                    )
+                }
+
+                <Text style={{ ...appStyles.heading }}>Add Members</Text>
+                {isLoadingMembers && <LoadingSpinner />}
+                {!isLoadingMembers &&
+                    members.map((item: any) =>
+                        <TouchableOpacity key={item.memberId} onPress={() => addToException(item)}>
+                            <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
+                                <MaterialIcons name="add-circle" size={20} />
+                                <Text style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</Text>
+                            </View>
+                        </TouchableOpacity>
+                    )
+                }
+            <View style={{marginVertical:40}} />
+            </ScrollView>
+            
+            <View style={{ position: "absolute", bottom: 30, alignSelf: "center" }} >
+                <ThemedButton title='Update Exception' onPress={saveException} />
+            </View>
+        </>
     )
 }
 

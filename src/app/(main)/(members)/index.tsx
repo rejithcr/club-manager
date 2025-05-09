@@ -28,8 +28,7 @@ export default function Home() {
 
   return (
     <>
-      <Text style={{textAlign:"right",margin: 15}}>{clubInfo.clubName}</Text>
-      <View style={{ flex: 1, justifyContent: "center", alignContent: "center" }}>
+      <View style={{ height:"90%", justifyContent: "center", alignContent: "center" }}>
         {isLoading && <LoadingSpinner />}
         {!isLoading &&
           <FlatList

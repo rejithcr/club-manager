@@ -145,14 +145,6 @@ export const getFeeExemptions = async (clubId: number) => {
     }
 }
 
-
-export const getAdhocFees = async (clubId: number) => {
-    return {
-        "Joining": "1500",
-        "Re - Joining": "1000",
-    }
-}
-
 export const getNextPeriodFeeMemberList = async (feeTypeId: string | null, listNextPaymentCollectionList: string) => {
     return get("/fee/collection", { feeTypeId, listNextPaymentCollectionList })
 }
@@ -210,4 +202,24 @@ export const getExceptionDetails = (clubFeeTypeExceptionId: string | null) => {
 
 export const updateExceptionType = (feeTypeExceptionId: string | null, exceptionType: string | undefined, exceptionAmount: string | undefined, exceptionMembers: any, email: string) => {
     return put("/fee/exception", null, { feeTypeExceptionId, exceptionType, exceptionAmount, exceptionMembers, email })
+}
+
+export const addAdhocFee = (clubId: string | null, adhocFeeName: any, adhocFeeDesc: any, adhocFeeAmount: any, addedMembers: any, email: string) => {
+    return post("/fee/adhoc", null, { clubId, adhocFeeName, adhocFeeDesc, adhocFeeAmount, addedMembers, email })
+}
+
+export const getAdhocFee = (clubId: number) => {
+    return get("/fee/adhoc", { clubId })
+}
+
+export const getAdhocFeePayments = async (adhocFeeId: string | null) => {
+    return get("/fee/adhoc", { adhocFeeId })
+}
+
+export const saveAdhocFeePayments = (paymentStatusUpadtes: any | undefined, clubId: string | null, updatePaymentStatus: string | undefined, email: string) => {
+    return put("/fee/adhoc", null, { paymentStatusUpadtes, clubId, updatePaymentStatus, email })
+}
+
+export const deleteAdhocFeeCollection = (clubAdhocFeeId: string | null, email: string) => {
+    return del("/fee/adhoc", { clubAdhocFeeId, email }, null)
 }

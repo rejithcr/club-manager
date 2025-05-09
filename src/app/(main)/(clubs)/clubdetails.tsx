@@ -62,12 +62,28 @@ const handleMenuPress = (name: string | undefined) => {
         router.push(`/(main)/(clubs)/(attendance)`)
     } else if (name == "members") {
         router.push(`/(main)/(members)`)
+    } else if (name == "transactions") {
+        router.push(`/(main)/(clubs)/(transactions)`)
     } else {
         throw ("Error")
     }
 }
 
 const actions = [
+    {
+        color: "black",
+        text: "Attendance",
+        icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
+        name: "attendance",
+        position: 3
+    },
+    {
+        color: "black",
+        text: "Memebers",
+        icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
+        name: "members",
+        position: 4
+    },
     {
         color: "black",
         text: "Fees",
@@ -77,16 +93,9 @@ const actions = [
     },
     {
         color: "black",
-        text: "Attendance",
-        icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
-        name: "attendance",
-        position: 1
-    },
-    {
-        color: "black",
-        text: "Memebers",
-        icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
-        name: "members",
+        text: "Transactions",
+        icon: <FontAwesome6 name={"money-bill-transfer"} size={15} color={"white"} />,
+        name: "transactions",
         position: 1
     },
 ];

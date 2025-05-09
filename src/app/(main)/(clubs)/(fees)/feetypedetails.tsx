@@ -151,7 +151,7 @@ const FeeTypeDetails = () => {
                         //onEndReachedThreshold={0.5}
                         renderItem={({ item }) => (
                             <KeyValueTouchableBox onPress={() => gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod)} keyName={item.clubFeeTypePeriod}
-                                keyValue={item.total != 0 ? `${Math.round(item.collected / item.total * 100)}%` : 'NA'} />
+                                keyValue={item.total != 0 ? `${Math.round(item.collected / item.total * 100)}%` : 'NA'} goto/>
                         )}
                     />
                 }

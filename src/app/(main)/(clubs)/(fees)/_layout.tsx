@@ -1,7 +1,6 @@
 import { ClubContext } from '@/src/context/ClubContext';
 import { Stack } from 'expo-router';
-import { useSearchParams } from 'expo-router/build/hooks';
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import {Text, View} from 'react-native'
 
 export default function FeesLayout() {
@@ -12,70 +11,77 @@ export default function FeesLayout() {
       <Stack.Screen
         name="index" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Fees"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Fees"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />      
       <Stack.Screen
         name="clubdues" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Club Dues"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Club Dues"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />      
       <Stack.Screen
         name="payments" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Fee Payment"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Fee Payment"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />     
       <Stack.Screen
         name="startcollection" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Start Collection"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Start Collection"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />     
       <Stack.Screen
         name="definefee" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Define Fee"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Define Fee"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />     
       <Stack.Screen
         name="feetypedetails" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Fee Type"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Fee Type"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />     
       <Stack.Screen
         name="exception/addfeeexception" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Add Fee Exception"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Add Fee Exception"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />     
       <Stack.Screen
         name="exception/editfeeexception" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Edit Fee Exception"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Edit Fee Exception"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />      
       <Stack.Screen
         name="editfeetype" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Edit Fee type"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Edit Fee type"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />     
       <Stack.Screen
         name="adhocfee/definefee" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: (props) => <FeeHeader header={"Adhoc fee"} clubName={clubInfo.clubName} />,
+          headerTitle: () => <FeeHeader header={"Adhoc fee"} clubName={clubInfo.clubName} />,
+          headerShown:true
+        }}
+      />     
+      <Stack.Screen
+        name="adhocfee/payments" // This is the name of the page and must match the url from root
+        options={{
+          headerTitle: () => <FeeHeader header={"Adhoc fee payments"} clubName={clubInfo.clubName} />,
           headerShown:true
         }}
       />     

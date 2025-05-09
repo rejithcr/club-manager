@@ -167,7 +167,6 @@ const AddMember = () => {
 
     return (
         <GestureHandlerRootView>
-            <Text style={{textAlign:"right",margin: 15}}>{params.get("clubName") || clubInfo.clubName}</Text>
             {isLoading && <LoadingSpinner />}
             {!isLoading && <ScrollView>
                 {showPhoneSearch &&
@@ -186,7 +185,7 @@ const AddMember = () => {
                     <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                     <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"}/>
-                    {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} />}
+                    {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"}/>}
                     {/* <DatePicker date={date} setDate={setDate} />
                     <InputText placeholder='Jersey Name' />
                     <InputText placeholder='Jersey Number' /> */}

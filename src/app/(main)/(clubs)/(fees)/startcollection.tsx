@@ -112,6 +112,6 @@ const MemberFeeItem = (props: {
     }
 
     return (
-        <KeyValueTouchableBox onPress={undefined} keyName={props?.firstName} keyValue={props?.clubFeeAmount} edit/>
+        <KeyValueTouchableBox onPress={undefined} keyName={props?.firstName} keyValue={props?.clubFeeAmount} />
     )
 }
