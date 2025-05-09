@@ -5,6 +5,11 @@ from ServiceDefualt import DefaultService
 from ServiceFee import FeeService
 from ServiceMember import MemberService
 from ServiceClubMember import ClubMemberService
+from ServiceFeeException import FeeExceptionService
+from ServiceFeeCollection import FeeCollectionService
+from ServiceFeeAdhoc import FeeAdhocService
+from ServiceClubTransaction import ClubTransactionService
+
 
 def get_params(event):
     params = {}
@@ -27,13 +32,23 @@ def get_service(event):
             if len(paths) > 2 and paths[2] =="member":
                 print("club member")
                 return ClubMemberService()
+            if len(paths) > 2 and paths[2] =="transaction":
+                print("transaction")
+                return ClubTransactionService()
             return ClubService()
         if paths[1] == "member":
             return MemberService()
         if paths[1] == "fee":
+            if len(paths) > 2 and paths[2] =="exception":
+                print("fee exception")
+                return FeeExceptionService()
+            if len(paths) > 2 and paths[2] =="collection":
+                print("fee collection")
+                return FeeCollectionService()
+            if len(paths) > 2 and paths[2] =="adhoc":
+                print("fee adhoc")
+                return FeeAdhocService()
             return FeeService()
-        if paths[1] == "member":
-            return MemberService()
         
     return DefaultService()
 
@@ -45,3 +60,5 @@ def execute(conn, service, params):
         return service.post(conn, params)
     elif params['method'] == "PUT":
         return service.put(conn, params)
+    elif params['method'] == "DELETE":
+        return service.delete(conn, params)

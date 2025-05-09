@@ -26,3 +26,9 @@ SAVE_MEMBERSHIP = """
    insert into membership (membership_id, club_id, member_id, role_id, created_by, updated_by) values
     (nextval('membership_id_seq'), %s, %s, %s, %s, %s)
 """
+
+GET_MEMBERSHIP_ID = """
+   select membership_id
+   from membership
+   where club_id = %s and member_id = %s
+"""

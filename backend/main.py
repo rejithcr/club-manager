@@ -16,6 +16,7 @@ def handler(event, context):
         conn = db.connect()
         result = factory.execute(conn, service, params)
     except Exception as e:
+        print(str(e))
         return {
             "isBase64Encoded": False,
             "statusCode": 500,

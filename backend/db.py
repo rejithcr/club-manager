@@ -30,3 +30,8 @@ def fetch_one(conn, query, params):
 def execute(conn, query, params):
     with conn.cursor() as cursor:
         return cursor.execute(query, params)
+
+
+def executemany(conn, query, params):
+    with conn.cursor() as cursor:
+        return cursor.execute(query, params)

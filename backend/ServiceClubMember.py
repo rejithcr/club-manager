@@ -18,10 +18,12 @@ class ClubMemberService():
         email = params.get('email')  
         member_id = params.get('memberId')  
         if not member_id: 
-            ms = MemberService()
-            ms.post(conn, params)                
-            member_id = db.fetch_one(conn, queries_member.GET_MEMBER, (member_id,))["memberId"]
-        
+            first_name = params.get('firstName')
+            last_name = params.get('lastName')
+            phone = params.get('phone')
+            db.execute(conn, queries_member.SAVE_MEMBER, (first_name, last_name, email, phone, email, email))        
+            member_id = db.fetch_one(conn, queries_member.GET_MEMBER_BY_EMAIL, (email,))["member_id"]
+            
         db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id, 
                     constants.ROLE_MEMBER, email, email))
         conn.commit()
