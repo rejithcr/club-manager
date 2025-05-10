@@ -10,14 +10,16 @@ const FeeSummary = (props: { memberEmail: string }) => {
 
   useEffect(() => {
     getDues(props.memberEmail)
-      .then(data => { setDues(data); setIsLoading(false) })
-      .catch(error => { console.error(error); setIsLoading(false) });
+      .then(data => { setDues(data)})
+      .catch(error => { console.error(error)})
+      .finally(() => setIsLoading(false))
   }, [])
 
   return (
     <View>
       <Text style={appStyles.title}>Dues Summary</Text>
       {isLoading && <LoadingSpinner />}
+      {!isLoading && dues?.length == 0 && <Text style={{ textAlign: "center" }}>Yay!! You are all clear 👏</Text>}
       {!isLoading && dues.map((club: any) => {
         return (
           <View key={club.club} style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15 }}>

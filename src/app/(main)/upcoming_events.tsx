@@ -13,14 +13,16 @@ const UpcomingEvents = (props: { memberEmail: string }) => {
 
   useEffect(() => {
     getEvents(props.memberEmail)
-      .then(data => { setEvents(data); setIsLoading(false) })
-      .catch(error => { console.error(error); setIsLoading(false) });
+      .then(data => { setEvents(data) })
+      .catch(error => { console.error(error) })
+      .finally(() => setIsLoading(false))
   }, [])
 
   return (
     <View>
       <Text style={appStyles.title}>Upcoming Events</Text>
       {isLoading && <LoadingSpinner />}
+      {!isLoading && events?.length == 0 && <Text style={{ textAlign: "center" }}>No upcoming events!</Text>}
       {!isLoading && events.map((event) => {
         return (
           <View key={event.id} style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15 }}>

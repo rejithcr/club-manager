@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import * as Google from 'expo-auth-session/providers/google'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { ActivityIndicator, Alert, View } from 'react-native'
+import { ActivityIndicator, Alert, Image, View } from 'react-native'
 import { appStyles } from '@/src/utils/styles'
 import { AuthContext } from '../../context/AuthContext';
 import { ANDROID_CLIENT_ID, WEB_CLIENT_ID } from '@/src/utils/keys'
@@ -30,8 +30,8 @@ const AuthHome = () => {
   }, [response])
 
   const validateLogin = async () => {
-    //const userInfoFromCache = await AsyncStorage.getItem("userInfo");
-    const userInfoFromCache = "{\"email\": \"rejithramakrishnan@gmail.com\",\"name\": \"Rejith\"}"
+    const userInfoFromCache = await AsyncStorage.getItem("userInfo");
+    //const userInfoFromCache = "{\"email\": \"rejithramakrishnan@gmail.com\",\"name\": \"Rejith\"}"
     console.log(userInfoFromCache)
     if (userInfoFromCache) {
       setUserInfo(JSON.parse(userInfoFromCache))
@@ -48,7 +48,6 @@ const AuthHome = () => {
       .then(response => {
         console.log(response.data)
         if (response.data?.memberId) {
-          console.log(response.data)
           setUserInfo({...userInfoFromCache,...response.data})
           router.replace('/(main)')
         } else {
@@ -87,6 +86,7 @@ const AuthHome = () => {
 
   return (
     <View style={appStyles.centerify}>
+      <Image source={require("../../assets/images/app-icon.png")} style={{height: 300, width: 300, marginBottom: 50}}/>
       {isLoading ? <ActivityIndicator size="large" color={"black"} /> : <ThemedButton title="Sign in with Google" onPress={() => promptAsyc()} />}
     </View>
   )

@@ -184,11 +184,11 @@ const AddMember = () => {
                 {(showRegisterForm || showAddNewMemberForm) && <>
                     <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
-                    <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"}/>
-                    {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"}/>}
+                    <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
+                    {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />}
                     {/* <DatePicker date={date} setDate={setDate} />
-                    <InputText placeholder='Jersey Name' />
-                    <InputText placeholder='Jersey Number' /> */}
+                <InputText placeholder='Jersey Name' />
+                <InputText placeholder='Jersey Number' /> */}
                     <View style={{ marginTop: 25 }} />
                     {showRegisterForm && <ThemedButton title="Register" onPress={createMember} />}
                     {!showRegisterForm && showAddNewMemberForm && <ThemedButton title="Add Member" onPress={createAndAddToClub} />}

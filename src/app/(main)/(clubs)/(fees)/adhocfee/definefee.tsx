@@ -39,7 +39,7 @@ const DefineFee = () => {
             .finally(() => setIsLoadingMembers(false))
     }, [])
     const addFee = () => {
-        if (validate(feeName, feeAmount)) {
+        if (validate(feeName, feeAmount, addedMembers)) {
             setIsLoading(true)
             const feeAddedMembers = addedMembers.map( m=> {return {...m, clubAdocFeePaymentAmount: amountPerMember}})            
             addAdhocFee(clubInfo.clubId, feeName, feeDescription, feeAmount, feeAddedMembers,userInfo.email)
@@ -122,13 +122,17 @@ const DefineFee = () => {
 
 export default DefineFee
 
-const validate = (feeName: string | null | undefined, feeAmount: string) => {
+const validate = (feeName: string | null | undefined, feeAmount: string, addedMembers: any[]) => {
     if (!isValidLength(feeName, 2)) {
         alert("Enter atleast 2 characters for fee name")
         return false
     }
     if (!isNumeric(feeAmount)) {
         alert("Enter numeric value for amount")
+        return false
+    }
+    if (addedMembers?.length == 0){
+        alert("Add atleast one member")
         return false
     }
     return true

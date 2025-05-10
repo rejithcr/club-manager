@@ -6,8 +6,8 @@ import React, { useContext } from "react";
 export default function TransactionLayout() {
   const { clubInfo } = useContext(ClubContext)
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Transactions"} clubName={clubInfo.clubName} />, headerShown: true }} />
-    </Stack>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Transactions"} clubName={clubInfo?.clubName} />, headerShown: true }} />
+      </Stack>
   )
 }

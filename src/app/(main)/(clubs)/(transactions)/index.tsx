@@ -1,4 +1,4 @@
-import { View, Text, Alert, FlatList } from 'react-native'
+import { View, Text, Alert, FlatList, Switch } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { ClubContext } from '@/src/context/ClubContext'
 import { getTransactions, saveTransaction } from '@/src/helpers/transaction_helper'
@@ -12,6 +12,7 @@ import { appStyles } from '@/src/utils/styles'
 import InputText from '@/src/components/InputText'
 import { isNumeric, isValidLength } from '@/src/utils/validators'
 import { AuthContext } from '@/src/context/AuthContext'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 const Transactions = () => {
   const [isLoading, setIsloading] = useState(false)
@@ -23,6 +24,7 @@ const Transactions = () => {
   const [isFectching, setIsFetching] = useState(false)
   const [hasMoreData, setHasMoreData] = useState(false)
   const [transactions, setTransactions] = useState<any>([])
+  const [showFees, setShowFees] = useState(false)
   const [resfresh, setRefresh] = useState(false)
 
   const { clubInfo } = useContext(ClubContext)
@@ -68,19 +70,24 @@ const Transactions = () => {
     }
   }
   return (
-    <>
+    <GestureHandlerRootView>
       <View style={{ flex: 1, marginBottom: 30 }}>
-        <View style={{ width: "80%", alignSelf: "center" }}>
-          <Picker>
+        <View style={{ width: "80%", alignSelf: "center", flexDirection: "row", justifyContent: "space-between" }}>
+          <Picker style={{width:"50%"}} enabled={!showFees}>
             <Picker.Item value={'ALL'} label='ALL' />
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
           </Picker>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Text>Show Fees</Text>
+            <Switch onValueChange={() => setShowFees(prev => !prev)} value={showFees} thumbColor={"black"} />
+          </View>
         </View>
         {isLoading && <LoadingSpinner />}
+        {!isLoading && transactions?.length == 0 && <Text style={{ textAlign: "center" }}>No transactions found!</Text>}
         {!isLoading && transactions &&
           <FlatList style={{ width: "100%" }}
-            ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .1, borderBottomColor: "grey", width: "80%", alignSelf: "center" }} />}
+            ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .2, borderBottomColor: "grey", width: "80%", alignSelf: "center" }} />}
             ListFooterComponent={() => isFectching && <LoadingSpinner /> || <View style={{ marginVertical: 30 }} />}
             data={transactions}
             initialNumToRender={8}
@@ -112,7 +119,7 @@ const Transactions = () => {
             <Picker.Item value={'CREDIT'} label='CREDIT' />
           </Picker>
           <InputText label="Category" onChangeText={setTxnCategory} />
-          <InputText label="Comments" onChangeText={setTxnComment} />
+          <InputText label="Details" onChangeText={setTxnComment} />
           <InputText label="Amount" onChangeText={setTxnAmount} keyboardType={"numeric"} />
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
             <ThemedButton title="   Add   " onPress={() => save()} />
@@ -123,7 +130,7 @@ const Transactions = () => {
       <FloatingMenu onPressMain={() => setIsAddTxnVisible(true)}
         icon={<MaterialIcons name={"add"} size={32} color={"white"} />}
       />
-    </>
+    </GestureHandlerRootView>
   )
 }
 

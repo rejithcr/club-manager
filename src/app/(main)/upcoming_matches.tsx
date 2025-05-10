@@ -10,13 +10,15 @@ const UpcomingMatches = (props: { memberEmail: string }) => {
   const [matches, setMatches] = useState<Match[]>([]);
   useEffect(() => {
     getMatches(props.memberEmail)
-      .then(data => { setMatches(data); setIsLoading(false) })
-      .catch(error => { console.error(error); setIsLoading(false) });
+      .then(data => { setMatches(data)})
+      .catch(error => { console.error(error)})
+      .finally(() => setIsLoading(false))
   }, [])
   return (
     <View>
       <Text style={appStyles.title}>Upcoming Matches</Text>
       {isLoading && <LoadingSpinner />}
+      {!isLoading && matches?.length == 0 && <Text style={{ textAlign: "center" }}>No upcoming matches!</Text>}
       {!isLoading && matches?.map((match) => {
         return (
           <View key={match.id} style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15 }}>

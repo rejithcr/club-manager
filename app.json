@@ -1,23 +1,22 @@
 {
   "expo": {
-    "name": "cricket-club-manager",
-    "slug": "cricket-club-manager",
+    "name": "Club Manager",
+    "slug": "club-manager",
     "version": "1.0.0",
-    "orientation": "portrait",
-    "icon": "./src/assets/images/icon.png",
-    "scheme": "com.rejithcr.cricketclubmanager",
+    "icon": "./src/assets/images/app-icon.png",
+    "scheme": "cr.dev.clubmanager",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.rejithcr.cricketclubmanager"
+      "bundleIdentifier": "cr.dev.clubmanager"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./src/assets/images/adaptive-icon.png",
+        "foregroundImage": "./src/assets/images/app-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.rejithcr.cricketclubmanager"
+      "package": "cr.dev.clubmanager"
     },
     "web": {
       "bundler": "metro",
@@ -29,7 +28,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./src/assets/images/splash-icon.png",
+          "image": "./src/assets/images/app-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -46,8 +45,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "dde6207b-7201-450a-b12d-0872e616f74f"
+        "projectId": "e900387d-92d2-49e3-986c-971a404e194d"
       }
-    }
+    },
+    "owner": "rejithcr"
   }
 }

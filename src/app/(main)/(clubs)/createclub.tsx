@@ -17,8 +17,8 @@ const CreateClub = () => {
     if (validate(clubName.trim())) {
       setIsLoading(true)
       createClub(clubName.trim(), userInfo.memberId, userInfo.email)
-        .then(response => router.replace(`/(main)/(clubs)/clubdetails?clubId=${response.data.clubId}&role=ADMIN`))
-        .catch(err => Alert.alert(err.response.data.message))
+        .then(response => router.replace(`/(main)/(clubs)/clubdetails?clubId=${response.data.clubId}&clubName=${clubName.trim()}&role=ADMIN`))
+        .catch(err => Alert.alert(err.response.data.err))
         .finally(() => setIsLoading(false))
     }
   }
