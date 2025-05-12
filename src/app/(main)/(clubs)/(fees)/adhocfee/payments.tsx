@@ -119,7 +119,7 @@ const Payments = () => {
                 </ScrollView>
             </Modal>
             <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
-                <ThemedButton title='Update Status' onPress={() => updatePaymentStatus()} />
+                <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
                 <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} />
             </View>
         </GestureHandlerRootView>

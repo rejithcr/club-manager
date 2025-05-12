@@ -36,13 +36,10 @@ const ClubDetails = () => {
     }
     return (
         <GestureHandlerRootView>
+            <View style={{marginVertical:10}} />
             {isLoading && <LoadingSpinner />}
-            {!isLoading && <ScrollView>
-                <MaterialIcons style={{alignSelf:"center", marginTop:20}} name="sports-cricket" size={100}/>
-                <Text style={{...appStyles.title, alignSelf:"center"}}>{clubDetails?.clubName}</Text>
-                <KeyValueUI data={clubDetails} hideKeys={[]} />
-                <View style={{ marginBottom: 20 }} />
-                <Text style={appStyles.heading}>Summary</Text>
+            {!isLoading && 
+            <ScrollView>
                 <ClubFeeSummary clubId={Number(params.get("clubId"))} clubName={params.get("clubName")}
                     showClubDues={showClubDues} showFeeByMember={showFeeByMember} />
             </ScrollView>

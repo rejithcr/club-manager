@@ -50,14 +50,13 @@ const DefineFee = () => {
                             defaultValue={feeType}
                         />
                         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "80%" }}>
-                            <Text style={{ width: "40%" }}>Select Period</Text>
+                            <Text style={{ width: "40%" }}>Select Interval</Text>
                             <Picker style={{ width: "60%", textAlign: "right" }}
                                 selectedValue={feeTypeInterval}
                                 onValueChange={(itemValue, _itemIndex) => setFeeTypeInterval(itemValue)}>
                                 <Picker.Item label="MONTHLY" value="MONTHLY" />
                                 <Picker.Item label="QUARTERLY" value="QUARTERLY" />
                                 <Picker.Item label="YEARLY" value="YEARLY" />
-                                <Picker.Item label="ADHOC" value="ADHOC" />
                             </Picker>
                         </View>
                         <InputText

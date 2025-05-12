@@ -2,14 +2,14 @@ import { StyleSheet } from "react-native"
 
 export const appStyles = StyleSheet.create({
     title: {
-        margin: 20,
+        marginVertical: 10,
         fontWeight: "bold",
         fontSize: 25,
         width: "80%",
         alignSelf: "center",
     },
     heading: {
-        margin: 15,
+        marginVertical: 10,
         fontWeight: "bold",
         fontSize: 20,
         width: "80%",

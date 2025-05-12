@@ -31,8 +31,8 @@ const Main = () => {
       {/* <FloatingProfileMenu photo={userInfo?.photo} /> */}
       <View style={{ marginTop: 25 }} />
       < ScrollView refreshControl={< RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
-        <UpcomingMatches memberEmail={userInfo?.email} />
         <MyClubs refresh={refresh}/>
+        <UpcomingMatches memberEmail={userInfo?.email} />
         <FeeSummary memberEmail={userInfo?.email} />
         <UpcomingEvents memberEmail={userInfo?.email} />
       </ScrollView >

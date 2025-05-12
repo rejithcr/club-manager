@@ -142,7 +142,8 @@ const FeeTypeDetails = () => {
             <View style={{ height: 450 }}>
                 <Text style={appStyles.heading}>Collections</Text>
                 {isFeeCollectionsLoading && <LoadingSpinner />}
-                {!isFeeCollectionsLoading && feeCollections.length ==0 && <Text style={{alignSelf:"center"}}>No collections present</Text>}
+                {!isFeeCollectionsLoading && feeCollections.length ==0 && 
+                <Text style={{alignSelf:"center", width:"80%"}}>No collections present. To start collecting fee for a period, press the below button.</Text>}
                 {!isFeeCollectionsLoading && feeCollections &&
                     <FlatList style={{ width: "100%" }}
                         data={feeCollections}

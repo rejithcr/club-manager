@@ -58,14 +58,14 @@ const Fees = () => {
           flexDirection: "row", alignItems: "center", width: "80%",
           justifyContent: "space-between", alignSelf: "center",
         }}>
-          <Text style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Active Fees</Text>
+          <Text style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Recurring Fees</Text>
           {clubInfo.role == ROLE_ADMIN && <TouchableOpacity style={{ width: "10%" }}
             onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
             <MaterialCommunityIcons size={25} name={'plus-circle'} />
           </TouchableOpacity> }
         </View>
         {isLoadingCurrent && <LoadingSpinner />}
-        {!isLoadingCurrent && currentFeeStructure?.length == 0 && <Text style={{ alignSelf: "center" }}>No fees defined</Text>}
+        {!isLoadingCurrent && currentFeeStructure?.length == 0 && <Text style={{ alignSelf: "center", width: "80%"}}>No fees defined. To define a fee type (eg. Membership fee), press the + icon.</Text>}
         {!isLoadingCurrent && currentFeeStructure?.map((fee: any) => {
           return <TouchableCard key={fee.clubFeeTypeId} showDetails={showFeeTypeDetails} id={fee}>
             <View style={{
@@ -86,7 +86,7 @@ const Fees = () => {
 
         <View style={{
           flexDirection: "row", alignItems: "center", width: "80%",
-          justifyContent: "space-between", alignSelf: "center", marginTop: 20
+          justifyContent: "space-between", alignSelf: "center", marginTop: 10
         }}>
           <Text style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Adhoc Collections</Text>
           {clubInfo.role == ROLE_ADMIN &&<TouchableOpacity style={{ width: "10%" }}
@@ -95,7 +95,10 @@ const Fees = () => {
           </TouchableOpacity>}
         </View>
         {isLoadingAdhoc && <LoadingSpinner />}
-        {!isLoadingAdhoc && adhocFees?.length == 0 && <Text style={{ alignSelf: "center" }}>No adhoc fees defined</Text>}
+        {!isLoadingAdhoc && adhocFees?.length == 0 && 
+        <Text style={{ alignSelf: "center", width: "80%" }}>No adhoc fees defined. 
+        This will be a on time collection from selected members. 
+        For eg. splitting expense amoung members who participatedi n an event. Press the + icon to define collection</Text>}
         {!isLoadingAdhoc && adhocFees?.map(fee =>
           <TouchableCard key={fee.clubAdhocFeeId} showDetails={showAdhocFeeDetails} id={fee}>
             <View style={{
