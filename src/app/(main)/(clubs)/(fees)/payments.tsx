@@ -1,14 +1,13 @@
-import { View, Text, FlatList, TouchableOpacity, Button, Alert } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity,  Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { deleteFeeCollection, getFeePayments, saveFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
-import Checkbox from 'expo-checkbox';
 import ThemedButton from '@/src/components/ThemedButton';
 import Modal from 'react-native-modal';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { AuthContext } from '@/src/context/AuthContext';
 import { router } from 'expo-router';
 import { ClubContext } from '@/src/context/ClubContext';
@@ -74,7 +73,11 @@ const Payments = () => {
     }
     return (
         <GestureHandlerRootView>
-            <Text style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</Text>
+            <Text style={{ ...appStyles.heading }}>Payment Status - {params.get("clubFeeTypePeriod")}</Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "80%", alignSelf: "center", marginBottom: 10 }}>
+                <View style={{flexDirection:"row"}}><Text style={{marginRight:10}}>Paid</Text><MaterialIcons name='check-circle' size={20} /></View>
+                <View style={{flexDirection:"row"}}><Text style={{marginRight:10}}>Not Paid</Text><MaterialIcons name='radio-button-unchecked' size={20} /></View>
+            </View>
             <View style={{ height: "80%" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
@@ -100,7 +103,7 @@ const Payments = () => {
                     </View>
                 </ScrollView>
             </Modal>
-            <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
+            <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
                 <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
                 <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} />
             </View>
@@ -140,10 +143,12 @@ const MemberFeeItem = (props: {
     return (
         <TouchableOpacity onPress={selectItem}>
             <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
-                <View style={{ width: "5%" }}>
-                    <Checkbox value={isSelected} color={"black"} />
+                <View style={{ width: "10%" }}>
+                    {isSelected ? <MaterialIcons name='check-circle' size={20} /> :
+                        <MaterialIcons name='radio-button-unchecked' size={20} />}
+                    {/* <Checkbox value={isSelected} color={"black"} /> */}
                 </View>
-                <Text style={{ width: "75%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</Text>
+                <Text style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</Text>
                 <Text style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</Text>
             </View>
         </TouchableOpacity>

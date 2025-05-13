@@ -2,9 +2,8 @@ import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
 import { useContext, useEffect, useState } from 'react'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import { Alert, Text, View } from 'react-native';
-import DatePicker from '@/src/components/DatePicker';
-import { getMemberByPhone, Member, regirsterMember } from '@/src/helpers/member_helper';
+import { Alert, View } from 'react-native';
+import { getMemberByPhone, regirsterMember } from '@/src/helpers/member_helper';
 import MemberItem from '@/src/components/MemberItem';
 import { useSearchParams } from 'expo-router/build/hooks';
 import { AuthContext } from '@/src/context/AuthContext';
@@ -22,7 +21,7 @@ const AddMember = () => {
     const [showAddNewMemberForm, setShowAddNewMemberForm] = useState<boolean>(false);
     const [searchNumber, setSearchNumber] = useState<string>();
     const [date, setDate] = useState<Date>(new Date());
-    const [memberDetails, setMemberDetails] = useState<Member>()
+    const [memberDetails, setMemberDetails] = useState<any>()
     const [firstName, setFirstName] = useState<string | null>("");
     const [lastName, setLastName] = useState("");
     const [phone, setPhone] = useState("");

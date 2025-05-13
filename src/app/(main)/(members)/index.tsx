@@ -1,9 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import { View, FlatList, Text } from "react-native";
+import { View, FlatList } from "react-native";
 import MemberItem from "@/src/components/MemberItem";
 import { router, useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
-import { useSearchParams } from "expo-router/build/hooks";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { getClubMembers } from "@/src/helpers/club_helper";
 import { ROLE_ADMIN } from "@/src/utils/constants";

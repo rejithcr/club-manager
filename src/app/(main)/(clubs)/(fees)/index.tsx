@@ -1,11 +1,11 @@
 import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { appStyles } from '@/src/utils/styles'
 import { getFeeStructure, getAdhocFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router, useFocusEffect } from 'expo-router'
-import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import TouchableCard from '@/src/components/TouchableCard'
 import { ClubContext } from '@/src/context/ClubContext'
 import { ROLE_ADMIN } from '@/src/utils/constants'
@@ -98,7 +98,7 @@ const Fees = () => {
         {!isLoadingAdhoc && adhocFees?.length == 0 && 
         <Text style={{ alignSelf: "center", width: "80%" }}>No adhoc fees defined. 
         This will be a on time collection from selected members. 
-        For eg. splitting expense amoung members who participatedi n an event. Press the + icon to define collection</Text>}
+        For eg. splitting expense amoung members who participated in an event. Press the + icon to define collection</Text>}
         {!isLoadingAdhoc && adhocFees?.map(fee =>
           <TouchableCard key={fee.clubAdhocFeeId} showDetails={showAdhocFeeDetails} id={fee}>
             <View style={{

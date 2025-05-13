@@ -8,11 +8,10 @@ import { appStyles } from '@/src/utils/styles';
 import Checkbox from 'expo-checkbox';
 import ThemedButton from '@/src/components/ThemedButton';
 import Modal from 'react-native-modal';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { AuthContext } from '@/src/context/AuthContext';
 import { router } from 'expo-router';
 import { ClubContext } from '@/src/context/ClubContext';
-import TouchableCard from '@/src/components/TouchableCard';
 import ShadowBox from '@/src/components/ShadowBox';
 
 const Payments = () => {
@@ -76,9 +75,7 @@ const Payments = () => {
             { cancelable: true },
         );
     }
-    const editAdhocFee = (adhocFeeId: number) => {
-
-    }
+    
     return (
         <GestureHandlerRootView>
             <View style={{ marginVertical: 10 }} />
@@ -92,8 +89,12 @@ const Payments = () => {
                 </View>
                 <Text style={{ marginRight: 10 }}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</Text>
             </ShadowBox>
-            <Text style={appStyles.heading}>Members</Text>
-            <View style={{ height: "65%" }}>
+            <Text style={appStyles.heading}>Payment Status</Text>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "80%", alignSelf: "center", marginBottom: 10 }}>
+                <View style={{flexDirection:"row"}}><Text style={{marginRight:10}}>Paid</Text><MaterialIcons name='check-circle' size={20} /></View>
+                <View style={{flexDirection:"row"}}><Text style={{marginRight:10}}>Not Paid</Text><MaterialIcons name='radio-button-unchecked' size={20} /></View>
+            </View>
+            <View style={{ height: "70%" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <FlatList style={{ width: "100%" }}
@@ -118,7 +119,7 @@ const Payments = () => {
                     </View>
                 </ScrollView>
             </Modal>
-            <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
+            <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
                 <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
                 <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} />
             </View>

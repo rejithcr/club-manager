@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Button, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, FlatList, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'

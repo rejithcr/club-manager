@@ -1,7 +1,7 @@
 import { View, Text, Alert, FlatList, Switch, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { ClubContext } from '@/src/context/ClubContext'
-import { getTransactions, saveTransaction } from '@/src/helpers/transaction_helper'
+import { deleteTransaction, getTransactions, saveTransaction, updateTransaction } from '@/src/helpers/transaction_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import FloatingMenu from '@/src/components/FloatingMenu'
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
@@ -18,17 +18,12 @@ const Transactions = () => {
   const [isLoading, setIsloading] = useState(false)
   const [isAddTxnVisible, setIsAddTxnVisible] = useState(false)
   const [txnTypeFilter, setTxnTypeFilter] = useState("ALL")
-  const [txnType, setTxnType] = useState("DEBIT")
-  const [txnAmount, setTxnAmount] = useState("")
-  const [txnCategory, setTxnCategory] = useState("")
-  const [txnComment, setTxnComment] = useState("")
   const [isFectching, setIsFetching] = useState(false)
   const [hasMoreData, setHasMoreData] = useState(false)
   const [transactions, setTransactions] = useState<any>([])
   const [showFees, setShowFees] = useState(false)
   const [resfresh, setRefresh] = useState(false)
-  const [editTxnValues, setEditTxnValues] = useState<any>({txnType:"", txnCategory: "", txnComment: "", txnAmount: ""})
-
+  const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnCategory: "", txnComment: "", txnAmount: "" })
 
   const { clubInfo } = useContext(ClubContext)
   const { userInfo } = useContext(AuthContext)
@@ -63,26 +58,63 @@ const Transactions = () => {
   }
 
   const handleSave = () => {
-    if (validate(txnCategory, txnComment, txnAmount)) {
-      saveTransaction(clubInfo.clubId, txnType, txnCategory, txnComment, Number(txnAmount), userInfo.email)
-        .then(() => {
-          offset.current = 0;
-          setRefresh(prev => !prev)
-        })
-        .catch(error => Alert.alert("Error", error.response.data.error))
-        .finally(() => setIsAddTxnVisible(false))
+    if (validate(txnValues?.txnCategory, txnValues?.txnComment, txnValues?.txnAmount)) {
+      if (txnValues?.txnId) {
+        updateTransaction(txnValues.txnId, txnValues.txnType, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
+          .then(() => {
+            offset.current = 0;
+            setRefresh(prev => !prev)
+          })
+          .catch(error => Alert.alert("Error", error.response.data.error))
+          .finally(() => setIsAddTxnVisible(false))
+      } else {
+        saveTransaction(clubInfo.clubId, txnValues.txnType, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
+          .then(() => {
+            offset.current = 0;
+            setRefresh(prev => !prev)
+          })
+          .catch(error => Alert.alert("Error", error.response.data.error))
+          .finally(() => setIsAddTxnVisible(false))
+      }
     }
   }
+  const handleDelete = () => {
+    console.log(txnValues)
+    Alert.alert(
+      'Are you sure!',
+      'This will delete the transcation. This cannot be recovered.',
+      [
+        {
+          text: 'OK', onPress: () => {
+            setIsloading(true)
+            deleteTransaction(txnValues.txnId)
+              .then(() => {
+                offset.current = 0;
+                setRefresh(prev => !prev)
+              })
+              .catch((error: { response: { data: { error: string | undefined } } }) => {
+                setIsloading(true); Alert.alert("Error", error.response.data.error)})
+              .finally(() => setIsAddTxnVisible(false))
+          }
+        },
+        { text: 'cancel', onPress: () => null },
+      ],
+      { cancelable: true },
+    );
+  }
+
   const handleEdit = (item: any) => {
-    console.log(item)
-    setEditTxnValues((prev: any) => ({ ...prev,txnType:item.clubTranscationType,  txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount }))
+    setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount })
     setIsAddTxnVisible(true)
+  }
+  const handleTxnTypeChange = (value: string) => {
+    setTxnValues((prev: any) => ({ ...prev, txnType: value }))
   }
   return (
     <GestureHandlerRootView>
       <View style={{ flex: 1, marginBottom: 30 }}>
         <View style={{ width: "80%", alignSelf: "center", flexDirection: "row", justifyContent: "space-between" }}>
-          <Picker style={{ width: "50%" }} enabled={!showFees} itemStyle={{ color: "black" }} onValueChange={setTxnTypeFilter}>
+          <Picker style={{ width: "50%", color: 'black'}} enabled={!showFees} onValueChange={setTxnTypeFilter}>
             <Picker.Item value={'ALL'} label='ALL' />
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
@@ -107,7 +139,7 @@ const Transactions = () => {
                 width: "85%", alignSelf: "center", alignItems: "center",
                 flexDirection: "row", justifyContent: "flex-end"
               }}>
-                {item.clubTransactionCategory !='FEE' && item.clubTransactionCategory !='ADHOC-FEE' && <TouchableOpacity style={{ width: "10%" }} onPress={() => handleEdit(item)}>
+                {item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && <TouchableOpacity style={{ width: "10%" }} onPress={() => handleEdit(item)}>
                   <MaterialCommunityIcons name='square-edit-outline' size={20} />
                 </TouchableOpacity>}
                 <View style={{ width: "60%" }}>
@@ -125,21 +157,23 @@ const Transactions = () => {
       </View>
       <Modal isVisible={isAddTxnVisible}>
         <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
-          <Text style={appStyles.heading}>{editTxnValues ? "Edit" : "Add"} Tansaction</Text>
-          <Picker style={{ width: "80%", alignSelf: "center" }} onValueChange={setTxnType} selectedValue={editTxnValues?.txnType || txnType}>
+          <Text style={appStyles.heading}>{txnValues?.txnId ? "Edit" : "Add"} Tansaction</Text>
+          <Picker style={{ width: "80%", alignSelf: "center" }} 
+            onValueChange={handleTxnTypeChange} selectedValue={txnValues?.txnType}>
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
           </Picker>
-          <InputText label="Category" onChangeText={setTxnCategory} defaultValue={editTxnValues?.txnCategory}/>
-          <InputText label="Details" onChangeText={setTxnComment} defaultValue={editTxnValues?.txnComment}/>
-          <InputText label="Amount" onChangeText={setTxnAmount} keyboardType={"numeric"} defaultValue={editTxnValues?.txnAmount}/>
-          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
+          <InputText label="Category" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnCategory: value }))} defaultValue={txnValues?.txnCategory} />
+          <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
+          <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />
+          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>
             <ThemedButton title={"   Save   "} onPress={() => handleSave()} />
-            <ThemedButton title="Cancel" onPress={() => setIsAddTxnVisible(false)} />
+            <ThemedButton title="Cancel" onPress={() => setIsAddTxnVisible(false)} />              
+            {txnValues?.txnId && <MaterialCommunityIcons name='delete' size={30} onPress={() => handleDelete()} />}
           </View>
         </View>
       </Modal>
-      <FloatingMenu onPressMain={() => {setEditTxnValues(null); setIsAddTxnVisible(true)}}
+      <FloatingMenu onPressMain={() => { setTxnValues({txnType:"DEBIT"}); setIsAddTxnVisible(true) }}
         icon={<MaterialIcons name={"add"} size={32} color={"white"} />}
       />
     </GestureHandlerRootView>

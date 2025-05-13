@@ -41,6 +41,6 @@ export const getMemberByEmail = (email: string) => {
     return get("/member", {email: email})
 }
 
-export const regirsterMember = async (member: any) => {
+export const regirsterMember = (member: any) => {
     return post("/member", null, member)
 }

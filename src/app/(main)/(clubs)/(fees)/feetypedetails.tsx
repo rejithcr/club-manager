@@ -1,24 +1,15 @@
-import { View, Text, TouchableOpacity, KeyboardAvoidingView, FlatList } from 'react-native'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, FlatList } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks'
-import KeyValueUI from '@/src/components/KeyValueUI'
 import ThemedButton from '@/src/components/ThemedButton'
-import InputText from '@/src/components/InputText'
 import { appStyles } from '@/src/utils/styles'
-import { addExceptionType, getExceptionTypes, getCollectionsOfFeeType } from '@/src/helpers/fee_helper'
-import { AuthContext } from '@/src/context/AuthContext'
-import ShadowBox from '@/src/components/ShadowBox'
-import { FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
-import { isNumeric, isValidLength } from '@/src/utils/validators'
+import { getExceptionTypes, getCollectionsOfFeeType } from '@/src/helpers/fee_helper'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox'
-import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import FloatingMenu from '@/src/components/FloatingMenu'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { router, useFocusEffect } from 'expo-router'
-import Modal from 'react-native-modal'
-import { Picker } from '@react-native-picker/picker'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import TouchableCard from '@/src/components/TouchableCard'
-import { ClubContext } from '@/src/context/ClubContext'
 
 const FeeTypeDetails = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -131,7 +122,8 @@ const FeeTypeDetails = () => {
                     </TouchableOpacity>
                 </View>
                 {showAddException && <View style={{ width: "90%", alignSelf: "center" }}>
-                    {(!exceptionTypes?.length || exceptionTypes?.length < 1) && <Text style={{ alignSelf: "center" }}>No exceptions present for this fee type</Text>}
+                    {(!exceptionTypes?.length || exceptionTypes?.length < 1) && 
+                    <Text style={{ alignSelf: "center", width:"80%" }}>No exceptions present for this fee type. You can add exceptions by pressing the + icon above. With this feature you can configure special fees for some members for this fee type (eg. in case of leave)</Text>}
                     {exceptionTypes?.map((et: any) =>
                         <KeyValueTouchableBox edit key={et.clubFeeTypeExceptionId} onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
                             keyName={et.clubFeeTypeExceptionReason} keyValue={`Rs. ${et.clubFeeExceptionAmount}`} />

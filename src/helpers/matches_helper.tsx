@@ -1,5 +1,3 @@
-import { sleep } from "../utils/common";
-
 export interface Match {
     id: number;
     name: string;

@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity, Button } from 'react-native'
+import { View, Text, FlatList, Button } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { getNextPeriodFeeMemberList, getNextPeriods, saveNextPeriodFeeCollection } from '@/src/helpers/fee_helper';
@@ -7,11 +7,9 @@ import LoadingSpinner from '@/src/components/LoadingSpinner';
 import ThemedButton from '@/src/components/ThemedButton';
 import { Picker } from '@react-native-picker/picker';
 import Modal from 'react-native-modal';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox';
 import { AuthContext } from '@/src/context/AuthContext';
 import { router } from 'expo-router';
-import { ClubContext } from '@/src/context/ClubContext';
 
 const StartNextPeriod = () => {
     const [isLoadingPeriods, setIsLoadingPeriods] = useState(false);
@@ -91,7 +89,7 @@ const StartNextPeriod = () => {
                     <Button title="Hide modal" onPress={() => setIsConfirmVisible(false)} />
                 </View>
             </Modal>
-            <View style={{ flexDirection: "row", justifyContent: "space-around", alignItems: "center" }}>
+            <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
                 {!isLoading && !isLoadingPeriods && <ThemedButton title='Start Collection' onPress={startCollection} /> }
             </View>
         </GestureHandlerRootView>

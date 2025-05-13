@@ -1,8 +1,7 @@
-import { View, Text, GestureResponderEvent, Alert } from 'react-native'
+import { View, Text, GestureResponderEvent, Alert, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
-import { getClubDetails } from '@/src/helpers/club_helper'
-import KeyValueUI from '@/src/components/KeyValueUI'
+import { getFundBalance, getTotalDue } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { FontAwesome6, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
@@ -10,40 +9,81 @@ import { router } from 'expo-router'
 import FloatingMenu from '@/src/components/FloatingMenu'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { ClubContext } from '@/src/context/ClubContext'
-import ClubFeeSummary from './(fees)/ClubFeeSummary'
 
 const ClubDetails = () => {
-    const [isLoading, setIsLoading] = useState(true)
     const router = useRouter()
     const params = useSearchParams()
-    const [clubDetails, setClubDetails] = useState<any>()
     const { setClubInfo } = useContext(ClubContext)
-    useEffect(() => {
-        setIsLoading(true)
-        setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") })
-        getClubDetails(Number(params.get("clubId")))
-            .then(response => setClubDetails(response.data))
+
+    const [isFundBalanceLoading, setIsFundBalanceLoading] = useState(false)
+    const [isTotalDueLoading, setIsTotalDueLoading] = useState(false)
+    const [fundBalance, setFundBalance] = useState(0)
+    const [totalDue, setTotalDue] = useState<number | undefined>(0);
+
+
+    const fetchFundBalance = () => {
+        setIsFundBalanceLoading(true)
+        getFundBalance(params.get("clubId"))
+            .then(response => setFundBalance(response.data.fundBalance))
             .catch(error => Alert.alert("Error", error.response.data.error))
-            .finally(() => setIsLoading(false))
+            .finally(() => setIsFundBalanceLoading(false))
+    }
+    const fetchTotalDue = () => {
+        setIsTotalDueLoading(true)
+        getTotalDue(params.get("clubId"))
+            .then(response => setTotalDue(response.data.totalDue))
+            .catch(error => Alert.alert("Error", error.response.data.error))
+            .finally(() => setIsTotalDueLoading(false))
+    }
+
+    useEffect(() => {
+        setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") });
+        fetchFundBalance();
+        fetchTotalDue();
     }, [])
 
     const showClubDues = (_: GestureResponderEvent): void => {
         router.push(`/(main)/(clubs)/(fees)/clubdues`)
     }
 
-    const showFeeByMember = (_: GestureResponderEvent): void => {
-        router.push(`/(main)/(clubs)/(fees)/payments`)
-    }
+    const onRefresh = () => {
+        fetchFundBalance();
+        fetchTotalDue();
+    };
     return (
         <GestureHandlerRootView>
-            <View style={{marginVertical:10}} />
-            {isLoading && <LoadingSpinner />}
-            {!isLoading && 
-            <ScrollView>
-                <ClubFeeSummary clubId={Number(params.get("clubId"))} clubName={params.get("clubName")}
-                    showClubDues={showClubDues} showFeeByMember={showFeeByMember} />
+            <View style={{ marginVertical: 10 }} />
+            <ScrollView refreshControl={<RefreshControl  onRefresh={onRefresh} refreshing={false} />}>
+                <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 5 }}>
+                    <View style={{ width: "100%", flexDirection: "row", flexWrap: "wrap" }}>
+                        <View style={{
+                            flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
+                            justifyContent: "space-between", alignItems: "center"
+                        }}>
+                            <Text style={{ fontWeight: "bold", fontSize: 15 }}>Fund Balance</Text>
+                            <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                                {isFundBalanceLoading && <LoadingSpinner />}
+                                {!isFundBalanceLoading && <Text style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {fundBalance || 0} </Text>}
+                                <View style={{ width: 20 }} />
+                            </View>
+                        </View>
+                        <View style={styles.divider} />
+                        <TouchableOpacity onPress={showClubDues} style={{
+                            flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
+                            justifyContent: "space-between"
+                        }}>
+                            <Text style={{ fontSize: 15 }}>Total Due</Text>
+                            {isTotalDueLoading && <LoadingSpinner />}
+                            {!isTotalDueLoading &&
+                                <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+                                    <Text style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {totalDue} </Text>
+                                    <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
+                                </View>
+                            }
+                        </TouchableOpacity>
+                    </View>
+                </View>
             </ScrollView>
-            }
             <FloatingMenu actions={actions} position={"left"} color='black'
                 icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
                 onPressItem={(name: string | undefined) => handleMenuPress(name)}
@@ -98,3 +138,28 @@ const actions = [
 ];
 
 export default ClubDetails
+
+
+const styles = StyleSheet.create({
+    item: {
+        width: "100%",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        alignItems: "center",
+        justifyContent: "space-between"
+    },
+    label: {
+        padding: 10,
+    },
+    date: {
+        padding: 10,
+    },
+    amount: {
+        padding: 10,
+    },
+    divider: {
+        borderBottomColor: 'rgba(136, 136, 136, 0.2)',
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        width: "100%"
+    }
+});
