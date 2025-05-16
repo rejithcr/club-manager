@@ -8,6 +8,7 @@ import { getClubMembers } from "@/src/helpers/club_helper";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
+import ThemedView from "@/src/components/themed-components/ThemedView";
 
 export default function Home() {
   const [members, setMembers] = useState<any>([]);
@@ -25,8 +26,8 @@ export default function Home() {
 
   const showDetails = (memberId: number) => router.push(`/(main)/(members)/memberdetails?id=${memberId}`)
 
-  return (
-    <>
+  return (    
+    <ThemedView style={{ flex: 1 }}>
       <View style={{ height:"90%", justifyContent: "center", alignContent: "center" }}>
         {isLoading && <LoadingSpinner />}
         {!isLoading &&
@@ -47,7 +48,7 @@ export default function Home() {
           onPressItem={(name: string | undefined) => handleMenuPress(name)}
           icon={<MaterialIcons name={"menu"} size={32} color={"white"} />} />
       }
-    </>
+    </ThemedView>
   );
 }
 

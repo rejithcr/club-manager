@@ -1,17 +1,19 @@
 import { StackHeader } from '@/src/components/StackHeader';
 import { ClubContext } from '@/src/context/ClubContext';
+import { useTheme } from '@/src/hooks/use-theme';
 import { Stack } from 'expo-router';
 import React, { useContext } from "react";
 
 export default function ClubLayout() {
   const { clubInfo } = useContext(ClubContext)
+  const { theme } = useTheme();
   return (
-      <Stack>
+      <Stack screenOptions={{ headerStyle: { backgroundColor: theme.primary} }}>
         <Stack.Screen name="index" options={{title: 'My Clubs', headerShown:true}}/>     
         <Stack.Screen
           name="clubdetails" // This is the name of the page and must match the url from root
           options={{
-            headerTitle: () => <StackHeader header={"Club details"} clubName={clubInfo?.clubName} />,
+            headerTitle: () => <StackHeader header={"Club details"} rightText={clubInfo?.clubName} />,
             headerShown:true
           }}
         />     
@@ -41,6 +43,13 @@ export default function ClubLayout() {
           options={{
             title: 'Transactions',
             headerShown:false
+          }}
+        />               
+        <Stack.Screen
+          name="joinclub" // This is the name of the page and must match the url from root
+          options={{
+            title: 'Join Club',
+            headerShown:true
           }}
         />   
       </Stack>

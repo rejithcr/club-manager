@@ -13,6 +13,8 @@ import InputText from '@/src/components/InputText'
 import { isNumeric, isValidLength } from '@/src/utils/validators'
 import { AuthContext } from '@/src/context/AuthContext'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import ThemedView from '@/src/components/themed-components/ThemedView'
+import ThemedText from '@/src/components/themed-components/ThemedText'
 
 const Transactions = () => {
   const [isLoading, setIsloading] = useState(false)
@@ -112,20 +114,20 @@ const Transactions = () => {
   }
   return (
     <GestureHandlerRootView>
-      <View style={{ flex: 1, marginBottom: 30 }}>
+      <ThemedView style={{ flex: 1}}>
         <View style={{ width: "80%", alignSelf: "center", flexDirection: "row", justifyContent: "space-between" }}>
-          <Picker style={{ width: "50%", color: 'black'}} enabled={!showFees} onValueChange={setTxnTypeFilter}>
+          <Picker style={{ width: "50%"}} enabled={!showFees} onValueChange={setTxnTypeFilter}>
             <Picker.Item value={'ALL'} label='ALL' />
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
           </Picker>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Text>Show Fees</Text>
-            <Switch onValueChange={() => setShowFees(prev => !prev)} value={showFees} thumbColor={"black"} />
+            <ThemedText>Show Fees</ThemedText>
+            <Switch onValueChange={() => setShowFees(prev => !prev)} value={showFees} />
           </View>
         </View>
         {isLoading && <LoadingSpinner />}
-        {!isLoading && transactions?.length == 0 && <Text style={{ textAlign: "center" }}>No transactions found!</Text>}
+        {!isLoading && transactions?.length == 0 && <ThemedText style={{ textAlign: "center" }}>No transactions found!</ThemedText>}
         {!isLoading && transactions &&
           <FlatList style={{ width: "100%" }}
             ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .2, borderBottomColor: "grey", width: "80%", alignSelf: "center" }} />}
@@ -140,24 +142,24 @@ const Transactions = () => {
                 flexDirection: "row", justifyContent: "flex-end"
               }}>
                 {item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && <TouchableOpacity style={{ width: "10%" }} onPress={() => handleEdit(item)}>
-                  <MaterialCommunityIcons name='square-edit-outline' size={20} />
+                  <MaterialCommunityIcons name='square-edit-outline' size={20} color={"#546E7A"}/>
                 </TouchableOpacity>}
                 <View style={{ width: "60%" }}>
-                  <Text style={{ fontWeight: '500' }}>{item.feeName}</Text>
-                  <Text style={{ fontSize: 12 }}>{item.memberName || item.clubTransactionComment}</Text>
+                  <ThemedText style={{ fontWeight: '500' }}>{item.feeName}</ThemedText>
+                  <ThemedText style={{ fontSize: 12 }}>{item.memberName || item.clubTransactionComment}</ThemedText>
                 </View>
                 <View style={{ alignItems: "flex-end", width: "30%" }}>
-                  <Text style={{ fontWeight: 'bold' }}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} Rs. {item.clubTransactionAmount}</Text>
-                  <Text style={{ fontSize: 8 }}>{item.createdDate}</Text>
+                  <ThemedText style={{ fontWeight: 'bold' }}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} Rs. {item.clubTransactionAmount}</ThemedText>
+                  <ThemedText style={{ fontSize: 8 }}>{item.createdDate}</ThemedText>
                 </View>
               </View>
             )}
           />
         }
-      </View>
-      <Modal isVisible={isAddTxnVisible}>
-        <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
-          <Text style={appStyles.heading}>{txnValues?.txnId ? "Edit" : "Add"} Tansaction</Text>
+      </ThemedView>
+      <Modal isVisible={isAddTxnVisible} backdropColor='grey'>
+        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+          <ThemedText style={appStyles.heading}>{txnValues?.txnId ? "Edit" : "Add"} Tansaction</ThemedText>
           <Picker style={{ width: "80%", alignSelf: "center" }} 
             onValueChange={handleTxnTypeChange} selectedValue={txnValues?.txnType}>
             <Picker.Item value={'DEBIT'} label='DEBIT' />
@@ -171,7 +173,7 @@ const Transactions = () => {
             <ThemedButton title="Cancel" onPress={() => setIsAddTxnVisible(false)} />              
             {txnValues?.txnId && <MaterialCommunityIcons name='delete' size={30} onPress={() => handleDelete()} />}
           </View>
-        </View>
+        </ThemedView>
       </Modal>
       <FloatingMenu onPressMain={() => { setTxnValues({txnType:"DEBIT"}); setIsAddTxnVisible(true) }}
         icon={<MaterialIcons name={"add"} size={32} color={"white"} />}

@@ -10,6 +10,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { router, useFocusEffect } from 'expo-router'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import TouchableCard from '@/src/components/TouchableCard'
+import ThemedView from '@/src/components/themed-components/ThemedView'
+import ThemedText from '@/src/components/themed-components/ThemedText'
 
 const FeeTypeDetails = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -92,18 +94,19 @@ const FeeTypeDetails = () => {
         })
     }
     return (
+        <ThemedView style={{flex: 1 }}>
         <GestureHandlerRootView>
             <View style={{ marginVertical: 10 }} />
-            <TouchableCard id={fee?.clubFeeTypeId} showDetails={editFeeType} style={{
+            <TouchableCard id={fee?.clubFeeTypeId} onPress={editFeeType} style={{
                 flexDirection: "row",
                 justifyContent: "space-between", alignSelf: "center"
             }}>
                 <View>
-                    <Text style={{ fontSize: 18, fontWeight: "bold" }}>{fee?.clubFeeType}</Text>
-                    <Text style={{ fontSize: 10, marginTop: 5 }}>{fee?.clubFeeTypeInterval}</Text>
+                    <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>{fee?.clubFeeType}</ThemedText>
+                    <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee?.clubFeeTypeInterval}</ThemedText>
                 </View>
                 <View style={{ flexDirection: "row" }}>
-                    <Text style={{ marginRight: 10 }}>Rs. {fee?.clubFeeAmount}</Text>
+                    <ThemedText style={{ marginRight: 10 }}>Rs. {fee?.clubFeeAmount}</ThemedText>
                     <MaterialCommunityIcons size={20} name={'square-edit-outline'} />
                 </View>
             </TouchableCard>
@@ -115,7 +118,7 @@ const FeeTypeDetails = () => {
                     <TouchableOpacity onPress={() => setShowAddException(!showAddException)}
                         style={{ flexDirection: "row", width: "80%", justifyContent: "flex-start", alignItems: "center" }}>
                         <MaterialCommunityIcons size={25} name={showAddException ? 'chevron-down-circle' : 'chevron-right-circle'} />
-                        <Text style={appStyles.heading}>Exceptions</Text>
+                        <ThemedText style={appStyles.heading}>Exceptions</ThemedText>
                     </TouchableOpacity>
                     <TouchableOpacity style={{ width: 50, alignItems: "center" }} onPress={() => gotoAddFeeExceptions()}>
                         <MaterialCommunityIcons size={25} name={'plus-circle'} />
@@ -123,7 +126,7 @@ const FeeTypeDetails = () => {
                 </View>
                 {showAddException && <View style={{ width: "90%", alignSelf: "center" }}>
                     {(!exceptionTypes?.length || exceptionTypes?.length < 1) && 
-                    <Text style={{ alignSelf: "center", width:"80%" }}>No exceptions present for this fee type. You can add exceptions by pressing the + icon above. With this feature you can configure special fees for some members for this fee type (eg. in case of leave)</Text>}
+                    <ThemedText style={{ alignSelf: "center", width:"80%" }}>No exceptions present for this fee type. You can add exceptions by pressing the + icon above. With this feature you can configure special fees for some members for this fee type (eg. in case of leave)</ThemedText>}
                     {exceptionTypes?.map((et: any) =>
                         <KeyValueTouchableBox edit key={et.clubFeeTypeExceptionId} onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
                             keyName={et.clubFeeTypeExceptionReason} keyValue={`Rs. ${et.clubFeeExceptionAmount}`} />
@@ -132,10 +135,10 @@ const FeeTypeDetails = () => {
                 }
             </View>
             <View style={{ height: 450 }}>
-                <Text style={appStyles.heading}>Collections</Text>
+                <ThemedText style={appStyles.heading}>Collections</ThemedText>
                 {isFeeCollectionsLoading && <LoadingSpinner />}
                 {!isFeeCollectionsLoading && feeCollections.length ==0 && 
-                <Text style={{alignSelf:"center", width:"80%"}}>No collections present. To start collecting fee for a period, press the below button.</Text>}
+                <ThemedText style={{alignSelf:"center", width:"80%"}}>No collections present. To start collecting fee for a period, press the below button.</ThemedText>}
                 {!isFeeCollectionsLoading && feeCollections &&
                     <FlatList style={{ width: "100%" }}
                         data={feeCollections}
@@ -170,6 +173,7 @@ const FeeTypeDetails = () => {
                 </View>
             </Modal>  */}
         </GestureHandlerRootView>
+        </ThemedView>
     )
 }
 

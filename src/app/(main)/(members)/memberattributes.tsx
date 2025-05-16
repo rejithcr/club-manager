@@ -4,6 +4,7 @@ import InputText from '@/src/components/InputText';
 import ThemedButton from '@/src/components/ThemedButton';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useSearchParams } from 'expo-router/build/hooks';
+import ThemedView from '@/src/components/themed-components/ThemedView';
 
 const MemberAttributes = () => {
   const [inputs, setInputs] = useState(['1']);
@@ -35,6 +36,7 @@ const MemberAttributes = () => {
   };
 
   return (
+    <ThemedView style={{ flex: 1 }}>
     <ScrollView>
       <Text style={{textAlign:"right",margin: 15}}>{params.get("clubName")}</Text>
       <View>
@@ -61,6 +63,7 @@ const MemberAttributes = () => {
         <ThemedButton title="Submit" onPress={handleSubmit} />
       </View>
     </ScrollView>
+    </ThemedView>
   );
 };
 

@@ -10,6 +10,8 @@ import Modal from 'react-native-modal';
 import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox';
 import { AuthContext } from '@/src/context/AuthContext';
 import { router } from 'expo-router';
+import ThemedView from '@/src/components/themed-components/ThemedView';
+import ThemedText from '@/src/components/themed-components/ThemedText';
 
 const StartNextPeriod = () => {
     const [isLoadingPeriods, setIsLoadingPeriods] = useState(false);
@@ -54,6 +56,7 @@ const StartNextPeriod = () => {
     }
 
     return (
+        <ThemedView style={{flex: 1 }}>
         <GestureHandlerRootView>
             {isLoading && <LoadingSpinner />}
             {!isLoading &&
@@ -61,7 +64,7 @@ const StartNextPeriod = () => {
                     flexDirection: "row", width: "80%", justifyContent: "space-between",
                     alignSelf: "center", marginBottom: 10, alignItems: "center"
                 }}>
-                    <Text style={{ width: "35%", fontWeight: "bold" }}>Select Period</Text>
+                    <ThemedText style={{ width: "35%", fontWeight: "bold" }}>Select Period</ThemedText>
                     <Picker style={{ width: "60%" }}
                         selectedValue={nextPeriodDate}
                         onValueChange={(itemValue, _itemIndex) => setNextPeriodDate(itemValue)}>
@@ -93,6 +96,7 @@ const StartNextPeriod = () => {
                 {!isLoading && !isLoadingPeriods && <ThemedButton title='Start Collection' onPress={startCollection} /> }
             </View>
         </GestureHandlerRootView>
+        </ThemedView>
     )
 }
 

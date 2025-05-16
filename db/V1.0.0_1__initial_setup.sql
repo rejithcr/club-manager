@@ -184,3 +184,16 @@ create table club_transaction (
     CONSTRAINT club_transcation_type_check CHECK (club_transcation_type in ('CREDIT','DEBIT'))
 );
 CREATE SEQUENCE club_transaction_id_seq START 1;
+
+create table membership_requests (
+    club_id integer not null,
+    member_id integer not null,
+    status varchar(30) not null,
+    comments text not null,
+    created_by varchar(100) not null,
+    created_ts timestamp  default now(),
+    updated_by varchar(100) not null,
+    updated_ts timestamp  default now(),
+    CONSTRAINT membership_status_check CHECK (status in ('REQUESTED','ACCEPTED','REJECTED')),
+    CONSTRAINT unique_membership_request UNIQUE (club_id,member_id)
+);

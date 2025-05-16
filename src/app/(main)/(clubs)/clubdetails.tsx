@@ -1,4 +1,4 @@
-import { View, Text, GestureResponderEvent, Alert, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native'
+import { View, GestureResponderEvent, Alert, TouchableOpacity, StyleSheet, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
 import { getFundBalance, getTotalDue } from '@/src/helpers/club_helper'
@@ -9,6 +9,9 @@ import { router } from 'expo-router'
 import FloatingMenu from '@/src/components/FloatingMenu'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { ClubContext } from '@/src/context/ClubContext'
+import ThemedView from '@/src/components/themed-components/ThemedView'
+import ShadowBox from '@/src/components/ShadowBox'
+import ThemedText from '@/src/components/themed-components/ThemedText'
 
 const ClubDetails = () => {
     const router = useRouter()
@@ -51,19 +54,20 @@ const ClubDetails = () => {
         fetchTotalDue();
     };
     return (
+        <ThemedView style={{flex:1}}>
         <GestureHandlerRootView>
             <View style={{ marginVertical: 10 }} />
             <ScrollView refreshControl={<RefreshControl  onRefresh={onRefresh} refreshing={false} />}>
-                <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 5 }}>
+                <ShadowBox style={{ width: "80%", marginBottom: 5 }}>
                     <View style={{ width: "100%", flexDirection: "row", flexWrap: "wrap" }}>
                         <View style={{
                             flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
                             justifyContent: "space-between", alignItems: "center"
                         }}>
-                            <Text style={{ fontWeight: "bold", fontSize: 15 }}>Fund Balance</Text>
+                            <ThemedText style={{ fontWeight: "bold", fontSize: 15 }}>Fund Balance</ThemedText>
                             <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
                                 {isFundBalanceLoading && <LoadingSpinner />}
-                                {!isFundBalanceLoading && <Text style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {fundBalance || 0} </Text>}
+                                {!isFundBalanceLoading && <ThemedText style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {fundBalance || 0} </ThemedText>}
                                 <View style={{ width: 20 }} />
                             </View>
                         </View>
@@ -72,23 +76,24 @@ const ClubDetails = () => {
                             flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
                             justifyContent: "space-between"
                         }}>
-                            <Text style={{ fontSize: 15 }}>Total Due</Text>
+                            <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
                             {isTotalDueLoading && <LoadingSpinner />}
                             {!isTotalDueLoading &&
                                 <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-                                    <Text style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {totalDue} </Text>
+                                    <ThemedText style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {totalDue} </ThemedText>
                                     <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
                                 </View>
                             }
                         </TouchableOpacity>
                     </View>
-                </View>
+                </ShadowBox>
             </ScrollView>
             <FloatingMenu actions={actions} position={"left"} color='black'
                 icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
                 onPressItem={(name: string | undefined) => handleMenuPress(name)}
             />
         </GestureHandlerRootView>
+        </ThemedView>
     )
 }
 

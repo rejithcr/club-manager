@@ -12,6 +12,9 @@ import { AuthContext } from '@/src/context/AuthContext'
 import { ClubContext } from '@/src/context/ClubContext'
 import { getClubMembers } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
+import ThemedView from '@/src/components/themed-components/ThemedView'
+import ThemedText from '@/src/components/themed-components/ThemedText'
+import ShadowBox from '@/src/components/ShadowBox'
 
 const DefineFee = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -68,6 +71,7 @@ const DefineFee = () => {
         })
     }
     return (
+        <ThemedView style={{ flex: 1 }}>
         <GestureHandlerRootView>
             <ScrollView>
                 {isLoading && <LoadingSpinner />}
@@ -89,27 +93,27 @@ const DefineFee = () => {
                             keyboardType={'numeric'}
                             defaultValue={feeAmount}
                         />
-                        <Text>Rs. {amountPerMember}/member</Text>
+                        <ThemedText>Rs. {amountPerMember}/member</ThemedText>
                     </View>
                 }
                 <View style={{ marginBottom: 10 }} />
                 {!isLoading && addedMembers && addedMembers.length > 0 && addedMembers.map((item: any, index) => 
                     <TouchableOpacity key={item.memberId} onPress={() => removeMember(item)}>
-                        <View style={{ ...appStyles.shadowBox, marginBottom: 15, width: "70%", justifyContent:"space-between", flexWrap: "wrap" }}>
-                            <Text style={{ fontSize: 15}}>{index+1}. {item?.firstName} {item?.lastName}</Text>
+                        <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 15, width: "70%", justifyContent:"space-between", flexWrap: "wrap" }}>
+                            <ThemedText style={{ fontSize: 15}}>{index+1}. {item?.firstName} {item?.lastName}</ThemedText>
                             <MaterialIcons name="remove-circle" size={20} />
-                        </View>
+                        </ShadowBox>
                     </TouchableOpacity>
                 )}
-                <Text style={appStyles.heading}>Add Members</Text>
+                <ThemedText style={appStyles.heading}>Add Members</ThemedText>
                 <View style={{ marginBottom: 80 }}>
                     {isLoadingMembers && <LoadingSpinner/>}
                     {!isLoading && !isLoadingMembers && members.map((item: any) => (
                         <TouchableOpacity key={item.memberId} onPress={() => addMember(item)}>
-                            <View style={{ ...appStyles.shadowBox, marginBottom: 15, width: "80%", flexWrap: "wrap" }}>
+                            <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 15, width: "80%", flexWrap: "wrap" }}>
                                 <MaterialIcons name="add-circle" size={20} />
-                                <Text style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</Text>
-                            </View>
+                                <ThemedText style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
+                            </ShadowBox>
                         </TouchableOpacity>
                     ))
                     }
@@ -117,6 +121,7 @@ const DefineFee = () => {
             </ScrollView>
             <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 30 }} title='Start Collection' onPress={addFee} />
         </GestureHandlerRootView>
+        </ThemedView>
     )
 }
 

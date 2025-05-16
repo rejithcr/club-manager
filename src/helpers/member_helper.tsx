@@ -44,3 +44,7 @@ export const getMemberByEmail = (email: string) => {
 export const regirsterMember = (member: any) => {
     return post("/member", null, member)
 }
+
+export const getMyRequests = (memberId: number) => {
+    return get("/member", {memberId, requests:"true"})
+}

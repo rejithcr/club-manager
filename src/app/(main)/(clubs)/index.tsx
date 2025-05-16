@@ -7,6 +7,7 @@ import TouchableCard from '@/src/components/TouchableCard';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { AuthContext } from '@/src/context/AuthContext';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
+import ThemedView from '@/src/components/themed-components/ThemedView';
 
 const ClubMain = () => {
   const [clubs, setClubs] = useState<any>([]);
@@ -30,7 +31,7 @@ const ClubMain = () => {
   const showDetails = (clubId: number, clubName: string, role: string) => router.push(`/(main)/(clubs)/clubdetails?clubId=${clubId}&clubName=${clubName}&role=${role}`)
 
   return (
-    <>
+    <ThemedView style={{flex:1}}>
       <View style={{ marginTop: 25 }} />
       <View>
         {isLoading && <LoadingSpinner />}
@@ -38,7 +39,7 @@ const ClubMain = () => {
           <FlatList
             data={clubs}
             renderItem={({ item }) => (
-              <TouchableCard key={item.clubId} showDetails={() => showDetails(item.clubId, item.clubName, item.roleName)} id={item.clubId}>
+              <TouchableCard key={item.clubId} onPress={() => showDetails(item.clubId, item.clubName, item.roleName)} id={item.clubId}>
                 <View style={{
                   flexDirection: "row", width: "100%",
                   justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
@@ -54,7 +55,7 @@ const ClubMain = () => {
       <FloatingMenu onPressMain={showCreateClub}
         icon={<MaterialIcons name={"add"} size={32} color={"white"} />}
       />
-    </>
+    </ThemedView>
   )
 }
 

@@ -9,6 +9,8 @@ import { deleteFee, editFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router } from 'expo-router'
 import { ClubContext } from '@/src/context/ClubContext'
+import ThemedView from '@/src/components/themed-components/ThemedView'
+import ThemedText from '@/src/components/themed-components/ThemedText'
 
 const EditFeeType = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -57,12 +59,12 @@ const EditFeeType = () => {
                 );
     }
     return (
-        <View style={{ marginBottom: 20 }}>
+        <ThemedView style={{ flex: 1}}>
             <InputText label='Fee Type' onChangeText={setClubFeeType} defaultValue={params.get("clubFeeType")} />
             {!isAmountEditable && <Text style={{ alignSelf: "center", fontSize: 10, color: "grey", width: "80%" }}>
                 Amount/Period not editable as some collections are already using this value</Text>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignSelf: "center", alignItems: "center", width: "80%", marginTop: 20 }}>
-                <Text style={{ width: "40%" }}>Select Period</Text>
+                <ThemedText style={{ width: "40%" }}>Select Period</ThemedText>
                 <Picker style={{ width: "60%", textAlign: "right" }}
                     selectedValue={params.get("clubFeeTypeInterval")}
                     enabled={isAmountEditable}
@@ -80,7 +82,7 @@ const EditFeeType = () => {
                     <ThemedButton title='Update Fee' onPress={saveFeeType} />
                     {isAmountEditable && <ThemedButton title='Delete Fee' onPress={deleteFeeType} />}
                 </View>}
-        </View>
+        </ThemedView>
     )
 }
 

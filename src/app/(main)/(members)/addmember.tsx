@@ -12,6 +12,7 @@ import { isValidEmail, isValidPhoneNumber } from '@/src/utils/validators';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { addMemberAndAssignClub, addToClub } from '@/src/helpers/club_helper';
 import { ClubContext } from '@/src/context/ClubContext';
+import ThemedView from '@/src/components/themed-components/ThemedView';
 
 const AddMember = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -165,6 +166,7 @@ const AddMember = () => {
     }
 
     return (
+        <ThemedView style={{ flex: 1 }}>
         <GestureHandlerRootView>
             {isLoading && <LoadingSpinner />}
             {!isLoading && <ScrollView>
@@ -195,6 +197,7 @@ const AddMember = () => {
             </ScrollView>
             }
         </GestureHandlerRootView>
+        </ThemedView>
     )
 }
 

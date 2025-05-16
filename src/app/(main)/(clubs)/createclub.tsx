@@ -7,6 +7,7 @@ import { router } from 'expo-router'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { Alert, View } from 'react-native'
 import { isValidLength } from '@/src/utils/validators'
+import ThemedView from '@/src/components/themed-components/ThemedView'
 
 const CreateClub = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -23,7 +24,7 @@ const CreateClub = () => {
     }
   }
   return (
-    <>
+    <ThemedView style={{ flex: 1 }}>
       {isLoading && <LoadingSpinner />}
       {!isLoading &&
         <View style={{ alignItems: "center", marginTop:20}}>
@@ -31,7 +32,7 @@ const CreateClub = () => {
           <ThemedButton title="Create" onPress={submitCreateClub} />
         </View>
       }
-    </>
+    </ThemedView>
   )
 }
 

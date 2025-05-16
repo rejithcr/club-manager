@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import InputText from '@/src/components/InputText'
 import DatePicker from '@/src/components/DatePicker'
 import ThemedButton from '@/src/components/ThemedButton'
+import ThemedView from '@/src/components/themed-components/ThemedView'
 
 const Register = () => {
     const [date, setDate] = useState<Date>(new Date());
@@ -10,7 +11,7 @@ const Register = () => {
         console.log("add player")
     }
     return (
-        <View>
+        <ThemedView style={{flex:1}}>
             <InputText placeholder='First Name' />
             <InputText placeholder='Last Name' />
             <InputText placeholder='Phone Number' />
@@ -19,7 +20,7 @@ const Register = () => {
             <InputText placeholder='Jersey Number' />
             <View style={{ marginTop: 25 }} />
             <ThemedButton title="Register" onPress={addMember} />
-        </View>
+       </ThemedView>
     )
 }
 

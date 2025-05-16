@@ -9,6 +9,7 @@ import { appStyles } from '@/src/utils/styles'
 import { AuthContext } from '../../context/AuthContext';
 import { ANDROID_CLIENT_ID, WEB_CLIENT_ID } from '@/src/utils/keys'
 import { getMemberByEmail } from '@/src/helpers/member_helper'
+import ThemedView from '@/src/components/themed-components/ThemedView'
 
 
 WebBrowser.maybeCompleteAuthSession()
@@ -30,8 +31,8 @@ const AuthHome = () => {
   }, [response])
 
   const validateLogin = async () => {
-    const userInfoFromCache = await AsyncStorage.getItem("userInfo");
-    //const userInfoFromCache = "{\"email\": \"rejithramakrishnan@gmail.com\",\"name\": \"Rejith\"}"
+    //const userInfoFromCache = await AsyncStorage.getItem("userInfo");
+    const userInfoFromCache = "{\"email\": \"rejithramakrishnan@gmail.com\",\"name\": \"Rejith\"}"
     //const userInfoFromCache = "{\"email\": \"rejith.cr@gmail.com\",\"name\": \"Kannan\"}"
     console.log(userInfoFromCache)
     if (userInfoFromCache) {
@@ -86,10 +87,12 @@ const AuthHome = () => {
   }
 
   return (
-    <View style={appStyles.centerify}>
-      <Image source={require("../../assets/images/app-icon.png")} style={{height: 300, width: 300, marginBottom: 50}}/>
-      {isLoading ? <ActivityIndicator size="large" color={"black"} /> : <ThemedButton title="Sign in with Google" onPress={() => promptAsyc()} />}
-    </View>
+    <ThemedView style={{flex: 1}}>
+      <View style={appStyles.centerify}>
+        <Image source={require("../../assets/images/app-icon.png")} style={{height: 300, width: 300, marginBottom: 50}}/>
+        {isLoading ? <ActivityIndicator size="large" color={"black"} /> : <ThemedButton title="Sign in with Google" onPress={() => promptAsyc()} />}
+      </View>
+    </ThemedView>
   )
 }
 

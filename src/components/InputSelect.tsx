@@ -1,4 +1,4 @@
-import { View, TextInput, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { Picker } from '@react-native-picker/picker'
 

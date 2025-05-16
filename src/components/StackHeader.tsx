@@ -1,10 +1,12 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
+import ThemedText from "./themed-components/ThemedText";
 
-export const StackHeader = (props: { header: string | undefined; clubName: string | null; }) => {
+export const StackHeader = (props: { header: string | undefined; rightText?: string | null | undefined; }) => {
+  
   return (
     <View style={{flexDirection:"row", justifyContent:"space-between", alignItems:"center"}}>
-      <Text style={{fontSize:20, fontWeight:"bold"}}>{props.header}</Text>
-      <Text>{props.clubName}</Text>
+      <ThemedText style={{fontSize:20, fontWeight:"bold"}}>{props.header}</ThemedText>
+      <ThemedText>{props?.rightText}</ThemedText>
     </View>
   )
 }

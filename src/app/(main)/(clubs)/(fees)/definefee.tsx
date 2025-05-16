@@ -10,6 +10,8 @@ import { router } from 'expo-router'
 import { isNumeric, isValidLength } from '@/src/utils/validators'
 import { AuthContext } from '@/src/context/AuthContext'
 import { ClubContext } from '@/src/context/ClubContext'
+import ThemedView from '@/src/components/themed-components/ThemedView'
+import ThemedText from '@/src/components/themed-components/ThemedText'
 
 const DefineFee = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -36,6 +38,7 @@ const DefineFee = () => {
         }
     }
     return (
+        <ThemedView style={{ flex: 1 }}>
         <GestureHandlerRootView>
             <ScrollView>
                 {isLoading && <LoadingSpinner />}
@@ -47,7 +50,7 @@ const DefineFee = () => {
                             defaultValue={feeType}
                         />
                         <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "80%" }}>
-                            <Text style={{ width: "40%" }}>Select Interval</Text>
+                            <ThemedText style={{ width: "40%" }}>Select Interval</ThemedText>
                             <Picker style={{ width: "60%", textAlign: "right" }}
                                 selectedValue={feeTypeInterval}
                                 onValueChange={(itemValue, _itemIndex) => setFeeTypeInterval(itemValue)}>
@@ -69,6 +72,7 @@ const DefineFee = () => {
                 }
             </ScrollView>
         </GestureHandlerRootView>
+        </ThemedView>
     )
 }
 

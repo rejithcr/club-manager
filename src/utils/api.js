@@ -1,8 +1,7 @@
 import axios from "axios";
 import { AUTH_TOKEN } from "@/src/utils/keys";
 
-const BASE_URL =
-  "https://n24tjyszxraupd5cuogxf377i40xiltl.lambda-url.ap-south-1.on.aws";
+const BASE_URL = "https://n24tjyszxraupd5cuogxf377i40xiltl.lambda-url.ap-south-1.on.aws";
 
 export const get = (path, queryParams) => {
   console.log("GET",BASE_URL + path, queryParams);

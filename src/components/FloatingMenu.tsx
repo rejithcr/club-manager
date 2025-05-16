@@ -1,5 +1,8 @@
 import { View, Text, StyleSheet, TouchableOpacity, GestureResponderEvent, Pressable } from 'react-native'
 import React, { useState } from 'react'
+import ThemedView from './themed-components/ThemedView';
+import ThemedText from './themed-components/ThemedText';
+import { useTheme } from '../hooks/use-theme';
 
 
 const FloatingMenu = (props: {
@@ -10,6 +13,8 @@ const FloatingMenu = (props: {
     onPressItem?: any;
     color?: string | undefined;
 }) => {
+
+    const { theme } = useTheme()
 
     const [actionsItems, setActionItems] = useState<any>()
     const [isActionsVisible, setIsActionsVisible] = useState<boolean>(false)
@@ -38,7 +43,9 @@ const FloatingMenu = (props: {
                                 <View style={styles.menuIcon} >
                                     { action.icon }
                                 </View>
-                                <View style={styles.menuText}><Text>{action.text}</Text></View>
+                                <ThemedView style={{...styles.menuText, backgroundColor: theme.primary}}>
+                                    <ThemedText>{action.text}</ThemedText>
+                                </ThemedView>
                             </TouchableOpacity>
                         )
                     }
@@ -75,7 +82,6 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     menuText: {
-        backgroundColor: "white",
         borderColor: "#eee",
         boxShadow: "0 0 15 10 rgba(0, 0, 0, .2)",
         borderRadius: 5,

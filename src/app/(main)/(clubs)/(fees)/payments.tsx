@@ -11,6 +11,10 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { AuthContext } from '@/src/context/AuthContext';
 import { router } from 'expo-router';
 import { ClubContext } from '@/src/context/ClubContext';
+import ThemedView from '@/src/components/themed-components/ThemedView';
+import ThemedText from '@/src/components/themed-components/ThemedText';
+import ShadowBox from '@/src/components/ShadowBox';
+import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -72,11 +76,11 @@ const Payments = () => {
         );
     }
     return (
+        <ThemedView style={{ flex: 1 }}>
         <GestureHandlerRootView>
-            <Text style={{ ...appStyles.heading }}>Payment Status - {params.get("clubFeeTypePeriod")}</Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "80%", alignSelf: "center", marginBottom: 10 }}>
-                <View style={{flexDirection:"row"}}><Text style={{marginRight:10}}>Paid</Text><MaterialIcons name='check-circle' size={20} /></View>
-                <View style={{flexDirection:"row"}}><Text style={{marginRight:10}}>Not Paid</Text><MaterialIcons name='radio-button-unchecked' size={20} /></View>
+            <ThemedText style={{ ...appStyles.heading }}>Payment Status - {params.get("clubFeeTypePeriod")}</ThemedText>
+            <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center", marginBottom: 10 }}>
+                <MaterialIcons name='warning' size={25} color={"#fff85b"}/><ThemedText style={{marginLeft:10, fontSize: 20}}>Pending</ThemedText>                
             </View>
             <View style={{ height: "80%" }}>
                 {isLoading && <LoadingSpinner />}
@@ -92,7 +96,7 @@ const Payments = () => {
             <Modal isVisible={isConfirmVisible}>
                 <ScrollView>
                     <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
-                        <Text style={appStyles.heading}>Confirm Updates</Text>
+                        <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
                         {paymentStatusUpdates.map((item) => {
                             return <PaymentUpdates key={item.clubFeePaymentId} {...item} />
                         })}
@@ -105,9 +109,10 @@ const Payments = () => {
             </Modal>
             <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
                 <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
-                <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} />
+                <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} color={"#ff6b6b"}/>
             </View>
         </GestureHandlerRootView>
+        </ThemedView>
     )
 }
 
@@ -142,15 +147,13 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
+            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
                 <View style={{ width: "10%" }}>
-                    {isSelected ? <MaterialIcons name='check-circle' size={20} /> :
-                        <MaterialIcons name='radio-button-unchecked' size={20} />}
-                    {/* <Checkbox value={isSelected} color={"black"} /> */}
+                    <ThemedCheckBox checked={isSelected}/>
                 </View>
-                <Text style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</Text>
-                <Text style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</Text>
-            </View>
+                <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</ThemedText>
+                <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</ThemedText>
+            </ShadowBox>
         </TouchableOpacity>
     )
 }
@@ -158,11 +161,11 @@ const MemberFeeItem = (props: {
 
 const PaymentUpdates = (props: { clubFeePaymentId: number | undefined; firstName?: string | null | undefined; paid: boolean | undefined; }) => {
     return (
-        <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
-            <Text numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName}</Text>
+        <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
+            <ThemedText numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName}</ThemedText>
             {props?.paid ?
                 <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-marked' /> :
                 <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-blank-outline' />}
-        </View>
+        </ShadowBox>
     )
 }

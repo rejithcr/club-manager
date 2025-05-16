@@ -1,5 +1,8 @@
 import { View, TextInput, Text, StyleSheet } from 'react-native'
 import React from 'react'
+import ThemedText from './themed-components/ThemedText';
+import { useTheme } from '../hooks/use-theme';
+import ThemedView from './themed-components/ThemedView';
 
 const InputText = (props: { 
   label?: string; 
@@ -11,11 +14,14 @@ const InputText = (props: {
   editable?: boolean;
   onChangeText?: any;
   blurOnSubmit?: any }) => {
+    
+        const { theme } = useTheme();
+        
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>{props.label || props.placeholder }</Text>
-      <TextInput style={styles.input} {...props} onChangeText={props.onChangeText} />
-    </View>
+    <ThemedView style={styles.container}>
+      <ThemedText style={styles.label}>{props.label || props.placeholder }</ThemedText>
+      <TextInput style={{color:theme.text, ...styles.input}} {...props} onChangeText={props.onChangeText} />
+    </ThemedView>
   )
 }
 
@@ -27,7 +33,8 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     borderBottomColor: "grey",
     borderBottomWidth: 1,
-    margin: 10
+    margin: 10,
+    
   },
   label:{
     fontSize: 10

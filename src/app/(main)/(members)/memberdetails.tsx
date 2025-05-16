@@ -4,6 +4,7 @@ import { useSearchParams } from 'expo-router/build/hooks';
 import { MaterialIcons } from '@expo/vector-icons';
 import { getMemberDetails, Member } from '@/src/helpers/member_helper';
 import KeyValueUI from '@/src/components/KeyValueUI';
+import ThemedView from '@/src/components/themed-components/ThemedView';
 
 const Profile = () => {
   const params = useSearchParams()
@@ -14,7 +15,7 @@ const Profile = () => {
   }, [])
 
   return (
-    <View>
+    <ThemedView style={{ flex: 1 }}>
       <View style={styles.photoContainer}>
         <MaterialIcons name={"account-circle"} size={100} />
       </View>
@@ -23,7 +24,7 @@ const Profile = () => {
 
       <KeyValueUI data={memberDetails} hideKeys={["id"]}/>
       
-    </View>
+    </ThemedView>
   )
 }
 

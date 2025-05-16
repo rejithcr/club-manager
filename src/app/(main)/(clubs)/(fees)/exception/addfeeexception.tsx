@@ -12,6 +12,9 @@ import Checkbox from 'expo-checkbox'
 import { appStyles } from '@/src/utils/styles'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { ClubContext } from '@/src/context/ClubContext'
+import ThemedView from '@/src/components/themed-components/ThemedView'
+import ThemedText from '@/src/components/themed-components/ThemedText'
+import ShadowBox from '@/src/components/ShadowBox'
 
 const AddFeeException = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -76,36 +79,37 @@ const AddFeeException = () => {
     };
 
     return (
-        <>
+        <ThemedView style={{ flex: 1 }}>
         <View>
             <View style={{ marginBottom: 20 }}>
                 <InputText label='Exception Type' onChangeText={setExceptionType} />
                 <InputText label='Amount' keyboardType={"numeric"} onChangeText={setExceptionAmount}/>
             </View>
-            <Text style={{ ...appStyles.heading }}>Select Members</Text>
+            <ThemedText style={{ ...appStyles.heading }}>Select Members</ThemedText>
             {isLoading && <LoadingSpinner />}
-            {!isLoading && <>
-                <FlatList
+            {!isLoading && <View style={{ height: "65%" }}>
+                <FlatList 
                     data={members}
+                    ListFooterComponent={() => <View style={{ height: 50 }} />}
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => toggleSelection(item.memberId)}>
-                            <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
+                            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
                                 <View style={{ width: "5%" }}>
                                     <Checkbox value={item.selected} color={"black"} />
                                 </View>
-                                <Text style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName}</Text>
-                            </View>
+                                <ThemedText style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName}</ThemedText>
+                            </ShadowBox>
                         </TouchableOpacity>
                     )}
                     keyExtractor={(item) => item.memberId}
                 />
-            </>
+            </View>
             }
         </View>
         <View style={{ position: "absolute", bottom: 30, alignSelf:"center" }} >
             <ThemedButton title='Add Exception' onPress={saveException} />
         </View>
-        </>
+        </ThemedView>
     )
 }
 

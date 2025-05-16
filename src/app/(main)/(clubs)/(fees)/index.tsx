@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Alert } from 'react-native'
+import { View, ScrollView, TouchableOpacity, Alert } from 'react-native'
 import React, { useCallback, useContext, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { appStyles } from '@/src/utils/styles'
@@ -9,6 +9,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import TouchableCard from '@/src/components/TouchableCard'
 import { ClubContext } from '@/src/context/ClubContext'
 import { ROLE_ADMIN } from '@/src/utils/constants'
+import ThemedText from '@/src/components/themed-components/ThemedText'
+import ThemedView from '@/src/components/themed-components/ThemedView'
 
 const Fees = () => {
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
@@ -52,32 +54,33 @@ const Fees = () => {
     })
   }
   return (
+    <ThemedView style={{flex: 1}}>
     <GestureHandlerRootView>
       <ScrollView>
         <View style={{
           flexDirection: "row", alignItems: "center", width: "80%",
           justifyContent: "space-between", alignSelf: "center",
         }}>
-          <Text style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Recurring Fees</Text>
+          <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Recurring Fees</ThemedText>
           {clubInfo.role == ROLE_ADMIN && <TouchableOpacity style={{ width: "10%" }}
             onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
             <MaterialCommunityIcons size={25} name={'plus-circle'} />
           </TouchableOpacity> }
         </View>
         {isLoadingCurrent && <LoadingSpinner />}
-        {!isLoadingCurrent && currentFeeStructure?.length == 0 && <Text style={{ alignSelf: "center", width: "80%"}}>No fees defined. To define a fee type (eg. Membership fee), press the + icon.</Text>}
+        {!isLoadingCurrent && currentFeeStructure?.length == 0 && <ThemedText style={{ alignSelf: "center", width: "80%"}}>No fees defined. To define a fee type (eg. Membership fee), press the + icon.</ThemedText>}
         {!isLoadingCurrent && currentFeeStructure?.map((fee: any) => {
-          return <TouchableCard key={fee.clubFeeTypeId} showDetails={showFeeTypeDetails} id={fee}>
+          return <TouchableCard key={fee.clubFeeTypeId} onPress={showFeeTypeDetails} id={fee}>
             <View style={{
               flexDirection: "row", width: "100%",
               justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
             }}>
               <View>
-                <Text style={{ fontWeight: "bold" }}>{fee.clubFeeType}</Text>
-                <Text style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</Text>
+                <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
+                <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
               </View>
               <View style={{ flexDirection: "row" }}>
-                <Text style={{ marginRight: 10 }}>Rs. {fee.clubFeeAmount}</Text>
+                <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubFeeAmount}</ThemedText>
                 <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
               </View>
             </View>
@@ -88,7 +91,7 @@ const Fees = () => {
           flexDirection: "row", alignItems: "center", width: "80%",
           justifyContent: "space-between", alignSelf: "center", marginTop: 10
         }}>
-          <Text style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Adhoc Collections</Text>
+          <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Adhoc Collections</ThemedText>
           {clubInfo.role == ROLE_ADMIN &&<TouchableOpacity style={{ width: "10%" }}
             onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
             <MaterialCommunityIcons size={25} name={'plus-circle'} />
@@ -96,21 +99,21 @@ const Fees = () => {
         </View>
         {isLoadingAdhoc && <LoadingSpinner />}
         {!isLoadingAdhoc && adhocFees?.length == 0 && 
-        <Text style={{ alignSelf: "center", width: "80%" }}>No adhoc fees defined. 
+        <ThemedText style={{ alignSelf: "center", width: "80%" }}>No adhoc fees defined. 
         This will be a on time collection from selected members. 
-        For eg. splitting expense amoung members who participated in an event. Press the + icon to define collection</Text>}
+        For eg. splitting expense amoung members who participated in an event. Press the + icon to define collection</ThemedText>}
         {!isLoadingAdhoc && adhocFees?.map(fee =>
-          <TouchableCard key={fee.clubAdhocFeeId} showDetails={showAdhocFeeDetails} id={fee}>
+          <TouchableCard key={fee.clubAdhocFeeId} onPress={showAdhocFeeDetails} id={fee}>
             <View style={{
               flexDirection: "row", width: "100%",
               justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
             }}>
               <View>
-                <Text style={{ fontWeight: "bold" }}>{fee.clubAdhocFeeName}</Text>
-                <Text style={{ fontSize: 10, marginTop: 5 }}>{fee.clubAdhocFeeDesc}</Text>
+                <ThemedText style={{ fontWeight: "bold" }}>{fee.clubAdhocFeeName}</ThemedText>
+                <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubAdhocFeeDesc}</ThemedText>
               </View>
               <View style={{ flexDirection: "row" }}>
-                <Text style={{ marginRight: 10 }}>Rs. {fee.clubAdhocFeePaymentAmount}</Text>
+                <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubAdhocFeePaymentAmount}</ThemedText>
                 <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
               </View>
             </View>
@@ -118,6 +121,7 @@ const Fees = () => {
         )}
       </ScrollView>
     </GestureHandlerRootView>
+    </ThemedView>
   )
 }
 

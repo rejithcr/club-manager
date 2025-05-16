@@ -1,32 +1,35 @@
 import { View, Text, StyleSheet } from 'react-native'
 import { appStyles } from '@/src/utils/styles';
+import ThemedView from '@/src/components/themed-components/ThemedView';
+import ShadowBox from '@/src/components/ShadowBox';
+import ThemedText from '@/src/components/themed-components/ThemedText';
 
 const FeeSummary = (props: { duesByMember: []}) => {
   return (
-    <View>
-      {props.duesByMember?.length == 0 && <Text style={{ textAlign: "center" }}>Yay!! You are all clear 👏</Text>}
+    <ThemedView>
+      {props.duesByMember?.length == 0 && <ThemedText style={{ textAlign: "center" }}>Yay!! You are all clear 👏</ThemedText>}
       {props.duesByMember?.map((club: any) => {
         return (
-          <View key={club.clubId} style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15 }}>
+          <ShadowBox key={club.clubId} style={{ padding: 10, width: "80%", marginBottom: 15, flexDirection: "column" }}>
             <View style={{
               flexDirection: "row", width: "100%", margin: 5,
               justifyContent: "space-between", alignItems: "center"
             }}>
-              <Text style={{ fontWeight: "bold", fontSize: 15 }}>Rs. {club.dueAmount}</Text>
-              <Text style={{ fontSize: 10, paddingRight: 10 }}> {club.clubName} </Text>
+              <ThemedText style={{ fontWeight: "bold", fontSize: 15 }}>Rs. {club.dueAmount}</ThemedText>
+              <ThemedText style={{ fontSize: 10, paddingRight: 10 }}> {club.clubName} </ThemedText>
             </View>
             {club.dues.map((due: any) =>
               <View key={due.paymentId.toString() + due.feeType} style={styles.item}>
                 <View style={styles.divider} />
-                <Text style={styles.label}>{due.fee} </Text>
-                <Text style={styles.date}>{due.feeDesc} </Text>
-                <Text style={styles.amount}>Rs. {due.amount}</Text>
+                <ThemedText style={styles.label}>{due.fee} </ThemedText>
+                <ThemedText style={styles.date}>{due.feeDesc} </ThemedText>
+                <ThemedText style={styles.amount}>Rs. {due.amount}</ThemedText>
               </View>
             )}
-          </View>
+          </ShadowBox>
         )
       })}
-    </View>
+    </ThemedView>
   )
 }
 

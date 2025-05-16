@@ -17,7 +17,6 @@ export const getClubMembers = (clubId: string | null) => {
     return get("/club/member", {clubId: clubId})
 }
 
-
 export const addMemberAndAssignClub = async (member: any) => {
     return post("/club/member", null, member)
 }
@@ -40,4 +39,12 @@ export const getDuesByMember = (memberId: number | null) => {
 
 export const getClubDues = (clubId: number | null) => {
     return get("/club/member", {clubId, duesByClub: "true"})
+}
+
+export const searchClubsByName = (clubName: string | null) => {
+    return get("/club", {clubName, search: "true"})
+}
+
+export const requestMembership = async ( clubId: number, memberId: number, email: string) => {
+    return post("/club/member", null, {memberId, clubId, email})
 }
