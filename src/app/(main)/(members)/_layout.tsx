@@ -6,9 +6,9 @@ import React, { useContext } from "react";
 
 export default function RootLayout() {
   const { clubInfo } = useContext(ClubContext)
-  const { theme } = useTheme();
+  const { colors } = useTheme();
   return (
-        <Stack screenOptions={{ headerStyle: { backgroundColor: theme.primary} }}>
+        <Stack screenOptions={{ headerStyle: { backgroundColor: colors.primary}, headerTintColor: colors.text }}>
         <Stack.Screen
           name="index" // This is the name of the page and must match the url from root
           options={{

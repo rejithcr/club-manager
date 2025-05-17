@@ -15,6 +15,8 @@ import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import ShadowBox from '@/src/components/ShadowBox';
 import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
+import { useTheme } from '@/src/hooks/use-theme';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -27,6 +29,7 @@ const Payments = () => {
     }[]>([])
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
+    const { colors } = useTheme()
 
     const params = useSearchParams()
 
@@ -78,9 +81,9 @@ const Payments = () => {
     return (
         <ThemedView style={{ flex: 1 }}>
         <GestureHandlerRootView>
-            <ThemedText style={{ ...appStyles.heading }}>Payment Status - {params.get("clubFeeTypePeriod")}</ThemedText>
+            <ThemedText style={{ ...appStyles.heading }}>Status for {params.get("clubFeeTypePeriod")}</ThemedText>
             <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center", marginBottom: 10 }}>
-                <MaterialIcons name='warning' size={25} color={"#fff85b"}/><ThemedText style={{marginLeft:10, fontSize: 20}}>Pending</ThemedText>                
+                <ThemedIcon name='MaterialIcons:warning' size={25} color={colors.warning}/><ThemedText style={{marginLeft:10, fontSize: 20}}>Pending</ThemedText>                
             </View>
             <View style={{ height: "80%" }}>
                 {isLoading && <LoadingSpinner />}
@@ -95,7 +98,7 @@ const Payments = () => {
             </View>
             <Modal isVisible={isConfirmVisible}>
                 <ScrollView>
-                    <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
+                    <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
                         <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
                         {paymentStatusUpdates.map((item) => {
                             return <PaymentUpdates key={item.clubFeePaymentId} {...item} />
@@ -104,12 +107,12 @@ const Payments = () => {
                             <ThemedButton title="Update" onPress={() => savePaymentUpdates()} />
                             <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
                         </View>
-                    </View>
+                    </ThemedView>
                 </ScrollView>
             </Modal>
             <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
                 <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
-                <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} color={"#ff6b6b"}/>
+                <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => deleteCollection()} color={colors.error}/>
             </View>
         </GestureHandlerRootView>
         </ThemedView>
@@ -163,9 +166,7 @@ const PaymentUpdates = (props: { clubFeePaymentId: number | undefined; firstName
     return (
         <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
             <ThemedText numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName}</ThemedText>
-            {props?.paid ?
-                <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-marked' /> :
-                <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-blank-outline' />}
+            <ThemedCheckBox checked={props?.paid} /> 
         </ShadowBox>
     )
 }

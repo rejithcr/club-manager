@@ -3,10 +3,10 @@ import React from 'react'
 import { useTheme } from '@/src/hooks/use-theme'
 
 const ThemedView = (props:any) => {
-    const {theme} = useTheme()
+    const {colors} = useTheme()
 
     return (
-        <View {...props} style={{ backgroundColor: theme.background, ...props?.style }} />
+        <View {...props} style={{ backgroundColor: colors.background, ...props?.style }} />
     )
 }
 

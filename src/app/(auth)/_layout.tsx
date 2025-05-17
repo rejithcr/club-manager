@@ -4,9 +4,9 @@ import { Stack } from 'expo-router'
 import { useTheme } from '@/src/hooks/use-theme';
 
 const AuthStack = () => {
-  const { theme } = useTheme();
+  const { colors } = useTheme();
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: theme.primary} }}>
+    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.primary}, headerTintColor: colors.text }}>
       <Stack.Screen  name='index' options={{title: "Login", headerShown:false}}/>
       <Stack.Screen  name='register' options={{title: "Register"}}/>
     </Stack>

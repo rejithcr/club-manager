@@ -5,16 +5,16 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 
 const MainStack = () => {
-  const { theme } = useTheme()
+  const { colors } = useTheme()
   return (
-    <SafeAreaView style={{ flex: 1 , backgroundColor: theme.background}}>
+    <SafeAreaView style={{ flex: 1 , backgroundColor: colors.background}}>
       <Stack>
-        <Stack.Screen name="index" options={{ title: "Home", headerShown: false }} />
+        <Stack.Screen name="index" options={{ title: "Club Manager", headerShown: true, headerStyle: { backgroundColor: colors.primary}, headerTintColor: colors.text }} />
         <Stack.Screen name="(members)" options={{ title: "Member", headerShown: false }} />
         <Stack.Screen name="(clubs)" options={{ title: "Club", headerShown: false }} />
         <Stack.Screen name="(profile)" options={{ title: "Club", headerShown: false }} />
       </Stack>
-      <StatusBar style={theme.name == "system" ? "light" : "dark"}/>
+      <StatusBar style={colors.statusbar == "light" ? "light" : "dark"}/>
     </SafeAreaView>
   )
 }

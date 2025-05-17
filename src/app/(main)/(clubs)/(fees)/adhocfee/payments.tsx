@@ -4,7 +4,7 @@ import { useSearchParams } from 'expo-router/build/hooks';
 import { deleteAdhocFeeCollection, getAdhocFeePayments, saveAdhocFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
-import { appStyles } from '@/src/utils/styles';
+import { appStyles, colors } from '@/src/utils/styles';
 import Checkbox from 'expo-checkbox';
 import ThemedButton from '@/src/components/ThemedButton';
 import Modal from 'react-native-modal';
@@ -15,6 +15,10 @@ import { ClubContext } from '@/src/context/ClubContext';
 import ShadowBox from '@/src/components/ShadowBox';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
+import { useTheme } from '@/src/hooks/use-theme';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
+import Spacer from '@/src/components/Spacer';
+import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -27,6 +31,7 @@ const Payments = () => {
     }[]>([])
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
+    const { colors } = useTheme()
 
     const params = useSearchParams()
     const feeObj = JSON.parse(params.get('adhocFee') || "")
@@ -92,10 +97,9 @@ const Payments = () => {
                 </View>
                 <ThemedText style={{ marginRight: 10 }}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
             </ShadowBox>
-            <ThemedText style={appStyles.heading}>Payment Status</ThemedText>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "80%", alignSelf: "center", marginBottom: 10 }}>
-                <View style={{flexDirection:"row"}}><ThemedText style={{marginRight:10}}>Paid</ThemedText><MaterialIcons name='check-circle' size={20} /></View>
-                <View style={{flexDirection:"row"}}><ThemedText style={{marginRight:10}}>Not Paid</ThemedText><MaterialIcons name='radio-button-unchecked' size={20} /></View>
+            <Spacer space={10} />
+            <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center", marginBottom: 10 }}>
+                <ThemedIcon name='MaterialIcons:warning' size={25} color={colors.warning}/><ThemedText style={{marginLeft:10, fontSize: 20}}>Pending</ThemedText>                
             </View>
             <View style={{ height: "70%" }}>
                 {isLoading && <LoadingSpinner />}
@@ -111,7 +115,7 @@ const Payments = () => {
             </View>
             <Modal isVisible={isConfirmVisible}>
                 <ScrollView>
-                    <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
+                    <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
                         <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
                         {paymentStatusUpdates.map((item) => {
                             return <PaymentUpdates key={item.clubFeePaymentId} {...item} />
@@ -120,12 +124,12 @@ const Payments = () => {
                             <ThemedButton title="Update" onPress={() => savePaymentUpdates()} />
                             <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
                         </View>
-                    </View>
+                    </ThemedView>
                 </ScrollView>
             </Modal>
             <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
                 <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
-                <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} />
+                <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} color={colors.error}/>
             </View>
         </GestureHandlerRootView>
         </ThemedView>
@@ -164,10 +168,10 @@ const MemberFeeItem = (props: {
     return (
         <TouchableOpacity onPress={selectItem}>
             <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
-                <View style={{ width: "5%" }}>
-                    <Checkbox value={isSelected} color={"black"} />
+                <View style={{ width: "10%" }}>
+                    <ThemedCheckBox checked={isSelected}/>
                 </View>
-                <ThemedText style={{ width: "75%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</ThemedText>
+                <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</ThemedText>
                 <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
             </ShadowBox>
         </TouchableOpacity>
@@ -177,11 +181,9 @@ const MemberFeeItem = (props: {
 
 const PaymentUpdates = (props: { clubFeePaymentId: number | undefined; firstName?: string | null | undefined; paid: boolean | undefined; }) => {
     return (
-        <View style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
+        <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
             <ThemedText numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName}</ThemedText>
-            {props?.paid ?
-                <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-marked' /> :
-                <MaterialCommunityIcons style={{ width: "20%", fontSize: 15, textAlign: "right" }} name='checkbox-blank-outline' />}
-        </View>
+            <ThemedCheckBox checked={props?.paid} /> 
+        </ShadowBox>
     )
 }

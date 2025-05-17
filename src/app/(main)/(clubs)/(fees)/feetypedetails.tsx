@@ -12,6 +12,7 @@ import LoadingSpinner from '@/src/components/LoadingSpinner'
 import TouchableCard from '@/src/components/TouchableCard'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 
 const FeeTypeDetails = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -107,7 +108,7 @@ const FeeTypeDetails = () => {
                 </View>
                 <View style={{ flexDirection: "row" }}>
                     <ThemedText style={{ marginRight: 10 }}>Rs. {fee?.clubFeeAmount}</ThemedText>
-                    <MaterialCommunityIcons size={20} name={'square-edit-outline'} />
+                    <ThemedIcon size={20} name={'MaterialCommunityIcons:square-edit-outline'} />
                 </View>
             </TouchableCard>
             <View>
@@ -117,11 +118,11 @@ const FeeTypeDetails = () => {
                 }}>
                     <TouchableOpacity onPress={() => setShowAddException(!showAddException)}
                         style={{ flexDirection: "row", width: "80%", justifyContent: "flex-start", alignItems: "center" }}>
-                        <MaterialCommunityIcons size={25} name={showAddException ? 'chevron-down-circle' : 'chevron-right-circle'} />
-                        <ThemedText style={appStyles.heading}>Exceptions</ThemedText>
+                        <ThemedIcon size={25} name={showAddException ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} />
+                        <ThemedText style={{...appStyles.heading, paddingLeft:5}}>Exceptions</ThemedText>
                     </TouchableOpacity>
                     <TouchableOpacity style={{ width: 50, alignItems: "center" }} onPress={() => gotoAddFeeExceptions()}>
-                        <MaterialCommunityIcons size={25} name={'plus-circle'} />
+                        <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} />
                     </TouchableOpacity>
                 </View>
                 {showAddException && <View style={{ width: "90%", alignSelf: "center" }}>

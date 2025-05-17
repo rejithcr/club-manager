@@ -4,10 +4,10 @@ import { colors } from '@/src/utils/styles'
 import { useTheme } from '@/src/hooks/use-theme'
 
 const ThemedText = (props: any) => {
-    const {theme} = useTheme()
+    const {colors} = useTheme()
 
     return (
-        <Text {...props} style={{ color: theme.text, ...props?.style }} />
+        <Text {...props} style={{ color: colors.text, ...props?.style }} />
     )
 }
 

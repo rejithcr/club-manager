@@ -3,9 +3,9 @@ import { Stack } from 'expo-router';
 import React from "react";
 
 export default function AttendanceLayout() {
-  const { theme } = useTheme();
+  const { colors } = useTheme();
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: theme.primary} }}>
+    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.primary}, headerTintColor: colors.text }}>
       <Stack.Screen name="index" options={{title: 'Attendance', headerShown:true}}/>      
     </Stack>
   )

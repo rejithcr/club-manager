@@ -3,26 +3,28 @@ import { StyleSheet } from "react-native"
 
 export const colors = {
   light: {
-    name: "light",
+    statusbar: "dark",
     primary: "#ffffff",
     secondary: "#03dac6",
     background: "#f5f5f5",
     text: "#000000",
     error: "#b00020",
-    warning: "#f0e68c",
+    warning: "#fdb924",
     disabled: "#f5f5f5",
-    success: "#5ac983"
+    success: "#5ac983",
+    button: "#007acc",
   },
   dark:{
-    name: "dark",
+    statusbar: "light",
     primary: "#333333",
     secondary: "#252526",
     background: "#1e1e1e",
     text: "#ffffff",
     error: "#ff6b6b",
-    warning: "#f0e68c",
+    warning: "#fdb924",
     disabled: "#f5f5f5",
-    success: "#5ac983"
+    success: "#5ac983",
+    button: "#007acc",
   }
 }
 

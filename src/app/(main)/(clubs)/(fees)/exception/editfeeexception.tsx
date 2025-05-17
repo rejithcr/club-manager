@@ -15,6 +15,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 
 const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
@@ -122,8 +123,8 @@ const EditFeeException = () => {
                                     <ThemedText style={{ textDecorationLine: getStrikeOut(member.endDate || member.endDateAdded) }}>{member.firstName} {member.lastName}</ThemedText>
                                     <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{member.startDate} {(member.endDate || member.endDateAdded) && " to "} {member.endDate || member.endDateAdded}</ThemedText>
                                 </View>
-                                {!member.endDate && (member.endDateAdded ? <MaterialIcons name="undo" size={20} onPress={() => endException(member)} />
-                                    : <MaterialIcons name="remove-circle" size={20} onPress={() => endException(member)} />)}
+                                {!member.endDate && (member.endDateAdded ? <ThemedIcon name="MaterialIcons:undo" size={20} onPress={() => endException(member)} />
+                                    : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} />)}
                             </ShadowBox>
                         </View>
                     )
@@ -135,7 +136,7 @@ const EditFeeException = () => {
                     members.map((item: any) =>
                         <TouchableOpacity key={item.memberId} onPress={() => addToException(item)}>
                             <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
-                                <MaterialIcons name="add-circle" size={20} />
+                                <ThemedIcon name="MaterialIcons:add-circle" size={20} />
                                 <ThemedText style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>

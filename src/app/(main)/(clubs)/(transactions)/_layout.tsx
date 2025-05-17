@@ -6,11 +6,11 @@ import React, { useContext } from "react";
 
 export default function TransactionLayout() {
   const { clubInfo } = useContext(ClubContext)
-  const { theme } = useTheme();
+  const { colors } = useTheme();
 
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: theme.primary } }}>
-      <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Transactions"} clubName={clubInfo?.clubName} />, headerShown: true }} />
+    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.primary }, headerTintColor: colors.text }}>
+      <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Transactions"} rightText={clubInfo?.clubName} />, headerShown: true }} />
     </Stack>
   )
 }

@@ -3,9 +3,9 @@ import React from 'react'
 import { useTheme } from '../hooks/use-theme';
 
 const ShadowBox = (props: any) => {
-    const { theme } = useTheme();
+    const { colors } = useTheme();
     return (
-        <View style={{backgroundColor: theme.primary, ...styles.container,...props.style}}>
+        <View style={{backgroundColor: colors.primary, ...styles.container,...props.style}}>
             {props.children}
         </View>
     )

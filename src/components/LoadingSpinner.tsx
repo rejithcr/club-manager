@@ -4,10 +4,10 @@ import { appStyles } from '../utils/styles'
 import { useTheme } from '../hooks/use-theme';
 
 const LoadingSpinner = () => {
-  const { theme } = useTheme();
+  const { colors } = useTheme();
   return (
     <View style={{...appStyles.centerify}}>
-      <ActivityIndicator size="small" color={theme.background} />
+      <ActivityIndicator size="small" color={colors.text} />
     </View>
   )
 }

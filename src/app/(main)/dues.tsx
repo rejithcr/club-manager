@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     borderBottomColor: 'rgba(136, 136, 136, 0.2)',
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: .75,
     width: "100%"
   }
 });

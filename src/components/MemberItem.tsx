@@ -6,6 +6,9 @@ import {
 } from "react-native";
 import React from "react";
 import { MaterialIcons } from "@expo/vector-icons";
+import ThemedText from "./themed-components/ThemedText";
+import ThemedIcon from "./themed-components/ThemedIcon";
+import ShadowBox from "./ShadowBox";
 
 const MemberItem = (props: {
   showDetails?: any;
@@ -17,28 +20,28 @@ const MemberItem = (props: {
 }) => {
   return (
     <TouchableOpacity onPress={()=> props.showDetails(props.memberId)}>
-      <View style={styles.container}>
-        <MaterialIcons style={styles.icon} name={"account-circle"} size={32} />
+      <ShadowBox style={styles.container}>
+        <ThemedIcon style={styles.icon} name={"MaterialIcons:account-circle"} size={32} />
         <View style={styles.spend}>
-          <Text>
+          <ThemedText>
             {props.firstName} {props.lastName}
-          </Text>
+          </ThemedText>
           {props.dateOfBirth ? (
-            <Text style={styles.date}>{props.dateOfBirth}</Text>
+            <ThemedText style={styles.date}>{props.dateOfBirth}</ThemedText>
           ) : null}
         </View>
         <View style={styles.amount}>
-          <Text>
+          <ThemedText>
             {props?.dues && (props?.dues == 0 ? (
-              <MaterialIcons style={styles.icon} name={"done-all"} size={32} />
+              <ThemedIcon style={styles.icon} name={"MaterialIcons:done-all"} size={32} />
             ) : props?.dues || 0 > 1000 ? (
               "Dues Rs." + (props?.dues || 0 / 1000).toString() + "K"
             ) : (
               "Dues Rs." + props?.dues
             ))}
-          </Text>
+          </ThemedText>
         </View>
-      </View>
+      </ShadowBox>
     </TouchableOpacity>
   );
 };

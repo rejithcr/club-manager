@@ -12,6 +12,7 @@ import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ShadowBox from '@/src/components/ShadowBox'
 import ThemedText from '@/src/components/themed-components/ThemedText'
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 
 const ClubDetails = () => {
     const router = useRouter()
@@ -81,7 +82,7 @@ const ClubDetails = () => {
                             {!isTotalDueLoading &&
                                 <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
                                     <ThemedText style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {totalDue} </ThemedText>
-                                    <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
+                                    <ThemedIcon size={20} name={'MaterialCommunityIcons:chevron-right-circle'} />
                                 </View>
                             }
                         </TouchableOpacity>

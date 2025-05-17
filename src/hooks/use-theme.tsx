@@ -10,13 +10,15 @@ export const useTheme = () => {
   const [themeColors, setThemeColors] = useState(colorScheme ? colors[colorScheme] : colors.light)
 
   useEffect(() => {
-    AsyncStorage.setItem("theme", theme);
-    if (theme === "system") {
-      setThemeColors(colorScheme ? colors[colorScheme] : colors.light)
-    } else if (theme === "dark") {
-      setThemeColors(colors["dark"])
-    } else {
-      setThemeColors(colors["light"])
+    if (theme) {
+      AsyncStorage.setItem("theme", theme);
+      if (theme === "system") {
+        setThemeColors(colorScheme ? colors[colorScheme] : colors.light)
+      } else if (theme === "dark") {
+        setThemeColors(colors["dark"])
+      } else {
+        setThemeColors(colors["light"])
+      }
     }
   }, [theme, colorScheme])
 
@@ -26,6 +28,7 @@ export const useTheme = () => {
   }, [])
 
   return {
-    theme: themeColors
+    theme,
+    colors: themeColors
   }
 }

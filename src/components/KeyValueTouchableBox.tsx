@@ -4,6 +4,7 @@ import { appStyles } from '../utils/styles'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import ThemedText from './themed-components/ThemedText'
 import { useTheme } from '../hooks/use-theme'
+import ThemedIcon from './themed-components/ThemedIcon'
 
 const KeyValueTouchableBox = (props: { 
     onPress: ((event: GestureResponderEvent) => void) | undefined; 
@@ -12,18 +13,18 @@ const KeyValueTouchableBox = (props: {
     keyName: string | null | undefined; 
     keyValue: string | number | null | undefined }) => {
     
-    const { theme } = useTheme();
+    const { colors } = useTheme();
 
     return (        
         <TouchableOpacity onPress={props.onPress}>
-            <View style={{ backgroundColor: theme.primary, 
+            <View style={{ backgroundColor: colors.primary, 
                 ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap",
                 flexBasis: "auto"
             }}>
                 <ThemedText numberOfLines={1} style={{ width: "60%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props.keyName}</ThemedText>
                 <ThemedText style={{ width: "30%", fontSize: 15, textAlign: "right" }}>{props.keyValue}</ThemedText>
-                {props.edit && <MaterialCommunityIcons style={{ width: "10%", fontSize: 15, textAlign: "right" }} name='square-edit-outline' /> }
-                {props.goto && <MaterialCommunityIcons style={{ width: "10%", fontSize: 15, textAlign: "right" }} name='chevron-right-circle' /> }
+                {props.edit && <ThemedIcon style={{ width: "10%", paddingLeft: 5}} name='MaterialCommunityIcons:square-edit-outline' /> }
+                {props.goto && <ThemedIcon style={{ width: "10%", paddingLeft: 5}} name='MaterialCommunityIcons:chevron-right-circle' /> }
             </View>
         </TouchableOpacity>
     )

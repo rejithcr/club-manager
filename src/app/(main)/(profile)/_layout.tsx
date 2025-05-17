@@ -4,9 +4,9 @@ import { Stack } from 'expo-router'
 
 
 const ProfileStack = () => {
-  const { theme } = useTheme();
+  const { colors } = useTheme();
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: theme.primary} }}>
+    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.primary}, headerTintColor: colors.text }}>
       <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Profile"} />, headerShown: true }} />
     </Stack>
   )

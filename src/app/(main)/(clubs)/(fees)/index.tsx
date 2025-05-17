@@ -11,6 +11,7 @@ import { ClubContext } from '@/src/context/ClubContext'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ThemedView from '@/src/components/themed-components/ThemedView'
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 
 const Fees = () => {
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
@@ -64,7 +65,7 @@ const Fees = () => {
           <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Recurring Fees</ThemedText>
           {clubInfo.role == ROLE_ADMIN && <TouchableOpacity style={{ width: "10%" }}
             onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
-            <MaterialCommunityIcons size={25} name={'plus-circle'} />
+            <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} />
           </TouchableOpacity> }
         </View>
         {isLoadingCurrent && <LoadingSpinner />}
@@ -81,7 +82,7 @@ const Fees = () => {
               </View>
               <View style={{ flexDirection: "row" }}>
                 <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubFeeAmount}</ThemedText>
-                <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
+                <ThemedIcon size={20} name={'MaterialCommunityIcons:chevron-right-circle'} />
               </View>
             </View>
           </TouchableCard>
@@ -91,10 +92,10 @@ const Fees = () => {
           flexDirection: "row", alignItems: "center", width: "80%",
           justifyContent: "space-between", alignSelf: "center", marginTop: 10
         }}>
-          <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Adhoc Collections</ThemedText>
+          <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Expense Splits</ThemedText>
           {clubInfo.role == ROLE_ADMIN &&<TouchableOpacity style={{ width: "10%" }}
             onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
-            <MaterialCommunityIcons size={25} name={'plus-circle'} />
+            <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} />
           </TouchableOpacity>}
         </View>
         {isLoadingAdhoc && <LoadingSpinner />}
@@ -114,7 +115,7 @@ const Fees = () => {
               </View>
               <View style={{ flexDirection: "row" }}>
                 <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubAdhocFeePaymentAmount}</ThemedText>
-                <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
+                <ThemedIcon size={20} name={'MaterialCommunityIcons:chevron-right-circle'} />
               </View>
             </View>
           </TouchableCard>

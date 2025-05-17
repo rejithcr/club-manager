@@ -7,10 +7,10 @@ import {Text, View} from 'react-native'
 
 export default function FeesLayout() {
   const { clubInfo } = useContext(ClubContext)
-  const { theme } = useTheme();
+  const { colors } = useTheme();
 
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: theme.primary} }}>
+    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.primary}, headerTintColor: colors.text }}>
         <Stack.Screen
           name="index" // This is the name of the page and must match the url from root
           options={{
@@ -77,14 +77,14 @@ export default function FeesLayout() {
         <Stack.Screen
           name="adhocfee/definefee" // This is the name of the page and must match the url from root
           options={{
-            headerTitle: () => <StackHeader header={"Adhoc fee"} rightText={clubInfo?.clubName} />,
+            headerTitle: () => <StackHeader header={"Split Expense"} rightText={clubInfo?.clubName} />,
             headerShown: true
           }}
         />
         <Stack.Screen
           name="adhocfee/payments" // This is the name of the page and must match the url from root
           options={{
-            headerTitle: () => <StackHeader header={"Adhoc fee payments"} rightText={clubInfo?.clubName} />,
+            headerTitle: () => <StackHeader header={"Split Payments"} rightText={clubInfo?.clubName} />,
             headerShown: true
           }}
         />

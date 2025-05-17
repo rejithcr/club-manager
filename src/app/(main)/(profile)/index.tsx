@@ -11,6 +11,7 @@ import TouchableCard from '@/src/components/TouchableCard'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox'
 import { ThemeContext } from '@/src/context/ThemeContext'
+import { View } from 'react-native'
 
 const Profile = () => {
     const { userInfo } = useContext(AuthContext)
@@ -21,6 +22,7 @@ const Profile = () => {
         <ThemedView style={{flex:1}}>
             <GestureHandlerRootView>
             <ThemedText style={appStyles.heading}>Joining Requests</ThemedText>
+            <View>
             {isLoadingMyRequests && <LoadingSpinner />}
             {!isLoadingMyRequests && myRequests?.length > 0 && myRequests.map((request: any) => (
                 <ThemedView key={request.clubId.toString() + request.memberId.toString()} style={{ margin: 10, padding: 10, borderWidth: 1, borderColor: '#ccc', borderRadius: 5 }}>
@@ -30,6 +32,7 @@ const Profile = () => {
                 </ThemedView>
             ))}
             {!isLoadingMyRequests && myRequests?.length === 0 && <ThemedText style={{alignSelf: "center"}}>No requests found</ThemedText>}
+            </View>
             <ThemedText style={appStyles.heading}>Theme</ThemedText>
             <TouchableCard id={undefined} onPress={() => setTheme("dark")}>
                 <ThemedText>Dark</ThemedText>

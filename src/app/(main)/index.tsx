@@ -13,6 +13,7 @@ import { appStyles } from '@/src/utils/styles';
 import { useHttpGet } from '@/src/hooks/use-http';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
+import Spacer from '@/src/components/Spacer';
 
 
 const Main = () => {
@@ -40,13 +41,13 @@ const Main = () => {
 
   return (
     <ThemedView style={{flex: 1}}>      
-      <ThemedView style={{ marginTop: 20 }} />
+      <Spacer space={5} />
       <ScrollView refreshControl={< RefreshControl refreshing={false} onRefresh={onRefresh} />}>
-        <ThemedText style={appStyles.title}>My Clubs</ThemedText>
+        <ThemedText style={appStyles.heading}>My Clubs</ThemedText>
         {isLoadingMyClubs && <LoadingSpinner />}
         {!isLoadingMemberDues && <MyClubs clubs={clubs} />}
 
-        {clubs?.length > 0 && <ThemedText style={appStyles.title}>Dues Summary</ThemedText> }
+        {clubs?.length > 0 && <ThemedText style={appStyles.heading}>Dues Summary</ThemedText> }
         {isLoadingMemberDues && <LoadingSpinner />}
         {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
         {/* <UpcomingMatches memberEmail={userInfo?.email} />

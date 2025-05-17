@@ -1,9 +1,8 @@
-import { Text, StyleSheet, TouchableOpacity, View, FlatList, Alert } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, FlatList, Alert } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react'
 import { appStyles } from '@/src/utils/styles';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import ThemedButton from '@/src/components/ThemedButton';
 import Checkbox from 'expo-checkbox';
 import { getClubDues } from '@/src/helpers/club_helper';
@@ -11,6 +10,7 @@ import { ClubContext } from '@/src/context/ClubContext';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import ShadowBox from '@/src/components/ShadowBox';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 
 const ClubDues = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -58,7 +58,7 @@ const MemberDue = (props: { member: any }) => {
         justifyContent: "space-between", alignItems: "center", flexWrap: "wrap",
         flexBasis: "auto"
       }}>
-        <MaterialCommunityIcons size={20} name={isShown ? 'chevron-down-circle' : 'chevron-right-circle'} />
+        <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} />
         <ThemedText style={{ width: "65%", fontSize: 15, paddingLeft: 5 }}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
         <ThemedText style={{ width: "25%", fontWeight: "bold", fontSize: 15 }}> Rs. {props?.member.totalDue} </ThemedText>
       </TouchableOpacity>

@@ -157,7 +157,7 @@ const Transactions = () => {
           />
         }
       </ThemedView>
-      <Modal isVisible={isAddTxnVisible} backdropColor='grey'>
+      <Modal isVisible={isAddTxnVisible}>
         <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
           <ThemedText style={appStyles.heading}>{txnValues?.txnId ? "Edit" : "Add"} Tansaction</ThemedText>
           <Picker style={{ width: "80%", alignSelf: "center" }} 

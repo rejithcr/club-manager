@@ -14,7 +14,7 @@ const FloatingMenu = (props: {
     color?: string | undefined;
 }) => {
 
-    const { theme } = useTheme()
+    const { colors } = useTheme()
 
     const [actionsItems, setActionItems] = useState<any>()
     const [isActionsVisible, setIsActionsVisible] = useState<boolean>(false)
@@ -43,7 +43,7 @@ const FloatingMenu = (props: {
                                 <View style={styles.menuIcon} >
                                     { action.icon }
                                 </View>
-                                <ThemedView style={{...styles.menuText, backgroundColor: theme.primary}}>
+                                <ThemedView style={{...styles.menuText, backgroundColor: colors.primary}}>
                                     <ThemedText>{action.text}</ThemedText>
                                 </ThemedView>
                             </TouchableOpacity>
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
         height: "100%"
     },
     container: {
-        bottom: 30,
+        bottom: 25,
         left: 30,
         position: 'absolute',
     },

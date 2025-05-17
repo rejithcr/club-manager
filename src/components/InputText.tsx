@@ -15,12 +15,12 @@ const InputText = (props: {
   onChangeText?: any;
   blurOnSubmit?: any }) => {
     
-        const { theme } = useTheme();
+        const { colors } = useTheme();
         
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.label}>{props.label || props.placeholder }</ThemedText>
-      <TextInput style={{color:theme.text, ...styles.input}} {...props} onChangeText={props.onChangeText} />
+      <TextInput style={{color:colors.text, ...styles.input}} {...props} onChangeText={props.onChangeText} />
     </ThemedView>
   )
 }

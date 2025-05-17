@@ -1,14 +1,13 @@
-import { View, Text } from 'react-native'
+import { View } from 'react-native'
 import { useRouter } from 'expo-router/build/hooks';
 import TouchableCard from '@/src/components/TouchableCard';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import ThemedView from '@/src/components/themed-components/ThemedView';
-import { useTheme } from '@/src/hooks/use-theme';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 
 const MyClubs = (props: { clubs: [] }) => {
   const router = useRouter()
-  const { theme } = useTheme();
   
   const showDetails = (clubId: number, clubName: string, role: string) => router.push(`/(main)/(clubs)/clubdetails?clubId=${clubId}&clubName=${clubName}&role=${role}`)
 
@@ -28,11 +27,11 @@ const MyClubs = (props: { clubs: [] }) => {
             justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
           }}>
             <ThemedText style={{ fontWeight: "bold" }}>{item.clubName}</ThemedText>
-            <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
+            <ThemedIcon name="MaterialCommunityIcons:chevron-right-circle" />
           </View>
         </TouchableCard>
       )}
-    </ThemedView>
+    </ThemedView> 
   )
 }
 
