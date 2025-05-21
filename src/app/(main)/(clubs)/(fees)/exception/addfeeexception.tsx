@@ -1,11 +1,11 @@
-import { View, Text, FlatList, TouchableOpacity } from 'react-native'
+import { View, FlatList, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
 import { addExceptionType } from '@/src/helpers/fee_helper'
 import { useSearchParams } from 'expo-router/build/hooks'
 import { AuthContext } from '@/src/context/AuthContext'
-import { isNumeric, isValidLength } from '@/src/utils/validators'
+import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { router } from 'expo-router'
 import { getClubMembers } from '@/src/helpers/club_helper'
 import Checkbox from 'expo-checkbox'
@@ -15,6 +15,9 @@ import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ShadowBox from '@/src/components/ShadowBox'
+import { useTheme } from '@/src/hooks/use-theme'
+import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox'
+import Spacer from '@/src/components/Spacer'
 
 const AddFeeException = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -22,6 +25,7 @@ const AddFeeException = () => {
     const [exceptionAmount, setExceptionAmount] = useState<string>("")
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
+    const { colors } = useTheme();
 
     const params = useSearchParams()
 
@@ -85,7 +89,9 @@ const AddFeeException = () => {
                 <InputText label='Exception Type' onChangeText={setExceptionType} />
                 <InputText label='Amount' keyboardType={"numeric"} onChangeText={setExceptionAmount}/>
             </View>
-            <ThemedText style={{ ...appStyles.heading }}>Select Members</ThemedText>
+            <ThemedText style={{width: "80%",  alignSelf: "center", fontSize: 20, fontWeight: "bold" }}>Select Members</ThemedText>
+            <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the members eligible for this fee exception</ThemedText>
+            <Spacer space={5} />
             {isLoading && <LoadingSpinner />}
             {!isLoading && <View style={{ height: "65%" }}>
                 <FlatList 
@@ -94,10 +100,8 @@ const AddFeeException = () => {
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => toggleSelection(item.memberId)}>
                             <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
-                                <View style={{ width: "5%" }}>
-                                    <Checkbox value={item.selected} color={"black"} />
-                                </View>
-                                <ThemedText style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName}</ThemedText>
+                                <ThemedCheckBox checked={item.selected} />                                
+                                <ThemedText style={{ width: "90%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>
                     )}
@@ -121,7 +125,7 @@ const validate = (exceptionType: string | null | undefined, exceptionAmount: str
         alert("Enter atleast 2 characters for exception type")
         return false
     }
-    if (!isNumeric(exceptionAmount)) {
+    if (!isCurrency(exceptionAmount)) {
         alert("Enter numeric value for amount")
         return false
     }

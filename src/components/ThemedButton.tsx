@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { useTheme } from '../hooks/use-theme';
 

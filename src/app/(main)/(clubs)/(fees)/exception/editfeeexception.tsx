@@ -5,17 +5,17 @@ import ThemedButton from '@/src/components/ThemedButton'
 import { getExceptionDetails, updateExceptionType } from '@/src/helpers/fee_helper'
 import { useSearchParams } from 'expo-router/build/hooks'
 import { AuthContext } from '@/src/context/AuthContext'
-import { isNumeric, isValidLength } from '@/src/utils/validators'
+import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { router } from 'expo-router'
 import { getClubMembers } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import ShadowBox from '@/src/components/ShadowBox'
-import { MaterialIcons } from '@expo/vector-icons'
 import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
+import { useTheme } from '@/src/hooks/use-theme'
 
 const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
@@ -27,6 +27,7 @@ const EditFeeException = () => {
     const [members, setMembers] = useState<any>([]);
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
+    const { colors } = useTheme();
 
     const params = useSearchParams()
 
@@ -124,7 +125,7 @@ const EditFeeException = () => {
                                     <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{member.startDate} {(member.endDate || member.endDateAdded) && " to "} {member.endDate || member.endDateAdded}</ThemedText>
                                 </View>
                                 {!member.endDate && (member.endDateAdded ? <ThemedIcon name="MaterialIcons:undo" size={20} onPress={() => endException(member)} />
-                                    : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} />)}
+                                    : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} color={colors.error}/>)}
                             </ShadowBox>
                         </View>
                     )
@@ -136,8 +137,8 @@ const EditFeeException = () => {
                     members.map((item: any) =>
                         <TouchableOpacity key={item.memberId} onPress={() => addToException(item)}>
                             <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
-                                <ThemedIcon name="MaterialIcons:add-circle" size={20} />
-                                <ThemedText style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
+                                <ThemedIcon name="MaterialIcons:add-circle" size={20} color={colors.add}/>
+                                <ThemedText style={{ width: "85%", fontSize: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>
                     )
@@ -163,7 +164,7 @@ const validate = (exceptionType: string | null | undefined, exceptionAmount: str
         alert("Enter atleast 2 characters for exception type")
         return false
     }
-    if (!isNumeric(exceptionAmount)) {
+    if (!isCurrency(exceptionAmount)) {
         alert("Enter numeric value for amount")
         return false
     }

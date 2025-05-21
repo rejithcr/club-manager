@@ -16,6 +16,6 @@ export const isValidLength = (value: string | null | undefined, length: number) 
 }
 
 
-export const isNumeric = (value: string) => {
-  return  /^-?\d+$/.test(value);
+export const isCurrency = (value: string) => {
+  return  /^\d+(?:\.\d{0,2})$/.test(value);
 }

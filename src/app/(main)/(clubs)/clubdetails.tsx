@@ -13,6 +13,8 @@ import ThemedView from '@/src/components/themed-components/ThemedView'
 import ShadowBox from '@/src/components/ShadowBox'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
+import Spacer from '@/src/components/Spacer'
+import TouchableCard from '@/src/components/TouchableCard'
 
 const ClubDetails = () => {
     const router = useRouter()
@@ -57,37 +59,31 @@ const ClubDetails = () => {
     return (
         <ThemedView style={{flex:1}}>
         <GestureHandlerRootView>
-            <View style={{ marginVertical: 10 }} />
+            <Spacer space={5} />
+            
+            <View style={{
+                flexDirection: "row", padding:10, width: "80%", alignSelf: "center",
+                justifyContent: "space-between", alignItems: "center"
+            }}>
+                <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>Fund Balance</ThemedText>
+                {isFundBalanceLoading && <LoadingSpinner />}
+                {!isFundBalanceLoading && <ThemedText style={{ marginRight: 10 }}>Rs. {fundBalance || 0}</ThemedText>}
+            </View>
+            <Spacer space={5} />
             <ScrollView refreshControl={<RefreshControl  onRefresh={onRefresh} refreshing={false} />}>
-                <ShadowBox style={{ width: "80%", marginBottom: 5 }}>
-                    <View style={{ width: "100%", flexDirection: "row", flexWrap: "wrap" }}>
-                        <View style={{
-                            flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
-                            justifyContent: "space-between", alignItems: "center"
-                        }}>
-                            <ThemedText style={{ fontWeight: "bold", fontSize: 15 }}>Fund Balance</ThemedText>
-                            <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-                                {isFundBalanceLoading && <LoadingSpinner />}
-                                {!isFundBalanceLoading && <ThemedText style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {fundBalance || 0} </ThemedText>}
-                                <View style={{ width: 20 }} />
-                            </View>
-                        </View>
-                        <View style={styles.divider} />
-                        <TouchableOpacity onPress={showClubDues} style={{
-                            flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
-                            justifyContent: "space-between"
-                        }}>
-                            <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
-                            {isTotalDueLoading && <LoadingSpinner />}
-                            {!isTotalDueLoading &&
-                                <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-                                    <ThemedText style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {totalDue} </ThemedText>
-                                    <ThemedIcon size={20} name={'MaterialCommunityIcons:chevron-right-circle'} />
-                                </View>
-                            }
-                        </TouchableOpacity>
+                <TouchableCard onPress={Number(totalDue) > 0 ? showClubDues : null}>
+                    <View style={{flexDirection: "row", justifyContent:"space-between", width:"90%"}}>
+                    <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
+                    {isTotalDueLoading && <LoadingSpinner />}
+                    {!isTotalDueLoading &&
+                        <ThemedText style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {totalDue} </ThemedText>                                   
+                    }
                     </View>
-                </ShadowBox>
+                </TouchableCard>
+                <Spacer space={4} />
+                <TouchableCard onPress={()=> router.push(`/(main)/(clubs)/membershiprequests`)}>
+                    <ThemedText>Membership Requests</ThemedText>
+                </TouchableCard>
             </ScrollView>
             <FloatingMenu actions={actions} position={"left"} color='black'
                 icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}

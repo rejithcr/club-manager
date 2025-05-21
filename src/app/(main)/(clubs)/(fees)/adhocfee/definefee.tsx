@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Alert } from 'react-native'
+import { View, TouchableOpacity, Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import { MaterialIcons } from '@expo/vector-icons'
@@ -7,7 +7,7 @@ import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler
 import { addAdhocFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router } from 'expo-router'
-import { isNumeric, isValidLength } from '@/src/utils/validators'
+import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { AuthContext } from '@/src/context/AuthContext'
 import { ClubContext } from '@/src/context/ClubContext'
 import { getClubMembers } from '@/src/helpers/club_helper'
@@ -15,6 +15,7 @@ import { appStyles } from '@/src/utils/styles'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ShadowBox from '@/src/components/ShadowBox'
+import { useTheme } from '@/src/hooks/use-theme'
 
 const DefineFee = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -27,10 +28,11 @@ const DefineFee = () => {
     const [feeDescription, setFeeDescription] = useState("")
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
+    const { colors } = useTheme()
 
     useEffect(()=>{
         if (feeAmount && addedMembers?.length > 0) {
-            setAmountPerMember(Math.round(Number(feeAmount)/addedMembers?.length))
+            setAmountPerMember(Number((Number(feeAmount)/addedMembers?.length).toFixed(2)))
         } 
     },[addedMembers,feeAmount])
 
@@ -99,20 +101,20 @@ const DefineFee = () => {
                 <View style={{ marginBottom: 10 }} />
                 {!isLoading && addedMembers && addedMembers.length > 0 && addedMembers.map((item: any, index) => 
                     <TouchableOpacity key={item.memberId} onPress={() => removeMember(item)}>
-                        <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 15, width: "70%", justifyContent:"space-between", flexWrap: "wrap" }}>
+                        <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 5, width: "70%", justifyContent:"space-between", flexWrap: "wrap" }}>
                             <ThemedText style={{ fontSize: 15}}>{index+1}. {item?.firstName} {item?.lastName}</ThemedText>
-                            <MaterialIcons name="remove-circle" size={20} />
+                            <MaterialIcons name="remove-circle" size={20} color={colors.error}/>
                         </ShadowBox>
                     </TouchableOpacity>
                 )}
-                <ThemedText style={appStyles.heading}>Add Members</ThemedText>
+                <ThemedText style={appStyles.heading}>Select Members</ThemedText>
                 <View style={{ marginBottom: 80 }}>
                     {isLoadingMembers && <LoadingSpinner/>}
                     {!isLoading && !isLoadingMembers && members.map((item: any) => (
                         <TouchableOpacity key={item.memberId} onPress={() => addMember(item)}>
-                            <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 15, width: "80%", flexWrap: "wrap" }}>
-                                <MaterialIcons name="add-circle" size={20} />
-                                <ThemedText style={{ width: "85%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
+                            <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 5, width: "80%", flexWrap: "wrap" }}>
+                                <MaterialIcons name="add-circle" size={20} color={colors.add}/>
+                                <ThemedText style={{ width: "90%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>
                     ))
@@ -132,7 +134,7 @@ const validate = (feeName: string | null | undefined, feeAmount: string, addedMe
         alert("Enter atleast 2 characters for fee name")
         return false
     }
-    if (!isNumeric(feeAmount)) {
+    if (!isCurrency(feeAmount)) {
         alert("Enter numeric value for amount")
         return false
     }

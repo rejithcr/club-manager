@@ -1,6 +1,5 @@
-import { Text, useColorScheme } from 'react-native'
+import { Text } from 'react-native'
 import React from 'react'
-import { colors } from '@/src/utils/styles'
 import { useTheme } from '@/src/hooks/use-theme'
 
 const ThemedText = (props: any) => {

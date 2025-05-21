@@ -1,4 +1,4 @@
-import { View, Text, Alert, FlatList, Switch, TouchableOpacity } from 'react-native'
+import { View, Alert, FlatList, Switch, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { ClubContext } from '@/src/context/ClubContext'
 import { deleteTransaction, getTransactions, saveTransaction, updateTransaction } from '@/src/helpers/transaction_helper'
@@ -8,13 +8,15 @@ import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { Picker } from '@react-native-picker/picker'
 import Modal from 'react-native-modal'
 import ThemedButton from '@/src/components/ThemedButton'
-import { appStyles } from '@/src/utils/styles'
+import { appStyles, colors } from '@/src/utils/styles'
 import InputText from '@/src/components/InputText'
-import { isNumeric, isValidLength } from '@/src/utils/validators'
+import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { AuthContext } from '@/src/context/AuthContext'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
+import { useTheme } from '@/src/hooks/use-theme'
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 
 const Transactions = () => {
   const [isLoading, setIsloading] = useState(false)
@@ -29,7 +31,8 @@ const Transactions = () => {
 
   const { clubInfo } = useContext(ClubContext)
   const { userInfo } = useContext(AuthContext)
-
+  const { colors } = useTheme()
+  
   const offset = useRef(0)
   const limit = 20
 
@@ -149,7 +152,7 @@ const Transactions = () => {
                   <ThemedText style={{ fontSize: 12 }}>{item.memberName || item.clubTransactionComment}</ThemedText>
                 </View>
                 <View style={{ alignItems: "flex-end", width: "30%" }}>
-                  <ThemedText style={{ fontWeight: 'bold' }}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} Rs. {item.clubTransactionAmount}</ThemedText>
+                  <ThemedText style={{ fontWeight: 'bold', color: item.clubTranscationType === 'CREDIT' ? colors.success : colors.error}}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} Rs. {item.clubTransactionAmount}</ThemedText>
                   <ThemedText style={{ fontSize: 8 }}>{item.createdDate}</ThemedText>
                 </View>
               </View>
@@ -171,7 +174,7 @@ const Transactions = () => {
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>
             <ThemedButton title={"   Save   "} onPress={() => handleSave()} />
             <ThemedButton title="Cancel" onPress={() => setIsAddTxnVisible(false)} />              
-            {txnValues?.txnId && <MaterialCommunityIcons name='delete' size={30} onPress={() => handleDelete()} />}
+            {txnValues?.txnId && <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => handleDelete()} color={colors.error}/>}
           </View>
         </ThemedView>
       </Modal>
@@ -194,7 +197,7 @@ const validate = (txnTypeCategory: string | null, txnTypeComment: string | null,
     alert("Enter atleast 2 characters for comment")
     return false
   }
-  if (!isNumeric(txnAmount)) {
+  if (!isCurrency(txnAmount)) {
     alert("Enter numeric value for amount")
     return false
   }

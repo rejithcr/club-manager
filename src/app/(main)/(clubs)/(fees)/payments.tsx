@@ -7,7 +7,6 @@ import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
 import ThemedButton from '@/src/components/ThemedButton';
 import Modal from 'react-native-modal';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { AuthContext } from '@/src/context/AuthContext';
 import { router } from 'expo-router';
 import { ClubContext } from '@/src/context/ClubContext';
@@ -17,6 +16,7 @@ import ShadowBox from '@/src/components/ShadowBox';
 import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
 import { useTheme } from '@/src/hooks/use-theme';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
+import Spacer from '@/src/components/Spacer';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -81,10 +81,13 @@ const Payments = () => {
     return (
         <ThemedView style={{ flex: 1 }}>
         <GestureHandlerRootView>
-            <ThemedText style={{ ...appStyles.heading }}>Status for {params.get("clubFeeTypePeriod")}</ThemedText>
-            <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center", marginBottom: 10 }}>
-                <ThemedIcon name='MaterialIcons:warning' size={25} color={colors.warning}/><ThemedText style={{marginLeft:10, fontSize: 20}}>Pending</ThemedText>                
+            <ThemedText style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</ThemedText>
+            <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center" }}>
+                <ThemedIcon name='MaterialIcons:warning' size={25} color={colors.warning}/>
+                <ThemedText style={{marginLeft:10, fontSize: 20}}>Status</ThemedText>                
             </View>
+            <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the member to update payment status</ThemedText>
+            <Spacer space={5} />
             <View style={{ height: "80%" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
@@ -150,12 +153,12 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
+            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 5, flexWrap: "wrap" }}>
+                <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</ThemedText>
+                <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</ThemedText>
                 <View style={{ width: "10%" }}>
                     <ThemedCheckBox checked={isSelected}/>
                 </View>
-                <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</ThemedText>
-                <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</ThemedText>
             </ShadowBox>
         </TouchableOpacity>
     )

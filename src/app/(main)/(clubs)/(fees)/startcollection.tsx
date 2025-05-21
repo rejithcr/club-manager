@@ -7,11 +7,12 @@ import LoadingSpinner from '@/src/components/LoadingSpinner';
 import ThemedButton from '@/src/components/ThemedButton';
 import { Picker } from '@react-native-picker/picker';
 import Modal from 'react-native-modal';
-import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox';
 import { AuthContext } from '@/src/context/AuthContext';
 import { router } from 'expo-router';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
+import TouchableCard from '@/src/components/TouchableCard';
+import Spacer from '@/src/components/Spacer';
 
 const StartNextPeriod = () => {
     const [isLoadingPeriods, setIsLoadingPeriods] = useState(false);
@@ -79,8 +80,7 @@ const StartNextPeriod = () => {
                     <FlatList style={{ width: "100%" }}
                         data={nextPeriodFee}
                         initialNumToRender={8}
-                        //onEndReached={fetchNextPage}
-                        //onEndReachedThreshold={0.5}
+                        ItemSeparatorComponent={() => <Spacer space={2}/>}
                         renderItem={({ item }) => (
                             <MemberFeeItem {...item} key={item.memberId} />
                         )}
@@ -105,15 +105,16 @@ export default StartNextPeriod
 const MemberFeeItem = (props: {
     id: number;
     firstName: string | undefined;
+    lastName: string | undefined;
     clubFeeAmount: number;
     exemption: string
 }) => {
 
-    const editFee = () => {
-        console.log("Presed edit")
-    }
 
     return (
-        <KeyValueTouchableBox onPress={undefined} keyName={props?.firstName} keyValue={props?.clubFeeAmount} />
+        <TouchableCard>
+            <ThemedText>{props?.firstName} {props?.lastName}</ThemedText>
+            <ThemedText>{props?.clubFeeAmount}</ThemedText>
+        </TouchableCard>
     )
 }

@@ -1,11 +1,10 @@
-import { View, Text, FlatList, TouchableOpacity, Alert } from 'react-native'
+import { View, FlatList, TouchableOpacity, Alert } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { deleteAdhocFeeCollection, getAdhocFeePayments, saveAdhocFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles, colors } from '@/src/utils/styles';
-import Checkbox from 'expo-checkbox';
 import ThemedButton from '@/src/components/ThemedButton';
 import Modal from 'react-native-modal';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
@@ -86,9 +85,9 @@ const Payments = () => {
     return (
         <ThemedView style={{ flex: 1 }}>
         <GestureHandlerRootView>
-            <View style={{ marginVertical: 10 }} />
-            <ShadowBox style={{
-                flexDirection: "row", padding:10, 
+            <Spacer space={5} />
+            <View style={{
+                flexDirection: "row", padding:10, width: "80%",
                 justifyContent: "space-between", alignSelf: "center"
             }}>
                 <View>
@@ -96,11 +95,13 @@ const Payments = () => {
                     <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeObj?.clubAdhocFeeDesc}</ThemedText>
                 </View>
                 <ThemedText style={{ marginRight: 10 }}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
-            </ShadowBox>
-            <Spacer space={10} />
-            <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center", marginBottom: 10 }}>
-                <ThemedIcon name='MaterialIcons:warning' size={25} color={colors.warning}/><ThemedText style={{marginLeft:10, fontSize: 20}}>Pending</ThemedText>                
             </View>
+            <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center" }}>
+                <ThemedIcon name='MaterialIcons:warning' size={25} color={colors.warning}/>
+                <ThemedText style={{marginLeft:10, fontSize: 20}}>Status</ThemedText>                
+            </View>
+            <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the member to update payment status</ThemedText>
+            <Spacer space={5} />
             <View style={{ height: "70%" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
@@ -167,12 +168,12 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
-                <View style={{ width: "10%" }}>
+            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 5 }}>                
+                <ThemedText style={{ width: "70%", fontSize: 15 }}>{props?.firstName}</ThemedText>
+                <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
+                <View style={{ width: "10%", flexDirection: "row", justifyContent:"center" }}>
                     <ThemedCheckBox checked={isSelected}/>
                 </View>
-                <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</ThemedText>
-                <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
             </ShadowBox>
         </TouchableOpacity>
     )

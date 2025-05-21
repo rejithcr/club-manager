@@ -41,6 +41,8 @@ create table membership (
     club_id integer not null,
     member_id integer not null,
     role_id integer not null,
+    start_date date not null,
+    end_date date,
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
@@ -58,7 +60,7 @@ create table club_fee_type (
     club_fee_type varchar(50) not null, -- MEMBERSHIP, MAINTENANCE, JOINING
     club_fee_type_interval varchar(10) not null, -- MONTHLY / QUATERLY / YEARLY 
     club_fee_is_active smallint not null, -- 1,0
-    club_fee_amount integer not null, -- 300
+    club_fee_amount numeric(7,2) not null, -- 300
     club_fee_type_desc varchar(100),
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
@@ -75,7 +77,7 @@ create table club_fee_type_exception (
     club_fee_type_exception_id integer primary key,
     club_fee_type_id integer not null,
     club_fee_type_exception_reason varchar(100) not null,
-    club_fee_exception_amount integer not null, -- 300
+    club_fee_exception_amount numeric(7,2) not null, -- 300
 	club_fee_exception_is_active smallint not null, -- 1,0
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
@@ -153,7 +155,7 @@ create table club_adhoc_fee_payment (
     club_adhoc_fee_payment_id integer primary key,
     club_adhoc_fee_id integer not null,
     membership_id integer not null,
-    club_adhoc_fee_payment_amount integer not null, -- 300
+    club_adhoc_fee_payment_amount numeric(7,2) not null, -- 300
     paid integer not null default 0,
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
@@ -168,7 +170,7 @@ CREATE SEQUENCE club_adhoc_fee_payment_id_seq START 1;
 create table club_transaction (
     club_transaction_id BIGINT primary key,
     club_id integer not null,
-    club_transaction_amount numeric not null,
+    club_transaction_amount numeric(7,2) not null,
     club_transcation_type varchar(6) not null, -- CREDIT/DEBIT
     club_transaction_category varchar(100) not null, -- FEE,CASHPRIZE, ...
     club_transaction_comment varchar(100), -- Akme Cup
@@ -194,6 +196,6 @@ create table membership_requests (
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
     updated_ts timestamp  default now(),
-    CONSTRAINT membership_status_check CHECK (status in ('REQUESTED','ACCEPTED','REJECTED')),
+    CONSTRAINT membership_status_check CHECK (status in ('REQUESTED','APPROVED','REJECTED')),
     CONSTRAINT unique_membership_request UNIQUE (club_id,member_id)
 );

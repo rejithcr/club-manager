@@ -3,19 +3,19 @@ import React, { useContext, useEffect, useState } from 'react'
 import { appStyles } from '@/src/utils/styles';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
-import ThemedButton from '@/src/components/ThemedButton';
-import Checkbox from 'expo-checkbox';
 import { getClubDues } from '@/src/helpers/club_helper';
 import { ClubContext } from '@/src/context/ClubContext';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import ShadowBox from '@/src/components/ShadowBox';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
+import { useTheme } from '@/src/hooks/use-theme';
+import Spacer from '@/src/components/Spacer';
 
 const ClubDues = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [duesByMembers, setDuesByMembers] = useState<any[] | undefined>(undefined);
-
+  
   const { clubInfo } = useContext(ClubContext)
 
   const fetchClubDues = () => {
@@ -32,15 +32,16 @@ const ClubDues = () => {
   return (
     <ThemedView style={{flex: 1 }}>
     <GestureHandlerRootView>
+        <Spacer space={5}/>
         {isLoading && <LoadingSpinner />}
-        <View style={{ ...appStyles.shadowBox, width: "90%", marginVertical: 15 }}>
+        <View style={{ width: "80%", alignSelf:"center" }}>
           {!isLoading && <FlatList
             data={duesByMembers}
             keyExtractor={(item) => item.memberId.toString()}
             renderItem={({ item }) => <MemberDue key={item.memberId} member={item} />}
           />}
         </View>
-        <ThemedButton title='Mark as paid' onPress={() => null} />
+        {/* <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => null} /> */}
     </GestureHandlerRootView>
     </ThemedView>
   )
@@ -48,6 +49,7 @@ const ClubDues = () => {
 
 const MemberDue = (props: { member: any }) => {
   const [isShown, setIsShown] = useState(false);
+  const { colors } = useTheme();
   const showMemberDues = () => {
     setIsShown(!isShown)
   }
@@ -58,7 +60,7 @@ const MemberDue = (props: { member: any }) => {
         justifyContent: "space-between", alignItems: "center", flexWrap: "wrap",
         flexBasis: "auto"
       }}>
-        <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} />
+        <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav}/>
         <ThemedText style={{ width: "65%", fontSize: 15, paddingLeft: 5 }}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
         <ThemedText style={{ width: "25%", fontWeight: "bold", fontSize: 15 }}> Rs. {props?.member.totalDue} </ThemedText>
       </TouchableOpacity>
@@ -77,10 +79,9 @@ const MemberFeeItem = (props: { paymentId: number; fee: string; feeType: string,
   return (
     <TouchableOpacity onPress={undefined}>
       <ShadowBox style={{
-        ...appStyles.shadowBox, width: "90%", marginBottom: 15, flexWrap: "wrap"
+        ...appStyles.shadowBox, width: "90%", marginBottom: 5, flexWrap: "wrap"
       }}>
-        <View style={{ width: "5%" }}><Checkbox value={false} color={"black"} /></View>
-        <ThemedText style={{ width: "70%", paddingLeft: 15 }}>{props?.fee} {props?.feeDesc}</ThemedText>
+        <ThemedText style={{ width: "75%"}}>{props?.fee} {props?.feeDesc}</ThemedText>
         <ThemedText style={{ width: "25%", fontSize: 15, textAlign: "right" }}>{props?.amount}</ThemedText>
       </ShadowBox>
     </TouchableOpacity>

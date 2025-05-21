@@ -9,11 +9,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyClubs from './myclubs';
 import { router } from 'expo-router';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
-import { appStyles } from '@/src/utils/styles';
 import { useHttpGet } from '@/src/hooks/use-http';
 import ThemedView from '@/src/components/themed-components/ThemedView';
-import ThemedText from '@/src/components/themed-components/ThemedText';
 import Spacer from '@/src/components/Spacer';
+import ThemedHeading from '@/src/components/themed-components/ThemedHeading';
 
 
 const Main = () => {
@@ -43,11 +42,11 @@ const Main = () => {
     <ThemedView style={{flex: 1}}>      
       <Spacer space={5} />
       <ScrollView refreshControl={< RefreshControl refreshing={false} onRefresh={onRefresh} />}>
-        <ThemedText style={appStyles.heading}>My Clubs</ThemedText>
+        <ThemedHeading>My Clubs</ThemedHeading>
         {isLoadingMyClubs && <LoadingSpinner />}
         {!isLoadingMemberDues && <MyClubs clubs={clubs} />}
 
-        {clubs?.length > 0 && <ThemedText style={appStyles.heading}>Dues Summary</ThemedText> }
+        {clubs?.length > 0 && <ThemedHeading>Dues Summary</ThemedHeading> }
         {isLoadingMemberDues && <LoadingSpinner />}
         {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
         {/* <UpcomingMatches memberEmail={userInfo?.email} />

@@ -13,7 +13,7 @@ export default function ClubLayout() {
         <Stack.Screen
           name="clubdetails" // This is the name of the page and must match the url from root
           options={{
-            headerTitle: () => <StackHeader header={"Club details"} rightText={clubInfo?.clubName} />,
+            headerTitle: () => <StackHeader header={"Club Home"} rightText={clubInfo?.clubName} />,
             headerShown:true
           }}
         />     
@@ -44,11 +44,11 @@ export default function ClubLayout() {
             title: 'Transactions',
             headerShown:false
           }}
-        />               
+        />           
         <Stack.Screen
-          name="joinclub" // This is the name of the page and must match the url from root
+          name="membershiprequests" // This is the name of the page and must match the url from root
           options={{
-            title: 'Join Club',
+            headerTitle: () => <StackHeader header={"Membership"} rightText={clubInfo?.clubName} />,
             headerShown:true
           }}
         />   

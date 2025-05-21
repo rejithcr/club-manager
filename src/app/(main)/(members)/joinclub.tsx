@@ -1,9 +1,14 @@
+import InputText from '@/src/components/InputText';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
+import Spacer from '@/src/components/Spacer';
+import ThemedText from '@/src/components/themed-components/ThemedText';
+import ThemedView from '@/src/components/themed-components/ThemedView';
+import TouchableCard from '@/src/components/TouchableCard';
 import { AuthContext } from '@/src/context/AuthContext';
 import { requestMembership, searchClubsByName } from '@/src/helpers/club_helper';
 import { router } from 'expo-router';
 import React, { useContext, useState } from 'react';
-import { View, TextInput, FlatList, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { FlatList, StyleSheet, Alert } from 'react-native';
 
 const JoinClub = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -34,40 +39,47 @@ const JoinClub = () => {
     };
 
     const handleSelectClub = (club: { clubId: number; clubName: string }) => {
-        setIsLoading(true);
-        requestMembership(club.clubId, userInfo.memberId, userInfo.email)
-            .then(() => router.push('/(main)/(profile)'))
-            .catch(error => Alert.alert("Error", error.response.data.error))
-            .finally(() => setIsLoading(false));
+        Alert.alert(
+            'Are you sure!',
+            'Please confirm to join ' + club.clubName,
+            [
+                {
+                    text: 'OK', onPress: () => {
+                        setIsLoading(true);
+                        requestMembership(club.clubId, userInfo.memberId, userInfo.email)
+                            .then((response) => { Alert.alert("Info", response.data.message); router.dismissTo('/(main)/(profile)') })
+                            .catch(error => Alert.alert("Error", error.response.data.error))
+                            .finally(() => setIsLoading(false));
+                    }
+                },
+                { text: 'cancel', onPress: () => null },
+            ]
+        );
     };
 
     return (
-        <View style={styles.container}>
-            <TextInput
-                style={styles.searchInput}
+        <ThemedView style={{ flex: 1 }}>
+            <InputText
+                label="Search club"
                 placeholder="Search clubs by name"
                 onChangeText={handleSearch}
             />
             {isLoading && <LoadingSpinner />}
             {!isLoading && filteredClubs.length === 0 && (
-                <Text style={styles.emptyText}>No clubs found</Text>
+                <ThemedText style={styles.emptyText}>No clubs found</ThemedText>
             )}
             {!isLoading && filteredClubs.length > 0 && <FlatList
                 data={filteredClubs}
                 keyExtractor={(item) => item.clubId.toString()}
                 renderItem={({ item }) => (
-                    <TouchableOpacity
-                        style={styles.clubItem}
-                        onPress={() => handleSelectClub(item)}
-                    >
-                        <Text style={styles.clubName}>{item.clubName}</Text>
-                    </TouchableOpacity>
+                    <TouchableCard onPress={() => handleSelectClub(item)}>
+                        <ThemedText style={styles.clubName}>{item.clubName}</ThemedText>
+                    </TouchableCard>
                 )}
-                ListEmptyComponent={
-                    <Text style={styles.emptyText}>No clubs found</Text>
-                }
+                ListEmptyComponent={<ThemedText style={styles.emptyText}>No clubs found</ThemedText>}
+                ItemSeparatorComponent={() => <Spacer space={2} />}
             />}
-        </View>
+        </ThemedView>
     );
 };
 

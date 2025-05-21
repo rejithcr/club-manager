@@ -1,4 +1,4 @@
-import { View, TextInput, Text, StyleSheet } from 'react-native'
+import { TextInput, StyleSheet } from 'react-native'
 import React from 'react'
 import ThemedText from './themed-components/ThemedText';
 import { useTheme } from '../hooks/use-theme';
@@ -20,7 +20,8 @@ const InputText = (props: {
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.label}>{props.label || props.placeholder }</ThemedText>
-      <TextInput style={{color:colors.text, ...styles.input}} {...props} onChangeText={props.onChangeText} />
+      <TextInput style={{color:colors.text, ...styles.input}} {...props} onChangeText={props.onChangeText} 
+        placeholderTextColor={colors.disabled}/>
     </ThemedView>
   )
 }

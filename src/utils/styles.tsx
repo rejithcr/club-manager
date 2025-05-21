@@ -10,9 +10,12 @@ export const colors = {
     text: "#000000",
     error: "#b00020",
     warning: "#fdb924",
-    disabled: "#f5f5f5",
+    disabled: "#869c98",
     success: "#5ac983",
     button: "#007acc",
+    nav: "#007acc",
+    add: "#5ac983",
+    heading: "#5ac983",
   },
   dark:{
     statusbar: "light",
@@ -22,9 +25,12 @@ export const colors = {
     text: "#ffffff",
     error: "#ff6b6b",
     warning: "#fdb924",
-    disabled: "#f5f5f5",
+    disabled: "#869c98",
     success: "#5ac983",
     button: "#007acc",
+    nav: "#007acc",
+    add: "#5ac983",
+    heading: "#5ac983",
   }
 }
 

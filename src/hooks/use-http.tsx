@@ -22,12 +22,12 @@ export const useHttpGet = (url: string, params: {}) => {
     return { data, isLoading, error, refetch: fetchData };
 }
 
-export const useHttpPost = (url: string, params: {}) => {
+export const useHttpPost = (url: string) => {
     const [data, setData] = React.useState<any>(null);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState(null);
 
-    const doPost = () => {
+    const doPost = (params: any) => {
         setIsLoading(true);
         post(url, {}, params)
             .then(response => setData(response.data))
@@ -38,12 +38,12 @@ export const useHttpPost = (url: string, params: {}) => {
     return { data, isLoading, error, doPost };
 }
 
-export const useHttpPut = (url: string, params: {}) => {
+export const useHttpPut = (url: string) => {
     const [data, setData] = React.useState<any>(null);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState(null);
 
-    const doPut = () => {
+    const doPut = (params: any) => {
         setIsLoading(true);
         put(url, {}, params)
             .then(response => setData(response.data))
@@ -55,12 +55,12 @@ export const useHttpPut = (url: string, params: {}) => {
 }
 
 
-export const useHttpDelete = (url: string, params: {}) => {
+export const useHttpDelete = (url: string) => {
     const [data, setData] = React.useState<any>(null);
     const [isLoading, setIsLoading] = React.useState(false);
     const [error, setError] = React.useState(null);
 
-    const doDelete = () => {
+    const doDelete = (params: any) => {
         setIsLoading(true);
         del(url, params, {})
             .then(response => setData(response.data))
