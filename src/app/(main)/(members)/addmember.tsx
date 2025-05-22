@@ -13,6 +13,8 @@ import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { addMemberAndAssignClub, addToClub } from '@/src/helpers/club_helper';
 import { ClubContext } from '@/src/context/ClubContext';
 import ThemedView from '@/src/components/themed-components/ThemedView';
+import Spacer from '@/src/components/Spacer';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddMember = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -164,39 +166,46 @@ const AddMember = () => {
                 setIsLoading(false)
             })
     }
-
+    const handleCancel = () => {
+        AsyncStorage.removeItem("userInfo")
+            .then(() => router.dismissTo("/(auth)"));
+    }
     return (
         <ThemedView style={{ flex: 1 }}>
-        <GestureHandlerRootView>
-            {isLoading && <LoadingSpinner />}
-            {!isLoading && <ScrollView>
-                {showPhoneSearch &&
-                    <>
-                        <InputText placeholder='Enter phone number' onChangeText={setSearchNumber} defaultValue={searchNumber} keyboardType="numeric" />
-                        <ThemedButton title="Search" onPress={searchMember} />
+            <GestureHandlerRootView>
+                {isLoading && <LoadingSpinner />}
+                {!isLoading && <ScrollView>
+                    {showPhoneSearch &&
+                        <>
+                            <InputText placeholder='Enter phone number' onChangeText={setSearchNumber} defaultValue={searchNumber} keyboardType="numeric" />
+                            <ThemedButton title="Search" onPress={searchMember} />
+                            <View style={{ marginTop: 25 }} />
+                        </>
+                    }
+                    {showExistingPlayer && <>
+                        <MemberItem firstName={memberDetails?.firstName} dateOfBirth={memberDetails?.dateOfBirth} lastName={memberDetails?.lastName} memberId={0} />
                         <View style={{ marginTop: 25 }} />
-                    </>
-                }
-                {showExistingPlayer && <>
-                    <MemberItem firstName={memberDetails?.firstName} dateOfBirth={memberDetails?.dateOfBirth} lastName={memberDetails?.lastName} memberId={0} />
-                    <View style={{ marginTop: 25 }} />
-                    <ThemedButton title="Add Member" onPress={() => addMemberToClub(memberDetails)} />
-                </>}
-                {(showRegisterForm || showAddNewMemberForm) && <>
-                    <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
-                    <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
-                    <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
-                    {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />}
-                    {/* <DatePicker date={date} setDate={setDate} />
+                        <ThemedButton title="Add Member" onPress={() => addMemberToClub(memberDetails)} />
+                    </>}
+                    {(showRegisterForm || showAddNewMemberForm) && <>
+                        <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
+                        <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
+                        <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
+                        {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />}
+                        {/* <DatePicker date={date} setDate={setDate} />
                 <InputText placeholder='Jersey Name' />
                 <InputText placeholder='Jersey Number' /> */}
-                    <View style={{ marginTop: 25 }} />
-                    {showRegisterForm && <ThemedButton title="Register" onPress={createMember} />}
-                    {!showRegisterForm && showAddNewMemberForm && <ThemedButton title="Add Member" onPress={createAndAddToClub} />}
-                </>}
-            </ScrollView>
-            }
-        </GestureHandlerRootView>
+                        <Spacer space={10} />
+                        <View style={{flexDirection:"row", justifyContent:"space-around"}}>
+                        {showRegisterForm && <ThemedButton title="Register" onPress={createMember} />}
+                        {!showRegisterForm && showAddNewMemberForm && <ThemedButton title="Add Member" onPress={createAndAddToClub} />}
+                        <Spacer space={10} />
+                        <ThemedButton title="Cancel" onPress={handleCancel} />
+                        </View>
+                    </>}
+                </ScrollView>
+                }
+            </GestureHandlerRootView>
         </ThemedView>
     )
 }

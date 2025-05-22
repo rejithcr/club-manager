@@ -7,7 +7,7 @@ import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler
 import { addRegularFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router } from 'expo-router'
-import { isNumeric, isValidLength } from '@/src/utils/validators'
+import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { AuthContext } from '@/src/context/AuthContext'
 import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
@@ -83,7 +83,7 @@ const validate = (feeType: string | null | undefined, feeAmount: string) => {
         alert("Enter atleast 2 characters for fee type")
         return false
     }
-    if (!isNumeric(feeAmount)) {
+    if (!isCurrency(feeAmount)) {
         alert("Enter numeric value for amount")
         return false
     }

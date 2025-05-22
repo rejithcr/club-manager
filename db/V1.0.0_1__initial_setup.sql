@@ -176,8 +176,9 @@ create table club_transaction (
     club_transaction_comment varchar(100), -- Akme Cup
     club_adhoc_fee_payment_id integer,
     club_fee_payment_id integer,
+    club_transaction_date date not null, -- day 1 of the period
     created_by varchar(100) not null,
-    created_ts timestamp  default now(),
+    created_ts timestamp default now(),
     updated_by varchar(100) not null,
     updated_ts timestamp  default now(),
     FOREIGN KEY (club_id) REFERENCES club(club_id),

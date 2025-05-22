@@ -11,6 +11,7 @@ import { router } from 'expo-router'
 import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
+import { isCurrency, isValidLength } from '@/src/utils/validators'
 
 const EditFeeType = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -29,12 +30,14 @@ const EditFeeType = () => {
         setIsAmountEditable(params.get("isAmountEditable") == "true" ? true : false)
     }, [])
 
-    const saveFeeType = () => {
-        setIsLoading(true)
-        editFee(params.get("clubFeeTypeId"), clubFeeType, clubFeeTypeInterval, clubFeeAmount, userInfo.email)
-            .then(() => router.dismissTo('/(main)/(clubs)/(fees)'))
-            .catch((error) => alert(JSON.stringify(error.response.data)))
-            .finally(() => setIsLoading(false))
+    const handleSaveFeeType = () => {
+        if(validate(clubFeeType, clubFeeAmount)) {
+            setIsLoading(true)
+            editFee(params.get("clubFeeTypeId"), clubFeeType, clubFeeTypeInterval, clubFeeAmount, userInfo.email)
+                .then(() => router.dismissTo('/(main)/(clubs)/(fees)'))
+                .catch((error) => alert(JSON.stringify(error.response.data)))
+                .finally(() => setIsLoading(false))
+        }
     }
     const deleteFeeType = () => {
         Alert.alert(
@@ -79,7 +82,7 @@ const EditFeeType = () => {
             {isLoading && <LoadingSpinner />}
             {!isLoading &&
                 <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
-                    <ThemedButton title='Update Fee' onPress={saveFeeType} />
+                    <ThemedButton title='Update Fee' onPress={handleSaveFeeType} />
                     {isAmountEditable && <ThemedButton title='Delete Fee' onPress={deleteFeeType} />}
                 </View>}
         </ThemedView>
@@ -87,3 +90,15 @@ const EditFeeType = () => {
 }
 
 export default EditFeeType
+
+const validate = (feeType: string | null | undefined, feeAmount: string| null | undefined) => {
+    if (!isValidLength(feeType, 2)) {
+        alert("Enter atleast 2 characters for fee type")
+        return false
+    }
+    if (!isCurrency(feeAmount)) {
+        alert("Enter numeric value for amount")
+        return false
+    }
+    return true
+}
