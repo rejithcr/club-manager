@@ -16,8 +16,8 @@ export const isValidLength = (value: string | null | undefined, length: number) 
 }
 
 
-export const isCurrency = (value: string | null | undefined) => {
-  return  value && /^\d+(\.\d{1,2})?$/.test(value);
+export const isCurrency = (value: string) => {
+  return  /^\d+(\.\d{1,2})?$/.test(value);
 }
 
 export const isValidYear = (year: string) => {

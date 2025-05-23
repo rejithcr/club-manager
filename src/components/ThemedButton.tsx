@@ -5,7 +5,8 @@ import { useTheme } from '../hooks/use-theme';
 const ThemedButton = (props: { title: string; onPress: any; disabled?: boolean; style?: any}) => {
     const { colors } = useTheme();
     return (
-        <TouchableOpacity style={{...styles.button, backgroundColor: props?.disabled ? colors.disabled : colors.button, ...props.style}} onPress={props?.onPress}>
+        <TouchableOpacity style={{...styles.button, backgroundColor: props?.disabled ? colors.disabled : colors.button, ...props.style}}
+            onPress={!props?.disabled ? props?.onPress : undefined}>
             <Text style={{...styles.text}}>{props.title}</Text>
         </TouchableOpacity>
     )

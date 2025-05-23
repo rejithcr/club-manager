@@ -131,8 +131,10 @@ const FeeTypeDetails = () => {
                         {(!exceptionTypes?.length || exceptionTypes?.length < 1) &&
                             <ThemedText style={{ alignSelf: "center", width: "80%" }}>No exceptions present for this fee type. You can add exceptions by pressing the + icon above. With this feature you can configure special fees for some members for this fee type (eg. in case of leave)</ThemedText>}
                         {exceptionTypes?.map((et: any) =>
-                            <KeyValueTouchableBox edit key={et.clubFeeTypeExceptionId} onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
+                            <View key={et.clubFeeTypeExceptionId}><KeyValueTouchableBox edit  onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
                                 keyName={et.clubFeeTypeExceptionReason} keyValue={`Rs. ${et.clubFeeExceptionAmount}`} />
+                                <Spacer space={2}/>
+                                </View>
                         )}
                     </View>
                     }

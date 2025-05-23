@@ -14,7 +14,6 @@ import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ShadowBox from '@/src/components/ShadowBox'
-import { useTheme } from '@/src/hooks/use-theme'
 import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox'
 import Spacer from '@/src/components/Spacer'
 
@@ -24,7 +23,6 @@ const AddFeeException = () => {
     const [exceptionAmount, setExceptionAmount] = useState<string>("")
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
-    const { colors } = useTheme();
 
     const params = useSearchParams()
 

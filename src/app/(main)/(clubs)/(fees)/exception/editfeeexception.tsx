@@ -17,12 +17,13 @@ import ThemedText from '@/src/components/themed-components/ThemedText'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import { useTheme } from '@/src/hooks/use-theme'
 import { ROLE_ADMIN } from '@/src/utils/constants'
+import Spacer from '@/src/components/Spacer'
 
 const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
     const [isLoadingException, setIsLoadingException] = useState(false)
     const [exceptionType, setExceptionType] = useState<string>("")
-    const [exceptionAmount, setExceptionAmount] = useState<string>("")
+    const [exceptionAmount, setExceptionAmount] = useState<string>("0")
     const [isAmountEditable, setIsAmountEditable] = useState<boolean>(false)
     const [exceptionMembers, setExceptionMembers] = useState<any>([])
     const [members, setMembers] = useState<any>([]);
@@ -119,7 +120,7 @@ const EditFeeException = () => {
                     }) => <View key={member?.memberId?.toString() + member?.endDate}>
                             <ShadowBox style={{
                                 flexDirection: "row", justifyContent: "space-between",
-                                width: "70%", padding: 10, marginBottom: 15
+                                width: "70%", padding: 10, 
                             }}>
                                 <View>
                                     <ThemedText style={{ textDecorationLine: getStrikeOut(member.endDate || member.endDateAdded) }}>{member.firstName} {member.lastName}</ThemedText>
@@ -128,6 +129,7 @@ const EditFeeException = () => {
                                 {!member.endDate && (member.endDateAdded ? <ThemedIcon name="MaterialIcons:undo" size={20} onPress={() => endException(member)} />
                                     : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} color={colors.error}/>)}
                             </ShadowBox>
+                            <Spacer space={2}/>
                         </View>
                     )
                 }
@@ -137,11 +139,12 @@ const EditFeeException = () => {
                 {!isLoadingMembers &&
                     members.map((item: any) =>
                         <TouchableOpacity key={item.memberId} onPress={() => addToException(item)}>
-                            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
+                            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 4, flexWrap: "wrap" }}>
                                 <ThemedIcon name="MaterialIcons:add-circle" size={20} color={colors.add}/>
                                 <ThemedText style={{ width: "85%", fontSize: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>
+
                     )
                 }
             <View style={{marginVertical:40}} />

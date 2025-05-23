@@ -38,7 +38,7 @@ const Profile = () => {
                 <TouchableCard onPress={() => setTheme("system")} icon={<ThemedCheckBox checked={theme == "system"} />}>
                     <ThemedText>System</ThemedText>
                 </TouchableCard>
- <Spacer space={5} />
+                <Spacer space={5} />
                 <View>
                     <View style={{
                         flexDirection: "row", width: "80%", alignItems: "center",
@@ -49,7 +49,7 @@ const Profile = () => {
                             <ThemedIcon size={25} name={false ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
                             <ThemedText style={{ ...appStyles.heading, paddingLeft: 5 }}>Membership Requests</ThemedText>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ width: 50, alignItems: "center" }} onPress={() => router.push(`/(main)/(members)/joinclub`)}>
+                        <TouchableOpacity style={{alignItems: "center" }} onPress={() => router.push(`/(main)/(members)/joinclub`)}>
                             <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
                         </TouchableOpacity>
                     </View>

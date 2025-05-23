@@ -18,6 +18,7 @@ import ThemedText from '@/src/components/themed-components/ThemedText'
 import { useTheme } from '@/src/hooks/use-theme'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import { ROLE_ADMIN } from '@/src/utils/constants'
+import DatePicker from '@/src/components/DatePicker'
 
 const Transactions = () => {
   const [isLoading, setIsloading] = useState(false)
@@ -29,7 +30,7 @@ const Transactions = () => {
   const [showFees, setShowFees] = useState(false)
   const [resfresh, setRefresh] = useState(false)
   const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnCategory: "", txnComment: "", txnAmount: "" })
-
+  const [date, setDate] = useState(new Date())
   const { clubInfo } = useContext(ClubContext)
   const { userInfo } = useContext(AuthContext)
   const { colors } = useTheme()
@@ -69,7 +70,7 @@ const Transactions = () => {
   const handleSave = () => {
     if (validate(txnValues?.txnCategory, txnValues?.txnComment, txnValues?.txnAmount)) {
       if (txnValues?.txnId) {
-        updateTransaction(txnValues.txnId, txnValues.txnType, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
+        updateTransaction(txnValues.txnId, txnValues.txnType, date, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
           .then(() => {
             offset.current = 0;
             setRefresh(prev => !prev)
@@ -77,7 +78,7 @@ const Transactions = () => {
           .catch(error => Alert.alert("Error", error.response.data.error))
           .finally(() => setIsAddTxnVisible(false))
       } else {
-        saveTransaction(clubInfo.clubId, txnValues.txnType, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
+        saveTransaction(clubInfo.clubId, date, txnValues.txnType, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
           .then(() => {
             offset.current = 0;
             setRefresh(prev => !prev)
@@ -159,7 +160,7 @@ const Transactions = () => {
                 </View>
                 <View style={{ alignItems: "flex-end", width: "30%" }}>
                   <ThemedText style={{ fontWeight: 'bold', color: item.clubTranscationType === 'CREDIT' ? colors.success : colors.error}}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} Rs. {item.clubTransactionAmount}</ThemedText>
-                  <ThemedText style={{ fontSize: 8 }}>{item.createdDate}</ThemedText>
+                  <ThemedText style={{ fontSize: 8 }}>{item.clubTransactionDate}</ThemedText>
                 </View>
               </View>
             )}
@@ -174,6 +175,7 @@ const Transactions = () => {
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
           </Picker>
+          <DatePicker date={date} setDate={setDate}/>
           <InputText label="Category" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnCategory: value }))} defaultValue={txnValues?.txnCategory} />
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />

@@ -4,12 +4,12 @@ export const getTransactions = async (clubId: string | null, txnType: string, sh
     return get("/club/transaction", { clubId, txnType, showFees, limit, offset })
 }
 
-export const saveTransaction = async (clubId: string | null, txnType: string,  txnCategory:string, txnComment: string, txnAmount: number, email: string) => {
-    return post("/club/transaction", null, { clubId, txnType, txnCategory, txnComment, txnAmount, email })
+export const saveTransaction = async (clubId: string | null, txnDate: Date, txnType: string,  txnCategory:string, txnComment: string, txnAmount: number, email: string) => {
+    return post("/club/transaction", null, {clubId, txnDate, txnType, txnCategory, txnComment, txnAmount, email })
 }
 
-export const updateTransaction = async (txnId: number, txnType: string,  txnCategory:string, txnComment: string, txnAmount: number, email: string) => {
-    return put("/club/transaction", null, { txnId, txnType, txnCategory, txnComment, txnAmount, email })
+export const updateTransaction = async (txnId: number, txnType: string, txnDate: Date, txnCategory:string, txnComment: string, txnAmount: number, email: string) => {
+    return put("/club/transaction", null, { txnId, txnType, txnCategory, txnDate, txnComment, txnAmount, email })
 }
 
 export const deleteTransaction = async (txnId: number) => {
