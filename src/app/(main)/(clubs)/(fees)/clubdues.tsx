@@ -34,7 +34,7 @@ const ClubDues = () => {
     <GestureHandlerRootView>
         <Spacer space={5}/>
         {isLoading && <LoadingSpinner />}
-        <View style={{ width: "80%", alignSelf:"center" }}>
+        <View style={{ width: "90%", alignSelf:"center" }}>
           {!isLoading && <FlatList
             data={duesByMembers}
             keyExtractor={(item) => item.memberId.toString()}
@@ -62,12 +62,14 @@ const MemberDue = (props: { member: any }) => {
       }}>
         <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav}/>
         <ThemedText style={{ width: "65%", fontSize: 15, paddingLeft: 5 }}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
-        <ThemedText style={{ width: "25%", fontWeight: "bold", fontSize: 15 }}> Rs. {props?.member.totalDue} </ThemedText>
+        <ThemedText style={{ width: "25%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}> Rs. {props?.member.totalDue} </ThemedText>
       </TouchableOpacity>
       {isShown &&
-        props?.member.dues.map((item: { paymentId: number; fee: string; feeType: string, feeDesc: string, amount: number; }) =>
-          <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />
-        )
+        <FlatList
+          data={props?.member.dues}
+          renderItem={({item}) => <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />}
+          ItemSeparatorComponent={() => <View style={{ marginVertical: 5, borderBottomWidth: .5, borderBottomColor: "grey", width: "90%", alignSelf: "center" }} />}
+          />
       }
     </View>
   )
@@ -77,37 +79,9 @@ export default ClubDues
 
 const MemberFeeItem = (props: { paymentId: number; fee: string; feeType: string, feeDesc: string, amount: number; }) => {
   return (
-    <TouchableOpacity onPress={undefined}>
-      <ShadowBox style={{
-        ...appStyles.shadowBox, width: "90%", marginBottom: 5, flexWrap: "wrap"
-      }}>
+      <ThemedView style={{width: "90%", flexDirection: "row", justifyContent: "space-between", alignSelf: "center"}}>
         <ThemedText style={{ width: "75%"}}>{props?.fee} {props?.feeDesc}</ThemedText>
         <ThemedText style={{ width: "25%", fontSize: 15, textAlign: "right" }}>{props?.amount}</ThemedText>
-      </ShadowBox>
-    </TouchableOpacity>
+      </ThemedView>
   )
 }
-
-const styles = StyleSheet.create({
-  item: {
-    width: "100%",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    justifyContent: "space-between"
-  },
-  label: {
-    padding: 10,
-  },
-  date: {
-    padding: 10,
-  },
-  amount: {
-    padding: 10,
-  },
-  divider: {
-    borderBottomColor: 'rgba(136, 136, 136, 0.2)',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    width: "100%"
-  }
-});

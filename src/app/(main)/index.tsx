@@ -51,6 +51,7 @@ const Main = () => {
         {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
         {/* <UpcomingMatches memberEmail={userInfo?.email} />
         <UpcomingEvents memberEmail={userInfo?.email} /> */}
+        <Spacer space={50} />
       </ScrollView >
 
       <FloatingMenu actions={actions} position={"left"} color='black'

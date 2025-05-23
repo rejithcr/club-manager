@@ -1,4 +1,4 @@
-import { get, post } from "../utils/api";
+import { get, post, put } from "../utils/api";
 
 export const getClubs = (memberId: number) => {
     return get("/club", {memberId: memberId})
@@ -47,4 +47,8 @@ export const searchClubsByName = (clubName: string | null) => {
 
 export const requestMembership = async ( clubId: number, memberId: number, email: string) => {
     return post("/club/member", null, {memberId, clubId, email})
+}
+
+export const membershipRequestPut = (params: {clubId: Number, memberId: Number, status: string, comments: string, email: any}) => {
+    return put("/club", null, params)
 }

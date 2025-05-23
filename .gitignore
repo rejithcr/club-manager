@@ -41,7 +41,6 @@ app-example
 #local
 google/
 troubleshooting.txt
-**/keys.tsx
 
 #backend
 backend/build

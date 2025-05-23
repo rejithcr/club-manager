@@ -42,46 +42,48 @@ const AdocFeesHome = () => {
     })
   }
   return (
-    <ThemedView style={{flex: 1}}>
-    <GestureHandlerRootView>
-      <ScrollView>      
+    <ThemedView style={{ flex: 1 }}>
+      <GestureHandlerRootView>
+        <ScrollView>
 
-        <View style={{
-          flexDirection: "row", alignItems: "center", width: "80%",
-          justifyContent: "space-between", alignSelf: "center", marginTop: 10
-        }}>
-          <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Expense Splits</ThemedText>
-          {clubInfo.role == ROLE_ADMIN &&<TouchableOpacity style={{ width: "10%" }}
-            onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
-            <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add}/>
-          </TouchableOpacity>}
-        </View>
-        {isLoadingAdhoc && <LoadingSpinner />}
-        {!isLoadingAdhoc && adhocFees?.length == 0 && 
-        <ThemedText style={{ alignSelf: "center", width: "80%" }}>No splits defined. 
-        This will be a one time collection from selected members. 
-        For eg. splitting expense amoung members who participated in an event. Press the + icon to define collection</ThemedText>}
-        {!isLoadingAdhoc && adhocFees?.map(fee =>  <View key={fee.clubAdhocFeeId}>
-          <TouchableCard onPress={showAdhocFeeDetails} id={fee}>
-            <View style={{
-              flexDirection: "row", width: "90%",
-              justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
-            }}>
-              <View>
-                <ThemedText style={{ fontWeight: "bold" }}>{fee.clubAdhocFeeName}</ThemedText>
-                <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubAdhocFeeDesc}</ThemedText>
-              </View>
-              <View >
-                <ThemedText style={{ textAlign: "right" }}>Rs. {fee.clubAdhocFeePaymentAmount}</ThemedText>
-                <ThemedText style={{fontSize: 10, marginTop: 5, textAlign: "right"  }}>Completed {Math.round(fee.completionPercentage)}%</ThemedText>
-                </View>
-            </View>
-          </TouchableCard>          
-          <Spacer space={4}/> 
+          <View style={{
+            flexDirection: "row", alignItems: "center", width: "80%",
+            justifyContent: "space-between", alignSelf: "center", marginTop: 10
+          }}>
+            <ThemedText style={{ ...appStyles.heading }}>Expense Splits</ThemedText>
+
+            <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
+              {clubInfo.role == ROLE_ADMIN && <TouchableOpacity
+                onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
+                <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
+              </TouchableOpacity>}</View>
           </View>
-        )}
-      </ScrollView>
-    </GestureHandlerRootView>
+          {isLoadingAdhoc && <LoadingSpinner />}
+          {!isLoadingAdhoc && adhocFees?.length == 0 &&
+            <ThemedText style={{ alignSelf: "center", width: "80%" }}>No splits defined.
+              This will be a one time collection from selected members.
+              For eg. splitting expense among members who participated in an event. Press the + icon to define collection</ThemedText>}
+          {!isLoadingAdhoc && adhocFees?.map(fee => <View key={fee.clubAdhocFeeId}>
+            <TouchableCard onPress={showAdhocFeeDetails} id={fee}>
+              <View style={{
+                flexDirection: "row", width: "90%",
+                justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
+              }}>
+                <View>
+                  <ThemedText style={{ fontWeight: "bold" }}>{fee.clubAdhocFeeName}</ThemedText>
+                  <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubAdhocFeeDesc}</ThemedText>
+                </View>
+                <View >
+                  <ThemedText style={{ textAlign: "right" }}>Rs. {fee.clubAdhocFeePaymentAmount}</ThemedText>
+                  <ThemedText style={{ fontSize: 10, marginTop: 5, textAlign: "right" }}>Completed {Math.round(fee.completionPercentage)}%</ThemedText>
+                </View>
+              </View>
+            </TouchableCard>
+            <Spacer space={4} />
+          </View>
+          )}
+        </ScrollView>
+      </GestureHandlerRootView>
     </ThemedView>
   )
 }

@@ -137,7 +137,7 @@ const Transactions = () => {
         {!isLoading && transactions?.length == 0 && <ThemedText style={{ textAlign: "center" }}>No transactions found!</ThemedText>}
         {!isLoading && transactions &&
           <FlatList style={{ width: "100%" }}
-            ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .2, borderBottomColor: "grey", width: "80%", alignSelf: "center" }} />}
+            ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .3, borderBottomColor: "grey", width: "80%", alignSelf: "center" }} />}
             ListFooterComponent={() => isFectching && <LoadingSpinner /> || <View style={{ marginVertical: 30 }} />}
             data={transactions}
             initialNumToRender={8}

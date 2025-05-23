@@ -88,17 +88,22 @@ const Payments = () => {
         <GestureHandlerRootView>
             <Spacer space={5} />
             <View style={{
-                flexDirection: "row", padding:10, width: "80%",
+                flexDirection: "row",  width: "80%", alignItems: "center",
                 justifyContent: "space-between", alignSelf: "center"
             }}>
                 <View>
                     <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>{feeObj?.clubAdhocFeeName}</ThemedText>
                     <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeObj?.clubAdhocFeeDesc}</ThemedText>
                 </View>
-                <ThemedText style={{ marginRight: 10 }}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
+                <View>
+                <ThemedText style={{ textAlign: "right"}}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
+                <ThemedText style={{ fontSize: 10, marginTop: 5,textAlign: "right" }}>Completed {Math.round(feeObj?.completionPercentage)}%</ThemedText>
+                </View>
             </View>
+            <Spacer space={5}/>
             <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center" }}>
-                <ThemedIcon name='MaterialIcons:warning' size={25} color={colors.warning}/>
+                <ThemedIcon name={Math.round(feeObj?.completionPercentage) !=100 ? 'MaterialIcons:warning' : 'MaterialIcons:check-circle'} size={25} 
+                    color={Math.round(feeObj?.completionPercentage) !=100 ? colors.warning : colors.success}/>
                 <ThemedText style={{marginLeft:10, fontSize: 20}}>Status</ThemedText>                
             </View>
             <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the member to update payment status</ThemedText>

@@ -41,7 +41,7 @@ const JoinClub = () => {
     const handleSelectClub = (club: { clubId: number; clubName: string }) => {
         Alert.alert(
             'Are you sure!',
-            'Please confirm to join ' + club.clubName,
+            `This will send your membership request for ${club.clubName} to the club admin`,
             [
                 {
                     text: 'OK', onPress: () => {

@@ -82,11 +82,7 @@ const Payments = () => {
     return (
         <ThemedView style={{ flex: 1 }}>
         <GestureHandlerRootView>
-            <ThemedText style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</ThemedText>
-            <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center" }}>
-                <ThemedIcon name='MaterialIcons:warning' size={25} color={colors.warning}/>
-                <ThemedText style={{marginLeft:10, fontSize: 20}}>Status</ThemedText>                
-            </View>
+            <ThemedText style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</ThemedText>            
             <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the member to update payment status</ThemedText>
             <Spacer space={5} />
             <View style={{ height: "80%" }}>

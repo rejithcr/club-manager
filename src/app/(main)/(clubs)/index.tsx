@@ -116,11 +116,12 @@ const ClubHome = () => {
                         flexDirection: "row", alignItems: "center", width: "80%",
                         justifyContent: "space-between", alignSelf: "center",
                     }}>
-                        <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Fees</ThemedText>
-                        {params.get("role") == ROLE_ADMIN && <TouchableOpacity style={{ width: "10%" }}
+                        <ThemedText style={{ ...appStyles.heading }}>Fees</ThemedText>
+                        <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
+                        {params.get("role") == ROLE_ADMIN && <TouchableOpacity
                             onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
                             <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
-                        </TouchableOpacity>}
+                        </TouchableOpacity>}</View>
                     </View>
                     {isLoadingCurrent && <LoadingSpinner />}
                     {!isLoadingCurrent && currentFeeStructure?.length == 0 && <ThemedText style={{ alignSelf: "center", width: "80%" }}>No fees defined. To define a fee type (eg. Membership fee), press the + icon.</ThemedText>}

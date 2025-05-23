@@ -1,4 +1,4 @@
-import { FlatList, View } from 'react-native'
+import { Alert, FlatList, View } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { useHttpGet, useHttpPut } from '@/src/hooks/use-http'
 import { ClubContext } from '@/src/context/ClubContext'
@@ -17,22 +17,27 @@ import { AuthContext } from '@/src/context/AuthContext'
 import { useTheme } from '@/src/hooks/use-theme'
 import { isValidLength } from '@/src/utils/validators'
 import { ROLE_ADMIN } from '@/src/utils/constants'
+import { membershipRequestPut } from '@/src/helpers/club_helper'
 
 const MembershipRequests = () => {
   const { colors } = useTheme()
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(AuthContext);
+  const [isUpdating, setIsUpdating] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [comments, setComments] = useState("")
-  const [statusChangeRequest, setStatusChangeRequest] = useState({});
-  const { data, isLoading } = useHttpGet('/club', { clubId: clubInfo.clubId, membershipRequests: "true" })
-  const { isLoading: isUpdating, doPut: updateStatus } = useHttpPut('/club')
+  const [statusChangeRequest, setStatusChangeRequest] = useState({ clubId: 0, memberId: 0 });
+  const { data, isLoading, refetch} = useHttpGet('/club', { clubId: clubInfo.clubId, membershipRequests: "true" })
 
   const handleStatusChange = (status: string) => {
-    if (validate(comments)) {
-      updateStatus({ ...statusChangeRequest, status, comments, email: userInfo.email })
+    if (validate(comments)) {    
       setIsModalVisible(false)
-    }
+      setIsUpdating(true);
+      membershipRequestPut({ clubId: statusChangeRequest.clubId, memberId: statusChangeRequest.memberId, status, comments, email: userInfo.email })
+          .then(() => refetch())
+          .catch(error => Alert.alert("Error", error.response.data.error))
+          .finally(() => setIsUpdating(false))
+    } 
   }
   const showApproveModal = (memberId: any, clubId: any) => {
     setStatusChangeRequest({ clubId, memberId })
@@ -88,5 +93,6 @@ const validate = (comments: string) => {
     alert("Enter atleast 2 characters for comments")
     return false
   }
+  return true
 }
 

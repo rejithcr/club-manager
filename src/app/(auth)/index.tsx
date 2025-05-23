@@ -7,7 +7,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ActivityIndicator, Alert, Image, View } from 'react-native'
 import { appStyles } from '@/src/utils/styles'
 import { AuthContext } from '../../context/AuthContext';
-import { ANDROID_CLIENT_ID, WEB_CLIENT_ID } from '@/src/utils/keys'
 import { getMemberByEmail } from '@/src/helpers/member_helper'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 
@@ -20,9 +19,9 @@ const AuthHome = () => {
   const [isLoading, setLoading] = useState(false)
   const [_, response, promptAsyc] = Google.useAuthRequest({
     //scopes: ['https://www.googleapis.com/auth/user.phonenumbers.read'],
-    androidClientId: ANDROID_CLIENT_ID,
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
     iosClientId: "",
-    webClientId: WEB_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
   })
   const router = useRouter()
 
