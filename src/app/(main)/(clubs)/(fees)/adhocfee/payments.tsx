@@ -18,6 +18,7 @@ import { useTheme } from '@/src/hooks/use-theme';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import Spacer from '@/src/components/Spacer';
 import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
+import { ROLE_ADMIN } from '@/src/utils/constants';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -71,7 +72,7 @@ const Payments = () => {
                     text: 'OK', onPress: () => {
                         setIsLoading(true)
                         deleteAdhocFeeCollection(feeObj?.clubAdhocFeeId, userInfo.email)
-                            .then((response) => { Alert.alert("Success", response.data.message); router.back() })
+                            .then((response) => { Alert.alert("Success", response.data.message); router.dismissTo('/(main)/(clubs)/(fees)/adhocfee') })
                             .catch(error => Alert.alert("Error", error.response.data.error))
                             .finally(() => setIsLoading(false));
                     }
@@ -128,10 +129,10 @@ const Payments = () => {
                     </ThemedView>
                 </ScrollView>
             </Modal>
-            <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
+            {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
                 <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
                 <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} color={colors.error}/>
-            </View>
+            </View>}
         </GestureHandlerRootView>
         </ThemedView>
     )

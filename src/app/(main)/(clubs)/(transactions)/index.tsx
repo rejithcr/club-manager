@@ -1,4 +1,4 @@
-import { View, Alert, FlatList, Switch, TouchableOpacity } from 'react-native'
+import { View, Alert, FlatList, Switch, TouchableOpacity, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import { ClubContext } from '@/src/context/ClubContext'
 import { deleteTransaction, getTransactions, saveTransaction, updateTransaction } from '@/src/helpers/transaction_helper'
@@ -17,6 +17,7 @@ import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import { useTheme } from '@/src/hooks/use-theme'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
+import { ROLE_ADMIN } from '@/src/utils/constants'
 
 const Transactions = () => {
   const [isLoading, setIsloading] = useState(false)
@@ -36,7 +37,7 @@ const Transactions = () => {
   const offset = useRef(0)
   const limit = 20
 
-  useEffect(() => {
+  const onRefresh = () => {    
     setIsloading(true)
     offset.current = 0
     getTransactions(clubInfo.clubId, txnTypeFilter, showFees, limit, offset.current)
@@ -46,6 +47,9 @@ const Transactions = () => {
       })
       .catch(error => Alert.alert("Error", error.response.data.error))
       .finally(() => setIsloading(false))
+  }
+  useEffect(() => {
+    onRefresh()
   }, [resfresh, txnTypeFilter, showFees])
 
   const fetchNextPage = () => {
@@ -139,12 +143,14 @@ const Transactions = () => {
             initialNumToRender={8}
             onEndReached={fetchNextPage}
             onEndReachedThreshold={0.2}
+            refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
             renderItem={({ item }) => (
               <View style={{
                 width: "85%", alignSelf: "center", alignItems: "center",
                 flexDirection: "row", justifyContent: "flex-end"
               }}>
-                {item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && <TouchableOpacity style={{ width: "10%" }} onPress={() => handleEdit(item)}>
+                {item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && clubInfo.role === ROLE_ADMIN &&
+                <TouchableOpacity style={{ width: "10%" }} onPress={() => handleEdit(item)}>
                   <MaterialCommunityIcons name='square-edit-outline' size={20} color={"#546E7A"}/>
                 </TouchableOpacity>}
                 <View style={{ width: "60%" }}>
@@ -178,9 +184,10 @@ const Transactions = () => {
           </View>
         </ThemedView>
       </Modal>
+      {clubInfo.role === ROLE_ADMIN &&
       <FloatingMenu onPressMain={() => { setTxnValues({txnType:"DEBIT"}); setIsAddTxnVisible(true) }}
         icon={<MaterialIcons name={"add"} size={32} color={"white"} />}
-      />
+      />}
     </GestureHandlerRootView>
   )
 }

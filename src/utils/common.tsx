@@ -18,3 +18,48 @@ export const getYear = (dateString: string) => {
     const d = new Date(dateString);
     return d.getFullYear();
 }
+
+export const getMonths = (year: number) => {
+  const months = [];
+
+  for (let month = 0; month < 12; month++) {
+    const date = new Date(year, month, 1);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); // month is 0-based
+    const dd = '01';
+    months.push({
+      period: date.toLocaleString('default', { month: 'long' }).substring(0,3).toUpperCase(),
+      startDate: `${yyyy}-${mm}-${dd}`
+    });
+  } 
+  return months;
+}
+
+export const getQuarters = (year: number) => {
+  const quarters = [];
+
+  for (let i = 0; i < 4; i++) {
+    const month = i * 3; // 0, 3, 6, 9
+    const date = new Date(year, month, 1);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0'); // month is 0-based
+    const dd = '01';
+    quarters.push({
+      period: `Q${i + 1}`,
+      startDate: `${yyyy}-${mm}-${dd}`
+    });
+  }
+
+  return quarters;
+}
+
+export const getCurrentMonthItem = (months: { period: string; startDate: string; }[] | undefined) => {
+  const currentMonthIndex = new Date().getMonth(); // 0-based index
+  return months && months[currentMonthIndex];
+}
+
+export const getCurrentQuarterItem = (quarters : { period: string; startDate: string; }[] | undefined) => {
+  const currentMonth = new Date().getMonth();
+  const currentQuarterIndex = Math.floor(currentMonth / 3); // 0-based index
+  return quarters && quarters[currentQuarterIndex];
+}

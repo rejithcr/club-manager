@@ -8,7 +8,6 @@ import { AuthContext } from '@/src/context/AuthContext'
 import { deleteFee, editFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router } from 'expo-router'
-import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
@@ -20,7 +19,6 @@ const EditFeeType = () => {
     const [clubFeeAmount, setClubFeeAmount] = useState<string | null>()
     const [clubFeeTypeInterval, setClubFeeTypeInterval] = useState<string | null>()
     const { userInfo } = useContext(AuthContext)
-    const { clubInfo } = useContext(ClubContext)
     const params = useSearchParams()
 
     useEffect(() => {
@@ -30,16 +28,16 @@ const EditFeeType = () => {
         setIsAmountEditable(params.get("isAmountEditable") == "true" ? true : false)
     }, [])
 
-    const handleSaveFeeType = () => {
+    const handleSaveFeeType = () => {        
         if(validate(clubFeeType, clubFeeAmount)) {
             setIsLoading(true)
             editFee(params.get("clubFeeTypeId"), clubFeeType, clubFeeTypeInterval, clubFeeAmount, userInfo.email)
-                .then(() => router.dismissTo('/(main)/(clubs)/(fees)'))
+                .then(() => router.dismissTo('/(main)/(clubs)'))
                 .catch((error) => alert(JSON.stringify(error.response.data)))
                 .finally(() => setIsLoading(false))
         }
     }
-    const deleteFeeType = () => {
+    const handleDeleteFeeType = () => {
         Alert.alert(
                     'Are you sure!',
                     'This will delete the fee type and all its exception types.',
@@ -50,7 +48,7 @@ const EditFeeType = () => {
                                 deleteFee(params.get("clubFeeTypeId"), userInfo.email)
                                     .then((response) => {
                                         Alert.alert("Success", response.data.message);
-                                        router.dismissTo(`/(main)/(clubs)/(fees)?clubId=${clubInfo.clubId}`)
+                                        router.dismissTo(`/(main)/(clubs)`)
                                     })
                                     .catch((error) => Alert.alert("Error", error.response.data.error))
                                     .finally(() => setIsLoading(false))
@@ -75,7 +73,6 @@ const EditFeeType = () => {
                     <Picker.Item label="MONTHLY" value="MONTHLY" />
                     <Picker.Item label="QUARTERLY" value="QUARTERLY" />
                     <Picker.Item label="YEARLY" value="YEARLY" />
-                    <Picker.Item label="ADHOC" value="ADHOC" />
                 </Picker>
             </View>
             <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setClubFeeAmount} defaultValue={params.get("clubFeeAmount")?.toString()} editable={isAmountEditable} />
@@ -83,7 +80,7 @@ const EditFeeType = () => {
             {!isLoading &&
                 <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
                     <ThemedButton title='Update Fee' onPress={handleSaveFeeType} />
-                    {isAmountEditable && <ThemedButton title='Delete Fee' onPress={deleteFeeType} />}
+                    {isAmountEditable && <ThemedButton title='Delete Fee' onPress={handleDeleteFeeType} />}
                 </View>}
         </ThemedView>
     )

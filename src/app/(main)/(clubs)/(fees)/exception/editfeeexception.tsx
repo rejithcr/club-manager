@@ -16,6 +16,7 @@ import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import { useTheme } from '@/src/hooks/use-theme'
+import { ROLE_ADMIN } from '@/src/utils/constants'
 
 const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
@@ -146,9 +147,9 @@ const EditFeeException = () => {
             <View style={{marginVertical:40}} />
             </ScrollView>
             
-            <View style={{ position: "absolute", bottom: 30, alignSelf: "center" }} >
+            {clubInfo.role === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 30, alignSelf: "center" }} >
                 <ThemedButton title='Update Exception' onPress={saveException} />
-            </View>
+            </View>}
         </ThemedView>
     )
 }

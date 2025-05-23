@@ -33,7 +33,7 @@ const AuthHome = () => {
   const validateLogin = async () => {
     //const userInfoFromCache = await AsyncStorage.getItem("userInfo");
     const userInfoFromCache = "{\"email\": \"rejithramakrishnan@gmail.com\",\"name\": \"Rejith\"}"
-   // const userInfoFromCache = "{\"email\": \"diay.cr@gmail.com\",\"name\": \"Diya\"}"
+    //const userInfoFromCache = "{\"email\": \"Ajai@babu.com\",\"name\": \"Diya\"}"
     console.log(userInfoFromCache)
     if (userInfoFromCache) {
       setUserInfo(JSON.parse(userInfoFromCache))

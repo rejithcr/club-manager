@@ -1,4 +1,4 @@
-import { RefreshControl, ScrollView, Text, View } from 'react-native'
+import { RefreshControl, ScrollView } from 'react-native'
 import { useRouter } from 'expo-router/build/hooks';
 import FloatingMenu from '@/src/components/FloatingMenu';
 import FeeSummary from './dues';
@@ -41,7 +41,7 @@ const Main = () => {
   return (
     <ThemedView style={{flex: 1}}>      
       <Spacer space={5} />
-      <ScrollView refreshControl={< RefreshControl refreshing={false} onRefresh={onRefresh} />}>
+      <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
         <ThemedHeading>My Clubs</ThemedHeading>
         {isLoadingMyClubs && <LoadingSpinner />}
         {!isLoadingMemberDues && <MyClubs clubs={clubs} />}

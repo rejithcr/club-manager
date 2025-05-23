@@ -1,68 +1,187 @@
-import { View, FlatList, Text, StyleSheet, Alert } from 'react-native'
+import { View, GestureResponderEvent, Alert, TouchableOpacity, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { useRouter } from 'expo-router/build/hooks';
-import FloatingMenu from '@/src/components/FloatingMenu';
-import { getClubs } from '@/src/helpers/club_helper';
-import TouchableCard from '@/src/components/TouchableCard';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { AuthContext } from '@/src/context/AuthContext';
-import LoadingSpinner from '@/src/components/LoadingSpinner';
-import ThemedView from '@/src/components/themed-components/ThemedView';
+import { useRouter, useSearchParams } from 'expo-router/build/hooks'
+import { getFundBalance, getTotalDue } from '@/src/helpers/club_helper'
+import { appStyles } from '@/src/utils/styles'
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
+import { router } from 'expo-router'
+import FloatingMenu from '@/src/components/FloatingMenu'
+import LoadingSpinner from '@/src/components/LoadingSpinner'
+import { ClubContext } from '@/src/context/ClubContext'
+import ThemedView from '@/src/components/themed-components/ThemedView'
+import ThemedText from '@/src/components/themed-components/ThemedText'
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
+import Spacer from '@/src/components/Spacer'
+import TouchableCard from '@/src/components/TouchableCard'
+import { ROLE_ADMIN } from '@/src/utils/constants'
+import { useTheme } from '@/src/hooks/use-theme'
+import { getFeeStructure } from '@/src/helpers/fee_helper'
 
-const ClubMain = () => {
-  const [clubs, setClubs] = useState<any>([]);
-  const [isLoading, setIsLoading] = useState(true)
-  const { userInfo } = useContext(AuthContext)
+const ClubHome = () => {
+    const router = useRouter()
+    const params = useSearchParams()
+    const { clubInfo, setClubInfo } = useContext(ClubContext)
 
-  const router = useRouter()
+    const { colors } = useTheme();
 
-  useEffect(() => {
-    getClubs(userInfo.memberId)
-      .then(response => {
-        const memberClubs = response.data
-        console.log(memberClubs)
-        setClubs(memberClubs);
-      })
-      .catch((error) => Alert.alert("Error", error.response.data.message))
-      .finally(() => setIsLoading(false))
-  }, []);
+    const [isFundBalanceLoading, setIsFundBalanceLoading] = useState(false)
+    const [isTotalDueLoading, setIsTotalDueLoading] = useState(false)
+    const [fundBalance, setFundBalance] = useState(0)
+    const [totalDue, setTotalDue] = useState<number | undefined>(0);
 
-  const showCreateClub = () => router.push("/(main)/(clubs)/createclub")
-  const showDetails = (clubId: number, clubName: string, role: string) => router.push(`/(main)/(clubs)/clubdetails?clubId=${clubId}&clubName=${clubName}&role=${role}`)
+    const [currentFeeStructure, setCurrentFeeStructure] = useState<any>([])
+    const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
 
-  return (
-    <ThemedView style={{flex:1}}>
-      <View style={{ marginTop: 25 }} />
-      <View>
-        {isLoading && <LoadingSpinner />}
-        {!isLoading &&
-          <FlatList
-            data={clubs}
-            renderItem={({ item }) => (
-              <TouchableCard key={item.clubId} onPress={() => showDetails(item.clubId, item.clubName, item.roleName)} id={item.clubId}>
+    const fetchFundBalance = () => {
+        setIsFundBalanceLoading(true)
+        getFundBalance(params.get("clubId"))
+            .then(response => setFundBalance(response.data.fundBalance))
+            .catch(error => Alert.alert("Error", error.response.data.error))
+            .finally(() => setIsFundBalanceLoading(false))
+    }
+    const fetchTotalDue = () => {
+        setIsTotalDueLoading(true)
+        getTotalDue(params.get("clubId"))
+            .then(response => setTotalDue(response.data.totalDue))
+            .catch(error => Alert.alert("Error", error.response.data.error))
+            .finally(() => setIsTotalDueLoading(false))
+    }
+    const showFeeTypeDetails = (fee: any) => {
+        router.push({
+            pathname: "/(main)/(clubs)/(fees)/feetypedetails",
+            params: { fee: JSON.stringify(fee) }
+        })
+    }
+
+    const fetchFees = () => {
+        setIsLoadingCurrent(true)
+        getFeeStructure(Number(params.get('clubId')))
+            .then(response => setCurrentFeeStructure(response.data))
+            .catch(error => Alert.alert("Error", error.response.data.error))
+            .finally(() => setIsLoadingCurrent(false));
+    }
+
+    useEffect(() => {
+        setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") });
+        fetchFundBalance();
+        fetchTotalDue();
+        fetchFees();
+    }, [])
+
+    const showClubDues = (_: GestureResponderEvent): void => {
+        router.push(`/(main)/(clubs)/(fees)/clubdues`)
+    }
+
+    const onRefresh = () => {
+        fetchFundBalance();
+        fetchTotalDue();    
+        fetchFees();    
+    };
+
+    return (
+        <ThemedView style={{ flex: 1 }}>
+            <GestureHandlerRootView>
+                <Spacer space={5} />
                 <View style={{
-                  flexDirection: "row", width: "100%",
-                  justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
+                    flexDirection: "row", width: "80%", alignSelf: "center",
+                    justifyContent: "space-between", alignItems: "center"
                 }}>
-                  <Text style={{ fontWeight: "bold" }}>{item.clubName}</Text>
-                  <MaterialCommunityIcons size={20} name={'chevron-right-circle'} />
+                    <ThemedText style={{ ...appStyles.heading, width: "50%" }}>Fund Balance</ThemedText>
+                    {isFundBalanceLoading && <LoadingSpinner />}
+                    {!isFundBalanceLoading && <ThemedText style={{ fontWeight: "bold", fontSize: 16, color: colors.success}}>Rs. {fundBalance || 0}</ThemedText>}
                 </View>
-              </TouchableCard>
-            )}
-          />
-        }
-      </View>
-      <FloatingMenu onPressMain={showCreateClub}
-        icon={<MaterialIcons name={"add"} size={32} color={"white"} />}
-      />
-    </ThemedView>
-  )
+                <Spacer space={5} />
+                <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
+                    <TouchableCard onPress={Number(totalDue) > 0 ? showClubDues : null}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%" }}>
+                            <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
+                            {isTotalDueLoading && <LoadingSpinner />}
+                            {!isTotalDueLoading &&
+                                <ThemedText style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {totalDue} </ThemedText>
+                            }
+                        </View>
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(transactions)`)}>
+                        <ThemedText>Transactions</ThemedText>
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Requests</ThemedText>
+                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/membershiprequests`)}>
+                        <ThemedText>Membership Requests</ThemedText>
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <View style={{
+                        flexDirection: "row", alignItems: "center", width: "80%",
+                        justifyContent: "space-between", alignSelf: "center",
+                    }}>
+                        <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Fees</ThemedText>
+                        {params.get("role") == ROLE_ADMIN && <TouchableOpacity style={{ width: "10%" }}
+                            onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
+                            <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
+                        </TouchableOpacity>}
+                    </View>
+                    {isLoadingCurrent && <LoadingSpinner />}
+                    {!isLoadingCurrent && currentFeeStructure?.length == 0 && <ThemedText style={{ alignSelf: "center", width: "80%" }}>No fees defined. To define a fee type (eg. Membership fee), press the + icon.</ThemedText>}
+                    {!isLoadingCurrent && currentFeeStructure?.map((fee: any) => {
+                        return <View key={fee.clubFeeTypeId}><TouchableCard onPress={showFeeTypeDetails} id={fee}>
+                            <View style={{
+                                flexDirection: "row", width: "90%",
+                                justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
+                            }}>
+                                <View>
+                                    <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
+                                    <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
+                                </View>
+                                <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubFeeAmount}</ThemedText>
+                            </View>
+                        </TouchableCard>
+                            <Spacer space={4} />
+                        </View>
+                    })}
+                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Expenses</ThemedText>
+                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
+                        <ThemedText>Expense Splits</ThemedText>
+                    </TouchableCard>
+                    <Spacer space={50} />
+                </ScrollView>
+                <FloatingMenu actions={actions} position={"left"} color='black'
+                    icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
+                    onPressItem={(name: string | undefined) => handleMenuPress(name)}
+                />
+            </GestureHandlerRootView>
+        </ThemedView>
+    )
 }
 
-export default ClubMain
+const handleMenuPress = (name: string | undefined) => {
+    if (name == "attendance") {
+        router.push(`/(main)/(clubs)/(attendance)`)
+    } else if (name == "members") {
+        router.push(`/(main)/(members)`)
+    } else if (name == "transactions") {
+        router.push(`/(main)/(clubs)/(transactions)`)
+    } else {
+        throw ("Error")
+    }
+}
 
-const styles = StyleSheet.create({
-  item: {
-    flex: 0.6,
-  },
-})
+const actions = [
+    {
+        color: "black",
+        text: "Attendance",
+        icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
+        name: "attendance",
+        position: 3
+    },
+    {
+        color: "black",
+        text: "Memebers",
+        icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
+        name: "members",
+        position: 4
+    }
+];
+
+export default ClubHome

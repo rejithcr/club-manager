@@ -16,9 +16,7 @@ import { useTheme } from '@/src/hooks/use-theme'
 
 const Fees = () => {
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
-  const [isLoadingAdhoc, setIsLoadingAdhoc] = useState(false);
   const [currentFeeStructure, setCurrentFeeStructure] = useState<any>([])
-  const [adhocFees, setAdhocFees] = useState<any[]>([])
   const { clubInfo } = useContext(ClubContext)
   const { colors } = useTheme();
 
@@ -31,29 +29,16 @@ const Fees = () => {
 
   const showFees = () => {
     setIsLoadingCurrent(true)
-    setIsLoadingAdhoc(true)
-
     getFeeStructure(Number(clubInfo.clubId))
       .then(response => setCurrentFeeStructure(response.data))
       .catch(error => Alert.alert("Error", error.response.data.error))
       .finally(() => setIsLoadingCurrent(false));
-
-    getAdhocFee(Number(clubInfo.clubId))
-      .then(response => setAdhocFees(response.data))
-      .catch(error => Alert.alert("Error", error.response.data.error))
-      .finally(() => setIsLoadingAdhoc(false));
   }
 
   const showFeeTypeDetails = (fee: any) => {
     router.push({
       pathname: "/(main)/(clubs)/(fees)/feetypedetails",
       params: { fee: JSON.stringify(fee) }
-    })
-  }
-  const showAdhocFeeDetails = (adhocFee: any) => {
-    router.push({
-      pathname: "/(main)/(clubs)/(fees)/adhocfee/payments",
-      params: { adhocFee: JSON.stringify(adhocFee) }
     })
   }
   return (
@@ -88,38 +73,6 @@ const Fees = () => {
           <Spacer space={4}/> 
           </View>
         })}
-
-        <View style={{
-          flexDirection: "row", alignItems: "center", width: "80%",
-          justifyContent: "space-between", alignSelf: "center", marginTop: 10
-        }}>
-          <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Expense Splits</ThemedText>
-          {clubInfo.role == ROLE_ADMIN &&<TouchableOpacity style={{ width: "10%" }}
-            onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
-            <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add}/>
-          </TouchableOpacity>}
-        </View>
-        {isLoadingAdhoc && <LoadingSpinner />}
-        {!isLoadingAdhoc && adhocFees?.length == 0 && 
-        <ThemedText style={{ alignSelf: "center", width: "80%" }}>No splits defined. 
-        This will be a one time collection from selected members. 
-        For eg. splitting expense amoung members who participated in an event. Press the + icon to define collection</ThemedText>}
-        {!isLoadingAdhoc && adhocFees?.map(fee =>  <View key={fee.clubAdhocFeeId}>
-          <TouchableCard onPress={showAdhocFeeDetails} id={fee}>
-            <View style={{
-              flexDirection: "row", width: "90%",
-              justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
-            }}>
-              <View>
-                <ThemedText style={{ fontWeight: "bold" }}>{fee.clubAdhocFeeName}</ThemedText>
-                <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubAdhocFeeDesc}</ThemedText>
-              </View>
-                <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubAdhocFeePaymentAmount}</ThemedText>
-            </View>
-          </TouchableCard>          
-          <Spacer space={4}/> 
-          </View>
-        )}
       </ScrollView>
     </GestureHandlerRootView>
     </ThemedView>

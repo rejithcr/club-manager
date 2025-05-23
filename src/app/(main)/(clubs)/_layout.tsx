@@ -9,9 +9,8 @@ export default function ClubLayout() {
   const { colors } = useTheme();
   return (
       <Stack screenOptions={{ headerStyle: { backgroundColor: colors.primary}, headerTintColor: colors.text }}>
-        <Stack.Screen name="index" options={{title: 'My Clubs', headerShown:true}}/>     
         <Stack.Screen
-          name="clubdetails" // This is the name of the page and must match the url from root
+          name="index" // This is the name of the page and must match the url from root
           options={{
             headerTitle: () => <StackHeader header={"Club Home"} rightText={clubInfo?.clubName} />,
             headerShown:true

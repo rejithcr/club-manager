@@ -16,6 +16,7 @@ import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { AuthContext } from '@/src/context/AuthContext'
 import { useTheme } from '@/src/hooks/use-theme'
 import { isValidLength } from '@/src/utils/validators'
+import { ROLE_ADMIN } from '@/src/utils/constants'
 
 const MembershipRequests = () => {
   const { colors } = useTheme()
@@ -66,7 +67,7 @@ const MembershipRequests = () => {
           </TouchableCard>}
         />}
       </ThemedView>
-      <Modal isVisible={isModalVisible}>
+      {clubInfo.role === ROLE_ADMIN && <Modal isVisible={isModalVisible}>
         <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
           <ThemedText style={{ ...appStyles.heading }}>Approve Request?</ThemedText>
           <InputText label="Comments" onChangeText={(value: string) => setComments(value)} />
@@ -76,7 +77,7 @@ const MembershipRequests = () => {
             <ThemedButton title="Cancel" onPress={() => setIsModalVisible(false)} />
           </View>
         </ThemedView>
-      </Modal>
+      </Modal>}
     </GestureHandlerRootView>
   )
 }

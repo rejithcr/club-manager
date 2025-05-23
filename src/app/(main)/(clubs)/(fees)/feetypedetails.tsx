@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, FlatList } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks'
 import ThemedButton from '@/src/components/ThemedButton'
 import { appStyles } from '@/src/utils/styles'
@@ -15,6 +15,8 @@ import ThemedText from '@/src/components/themed-components/ThemedText'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
+import { ROLE_ADMIN } from '@/src/utils/constants'
+import { ClubContext } from '@/src/context/ClubContext'
 
 const FeeTypeDetails = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -24,7 +26,7 @@ const FeeTypeDetails = () => {
     const [feeCollections, setFeeCollections] = useState<any>([])
     const [isFeeCollectionsLoading, setIsFeeCollectionsLoading] = useState(false)
     const { colors } = useTheme();
-
+    const { clubInfo } = useContext(ClubContext)
     const params = useSearchParams()
 
     const feeObj = JSON.parse(params.get('fee') || "")
@@ -101,7 +103,8 @@ const FeeTypeDetails = () => {
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
                 <Spacer space={10} />
-                <TouchableCard id={fee?.clubFeeTypeId} onPress={editFeeType} icon={<ThemedIcon name={'MaterialCommunityIcons:square-edit-outline'} color={colors.warning}/>}>
+                <TouchableCard id={fee?.clubFeeTypeId} onPress={clubInfo.role === ROLE_ADMIN && editFeeType}
+                     icon={<ThemedIcon name={'MaterialCommunityIcons:square-edit-outline'} color={colors.warning}/>}>
                     <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width:"90%"}}>
                         <View>
                             <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>{fee?.clubFeeType}</ThemedText>
@@ -120,9 +123,9 @@ const FeeTypeDetails = () => {
                             <ThemedIcon size={25} name={showAddException ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav}/>
                             <ThemedText style={{ ...appStyles.heading, paddingLeft: 5 }}>Exceptions</ThemedText>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ width: 50, alignItems: "center" }} onPress={() => gotoAddFeeExceptions()}>
+                        {clubInfo.role === ROLE_ADMIN &&<TouchableOpacity style={{ width: 50, alignItems: "center" }} onPress={() => gotoAddFeeExceptions()}>
                             <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
-                        </TouchableOpacity>
+                        </TouchableOpacity>}
                     </View>
                     {showAddException && <View style={{ width: "90%", alignSelf: "center" }}>
                         {(!exceptionTypes?.length || exceptionTypes?.length < 1) &&
@@ -151,9 +154,10 @@ const FeeTypeDetails = () => {
                         />
                     }
                 </View>
+                {clubInfo.role === ROLE_ADMIN &&
                 <View style={{ position: "absolute", bottom: 30, alignSelf: "center" }} >
                     <ThemedButton title='Start new collection' onPress={showStartCollectionPage} />
-                </View>
+                </View>}
                 {/*  <Modal isVisible={isSelectPeriodVisible}>
                 <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
                     <Text style={appStyles.heading}>Select Period</Text>

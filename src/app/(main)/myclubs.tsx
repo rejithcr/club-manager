@@ -5,13 +5,11 @@ import {  MaterialIcons } from '@expo/vector-icons';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import Spacer from '@/src/components/Spacer';
-import { useTheme } from '@/src/hooks/use-theme';
 
 const MyClubs = (props: { clubs: [] }) => {
   const router = useRouter()
-  const { colors } = useTheme()
 
-  const showDetails = (clubId: number, clubName: string, role: string) => router.push(`/(main)/(clubs)/clubdetails?clubId=${clubId}&clubName=${clubName}&role=${role}`)
+  const showDetails = (clubId: number, clubName: string, role: string) => router.push(`/(main)/(clubs)?clubId=${clubId}&clubName=${clubName}&role=${role}`)
 
   return (
     <ThemedView>

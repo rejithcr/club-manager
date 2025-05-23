@@ -88,6 +88,13 @@ export default function FeesLayout() {
             headerShown: true
           }}
         />
+        <Stack.Screen
+          name="adhocfee/index" // This is the name of the page and must match the url from root
+          options={{
+            headerTitle: () => <StackHeader header={"Expenses Home"} rightText={clubInfo?.clubName} />,
+            headerShown: true
+          }}
+        />
       </Stack>
   )
 }

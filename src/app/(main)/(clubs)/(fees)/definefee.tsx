@@ -22,14 +22,14 @@ const DefineFee = () => {
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
 
-    const addFee = () => {
+    const handleAddFee = () => {
         if (validate(feeType, feeAmount)) {
             setIsLoading(true)
             addRegularFee(clubInfo.clubId, feeType, feeTypeInterval, feeAmount, userInfo.email)
                 .then((response) => {
                     console.log(response.data)
                     Alert.alert("Success", "Fee added successfully")
-                    router.dismissTo(`/(main)/(clubs)/(fees)`)
+                    router.dismissTo(`/(main)/(clubs)`)
                 })
                 .catch((error: any) => {
                     Alert.alert("Error", error.response.data.error)
@@ -67,7 +67,7 @@ const DefineFee = () => {
                         />
 
                         <View style={{ marginBottom: 40 }} />
-                        <ThemedButton title='Add Fee' onPress={addFee} />
+                        <ThemedButton title='Add Fee' onPress={handleAddFee} />
                     </View>
                 }
             </ScrollView>

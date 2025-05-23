@@ -17,6 +17,7 @@ import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
 import { useTheme } from '@/src/hooks/use-theme';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import Spacer from '@/src/components/Spacer';
+import { ROLE_ADMIN } from '@/src/utils/constants';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -113,10 +114,10 @@ const Payments = () => {
                     </ThemedView>
                 </ScrollView>
             </Modal>
-            <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
+            {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
                 <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
                 <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => deleteCollection()} color={colors.error}/>
-            </View>
+            </View> }
         </GestureHandlerRootView>
         </ThemedView>
     )

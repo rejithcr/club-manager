@@ -51,7 +51,7 @@ const DefineFee = () => {
                 .then((response) => {
                     console.log(response.data)
                     Alert.alert("Success", "Fee added successfully")
-                    router.dismissTo(`/(main)/(clubs)/(fees)`)
+                    router.dismissTo(`/(main)/(clubs)/(fees)/adhocfee`)
                 })
                 .catch((error: any) => {
                     Alert.alert("Error", error.response.data.error) 
