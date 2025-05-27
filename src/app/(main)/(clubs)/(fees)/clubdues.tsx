@@ -58,7 +58,7 @@ const MemberDue = (props: { member: any }) => {
     <>
     <ShadowBox style={{ width: "100%"}}>
       <TouchableOpacity onPress={showMemberDues} style={{
-        flexDirection: "row", width: "100%", paddingVertical: 5,
+        flexDirection: "row", width: "100%",
         justifyContent: "space-between", alignItems: "center"
       }}>
         <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav}/>

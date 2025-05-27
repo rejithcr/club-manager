@@ -1,34 +1,44 @@
-import { View, Text, StyleSheet } from 'react-native'
-import { appStyles } from '@/src/utils/styles';
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ShadowBox from '@/src/components/ShadowBox';
 import ThemedText from '@/src/components/themed-components/ThemedText';
+import { useState } from 'react';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
+import { useTheme } from '@/src/hooks/use-theme';
+import Spacer from '@/src/components/Spacer';
 
-const FeeSummary = (props: { duesByMember: []}) => {
+const FeeSummary = (props: { duesByMember: [] }) => {
+  const [showDues, setShowDues] = useState(true)
+  const { colors } = useTheme()
+
   return (
     <ThemedView>
       {props.duesByMember?.length == 0 && <ThemedText style={{ textAlign: "center" }}>Yay!! You are all clear 👏</ThemedText>}
       {props.duesByMember?.map((club: any) => {
         return (
-          <ShadowBox key={club.clubId} style={{ padding: 10, width: "80%", marginBottom: 15, flexDirection: "column" }}>
-            <View style={{
-              flexDirection: "row", width: "100%", margin: 5,
-              justifyContent: "space-between", alignItems: "center"
-            }}>
-              <ThemedText style={{ fontWeight: "bold", paddingLeft: 5, fontSize: 15, }}>{club.clubName}</ThemedText>
-              <ThemedText style={{ fontWeight: "bold" , paddingRight: 5}}>Rs. {club.dueAmount}</ThemedText>
-            </View>
-            {club.dues.map((due: any) =>
+          <>
+            <ShadowBox key={club.clubId}>
+              <TouchableOpacity onPress={() => setShowDues(prev => !prev)} style={{
+                flexDirection: "row", width: "100%", 
+                justifyContent: "space-between", alignItems: "center"
+              }}>
+                <ThemedIcon size={20} name={showDues ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
+                <ThemedText style={{ width: "60%", fontSize: 15 }}>{club.clubName}</ThemedText>
+                <ThemedText style={{ width: "30%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}>Rs. {club.dueAmount}</ThemedText>
+              </TouchableOpacity>
+            </ShadowBox>
+            {showDues && club.dues.map((due: any) =>
               <View key={due.paymentId.toString() + due.feeType} style={styles.item}>
                 <View style={styles.divider} />
-                <View style={{paddingVertical: 5}}>
-                <ThemedText style={styles.label}>{due.fee} </ThemedText>
-                <ThemedText style={styles.subLabel}>{due.feeDesc} </ThemedText>
+                <View style={{ paddingVertical: 5 }}>
+                  <ThemedText style={styles.label}>{due.fee} </ThemedText>
+                  <ThemedText style={styles.subLabel}>{due.feeDesc} </ThemedText>
                 </View>
                 <ThemedText style={styles.amount}>Rs. {due.amount}</ThemedText>
               </View>
             )}
-          </ShadowBox>
+            <Spacer space={4} />
+          </>
         )
       })}
     </ThemedView>
@@ -40,9 +50,9 @@ export default FeeSummary
 
 const styles = StyleSheet.create({
   item: {
-    width: "100%",
+    width: "75%",
     flexDirection: "row",
-    flexWrap: "wrap",
+    flexWrap: "wrap", alignSelf:"center",
     alignItems: "center",
     justifyContent: "space-between"
   },
