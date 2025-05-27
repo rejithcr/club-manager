@@ -81,7 +81,7 @@ const Profile = () => {
                                     </TouchableCard>
                                 }
                             />}
-                        {!isLoadingMyRequests && myRequests?.length === 0 && <ThemedText style={{ alignSelf: "center" }}>No requests found</ThemedText>}
+                        {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length === 0 && <ThemedText style={{ alignSelf: "center" }}>No requests found</ThemedText>}
                     </View>
                 </View>
             </GestureHandlerRootView>

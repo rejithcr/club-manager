@@ -16,7 +16,6 @@ def convert_to_camel_case(data:dict):
  
 
 def get_dates_of_period(club_fee_type_interval, latestPeriodDate):
-    current_year = datetime.now().year
     date_objects = []
     print(club_fee_type_interval)
     range_start = -2 # need to fix the dynamic range. case: collection restart after long gap
