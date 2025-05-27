@@ -65,14 +65,14 @@ const StartNextPeriod = () => {
     }, [periods]);
 
 
-    const startCollection = () => {
+    const handleStartCollection = () => {
         setIsLoadingPeriods(true)
         let nextPeriodLabel;
-        if (interval !== 'YEARLY'){
+        if (interval !== 'YEARLY') {
             const nextP = periods?.find((p: any) => p.startDate == nextPeriodDate)
-            nextPeriodLabel = nextP?.period + '-' + nextPeriodDate?.substring(0,4)
-        } else {            
-            nextPeriodLabel = nextPeriodDate?.substring(0,4)
+            nextPeriodLabel = nextP?.period + '-' + nextPeriodDate?.substring(0, 4)
+        } else {
+            nextPeriodLabel = nextPeriodDate?.substring(0, 4)
         }
         saveNextPeriodFeeCollection(params.get("clubFeeTypeId"), nextPeriodFee, nextPeriodDate, nextPeriodLabel, userInfo.email)
             .then(() =>
@@ -103,17 +103,21 @@ const StartNextPeriod = () => {
                                 })}
                             </Picker>}
                         <TextInput keyboardType='numeric' defaultValue={'2025'} onChangeText={(text) => setYear(text)}
-                            style={{ width: "30%", fontSize: 18, textAlign: "center", borderBottomColor: colors.text, borderBottomWidth: 1, padding: 1 }} />
+                            style={{
+                                color: colors.text, width: "30%", fontSize: 18, textAlign: "center",
+                                borderBottomColor: colors.text, borderBottomWidth: 1, padding: 1
+                            }} />
 
                     </View>
                 </View>
-                <View style={{ height: "80%" }}>
+                <View style={{ height: "100%" }}>
                     {isLoadingPeriods && <LoadingSpinner />}
                     {!isLoadingPeriods &&
                         <FlatList style={{ width: "100%" }}
                             data={nextPeriodFee}
                             initialNumToRender={8}
-                            ItemSeparatorComponent={() => <Spacer space={2} />}
+                            ListFooterComponent={() => <Spacer space={80}/>}
+                            ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <MemberFeeItem {...item} key={item.memberId} />
                             )}
@@ -126,7 +130,7 @@ const StartNextPeriod = () => {
                     </View>
                 </Modal>
                 <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30 }}>
-                    {!isLoadingPeriods && <ThemedButton title='Start Collection' onPress={startCollection} disabled={!isStartCollectionEnabled} />}
+                    {!isLoadingPeriods && <ThemedButton title='Start Collection' onPress={handleStartCollection} disabled={!isStartCollectionEnabled} />}
                 </View>
             </GestureHandlerRootView>
         </ThemedView>

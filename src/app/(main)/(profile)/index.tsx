@@ -13,7 +13,6 @@ import { ThemeContext } from '@/src/context/ThemeContext'
 import { FlatList, TouchableOpacity, View } from 'react-native'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import { useTheme } from '@/src/hooks/use-theme'
-import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox'
 import { router } from 'expo-router'
 
 const Profile = () => {
@@ -21,20 +20,23 @@ const Profile = () => {
     const { data: myRequests, isLoading: isLoadingMyRequests } = useHttpGet("/member", { memberId: userInfo?.memberId, requests: "true" })
     const { theme, setTheme } = useContext(ThemeContext);
     const { colors } = useTheme()
+    const [isMembershipRequestShown, setIsMembershipRequestShown] = React.useState(true)
+    const handleToggleMembershipRequests = () => {
+        console.log(isMembershipRequestShown)
+        setIsMembershipRequestShown(prev => !prev)
+    }
     return (
         <ThemedView style={{ flex: 1 }}>
-            <GestureHandlerRootView>
-                <Spacer space={5} />
-                
+            <GestureHandlerRootView>                
                 <ThemedText style={appStyles.heading}>Theme</ThemedText>
                 <TouchableCard onPress={() => setTheme("dark")} icon={<ThemedCheckBox checked={theme == "dark"} />}>
                     <ThemedText>Dark</ThemedText>
                 </TouchableCard>
-                <Spacer space={2} />
+                <Spacer space={4} />
                 <TouchableCard onPress={() => setTheme("light")} icon={<ThemedCheckBox checked={!theme || theme == "light"} />}>
                     <ThemedText>Light</ThemedText>
                 </TouchableCard>
-                <Spacer space={2} />
+                <Spacer space={4} />
                 <TouchableCard onPress={() => setTheme("system")} icon={<ThemedCheckBox checked={theme == "system"} />}>
                     <ThemedText>System</ThemedText>
                 </TouchableCard>
@@ -44,9 +46,9 @@ const Profile = () => {
                         flexDirection: "row", width: "80%", alignItems: "center",
                         justifyContent: "space-between", alignSelf: "center",
                     }}>
-                        <TouchableOpacity onPress={() => { }}
+                        <TouchableOpacity onPress={() => handleToggleMembershipRequests()}
                             style={{ flexDirection: "row", width: "80%", justifyContent: "flex-start", alignItems: "center" }}>
-                            <ThemedIcon size={25} name={false ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
+                            <ThemedIcon size={25} name={isMembershipRequestShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
                             <ThemedText style={{ ...appStyles.heading, paddingLeft: 5 }}>Membership Requests</ThemedText>
                         </TouchableOpacity>
                         <TouchableOpacity style={{alignItems: "center" }} onPress={() => router.push(`/(main)/(members)/joinclub`)}>
@@ -56,11 +58,11 @@ const Profile = () => {
 
                     <View>
                         {isLoadingMyRequests && <LoadingSpinner />}
-                        {!isLoadingMyRequests && myRequests?.length > 0 &&
+                        {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length > 0 &&
                             <FlatList
                                 data={myRequests}
                                 keyExtractor={(item) => item.clubId}
-                                ItemSeparatorComponent={() => <Spacer space={2} />}
+                                ItemSeparatorComponent={() => <Spacer space={4} />}
                                 ListEmptyComponent={<ThemedText>No Requests found</ThemedText>}
                                 renderItem={({ item }) =>
                                     <TouchableCard>

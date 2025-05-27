@@ -24,7 +24,6 @@ const EditFeeException = () => {
     const [isLoadingException, setIsLoadingException] = useState(false)
     const [exceptionType, setExceptionType] = useState<string>("")
     const [exceptionAmount, setExceptionAmount] = useState<string>("0")
-    const [isAmountEditable, setIsAmountEditable] = useState<boolean>(false)
     const [exceptionMembers, setExceptionMembers] = useState<any>([])
     const [members, setMembers] = useState<any>([]);
     const { userInfo } = useContext(AuthContext)
@@ -33,7 +32,7 @@ const EditFeeException = () => {
 
     const params = useSearchParams()
 
-    const saveException = () => {
+    const handleSaveException = () => {
         const changes = exceptionMembers.filter((item: { endDateAdded: any; clubFeeTypeExceptionMemberId: any }) => item.endDateAdded || !item.clubFeeTypeExceptionMemberId)
         if (validate(exceptionType, exceptionAmount)) {
             setIsLoadingMembers(true)
@@ -54,7 +53,6 @@ const EditFeeException = () => {
                 setExceptionType(exceptionType.clubFeeTypeExceptionReason)
                 setExceptionAmount(exceptionType.clubFeeExceptionAmount)
                 setExceptionMembers(exceptionType.members)
-                setIsAmountEditable(exceptionType.isAmountEditable)
                 setIsLoadingMembers(true)
                 getClubMembers(clubInfo.clubId)
                     .then(response => {
@@ -107,9 +105,7 @@ const EditFeeException = () => {
             <ScrollView>
                 <View style={{ marginBottom: 20 }}>
                     <InputText label='Exception Type' onChangeText={setExceptionType} defaultValue={exceptionType} />
-                    {!isAmountEditable && <Text style={{ alignSelf: "center", fontSize: 10, color: "grey", width: "80%" }}>
-                        Amount not editable as some collections are already using this value</Text>}
-                    <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setExceptionAmount} defaultValue={exceptionAmount.toString()} editable={isAmountEditable} />
+                    <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setExceptionAmount} defaultValue={exceptionAmount.toString()} />
                 </View>
 
                 {isLoadingException && <LoadingSpinner />}
@@ -129,7 +125,7 @@ const EditFeeException = () => {
                                 {!member.endDate && (member.endDateAdded ? <ThemedIcon name="MaterialIcons:undo" size={20} onPress={() => endException(member)} />
                                     : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} color={colors.error}/>)}
                             </ShadowBox>
-                            <Spacer space={2}/>
+                            <Spacer space={4}/>
                         </View>
                     )
                 }
@@ -137,21 +133,22 @@ const EditFeeException = () => {
                 <ThemedText style={{ ...appStyles.heading }}>Add Members</ThemedText>
                 {isLoadingMembers && <LoadingSpinner />}
                 {!isLoadingMembers &&
-                    members.map((item: any) =>
+                    members.map((item: any) =><>
                         <TouchableOpacity key={item.memberId} onPress={() => addToException(item)}>
-                            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 4, flexWrap: "wrap" }}>
+                            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", flexWrap: "wrap" }}>
                                 <ThemedIcon name="MaterialIcons:add-circle" size={20} color={colors.add}/>
                                 <ThemedText style={{ width: "85%", fontSize: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>
-
+                        <Spacer space={4} />
+                        </>
                     )
                 }
             <View style={{marginVertical:40}} />
             </ScrollView>
             
             {clubInfo.role === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 30, alignSelf: "center" }} >
-                <ThemedButton title='Update Exception' onPress={saveException} />
+                <ThemedButton title='Update Exception' onPress={handleSaveException} />
             </View>}
         </ThemedView>
     )

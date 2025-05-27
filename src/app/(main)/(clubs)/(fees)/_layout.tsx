@@ -10,7 +10,7 @@ export default function FeesLayout() {
   const { colors } = useTheme();
 
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.primary}, headerTintColor: colors.text }}>
+    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text }}>
         <Stack.Screen
           name="index" // This is the name of the page and must match the url from root
           options={{

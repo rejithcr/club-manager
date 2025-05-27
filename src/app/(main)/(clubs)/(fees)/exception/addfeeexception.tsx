@@ -94,9 +94,10 @@ const AddFeeException = () => {
                 <FlatList 
                     data={members}
                     ListFooterComponent={() => <View style={{ height: 50 }} />}
+                    ItemSeparatorComponent={() => <Spacer space={4}/>}
                     renderItem={({ item }) => (
                         <TouchableOpacity onPress={() => toggleSelection(item.memberId)}>
-                            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
+                            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", flexWrap: "wrap" }}>
                                 <ThemedCheckBox checked={item.selected} />                                
                                 <ThemedText style={{ width: "90%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>

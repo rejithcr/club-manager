@@ -22,7 +22,7 @@ export const addMemberAndAssignClub = async (member: any) => {
 }
 
 export const addToClub = async (memberId: number, clubId: number, email: string) => {
-    return post("/club/member", null, {memberId, clubId, email})
+    return post("/club/member", null, {memberId, clubId,  addToClub: "true", email})
 }
 
 export const getFundBalance = async (clubId: string | null) => {
@@ -46,9 +46,13 @@ export const searchClubsByName = (clubName: string | null) => {
 }
 
 export const requestMembership = async ( clubId: number, memberId: number, email: string) => {
-    return post("/club/member", null, {memberId, clubId, email})
+    return post("/club/member", null, {memberId, clubId, membershipRequest: true, email})
 }
 
 export const membershipRequestPut = (params: {clubId: Number, memberId: Number, status: string, comments: string, email: any}) => {
     return put("/club", null, params)
+}
+
+export const getClubCounts = (clubId: string | null) => {
+    return get("/club", {clubId, counts: "true"})
 }

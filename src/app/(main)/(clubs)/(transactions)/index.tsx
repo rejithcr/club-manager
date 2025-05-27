@@ -68,6 +68,7 @@ const Transactions = () => {
   }
 
   const handleSave = () => {
+    setIsAddTxnVisible(false)
     if (validate(txnValues?.txnCategory, txnValues?.txnComment, txnValues?.txnAmount)) {
       if (txnValues?.txnId) {
         updateTransaction(txnValues.txnId, txnValues.txnType, date, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)

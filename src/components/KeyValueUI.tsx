@@ -2,6 +2,7 @@ import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { camelCaseToWords } from '../utils/string'
 import ThemedView from './themed-components/ThemedView';
+import ThemedText from './themed-components/ThemedText';
 
 const KeyValueUI = (props: { data: any; hideKeys?: string[] }) => {
     const list = Object.keys(props?.data || {})
@@ -11,9 +12,9 @@ const KeyValueUI = (props: { data: any; hideKeys?: string[] }) => {
         <ThemedView style={styles.detailsTable}>
             {list.map(item =>
                 <View key={item.key} style={styles.item}>
-                    <Text style={styles.label}>{camelCaseToWords(item.key)}</Text>
-                    <Text style={styles.value}>{item.value}</Text>
-                    <View style={styles.divider} />
+                    <ThemedText style={styles.label}>{camelCaseToWords(item.key)}</ThemedText>
+                    <ThemedText style={styles.value}>{item.value}</ThemedText>
+                    <ThemedView style={styles.divider} />
                 </View>
             )}
         </ThemedView>

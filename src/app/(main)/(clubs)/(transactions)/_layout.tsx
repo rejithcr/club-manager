@@ -9,7 +9,7 @@ export default function TransactionLayout() {
   const { colors } = useTheme();
 
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.primary }, headerTintColor: colors.text }}>
+    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background }, headerTintColor: colors.text }}>
       <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Transactions"} rightText={clubInfo?.clubName} />, headerShown: true }} />
     </Stack>
   )

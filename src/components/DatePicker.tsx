@@ -1,7 +1,8 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native'
+import { View, StyleSheet, Pressable } from 'react-native'
 import React, { useState } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ThemedIcon from './themed-components/ThemedIcon';
+import ThemedText from './themed-components/ThemedText';
 
 const DatePicker = (props: { date: Date; setDate: any }) => {
     const [show, setShow] = useState(false);
@@ -19,7 +20,7 @@ const DatePicker = (props: { date: Date; setDate: any }) => {
         <>
             <Pressable onPress={() => showDatepicker()}>
                 <View style={styles.container}>
-                    <Text>{props.date.toLocaleDateString()} </Text>
+                    <ThemedText>{props.date.toLocaleDateString()} </ThemedText>
                     <ThemedIcon name={"MaterialIcons:edit-calendar"} size={32} />
                 </View>
             </Pressable>

@@ -9,7 +9,9 @@ const MainStack = () => {
   return (
     <SafeAreaView style={{ flex: 1 , backgroundColor: colors.background}}>
       <Stack>
-        <Stack.Screen name="index" options={{ title: "Club Manager", headerShown: true, headerStyle: { backgroundColor: colors.primary}, headerTintColor: colors.text }} />
+        <Stack.Screen name="index" options={{ title: "Club Manager", headerShown: true, 
+          headerStyle: { backgroundColor: colors.background}, 
+          headerTintColor: colors.text}} />
         <Stack.Screen name="(members)" options={{ title: "Member", headerShown: false }} />
         <Stack.Screen name="(clubs)" options={{ title: "Club", headerShown: false }} />
         <Stack.Screen name="(profile)" options={{ title: "Profile", headerShown: false }} />

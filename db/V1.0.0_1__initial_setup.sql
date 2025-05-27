@@ -123,8 +123,10 @@ create table club_fee_payment (
     club_fee_payment_id integer primary key,
     club_fee_collection_id integer not null,
     membership_id integer not null,
+    club_fee_payment_amount numeric(7,2) not null, -- 300
     paid integer not null default 0,
     club_fee_type_exception_member_id integer,
+    club_fee_comments text,
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,

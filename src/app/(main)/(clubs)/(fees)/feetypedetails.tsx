@@ -95,7 +95,7 @@ const FeeTypeDetails = () => {
             params: {
                 clubFeeTypeId: fee.clubFeeTypeId, clubFeeAmount: fee.clubFeeAmount,
                 clubFeeType: fee.clubFeeType, clubFeeTypeInterval: fee.clubFeeTypeInterval,
-                isAmountEditable: feeCollections.length > 0 ? "false" : "true"
+                isEditable: feeCollections.length > 0 ? "false" : "true"
             }
         })
     }
@@ -133,7 +133,7 @@ const FeeTypeDetails = () => {
                         {exceptionTypes?.map((et: any) =>
                             <View key={et.clubFeeTypeExceptionId}><KeyValueTouchableBox edit  onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
                                 keyName={et.clubFeeTypeExceptionReason} keyValue={`Rs. ${et.clubFeeExceptionAmount}`} />
-                                <Spacer space={2}/>
+                                <Spacer space={4}/>
                                 </View>
                         )}
                     </View>
@@ -148,7 +148,7 @@ const FeeTypeDetails = () => {
                         <FlatList style={{ width: "100%" }}
                             data={feeCollections}
                             initialNumToRender={8}
-                            ItemSeparatorComponent={() => <Spacer space={2} />}
+                            ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <KeyValueTouchableBox onPress={() => gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod)} 
                                     keyName={item.clubFeeTypePeriod}

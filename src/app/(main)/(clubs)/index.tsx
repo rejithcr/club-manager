@@ -1,7 +1,7 @@
 import { View, GestureResponderEvent, Alert, TouchableOpacity, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
-import { getFundBalance, getTotalDue } from '@/src/helpers/club_helper'
+import { getClubCounts, getFundBalance, getTotalDue } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
@@ -21,14 +21,16 @@ import { getFeeStructure } from '@/src/helpers/fee_helper'
 const ClubHome = () => {
     const router = useRouter()
     const params = useSearchParams()
-    const { clubInfo, setClubInfo } = useContext(ClubContext)
-
+    const { setClubInfo } = useContext(ClubContext)
+    
     const { colors } = useTheme();
 
     const [isFundBalanceLoading, setIsFundBalanceLoading] = useState(false)
     const [isTotalDueLoading, setIsTotalDueLoading] = useState(false)
+    const [isClubCountsLoading, setIsClubCountsLoading] = useState(false)
     const [fundBalance, setFundBalance] = useState(0)
     const [totalDue, setTotalDue] = useState<number | undefined>(0);
+    const [clubCounts, setClubCounts] = useState<any[]>([]);
 
     const [currentFeeStructure, setCurrentFeeStructure] = useState<any>([])
     const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
@@ -46,6 +48,13 @@ const ClubHome = () => {
             .then(response => setTotalDue(response.data.totalDue))
             .catch(error => Alert.alert("Error", error.response.data.error))
             .finally(() => setIsTotalDueLoading(false))
+    }
+    const fetchClubCounts = () => {
+        setIsClubCountsLoading(true)
+        getClubCounts(params.get("clubId"))
+            .then(response => {console.log(response.data); setClubCounts(response.data)})
+            .catch(error => Alert.alert("Error", error.response.data.error))
+            .finally(() => setIsClubCountsLoading(false))
     }
     const showFeeTypeDetails = (fee: any) => {
         router.push({
@@ -67,6 +76,7 @@ const ClubHome = () => {
         fetchFundBalance();
         fetchTotalDue();
         fetchFees();
+        fetchClubCounts()
     }, [])
 
     const showClubDues = (_: GestureResponderEvent): void => {
@@ -89,7 +99,8 @@ const ClubHome = () => {
                 }}>
                     <ThemedText style={{ ...appStyles.heading, width: "50%" }}>Fund Balance</ThemedText>
                     {isFundBalanceLoading && <LoadingSpinner />}
-                    {!isFundBalanceLoading && <ThemedText style={{ fontWeight: "bold", fontSize: 16, color: colors.success}}>Rs. {fundBalance || 0}</ThemedText>}
+                    {!isFundBalanceLoading && 
+                        <ThemedText style={{ fontWeight: "bold", fontSize: 16, color: fundBalance > 0 ? colors.success: colors.error }}>Rs. {fundBalance || 0}</ThemedText>}
                 </View>
                 <Spacer space={5} />
                 <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
@@ -107,9 +118,16 @@ const ClubHome = () => {
                         <ThemedText>Transactions</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
-                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Requests</ThemedText>
+                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Membership</ThemedText>
                     <TouchableCard onPress={() => router.push(`/(main)/(clubs)/membershiprequests`)}>
                         <ThemedText>Membership Requests</ThemedText>
+                        {isClubCountsLoading && <LoadingSpinner />}
+                        {!isClubCountsLoading && clubCounts?.find(i=>i.countType==="openMembershipRequests")?.count > 0 && <View style={{ alignItems: "center", borderRadius: 100, width:20, backgroundColor: colors.button}}>  
+                        <ThemedText>{clubCounts?.find(i=>i.countType==="openMembershipRequests")?.count}</ThemedText></View>}
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <TouchableCard onPress={() => router.push('/(main)/(members)')}>
+                        <ThemedText>Members</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
                     <View style={{
@@ -147,10 +165,10 @@ const ClubHome = () => {
                     </TouchableCard>
                     <Spacer space={50} />
                 </ScrollView>
-                <FloatingMenu actions={actions} position={"left"} color='black'
+                {/* <FloatingMenu actions={actions} position={"left"} color='black'
                     icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
                     onPressItem={(name: string | undefined) => handleMenuPress(name)}
-                />
+                /> */}
             </GestureHandlerRootView>
         </ThemedView>
     )
@@ -169,17 +187,17 @@ const handleMenuPress = (name: string | undefined) => {
 }
 
 const actions = [
-    {
-        color: "black",
-        text: "Attendance",
-        icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
-        name: "attendance",
-        position: 3
-    },
+    // {
+    //     color: "black",
+    //     text: "Attendance",
+    //     icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
+    //     name: "attendance",
+    //     position: 3
+    // },
     {
         color: "black",
         text: "Memebers",
-        icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
+        icon: <MaterialCommunityIcons name={"account-circle"} size={15} color={"white"} />,
         name: "members",
         position: 4
     }

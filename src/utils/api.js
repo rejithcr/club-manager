@@ -43,7 +43,7 @@ export const del = (path, queryParams, payload) => {
   const response = axios.delete(BASE_URL + path, {
     params: { ...queryParams },
     headers: {
-      "auth-token": AUTH_TOKEN,
+      "auth-token": process.env.EXPO_PUBLIC_AUTH_TOKEN,
     },
   });
   return response;

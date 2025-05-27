@@ -15,6 +15,7 @@ import { ClubContext } from '@/src/context/ClubContext';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import Spacer from '@/src/components/Spacer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ThemedText from '@/src/components/themed-components/ThemedText';
 
 const AddMember = () => {
     const [isLoading, setIsLoading] = useState(false)
@@ -177,24 +178,22 @@ const AddMember = () => {
                 {!isLoading && <ScrollView>
                     {showPhoneSearch &&
                         <>
-                            <InputText placeholder='Enter phone number' onChangeText={setSearchNumber} defaultValue={searchNumber} keyboardType="numeric" />
+                            <InputText label="Enter phone number" placeholder='Search by phone number' onChangeText={setSearchNumber} defaultValue={searchNumber} keyboardType="numeric" />
                             <ThemedButton title="Search" onPress={searchMember} />
-                            <View style={{ marginTop: 25 }} />
+                            <Spacer space={12}/>
                         </>
                     }
                     {showExistingPlayer && <>
-                        <MemberItem firstName={memberDetails?.firstName} dateOfBirth={memberDetails?.dateOfBirth} lastName={memberDetails?.lastName} memberId={0} />
-                        <View style={{ marginTop: 25 }} />
+                        <MemberItem showDetails={()=>{}} firstName={memberDetails?.firstName} dateOfBirth={memberDetails?.dateOfBirth} lastName={memberDetails?.lastName} memberId={0} />
+                        <Spacer space={12}/>
                         <ThemedButton title="Add Member" onPress={() => addMemberToClub(memberDetails)} />
                     </>}
                     {(showRegisterForm || showAddNewMemberForm) && <>
+                         {!showRegisterForm && <ThemedText style={{ alignSelf: "center", fontSize: 12, color: "grey", width: "80%" }}>No member found with the given phone number. Please add new member</ThemedText>}
                         <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
                         <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
-                        <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
-                        {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />}
-                        {/* <DatePicker date={date} setDate={setDate} />
-                <InputText placeholder='Jersey Name' />
-                <InputText placeholder='Jersey Number' /> */}
+                        <InputText label="Phone" onChangeText={setPhone} defaultValue={searchNumber} keyboardType={"numeric"} />
+                        {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />}                      
                         <Spacer space={10} />
                         <View style={{flexDirection:"row", justifyContent:"space-around"}}>
                         {showRegisterForm && <ThemedButton title="Register" onPress={createMember} />}

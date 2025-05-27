@@ -69,7 +69,7 @@ const Payments = () => {
                     text: 'OK', onPress: () => {
                         setIsLoading(true)
                         deleteFeeCollection(params.get("clubFeeCollectionId"), userInfo.email)
-                            .then((response) => {Alert.alert("Success", response.data.message); router.back()})
+                            .then(() => router.back())
                             .catch(error => Alert.alert("Error", error.response.data.error))
                             .finally(() => setIsLoading(false));
                     }
@@ -85,12 +85,14 @@ const Payments = () => {
             <ThemedText style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</ThemedText>            
             <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the member to update payment status</ThemedText>
             <Spacer space={5} />
-            <View style={{ height: "80%" }}>
+            <View>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <FlatList style={{ width: "100%" }}
                         data={feeByMembers}
                         initialNumToRender={8}
+                        ListFooterComponent={() => <Spacer space={80}/>}
+                        ItemSeparatorComponent={()=> <Spacer space={4}/>}
                         renderItem={({ item }) => (
                             <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
                         )}
@@ -150,7 +152,7 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 5, flexWrap: "wrap" }}>
+            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", flexWrap: "wrap" }}>
                 <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</ThemedText>
                 <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</ThemedText>
                 <View style={{ width: "10%" }}>

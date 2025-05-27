@@ -9,6 +9,7 @@ import { ROLE_ADMIN } from "@/src/utils/constants";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
+import Spacer from "@/src/components/Spacer";
 
 export default function Home() {
   const [members, setMembers] = useState<any>([]);
@@ -24,16 +25,18 @@ export default function Home() {
       })
   }, []);
 
-  const showDetails = (memberId: number) => router.push(`/(main)/(members)/memberdetails?id=${memberId}`)
+  const showDetails = (memberId: number) => router.push(`/(main)/(members)/memberdetails?memberId=${memberId}`)
 
   return (    
     <ThemedView style={{ flex: 1 }}>
+      <Spacer space={5}/>
       <View style={{ height:"90%", justifyContent: "center", alignContent: "center" }}>
         {isLoading && <LoadingSpinner />}
         {!isLoading &&
           <FlatList
             data={members}
             initialNumToRender={8}
+            ListFooterComponent={<Spacer space={10} />}
             //onEndReached={fetchNextPage}
             //onEndReachedThreshold={0.5}
             renderItem={({ item }) => (
@@ -64,13 +67,13 @@ const handleMenuPress = (name: string | undefined) => {
 }
 
 const actions = [
-  {
-    color: "black",
-    text: "Edit Member Attributes",
-    icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
-    name: "attributes",
-    position: 1
-  },
+  // {
+  //   color: "black",
+  //   text: "Edit Member Attributes",
+  //   icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
+  //   name: "attributes",
+  //   position: 1
+  // },
   {
     color: "black",
     text: "Add Memeber",

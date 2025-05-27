@@ -108,12 +108,13 @@ const Payments = () => {
             </View>
             <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the member to update payment status</ThemedText>
             <Spacer space={5} />
-            <View style={{ height: "70%" }}>
+            <View style={{ height: "90%" }}>
                 {isLoading && <LoadingSpinner />}
                 {!isLoading &&
                     <FlatList style={{ width: "100%" }}
                         data={feeByMembers}
-                        ListFooterComponent={() => <View style={{ height: 50 }} />}
+                        ListFooterComponent={() => <Spacer space={60}/>}
+                        ItemSeparatorComponent={() => <Spacer space={4}/>}
                         initialNumToRender={8}
                         renderItem={({ item }) => (
                             <MemberFeeItem {...item} key={item.clubAdhocFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
@@ -174,7 +175,7 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 5 }}>                
+            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%"}}>                
                 <ThemedText style={{ width: "70%", fontSize: 15 }}>{props?.firstName}</ThemedText>
                 <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
                 <View style={{ width: "10%", flexDirection: "row", justifyContent:"center" }}>

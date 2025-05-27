@@ -5,25 +5,32 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { getMemberDetails, Member } from '@/src/helpers/member_helper';
 import KeyValueUI from '@/src/components/KeyValueUI';
 import ThemedView from '@/src/components/themed-components/ThemedView';
+import ThemedText from '@/src/components/themed-components/ThemedText';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 
 const Profile = () => {
   const params = useSearchParams()
+  const [isMemberLoading, setIsMemberLoading] = useState(false)
   const [memberDetails, setMemberDetails] = useState<Member>()
   useEffect(() => {
-    const member = getMemberDetails(Number(params.get("id")));
-    setMemberDetails(member);
+    setIsMemberLoading(true);
+    getMemberDetails(Number(params.get("memberId")))
+    .then(response => {console.log(response.data);setMemberDetails(response.data)})
+    .catch(error => alert(error?.response?.data?.error || "Error fetching member details"))
+    .finally(() => setIsMemberLoading(false));
   }, [])
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <View style={styles.photoContainer}>
-        <MaterialIcons name={"account-circle"} size={100} />
-      </View>
-
-      <Text style={styles.title}>{memberDetails?.firstName} {memberDetails?.lastName}</Text>
-
-      <KeyValueUI data={memberDetails} hideKeys={["id"]}/>
-      
+      {isMemberLoading && <LoadingSpinner />}
+      {!isMemberLoading && memberDetails && <>
+      <ThemedView style={styles.photoContainer}>
+        <ThemedIcon name={"MaterialIcons:account-circle"} size={100} />
+      </ThemedView>
+      <ThemedText style={styles.title}>{memberDetails?.firstName} {memberDetails?.lastName}</ThemedText>
+      <KeyValueUI data={memberDetails} hideKeys={["memberId", "firstName", "lastName"]}/>     
+      </>} 
     </ThemedView>
   )
 }
@@ -36,10 +43,8 @@ const styles = StyleSheet.create({
     minHeight: 150,
     margin: 5,
     padding: 10,
-    flex: 1,
     width: 150,
     borderRadius: 100,
-    borderColor: "#eee",
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",

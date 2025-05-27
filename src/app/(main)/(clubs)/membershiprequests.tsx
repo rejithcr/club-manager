@@ -1,10 +1,10 @@
 import { Alert, FlatList, View } from 'react-native'
 import React, { useContext, useState } from 'react'
-import { useHttpGet, useHttpPut } from '@/src/hooks/use-http'
+import { useHttpGet } from '@/src/hooks/use-http'
 import { ClubContext } from '@/src/context/ClubContext'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ThemedView from '@/src/components/themed-components/ThemedView'
-import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Modal from 'react-native-modal'
 import ThemedButton from '@/src/components/ThemedButton'
 import InputText from '@/src/components/InputText'
@@ -55,6 +55,7 @@ const MembershipRequests = () => {
         {!(isLoading || isUpdating) && <FlatList
           data={data}
           keyExtractor={(item) => item.memberId}
+          ListEmptyComponent={<ThemedText style={{alignSelf: "center"}}>No requests found.</ThemedText>}
           ItemSeparatorComponent={() => <Spacer space={2} />}
           renderItem={({ item }) => <TouchableCard onPress={() => showApproveModal(item.memberId, item.clubId)}>
             <View style={{ flexDirection: "row", alignItems: "center", width: '80%' }}>

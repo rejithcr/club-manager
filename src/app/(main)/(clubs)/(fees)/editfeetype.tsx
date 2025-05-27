@@ -14,9 +14,9 @@ import { isCurrency, isValidLength } from '@/src/utils/validators'
 
 const EditFeeType = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [isAmountEditable, setIsAmountEditable] = useState<boolean>()
+    const [isEditable, setIsEditable] = useState<boolean>()
     const [clubFeeType, setClubFeeType] = useState<string | null>()
-    const [clubFeeAmount, setClubFeeAmount] = useState<string | null>()
+    const [clubFeeAmount, setClubFeeAmount] = useState<string>("")
     const [clubFeeTypeInterval, setClubFeeTypeInterval] = useState<string | null>()
     const { userInfo } = useContext(AuthContext)
     const params = useSearchParams()
@@ -24,8 +24,8 @@ const EditFeeType = () => {
     useEffect(() => {
         setClubFeeTypeInterval(params.get("clubFeeTypeInterval"))
         setClubFeeType(params.get("clubFeeType"))
-        setClubFeeAmount(params.get("clubFeeAmount"))
-        setIsAmountEditable(params.get("isAmountEditable") == "true" ? true : false)
+        setClubFeeAmount(params.get("clubFeeAmount") || "")
+        setIsEditable(params.get("isEditable") == "true" ? true : false)
     }, [])
 
     const handleSaveFeeType = () => {        
@@ -62,25 +62,25 @@ const EditFeeType = () => {
     return (
         <ThemedView style={{ flex: 1}}>
             <InputText label='Fee Type' onChangeText={setClubFeeType} defaultValue={params.get("clubFeeType")} />
-            {!isAmountEditable && <Text style={{ alignSelf: "center", fontSize: 10, color: "grey", width: "80%" }}>
-                Amount/Period not editable as some collections are already using this value</Text>}
+            {!isEditable && <Text style={{ alignSelf: "center", fontSize: 10, color: "grey", width: "80%" }}>
+                Interval not editable as some collections are already using this value. You can create a new fee type with different interval</Text>}
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignSelf: "center", alignItems: "center", width: "80%", marginTop: 20 }}>
-                <ThemedText style={{ width: "40%" }}>Select Period</ThemedText>
+                <ThemedText style={{ width: "40%" }}>Select Interval</ThemedText>
                 <Picker style={{ width: "60%", textAlign: "right" }}
                     selectedValue={params.get("clubFeeTypeInterval")}
-                    enabled={isAmountEditable}
+                    enabled={isEditable}
                     onValueChange={(itemValue, _itemIndex) => setClubFeeTypeInterval(itemValue)}>
                     <Picker.Item label="MONTHLY" value="MONTHLY" />
                     <Picker.Item label="QUARTERLY" value="QUARTERLY" />
                     <Picker.Item label="YEARLY" value="YEARLY" />
                 </Picker>
             </View>
-            <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setClubFeeAmount} defaultValue={params.get("clubFeeAmount")?.toString()} editable={isAmountEditable} />
+            <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setClubFeeAmount} defaultValue={params.get("clubFeeAmount")?.toString()} />
             {isLoading && <LoadingSpinner />}
             {!isLoading &&
                 <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
                     <ThemedButton title='Update Fee' onPress={handleSaveFeeType} />
-                    {isAmountEditable && <ThemedButton title='Delete Fee' onPress={handleDeleteFeeType} />}
+                    {isEditable && <ThemedButton title='Delete Fee' onPress={handleDeleteFeeType} />}
                 </View>}
         </ThemedView>
     )
@@ -88,7 +88,7 @@ const EditFeeType = () => {
 
 export default EditFeeType
 
-const validate = (feeType: string | null | undefined, feeAmount: string| null | undefined) => {
+const validate = (feeType: string | null | undefined, feeAmount: string) => {
     if (!isValidLength(feeType, 2)) {
         alert("Enter atleast 2 characters for fee type")
         return false
