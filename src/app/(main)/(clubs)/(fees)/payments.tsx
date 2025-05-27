@@ -26,7 +26,8 @@ const Payments = () => {
     const [paymentStatusUpdates, setPaymentStatusUpdates] = useState<{
         clubFeePaymentId: number;
         paid: boolean;
-        firstName?: string
+        firstName?: string;
+        paymentDate?: Date
     }[]>([])
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
@@ -133,14 +134,14 @@ const MemberFeeItem = (props: {
     const selectItem = () => {
         setIsSelected(prev => !prev)
 
-        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined; amount: number })[]) => {
+        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined; amount: number; paymentDate: Date})[]) => {
 
             let item = prev.find(item => item.clubFeePaymentId == props.clubFeePaymentId)
             const initialPaymentStatus = props.feeByMembers?.find((item: { clubFeePaymentId: number; }) => item.clubFeePaymentId == props.clubFeePaymentId)
             if (item) {
                 item.paid = !isSelected
             } else {
-                item = { clubFeePaymentId: props.clubFeePaymentId, paid: !isSelected, firstName: props.firstName, amount: props.amount }
+                item = { clubFeePaymentId: props.clubFeePaymentId, paid: !isSelected, firstName: props.firstName, amount: props.amount, paymentDate: new Date() }
                 prev.push(item)
             }
             if (initialPaymentStatus?.paid == !isSelected) {

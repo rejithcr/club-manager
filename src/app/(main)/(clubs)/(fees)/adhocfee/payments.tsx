@@ -27,7 +27,8 @@ const Payments = () => {
     const [paymentStatusUpdates, setPaymentStatusUpdates] = useState<{
         clubFeePaymentId: number;
         paid: boolean;
-        firstName?: string
+        firstName?: string;
+        paymentDate: Date
     }[]>([])
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
@@ -147,7 +148,7 @@ const Payments = () => {
 export default Payments
 
 const MemberFeeItem = (props: {
-    clubAdhocFeePaymentId: number; firstName: string | undefined;
+    clubAdhocFeePaymentId: number; firstName: string | undefined; paymentDate: Date
     paid: number; clubAdhocFeePaymentAmount: number; setPaymentStatusUpdates: any;
     feeByMembers: any | undefined
 }) => {
@@ -156,14 +157,14 @@ const MemberFeeItem = (props: {
     const selectItem = () => {
         setIsSelected(prev => !prev)
 
-        props.setPaymentStatusUpdates((prev: ({ clubAdhocFeePaymentId: number; paid: Boolean; firstName?: string | undefined; clubAdhocFeePaymentAmount: number })[]) => {
+        props.setPaymentStatusUpdates((prev: ({ clubAdhocFeePaymentId: number; paid: Boolean; firstName?: string | undefined; clubAdhocFeePaymentAmount: number; paymentDate: Date })[]) => {
 
             let item = prev.find(item => item.clubAdhocFeePaymentId == props.clubAdhocFeePaymentId)
             const initialPaymentStatus = props.feeByMembers?.find((item: { clubAdhocFeePaymentId: number; }) => item.clubAdhocFeePaymentId == props.clubAdhocFeePaymentId)
             if (item) {
                 item.paid = !isSelected
             } else {
-                item = { clubAdhocFeePaymentId: props.clubAdhocFeePaymentId, paid: !isSelected, firstName: props.firstName, clubAdhocFeePaymentAmount: props.clubAdhocFeePaymentAmount }
+                item = { clubAdhocFeePaymentId: props.clubAdhocFeePaymentId, paid: !isSelected, firstName: props.firstName, clubAdhocFeePaymentAmount: props.clubAdhocFeePaymentAmount, paymentDate: new Date() }
                 prev.push(item)
             }
             if (initialPaymentStatus?.paid == !isSelected) {

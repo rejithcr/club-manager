@@ -45,7 +45,6 @@ const AdocFeesHome = () => {
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
         <ScrollView>
-
           <View style={{
             flexDirection: "row", alignItems: "center", width: "80%",
             justifyContent: "space-between", alignSelf: "center", marginTop: 10
