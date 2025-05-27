@@ -30,23 +30,18 @@ def get_service(event):
         print(paths)
         if paths[1] == "club":
             if len(paths) > 2 and paths[2] =="member":
-                print("club member")
                 return ClubMemberService()
             if len(paths) > 2 and paths[2] =="transaction":
-                print("transaction")
                 return ClubTransactionService()
             return ClubService()
         if paths[1] == "member":
             return MemberService()
         if paths[1] == "fee":
             if len(paths) > 2 and paths[2] =="exception":
-                print("fee exception")
                 return FeeExceptionService()
             if len(paths) > 2 and paths[2] =="collection":
-                print("fee collection")
                 return FeeCollectionService()
             if len(paths) > 2 and paths[2] =="adhoc":
-                print("fee adhoc")
                 return FeeAdhocService()
             return FeeService()
         

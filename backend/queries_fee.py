@@ -169,16 +169,12 @@ GET_NEXT_PAYTMENT_COLLECTION_LIST = """
 
 GET_FEE_COLLECTION_BY_FEE_TYPE_ID = """
     select s.club_fee_collection_id, s.club_fee_type_period , s.club_fee_type_date, 
-        sum(s.club_fee_amount) total, sum(s.paid * s.club_fee_amount) collected
+        sum(s.club_fee_payment_amount) total, sum(s.paid * s.club_fee_payment_amount) collected
     from (
         select cfc.club_fee_collection_id, cfc.club_fee_type_period , to_char(cfc.club_fee_type_date, 'YYYY-MM-DD') club_fee_type_date, 
-            (case when cftem.membership_id is not null then cfte.club_fee_exception_amount else cft.club_fee_amount end) as club_fee_amount,
-            cfp.paid
+            cfp.club_fee_payment_amount, cfp.paid
         from club_fee_collection cfc 
             inner join club_fee_payment cfp on cfc.club_fee_collection_id = cfp.club_fee_collection_id
-            inner join club_fee_type cft on cft.club_fee_type_id = cfc.club_fee_type_id
-            left join club_fee_type_exception_member cftem on cfp.club_fee_type_exception_member_id = cftem.club_fee_type_exception_member_id
-            left join club_fee_type_exception cfte on cfte.club_fee_type_exception_id = cftem.club_fee_type_exception_id
         where cfc.club_fee_type_id = %s
     ) s
     group by s.club_fee_collection_id, s.club_fee_type_period , s.club_fee_type_date
@@ -186,15 +182,11 @@ GET_FEE_COLLECTION_BY_FEE_TYPE_ID = """
 """
 
 GET_FEE_PAYMENT_BY_FEE_COLLECTION_ID = """
-    select cfp.club_fee_payment_id , m.first_name,cfp.paid,
-	 (case when cftem.membership_id is not null then cfte.club_fee_exception_amount else cft.club_fee_amount end) as amount	
+    select cfp.club_fee_payment_id , m.first_name,  m.last_name,cfp.paid, cfp.club_fee_payment_amount as amount	
     from club_fee_payment cfp
         inner join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id
-        inner join club_fee_type cft on cft.club_fee_type_id = cfc.club_fee_type_id
         inner join membership ms on cfp.membership_id = ms.membership_id 
         inner join "member" m on m.member_id = ms.member_id
-        left join club_fee_type_exception_member cftem on cfp.club_fee_type_exception_member_id = cftem.club_fee_type_exception_member_id
-        left join club_fee_type_exception cfte on cfte.club_fee_type_exception_id = cftem.club_fee_type_exception_id
     where cfp.club_fee_collection_id = %s
     order by cfp.paid, amount
 """
@@ -208,7 +200,7 @@ ADD_FEE_TYPE_COLLECTION_START = """
 """
 
 GET_TRANSACTION_IDS_TO_BE_DELETED = """
-    select club_transaction_id
+    select club_fee_payment_id
     from club_fee_payment cfp
     where cfp.club_fee_collection_id = %s
 """
@@ -221,63 +213,55 @@ DELETE_FEE_COLLECTION = """
     where club_fee_collection_id = %s;
 """
 
+DELETE_ADHOC_FEE_COLLECTION = """
+    delete from club_adhoc_fee_payment
+    where club_adhoc_fee_id = %s;
+    
+    delete from club_adhoc_fee
+    where club_adhoc_fee_id = %s;
+
+"""
+
 ADD_FEE_TYPE_PAYMENT = """
     insert into club_fee_payment(club_fee_payment_id, club_fee_collection_id, membership_id, 
-            club_fee_type_exception_member_id, created_by, updated_by)
-    values (nextval('club_fee_payment_id_seq'), %s,%s,%s,%s,%s)
+            club_fee_payment_amount, club_fee_type_exception_member_id, created_by, updated_by)
+    values (nextval('club_fee_payment_id_seq'), %s,%s,%s,%s,%s,%s)
 """
 
 UPDATE_FEE_PAYMENT_STATUS = """
     update club_fee_payment cfp 
-    set paid = %s, club_transaction_id = %s, updated_by = %s
+    set paid = %s, updated_by = %s
     where cfp.club_fee_payment_id = %s
-"""
-
-GET_TRANSACTION_ID_FROM_PAYMENT = """
-    select cfp.club_transaction_id
-    from club_fee_payment cfp
-    where cfp.club_fee_payment_id = %s
-"""
-
-GET_TRANSACTION_ID_FROM_ADHOC_PAYMENT = """
-    select cfp.club_transaction_id
-    from club_adhoc_fee_payment cfp
-    where cfp.club_adhoc_fee_payment_id = %s
 """
 
 UPDATE_ADHOC_FEE_PAYMENT_STATUS = """
     update club_adhoc_fee_payment cafp
-    set paid = %s, club_transaction_id = %s, updated_by = %s
+    set paid = %s,updated_by = %s
     where cafp.club_adhoc_fee_payment_id = %s
 """
 
-GET_TRANSACTION_ID_SEQ_NEXT_VAL = "select nextval('club_transaction_id_seq')"
+#GET_TRANSACTION_ID_SEQ_NEXT_VAL = "select nextval('club_transaction_id_seq')"
 
-ADD_TRANSACTION = """
+ADD_FEE_TRANSACTION = """
     insert into club_transaction(club_transaction_id, club_id, club_transaction_amount, club_transcation_type, 
-        club_transaction_category, club_transaction_comment, created_by, updated_by)
-    values(%s, %s, %s, %s, %s, %s, %s, %s)
+        club_transaction_category, club_transaction_comment, club_fee_payment_id, club_transaction_date, created_by, updated_by)
+    values(nextval('club_transaction_id_seq'), %s, %s, %s, %s, %s, %s, %s, %s, %s)
 """
 
-DELETE_TRANSACTION = """
+ADD_ADHOC_FEE_TRANSACTION = """
+    insert into club_transaction(club_transaction_id, club_id, club_transaction_amount, club_transcation_type,
+        club_transaction_category, club_transaction_comment, club_adhoc_fee_payment_id, club_transaction_date, created_by, updated_by)
+    values(nextval('club_transaction_id_seq'), %s, %s, %s, %s, %s, %s, %s, %s, %s)
+"""
+
+DELETE_FEE_TRANSACTION = """
     delete from club_transaction
-    where club_transaction_id = %s
+    where club_fee_payment_id = %s
 """
 
-GET_FUND_BALANCE = """
-    select (c.credit - d.debit) fund_balance
-    from (
-        select sum(t.club_transaction_amount ) credit
-        from "club_transaction" t
-        where t.club_transcation_type ='CREDIT'
-            and t.club_id = %s
-            
-    ) c,  (
-        select coalesce(sum(t.club_transaction_amount), 0) debit
-        from "club_transaction" t
-        where t.club_transcation_type ='DEBIT'
-            and t.club_id = %s
-    ) d
+DELETE_ADHOC_FEE_TRANSACTION = """
+    delete from club_transaction
+    where club_adhoc_fee_payment_id = %s
 """
 
 GET_FEE_ADHOC_ID_SEQ_NEXT_VAL = "select nextval('club_adhoc_fee_id_seq')"
@@ -296,11 +280,13 @@ ADD_FEE_ADHOC_PAYMENT = """
 
 GET_FEE_ADHOC_COLLECTIONS = """
     select caf.club_adhoc_fee_id, caf.club_adhoc_fee_name,caf.club_adhoc_fee_desc,
-            caf.club_adhoc_fee_is_active, sum(cafp.club_adhoc_fee_payment_amount) club_adhoc_fee_payment_amount
+            caf.club_adhoc_fee_is_active, sum(cafp.club_adhoc_fee_payment_amount) club_adhoc_fee_payment_amount,
+            cast(sum(cafp.paid) as numeric)/count(*) * 100 completion_percentage
     from club_adhoc_fee caf
         join club_adhoc_fee_payment cafp on caf.club_adhoc_fee_id = cafp.club_adhoc_fee_id
     where caf.club_id = %s
     group by caf.club_adhoc_fee_id, caf.club_adhoc_fee_name,caf.club_adhoc_fee_desc, caf.club_adhoc_fee_is_active
+    order by 6
 """
 
 GET_FEE_ADHOC_COLLECTION_BY_ID = """
@@ -323,15 +309,7 @@ GET_FEE_ADHOC_COLLECTION_BY_ID = """
 """
 
 GET_ADHOC_TRANSACTION_IDS_TO_BE_DELETED = """
-    select club_transaction_id
+    select club_adhoc_fee_payment_id
     from club_adhoc_fee_payment cafp
     where cafp.club_adhoc_fee_id = %s
-"""
-
-DELETE_ADHOC_FEE_COLLECTION = """
-    delete from club_adhoc_fee_payment
-    where club_adhoc_fee_id = %s;
-
-    delete from club_adhoc_fee
-    where club_adhoc_fee_id = %s;
 """

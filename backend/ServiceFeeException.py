@@ -9,16 +9,18 @@ class FeeExceptionService():
         clubFeeTypeExceptionId = params.get("clubFeeTypeExceptionId")
 
         if clubFeeTypeExceptionId:
-            collections = db.fetch(conn, queries_fee.GET_COLLECTIONS_OF_EXCEPTION, (clubFeeTypeExceptionId,))
-            periods = [p['club_fee_type_period'] for p in collections]
+            # collections = db.fetch(conn, queries_fee.GET_COLLECTIONS_OF_EXCEPTION, (clubFeeTypeExceptionId,))
+            # periods = [p['club_fee_type_period'] for p in collections]
 
             exception = db.fetch_one(conn, queries_fee.GET_FEE_TYPE_EXCEPTION, (clubFeeTypeExceptionId,))
             x_members = [member for member in exception['members'] if member["member_id"]]
             exception['members'] = x_members
-            if periods:
-                exception['isAmountEditable'] = False
-            else:
-                exception['isAmountEditable'] = True
+
+            # TBD: the edits need to be logged for audit. We were restricting the edit instead.
+            # if periods:
+            #     exception['isAmountEditable'] = False
+            # else:
+            #     exception['isAmountEditable'] = True
 
             return helper.convert_to_camel_case(exception) if exception else None
         else:
@@ -62,10 +64,11 @@ class FeeExceptionService():
                 # any open fee payments?
                 open_fee_payments = db.fetch(conn, queries_fee.GET_OPEN_FEE_EXCEPTION_PAYMENTS, 
                     (member['clubFeeTypeExceptionMemberId'],))
-
-                if open_fee_payments:
-                    periods = [p['club_fee_type_period'] for p in open_fee_payments]
-                    raise Exception(f"Cannot update fee type exception for {member['firstName']}. There are open fee payments for {periods}")
+                
+                # TBD: need to validate the end date based on the open collection
+                # if open_fee_payments:
+                #     periods = [p['club_fee_type_period'] for p in open_fee_payments]
+                #     raise Exception(f"Cannot update fee type exception for {member['firstName']}. There are open fee payments for {periods}")
 
                 db.execute(conn, queries_fee.UPDATE_FEE_TYPE_EXCEPTION_MEMBER_END_DATE,
                         (member['endDateAdded'], email, member['clubFeeTypeExceptionMemberId']))

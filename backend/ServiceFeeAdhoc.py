@@ -39,27 +39,29 @@ class FeeAdhocService():
         club_transaction_id = None
         for item in paymentStatusUpadtes:
             if item["paid"]:
-                club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_SEQ_NEXT_VAL, None)['nextval']
-                db.execute(conn, queries_fee.ADD_TRANSACTION, 
-                    (club_transaction_id, clubId, item["clubAdhocFeePaymentAmount"], "CREDIT", "ADHOC-FEE", 
-                    f"Fee collection for adhoc paymentId {item['clubAdhocFeePaymentId']}", email, email))
-                db.execute(conn, queries_fee.UPDATE_ADHOC_FEE_PAYMENT_STATUS, (1, club_transaction_id, email, item["clubAdhocFeePaymentId"]))
+                #club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_SEQ_NEXT_VAL, None)['nextval']
+                db.execute(conn, queries_fee.ADD_ADHOC_FEE_TRANSACTION, 
+                    (clubId, item["clubAdhocFeePaymentAmount"], "CREDIT", "ADHOC-FEE", 
+                    f"Fee collection for adhoc paymentId {item['clubAdhocFeePaymentId']}", item["clubAdhocFeePaymentId"], item["paymentDate"], email, email))
+                db.execute(conn, queries_fee.UPDATE_ADHOC_FEE_PAYMENT_STATUS, (1, email, item["clubAdhocFeePaymentId"]))
             else:
-                club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_FROM_ADHOC_PAYMENT, 
-                                                    (item["clubAdhocFeePaymentId"],))['club_transaction_id']
-                db.execute(conn, queries_fee.UPDATE_ADHOC_FEE_PAYMENT_STATUS, (0, None, email, item["clubAdhocFeePaymentId"]))
-                db.execute(conn, queries_fee.DELETE_TRANSACTION, (club_transaction_id,))
+                # club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_FROM_ADHOC_PAYMENT, 
+                #                                     (item["clubAdhocFeePaymentId"],))['club_transaction_id']
+                db.execute(conn, queries_fee.UPDATE_ADHOC_FEE_PAYMENT_STATUS, (0, email, item["clubAdhocFeePaymentId"]))
+                db.execute(conn, queries_fee.DELETE_ADHOC_FEE_TRANSACTION, (item["clubAdhocFeePaymentId"], ))
         conn.commit()
         return {"message": f"Updated payment status for {str(paymentStatusUpadtes)}"}
     
     
     def delete(self,conn, params):
         clubAdhocFeeId = params.get("clubAdhocFeeId")
-        txn_ids = db.fetch(conn, queries_fee.GET_ADHOC_TRANSACTION_IDS_TO_BE_DELETED, (clubAdhocFeeId, )) 
+        
+        adhoc_payment_ids = db.fetch(conn, queries_fee.GET_ADHOC_TRANSACTION_IDS_TO_BE_DELETED, (clubAdhocFeeId, )) 
+        for payment_id in adhoc_payment_ids:
+            db.execute(conn, queries_fee.DELETE_ADHOC_FEE_TRANSACTION, (payment_id['club_adhoc_fee_payment_id'], ))
+
         db.execute(conn, queries_fee.DELETE_ADHOC_FEE_COLLECTION, 
                 (clubAdhocFeeId,clubAdhocFeeId))  
-        for txn_id in txn_ids:
-            db.execute(conn, queries_fee.DELETE_TRANSACTION, (txn_id['club_transaction_id'], ))
 
         conn.commit()
         return {"message": f"Fee type collections deleted"}

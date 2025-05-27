@@ -1,8 +1,8 @@
 import db
 import queries_club
-import queries_fee
 import queries_member
 import helper
+import constants
 
 
 class ClubService():
@@ -10,14 +10,31 @@ class ClubService():
     def get(self, conn, params):
         clubId = params.get('clubId')
         memberId = params.get('memberId')    
-        fundBalance = params.get('fundBalance')      
+        fundBalance = params.get('fundBalance')     
+        totalDue = params.get('totalDue') 
+        search = params.get('search')
+        clubName = params.get('clubName')
+        membershipRequests = params.get('membershipRequests')
+        counts = params.get('counts')
 
         if memberId: 
             clubs = db.fetch(conn, queries_club.GET_CLUBS_BY_MEMBER, (memberId,))   
             return [helper.convert_to_camel_case(club) for club in clubs]         
         elif fundBalance:            
-            fb = db.fetch_one(conn, queries_fee.GET_FUND_BALANCE, (clubId,clubId))   
-            return helper.convert_to_camel_case(fb)
+            fb = db.fetch_one(conn, queries_club.GET_FUND_BALANCE, (clubId,clubId))   
+            return helper.convert_to_camel_case(fb)   
+        elif totalDue:            
+            td = db.fetch_one(conn, queries_club.TOTAL_DUE, (clubId,clubId))   
+            return helper.convert_to_camel_case(td)
+        elif search:            
+            clubs = db.fetch(conn, queries_club.SEARCH_CLUB, (f"%{clubName.upper()}%",))   
+            return [helper.convert_to_camel_case(club) for club in clubs]       
+        elif membershipRequests:
+            requests = db.fetch(conn, queries_club.GET_MEMBERSHIP_REQUESTS, (clubId, ))
+            return [helper.convert_to_camel_case(request) for request in requests]
+        elif counts:
+            counts = db.fetch(conn, queries_club.GET_CLUB_COUNTS, (clubId,))
+            return [helper.convert_to_camel_case(count) for count in counts]
         else:        
             club = db.fetch_one(conn, queries_club.GET_CLUB, (clubId,))
             return helper.convert_to_camel_case(club) if club else {}
@@ -37,5 +54,21 @@ class ClubService():
         return {"clubId": club_id}
     
     def put(self, conn, params):
-        return "club put"
-    
+        clubId = params.get('clubId')
+        email=params.get('email')
+        memberId=params.get('memberId')
+        comments=params.get('comments')
+        status=params.get('status')
+        
+        if status == "APPROVED": 
+            db.execute(conn, queries_club.UPDATE_MEMBERSHIP_REQUEST_STATUS, (status, comments, email, clubId, memberId))
+            db.execute(conn, queries_member.SAVE_MEMBERSHIP, (clubId, memberId, constants.ROLE_MEMBER, email, email))
+            conn.commit()
+            return {"message": "Membership "+ status}
+        elif status == "REJECTED":
+            db.execute(conn, queries_club.DELETE_MEMBERSHIP, (clubId, memberId))
+            db.execute(conn, queries_club.UPDATE_MEMBERSHIP_REQUEST_STATUS, (status, comments, email, clubId, memberId))
+            conn.commit()
+            return {"message": "Membership "+ status}
+        
+        return {"message": "Nothing done"}

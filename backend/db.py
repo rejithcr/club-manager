@@ -5,12 +5,11 @@ import psycopg2.extras
 def connect():  
     conn = psycopg2.connect(
         dbname="postgres",
-        user="postgres.idgqxnsqcsigrehkxurd",
-        password="supa@base123*",
-        host="aws-0-ap-south-1.pooler.supabase.com",
+        user="",
+        password="",
+        host="",
         port=6543
     )
-    #engine = db.create_engine('postgresql://postgres.idgqxnsqcsigrehkxurd:%s@aws-0-ap-south-1.pooler.supabase.com:6543/postgres' % quote_plus('supa@base123*'))
     return conn
 
 

@@ -8,11 +8,16 @@ class MemberService():
         member_id = params.get('memberId')
         email = params.get('email')
         phone = params.get('phone')
+        requests = params.get('requests')
+
         member = None
         if email:
             member = db.fetch_one(conn, queries_member.GET_MEMBER_BY_EMAIL, (email,))
         elif phone:
             member = db.fetch_one(conn, queries_member.GET_MEMBER_BY_PHONE, (phone, ))
+        elif requests:
+            requests = db.fetch(conn, queries_member.GET_REQUESTS, (member_id, ))
+            return [helper.convert_to_camel_case(request) for request in requests]
         else:                    
             member = db.fetch_one(conn, queries_member.GET_MEMBER, (member_id,))
 

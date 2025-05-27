@@ -55,14 +55,15 @@ class FeeCollectionService():
             club_transaction_id = None
             for item in paymentStatusUpadtes:
                 if item["paid"]:
-                    club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_SEQ_NEXT_VAL, None)['nextval']
-                    db.execute(conn, queries_fee.ADD_TRANSACTION, 
-                        (club_transaction_id, clubId, item["amount"], "CREDIT", "FEE", f"Fee collection for paymentId {item['clubFeePaymentId']}", email, email))
-                    db.execute(conn, queries_fee.UPDATE_FEE_PAYMENT_STATUS, (1, club_transaction_id, email, item["clubFeePaymentId"]))
+                    #club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_SEQ_NEXT_VAL, None)['nextval']
+                    db.execute(conn, queries_fee.ADD_FEE_TRANSACTION, 
+                        (clubId, item["amount"], "CREDIT", "FEE", f"Fee collection for paymentId {item['clubFeePaymentId']}", 
+                        item["clubFeePaymentId"], item["paymentDate"], email, email))
+                    db.execute(conn, queries_fee.UPDATE_FEE_PAYMENT_STATUS, (1, email, item["clubFeePaymentId"]))
                 else:
-                    club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_FROM_PAYMENT, (item["clubFeePaymentId"],))['club_transaction_id']
-                    db.execute(conn, queries_fee.UPDATE_FEE_PAYMENT_STATUS, (0, None, email, item["clubFeePaymentId"]))
-                    db.execute(conn, queries_fee.DELETE_TRANSACTION, (club_transaction_id,))
+                    #club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_FROM_PAYMENT, (item["clubFeePaymentId"],))['club_transaction_id']
+                    db.execute(conn, queries_fee.UPDATE_FEE_PAYMENT_STATUS, (0, email, item["clubFeePaymentId"]))
+                    db.execute(conn, queries_fee.DELETE_FEE_TRANSACTION, (item["clubFeePaymentId"],))
             conn.commit()
             return {"message": f"Updated payment status for {str(paymentStatusUpadtes)}"}
 
@@ -74,7 +75,7 @@ class FeeCollectionService():
 
             for nxtFee in nextPeriodFees:
                 db.execute(conn, queries_fee.ADD_FEE_TYPE_PAYMENT, 
-                    (club_fee_collection_id, nxtFee["membershipId"], nxtFee["clubFeeTypeExceptionMemberId"],email,email))
+                    (club_fee_collection_id, nxtFee["membershipId"],nxtFee["clubFeeAmount"], nxtFee["clubFeeTypeExceptionMemberId"],email,email))
 
             conn.commit()
 
@@ -87,11 +88,13 @@ class FeeCollectionService():
     
     def delete(self, conn, params):
         clubFeeCollectionId = params.get("clubFeeCollectionId")
-        txn_ids = db.fetch(conn, queries_fee.GET_TRANSACTION_IDS_TO_BE_DELETED, (clubFeeCollectionId, )) 
+
+        club_fee_payment_ids = db.fetch(conn, queries_fee.GET_TRANSACTION_IDS_TO_BE_DELETED, (clubFeeCollectionId, )) 
+        for payment_id in club_fee_payment_ids:
+            db.execute(conn, queries_fee.DELETE_FEE_TRANSACTION, (payment_id['club_fee_payment_id'], ))
+
         db.execute(conn, queries_fee.DELETE_FEE_COLLECTION, 
                 (clubFeeCollectionId,clubFeeCollectionId))  
-        for txn_id in txn_ids:
-            db.execute(conn, queries_fee.DELETE_TRANSACTION, (txn_id['club_transaction_id'], ))
-
+       
         conn.commit()
         return {"message": f"Fee type collections deleted"}
