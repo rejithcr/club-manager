@@ -1,16 +1,15 @@
-import { StyleSheet, TouchableOpacity, View, FlatList, Alert } from 'react-native';
+import { TouchableOpacity, View, FlatList, Alert } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react'
-import { appStyles } from '@/src/utils/styles';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { getClubDues } from '@/src/helpers/club_helper';
 import { ClubContext } from '@/src/context/ClubContext';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
-import ShadowBox from '@/src/components/ShadowBox';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import { useTheme } from '@/src/hooks/use-theme';
 import Spacer from '@/src/components/Spacer';
+import ShadowBox from '@/src/components/ShadowBox';
 
 const ClubDues = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -38,6 +37,8 @@ const ClubDues = () => {
           {!isLoading && <FlatList
             data={duesByMembers}
             keyExtractor={(item) => item.memberId.toString()}
+            ItemSeparatorComponent={()=><Spacer space={4}/>}
+            ListFooterComponent={()=><Spacer space={4}/>}
             renderItem={({ item }) => <MemberDue key={item.memberId} member={item} />}
           />}
         </View>
@@ -54,24 +55,27 @@ const MemberDue = (props: { member: any }) => {
     setIsShown(!isShown)
   }
   return (
-    <View style={{ width: "100%"}}>
+    <>
+    <ShadowBox style={{ width: "100%"}}>
       <TouchableOpacity onPress={showMemberDues} style={{
-        flexDirection: "row", width: "100%", margin: 5, paddingVertical: 5,
-        justifyContent: "space-between", alignItems: "center", flexWrap: "wrap",
-        flexBasis: "auto"
+        flexDirection: "row", width: "100%", paddingVertical: 5,
+        justifyContent: "space-between", alignItems: "center"
       }}>
         <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav}/>
-        <ThemedText style={{ width: "65%", fontSize: 15, paddingLeft: 5 }}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
+        <ThemedText style={{ width: "65%", fontSize: 15}}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
         <ThemedText style={{ width: "25%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}> Rs. {props?.member.totalDue} </ThemedText>
       </TouchableOpacity>
+    </ShadowBox>
       {isShown &&
         <FlatList
           data={props?.member.dues}
+          ListHeaderComponent={()=> <Spacer space={2}/>}
+          ListFooterComponent={()=> <Spacer space={4}/>}
           renderItem={({item}) => <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />}
-          ItemSeparatorComponent={() => <View style={{ marginVertical: 5, borderBottomWidth: .5, borderBottomColor: "grey", width: "90%", alignSelf: "center" }} />}
+          ItemSeparatorComponent={() => <ThemedView style={{ marginVertical: 5, borderBottomWidth: .5, borderBottomColor: "grey", width: "90%", alignSelf: "center" }} />}
           />
       }
-    </View>
+      </>
   )
 }
 
@@ -79,9 +83,9 @@ export default ClubDues
 
 const MemberFeeItem = (props: { paymentId: number; fee: string; feeType: string, feeDesc: string, amount: number; }) => {
   return (
-      <ThemedView style={{width: "90%", flexDirection: "row", justifyContent: "space-between", alignSelf: "center"}}>
+      <View style={{width: "90%", flexDirection: "row", justifyContent: "space-between", alignSelf: "center"}}>
         <ThemedText style={{ width: "75%"}}>{props?.fee} {props?.feeDesc}</ThemedText>
         <ThemedText style={{ width: "25%", fontSize: 15, textAlign: "right" }}>{props?.amount}</ThemedText>
-      </ThemedView>
+      </View>
   )
 }

@@ -47,9 +47,10 @@ export default function Home() {
       </View>
       {clubInfo.role == ROLE_ADMIN &&
         <FloatingMenu
-          actions={actions}
-          onPressItem={(name: string | undefined) => handleMenuPress(name)}
-          icon={<MaterialIcons name={"menu"} size={32} color={"white"} />} />
+         // actions={actions}
+          onPressMain={() => {router.push(`/(main)/(members)/addmember`) }}
+         // onPressMain={(name: string | undefined) => handleMenuPress(name)}
+          icon={<MaterialIcons name={"add"} size={32} color={"white"} />} />
       }
     </ThemedView>
   );

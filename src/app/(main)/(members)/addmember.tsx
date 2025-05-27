@@ -24,7 +24,6 @@ const AddMember = () => {
     const [showPhoneSearch, setShowPhoneSearch] = useState<boolean>(true);
     const [showAddNewMemberForm, setShowAddNewMemberForm] = useState<boolean>(false);
     const [searchNumber, setSearchNumber] = useState<string>();
-    const [date, setDate] = useState<Date>(new Date());
     const [memberDetails, setMemberDetails] = useState<any>()
     const [firstName, setFirstName] = useState<string | null>("");
     const [lastName, setLastName] = useState("");
@@ -171,6 +170,10 @@ const AddMember = () => {
         AsyncStorage.removeItem("userInfo")
             .then(() => router.dismissTo("/(auth)"));
     }
+    const handleSearchNumberChange = (text: string) => {
+        setSearchNumber(text)
+        setPhone(text)
+    }
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
@@ -178,7 +181,7 @@ const AddMember = () => {
                 {!isLoading && <ScrollView>
                     {showPhoneSearch &&
                         <>
-                            <InputText label="Enter phone number" placeholder='Search by phone number' onChangeText={setSearchNumber} defaultValue={searchNumber} keyboardType="numeric" />
+                            <InputText label="Enter phone number" placeholder='Search by phone number' onChangeText={handleSearchNumberChange} defaultValue={searchNumber} keyboardType="numeric" />
                             <ThemedButton title="Search" onPress={searchMember} />
                             <Spacer space={12}/>
                         </>
