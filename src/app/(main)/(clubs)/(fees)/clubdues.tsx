@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, FlatList, Alert } from 'react-native';
+import { TouchableOpacity, View, FlatList, Alert, StyleSheet } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
@@ -14,7 +14,7 @@ import ShadowBox from '@/src/components/ShadowBox';
 const ClubDues = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [duesByMembers, setDuesByMembers] = useState<any[] | undefined>(undefined);
-  
+
   const { clubInfo } = useContext(ClubContext)
 
   const fetchClubDues = () => {
@@ -29,21 +29,21 @@ const ClubDues = () => {
   }, [])
 
   return (
-    <ThemedView style={{flex: 1 }}>
-    <GestureHandlerRootView>
-        <Spacer space={5}/>
+    <ThemedView style={{ flex: 1 }}>
+      <GestureHandlerRootView>
+        <Spacer space={5} />
         {isLoading && <LoadingSpinner />}
-        <View style={{ width: "90%", alignSelf:"center" }}>
+        <View style={{ width: "90%", alignSelf: "center" }}>
           {!isLoading && <FlatList
             data={duesByMembers}
             keyExtractor={(item) => item.memberId.toString()}
-            ItemSeparatorComponent={()=><Spacer space={4}/>}
-            ListFooterComponent={()=><Spacer space={4}/>}
+            ItemSeparatorComponent={() => <Spacer space={4} />}
+            ListFooterComponent={() => <Spacer space={4} />}
             renderItem={({ item }) => <MemberDue key={item.memberId} member={item} />}
           />}
         </View>
         {/* <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => null} /> */}
-    </GestureHandlerRootView>
+      </GestureHandlerRootView>
     </ThemedView>
   )
 }
@@ -56,26 +56,26 @@ const MemberDue = (props: { member: any }) => {
   }
   return (
     <>
-    <ShadowBox style={{ width: "100%"}}>
-      <TouchableOpacity onPress={showMemberDues} style={{
-        flexDirection: "row", width: "100%",
-        justifyContent: "space-between", alignItems: "center"
-      }}>
-        <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav}/>
-        <ThemedText style={{ width: "65%", fontSize: 15}}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
-        <ThemedText style={{ width: "25%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}> Rs. {props?.member.totalDue} </ThemedText>
-      </TouchableOpacity>
-    </ShadowBox>
+      <ShadowBox style={{ width: "100%" }}>
+        <TouchableOpacity onPress={showMemberDues} style={{
+          flexDirection: "row", width: "100%",
+          justifyContent: "space-between", alignItems: "center"
+        }}>
+          <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
+          <ThemedText style={{ width: "65%", fontSize: 15 }}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
+          <ThemedText style={{ width: "25%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}> Rs. {props?.member.totalDue} </ThemedText>
+        </TouchableOpacity>
+      </ShadowBox>
       {isShown &&
         <FlatList
           data={props?.member.dues}
-          ListHeaderComponent={()=> <Spacer space={2}/>}
-          ListFooterComponent={()=> <Spacer space={4}/>}
-          renderItem={({item}) => <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />}
-          ItemSeparatorComponent={() => <ThemedView style={{ marginVertical: 5, borderBottomWidth: .5, borderBottomColor: "grey", width: "90%", alignSelf: "center" }} />}
-          />
+          ListHeaderComponent={() => <Spacer space={2} />}
+          ListFooterComponent={() => <Spacer space={4} />}
+          renderItem={({ item }) => <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />}
+          ItemSeparatorComponent={() => <View style={styles.divider} />}
+        />
       }
-      </>
+    </>
   )
 }
 
@@ -83,9 +83,44 @@ export default ClubDues
 
 const MemberFeeItem = (props: { paymentId: number; fee: string; feeType: string, feeDesc: string, amount: number; }) => {
   return (
-      <View style={{width: "90%", flexDirection: "row", justifyContent: "space-between", alignSelf: "center"}}>
-        <ThemedText style={{ width: "75%"}}>{props?.fee} {props?.feeDesc}</ThemedText>
-        <ThemedText style={{ width: "25%", fontSize: 15, textAlign: "right" }}>{props?.amount}</ThemedText>
+    <View key={props.paymentId.toString() + props.feeType} style={styles.item}>      
+      <View style={{ paddingVertical: 5 }}>
+        <ThemedText style={styles.label}>{props?.fee} </ThemedText>
+        <ThemedText style={styles.subLabel}>{props?.feeDesc} </ThemedText>
       </View>
+      <ThemedText style={styles.amount}>Rs. {props?.amount}</ThemedText>
+    </View>
   )
 }
+
+
+
+const styles = StyleSheet.create({
+  item: {
+    width: "85%",
+    flexDirection: "row",
+    flexWrap: "wrap", alignSelf:"center",
+    alignItems: "center",
+    justifyContent: "space-between"
+  },
+  label: {
+    paddingHorizontal: 10,
+    paddingLeft: 5
+  },
+  subLabel: {
+    fontSize: 10,
+    paddingLeft: 5
+  },
+  date: {
+    padding: 5,
+  },
+  amount: {
+    padding: 5,
+  },
+  divider: {
+    borderBottomColor: 'rgba(136, 136, 136, 0.2)',
+    borderBottomWidth: .75,
+    width: "85%", 
+    alignSelf: "center"
+  }
+});

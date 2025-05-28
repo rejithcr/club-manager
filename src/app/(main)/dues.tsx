@@ -16,8 +16,8 @@ const FeeSummary = (props: { duesByMember: [] }) => {
       {props.duesByMember?.length == 0 && <ThemedText style={{ textAlign: "center" }}>Yay!! You are all clear 👏</ThemedText>}
       {props.duesByMember?.map((club: any) => {
         return (
-          <>
-            <ShadowBox key={club.clubId}>
+          <View key={club.clubId}>
+            <ShadowBox >
               <TouchableOpacity onPress={() => setShowDues(prev => !prev)} style={{
                 flexDirection: "row", width: "100%", 
                 justifyContent: "space-between", alignItems: "center"
@@ -38,7 +38,7 @@ const FeeSummary = (props: { duesByMember: [] }) => {
               </View>
             )}
             <Spacer space={4} />
-          </>
+          </View>
         )
       })}
     </ThemedView>
