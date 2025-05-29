@@ -20,14 +20,14 @@ const Profile = () => {
     const { data: myRequests, isLoading: isLoadingMyRequests } = useHttpGet("/member", { memberId: userInfo?.memberId, requests: "true" })
     const { theme, setTheme } = useContext(ThemeContext);
     const { colors } = useTheme()
-    const [isMembershipRequestShown, setIsMembershipRequestShown] = React.useState(true)
+    const [isMembershipRequestShown, setIsMembershipRequestShown] = React.useState(false)
     const handleToggleMembershipRequests = () => {
         console.log(isMembershipRequestShown)
         setIsMembershipRequestShown(prev => !prev)
     }
     return (
         <ThemedView style={{ flex: 1 }}>
-            <GestureHandlerRootView>                
+            <GestureHandlerRootView>
                 <ThemedText style={appStyles.heading}>Theme</ThemedText>
                 <TouchableCard onPress={() => setTheme("dark")} icon={<ThemedCheckBox checked={theme == "dark"} />}>
                     <ThemedText>Dark</ThemedText>
@@ -40,7 +40,6 @@ const Profile = () => {
                 <TouchableCard onPress={() => setTheme("system")} icon={<ThemedCheckBox checked={theme == "system"} />}>
                     <ThemedText>System</ThemedText>
                 </TouchableCard>
-                <Spacer space={5} />
                 <View>
                     <View style={{
                         flexDirection: "row", width: "80%", alignItems: "center",
@@ -51,11 +50,10 @@ const Profile = () => {
                             <ThemedIcon size={25} name={isMembershipRequestShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
                             <ThemedText style={{ ...appStyles.heading, paddingLeft: 5 }}>Membership Requests</ThemedText>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{alignItems: "center" }} onPress={() => router.push(`/(main)/(members)/joinclub`)}>
+                        <TouchableOpacity style={{ alignItems: "center" }} onPress={() => router.push(`/(main)/(members)/joinclub`)}>
                             <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
                         </TouchableOpacity>
-                    </View>
-
+                    </View>                    
                     <View>
                         {isLoadingMyRequests && <LoadingSpinner />}
                         {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length > 0 &&
@@ -83,7 +81,11 @@ const Profile = () => {
                             />}
                         {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length === 0 && <ThemedText style={{ alignSelf: "center" }}>No requests found</ThemedText>}
                     </View>
-                </View>
+                </View>                
+                <ThemedText style={appStyles.heading}>Other</ThemedText>
+                <TouchableCard onPress={() => router.push(`/(main)/(profile)/editmember?memberId=${userInfo?.memberId}`)}>
+                    <ThemedText>Edit your details</ThemedText>
+                </TouchableCard>
             </GestureHandlerRootView>
         </ThemedView>
     )

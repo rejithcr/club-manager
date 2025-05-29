@@ -8,6 +8,7 @@ const ProfileStack = () => {
   return (
     <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text }}>
       <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Profile"} />, headerShown: true }} />
+      <Stack.Screen name="editmember" options={{ headerTitle: () => <StackHeader header={"Edit details"} />, headerShown: true }} />
     </Stack>
   )
 }

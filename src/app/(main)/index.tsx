@@ -46,7 +46,7 @@ const Main = () => {
         {isLoadingMyClubs && <LoadingSpinner />}
         {!isLoadingMemberDues && <MyClubs clubs={clubs} />}
 
-        {clubs?.length > 0 && <ThemedHeading>Dues Summary</ThemedHeading> }
+        {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading> }
         {isLoadingMemberDues && <LoadingSpinner />}
         {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
         {/* <UpcomingMatches memberEmail={userInfo?.email} />

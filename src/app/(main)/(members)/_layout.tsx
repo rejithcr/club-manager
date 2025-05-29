@@ -43,6 +43,13 @@ export default function RootLayout() {
             headerTitle: () => <StackHeader header={"Join Club"} rightText={clubInfo?.clubName} />,
             headerShown:true
           }}
+        />         
+        <Stack.Screen
+          name="editmember" // This is the name of the page and must match the url from root
+          options={{
+            headerTitle: () => <StackHeader header={"Edit Member"} rightText={clubInfo?.clubName} />,
+            headerShown:true
+          }}
         />   
       </Stack>
   )

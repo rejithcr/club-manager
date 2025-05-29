@@ -125,7 +125,7 @@ const Payments = () => {
 export default Payments
 
 const MemberFeeItem = (props: {
-    clubFeePaymentId: number; firstName: string | undefined;
+    clubFeePaymentId: number; firstName: string | undefined; lastName: string | undefined;
     paid: number; amount: number; setPaymentStatusUpdates: any;
     feeByMembers: any | undefined
 }) => {
@@ -134,14 +134,14 @@ const MemberFeeItem = (props: {
     const selectItem = () => {
         setIsSelected(prev => !prev)
 
-        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined; amount: number; paymentDate: Date})[]) => {
+        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName?: string | undefined; amount: number; paymentDate: Date})[]) => {
 
             let item = prev.find(item => item.clubFeePaymentId == props.clubFeePaymentId)
             const initialPaymentStatus = props.feeByMembers?.find((item: { clubFeePaymentId: number; }) => item.clubFeePaymentId == props.clubFeePaymentId)
             if (item) {
                 item.paid = !isSelected
             } else {
-                item = { clubFeePaymentId: props.clubFeePaymentId, paid: !isSelected, firstName: props.firstName, amount: props.amount, paymentDate: new Date() }
+                item = { clubFeePaymentId: props.clubFeePaymentId, paid: !isSelected, firstName: props.firstName, lastName: props.lastName, amount: props.amount, paymentDate: new Date() }
                 prev.push(item)
             }
             if (initialPaymentStatus?.paid == !isSelected) {
@@ -154,7 +154,7 @@ const MemberFeeItem = (props: {
     return (
         <TouchableOpacity onPress={selectItem}>
             <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", flexWrap: "wrap" }}>
-                <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName}</ThemedText>
+                <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName} {props?.lastName}</ThemedText>
                 <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</ThemedText>
                 <View style={{ width: "10%" }}>
                     <ThemedCheckBox checked={isSelected}/>

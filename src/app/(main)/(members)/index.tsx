@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from "react";
-import { View, FlatList } from "react-native";
+import { View, FlatList, Alert, RefreshControl } from "react-native";
 import MemberItem from "@/src/components/MemberItem";
 import { router, useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
 import { getClubMembers } from "@/src/helpers/club_helper";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
@@ -17,12 +17,17 @@ export default function Home() {
   const { clubInfo } = useContext(ClubContext)
 
   const router = useRouter()
-  useEffect(() => {
+
+  const loadMembers = () => {
+    setIsLoading(true)
     getClubMembers(clubInfo.clubId)
-      .then(response => {
-        setMembers(response.data)
-        setIsLoading(false)
-      })
+      .then(response => setMembers(response.data))
+      .catch(err => Alert.alert("Error", err.response.data.error))
+      .finally(()=> setIsLoading(false))
+  }
+
+  useEffect(() => {
+    loadMembers()
   }, []);
 
   const showDetails = (memberId: number) => router.push(`/(main)/(members)/memberdetails?memberId=${memberId}`)
@@ -37,8 +42,7 @@ export default function Home() {
             data={members}
             initialNumToRender={8}
             ListFooterComponent={<Spacer space={10} />}
-            //onEndReached={fetchNextPage}
-            //onEndReachedThreshold={0.5}
+            refreshControl={<RefreshControl refreshing={false} onRefresh={loadMembers} />}
             renderItem={({ item }) => (
               <MemberItem {...item} key={item.member_id} showDetails={showDetails} />
             )}

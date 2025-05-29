@@ -1,4 +1,4 @@
-import { get, post } from '@/src/utils/api'
+import { del, get, post, put } from '@/src/utils/api'
 
 export interface Member {
     memberId: number;
@@ -6,20 +6,22 @@ export interface Member {
     lastName?: string;
     phone?: number;
     email?: string;
+    photo?: string;
+    updatedBy?: string
 }
 
 
 export const getMemberDetails = (memberId: number) => {
-    return get("/member", {memberId})
+    return get("/member", { memberId })
 }
 
 
-export const getMemberByPhone = (phone: string|undefined) => {
-    return get("/member", {phone: phone})
+export const getMemberByPhone = (phone: string | undefined) => {
+    return get("/member", { phone: phone })
 }
 
 export const getMemberByEmail = (email: string) => {
-    return get("/member", {email: email})
+    return get("/member", { email: email })
 }
 
 export const regirsterMember = (member: any) => {
@@ -27,5 +29,10 @@ export const regirsterMember = (member: any) => {
 }
 
 export const getMyRequests = (memberId: number) => {
-    return get("/member", {memberId, requests:"true"})
+    return get("/member", { memberId, requests: "true" })
 }
+
+export const saveMemberDetails = (memberId: number, firstName: string | undefined, lastName: string | undefined, phone: number | undefined, email: string | undefined, updatedBy: string | undefined) => {
+    return put("/member", null, { memberId, firstName, lastName, phone, email, updatedBy })
+}
+

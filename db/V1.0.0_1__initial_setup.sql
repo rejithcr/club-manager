@@ -14,6 +14,7 @@ create table member (
     last_name varchar(50) not null,
     email varchar(100) not null unique,
     phone varchar(13) not null unique,
+    photo text, 
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
@@ -41,6 +42,7 @@ create table membership (
     club_id integer not null,
     member_id integer not null,
     role_id integer not null,
+    is_active integer default 1;
     start_date date not null,
     end_date date,
     created_by varchar(100) not null,

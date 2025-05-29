@@ -39,22 +39,28 @@ const AddMember = () => {
         setLastName('')
         setPhone('')
         setEmail('')
+        setSearchNumber('')
         setShowAddNewMemberForm(false)
     }
 
     const addMemberToClub = (member: any | undefined) => {
-        addToClub(member.memberId, Number(params.get("clubId") || clubInfo.clubId), member.email)
-            .then(response => {
-                alert(`${response?.data.message}`);
-                clearForm()
-            })
-            .catch((err) => {
-                console.log(err)
-                alert(`Error: ${err?.message}`);
-            })
-            .finally(() => {
-                setIsLoading(false)
-            })
+        Alert.alert(
+            'Are you sure!',
+            "Clck 'OK' to add the member to club.",
+            [
+                {
+                    text: 'OK', onPress: () => {
+                        setIsLoading(true)
+                        addToClub(member.memberId, Number(params.get("clubId") || clubInfo.clubId), member.email)
+                            .then(response => { alert(`${response?.data.message}`); clearForm() })
+                            .catch((err) => { Alert.alert('Error', err.response.data.error); })
+                            .finally(() => { setIsLoading(false) })
+                    }
+                },
+                { text: 'cancel', onPress: () => null },
+            ],
+            { cancelable: true },
+        );
     }
 
     const createAndAddToClub = () => {
@@ -65,6 +71,7 @@ const AddMember = () => {
                 "lastName": lastName,
                 "email": email,
                 "phone": phone,
+                "createdBy": userInfo.email,
                 "clubId": params.get("clubId") || clubInfo.clubId
             }
             addMemberAndAssignClub(payload)
@@ -118,6 +125,8 @@ const AddMember = () => {
                 "firstName": firstName,
                 "lastName": lastName,
                 "email": userInfo.email,
+                "createdBy": userInfo.email,
+                "photo": userInfo.photo,
                 "phone": phone
             }
             regirsterMember(payload)
@@ -139,6 +148,7 @@ const AddMember = () => {
             setShowRegisterForm(true)
             setShowPhoneSearch(false)
             setFirstName(params.get("name"))
+            console.log(userInfo)
         }
     }, [])
 
@@ -183,26 +193,24 @@ const AddMember = () => {
                         <>
                             <InputText label="Enter phone number" placeholder='Search by phone number' onChangeText={handleSearchNumberChange} defaultValue={searchNumber} keyboardType="numeric" />
                             <ThemedButton title="Search" onPress={searchMember} />
-                            <Spacer space={12}/>
+                            <Spacer space={12} />
                         </>
                     }
                     {showExistingPlayer && <>
-                        <MemberItem showDetails={()=>{}} firstName={memberDetails?.firstName} dateOfBirth={memberDetails?.dateOfBirth} lastName={memberDetails?.lastName} memberId={0} />
-                        <Spacer space={12}/>
-                        <ThemedButton title="Add Member" onPress={() => addMemberToClub(memberDetails)} />
+                        <MemberItem showDetails={() => addMemberToClub(memberDetails)} firstName={memberDetails?.firstName} dateOfBirth={memberDetails?.dateOfBirth} lastName={memberDetails?.lastName} memberId={0} />
                     </>}
                     {(showRegisterForm || showAddNewMemberForm) && <>
-                         {!showRegisterForm && <ThemedText style={{ alignSelf: "center", fontSize: 12, color: "grey", width: "80%" }}>No member found with the given phone number. Please add new member</ThemedText>}
+                        {!showRegisterForm && <ThemedText style={{ alignSelf: "center", fontSize: 12, color: "grey", width: "80%" }}>No member found with the given phone number. Please add new member</ThemedText>}
                         <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
                         <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                         <InputText label="Phone" onChangeText={setPhone} defaultValue={searchNumber} keyboardType={"numeric"} />
-                        {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />}                      
+                        {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />}
                         <Spacer space={10} />
-                        <View style={{flexDirection:"row", justifyContent:"space-around"}}>
-                        {showRegisterForm && <ThemedButton title="Register" onPress={createMember} />}
-                        {!showRegisterForm && showAddNewMemberForm && <ThemedButton title="Add Member" onPress={createAndAddToClub} />}
-                        <Spacer space={10} />
-                        <ThemedButton title="Cancel" onPress={handleCancel} />
+                        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                            {showRegisterForm && <ThemedButton title="Register" onPress={createMember} />}
+                            {!showRegisterForm && showAddNewMemberForm && <ThemedButton title="Add Member" onPress={createAndAddToClub} />}
+                            <Spacer space={10} />
+                            <ThemedButton title="Cancel" onPress={handleCancel} />
                         </View>
                     </>}
                 </ScrollView>

@@ -20,7 +20,7 @@ const InputText = (props: {
   return (
     <ThemedView style={styles.container}>
       <ThemedText style={styles.label}>{props.label || props.placeholder }</ThemedText>
-      <TextInput style={{color:colors.text, ...styles.input}} {...props} onChangeText={props.onChangeText} 
+      <TextInput style={{color: (props?.editable || props?.editable == false ?"grey" : colors.text), ...styles.input}} {...props} onChangeText={props.onChangeText} 
         placeholderTextColor={colors.disabled}/>
     </ThemedView>
   )

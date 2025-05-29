@@ -1,4 +1,4 @@
-import { get, post, put } from "../utils/api";
+import { del, get, post, put } from "../utils/api";
 
 export const getClubs = (memberId: number) => {
     return get("/club", {memberId: memberId})
@@ -55,4 +55,8 @@ export const membershipRequestPut = (params: {clubId: Number, memberId: Number, 
 
 export const getClubCounts = (clubId: string | null) => {
     return get("/club", {clubId, counts: "true"})
+}
+
+export const removeMember = (clubId: number, memberId: number, email: string) => {
+    return del("/club/member", { clubId, memberId, email }, null)
 }

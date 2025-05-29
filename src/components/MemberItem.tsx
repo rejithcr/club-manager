@@ -1,6 +1,6 @@
 import {
   View,
-  Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
@@ -14,13 +14,15 @@ const MemberItem = (props: {
   firstName: string | undefined;
   dateOfBirth: string | undefined;
   dues?: number;
+  photo?: string;
   lastName: string | undefined;
   memberId: number;
 }) => {
   return (
-    <TouchableOpacity onPress={()=> props.showDetails(props.memberId)}>
+    <TouchableOpacity onPress={() => props.showDetails(props.memberId)}>
       <ShadowBox style={styles.container}>
-        <ThemedIcon style={styles.icon} name={"MaterialIcons:account-circle"} size={32} />
+        {props?.photo ? <Image source={{ uri: props?.photo }} style={{ height: 32, width: 32, borderRadius: 100, }} />
+          : <ThemedIcon style={styles.icon} name={"MaterialIcons:account-circle"} size={32} />}
         <View style={styles.spend}>
           <ThemedText>
             {props.firstName} {props.lastName}
