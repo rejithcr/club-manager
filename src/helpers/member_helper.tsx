@@ -7,7 +7,8 @@ export interface Member {
     phone?: number;
     email?: string;
     photo?: string;
-    updatedBy?: string
+    updatedBy?: string;
+    role?: string
 }
 
 

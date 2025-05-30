@@ -12,9 +12,10 @@ import Spacer from '@/src/components/Spacer';
 import ThemedButton from '@/src/components/ThemedButton';
 import { router } from 'expo-router';
 import { useTheme } from '@/src/hooks/use-theme';
-import { removeMember } from '@/src/helpers/club_helper';
+import { getClubMember, removeMember } from '@/src/helpers/club_helper';
 import { ClubContext } from '@/src/context/ClubContext';
 import { AuthContext } from '@/src/context/AuthContext';
+import { ROLE_ADMIN } from '@/src/utils/constants';
 
 const Profile = () => {
   const params = useSearchParams()
@@ -26,7 +27,7 @@ const Profile = () => {
 
   useEffect(() => {
     setIsMemberLoading(true);
-    getMemberDetails(Number(params.get("memberId")))
+    getClubMember(clubInfo.clubId, Number(params.get("memberId")))
       .then(response => { console.log(response.data); setMemberDetails(response.data) })
       .catch(error => alert(error?.response?.data?.error || "Error fetching member details"))
       .finally(() => setIsMemberLoading(false));
@@ -66,11 +67,12 @@ const Profile = () => {
         <KeyValueUI data={memberDetails} hideKeys={["photo", "firstName", "lastName"]} />
       </>}
       <Spacer space={10} />
+      {clubInfo.role === ROLE_ADMIN &&
       <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
         <ThemedButton title="    Edit    " onPress={() => router.push(`/(main)/(members)/editmember?memberId=${params.get("memberId")}`)} />
         <Spacer space={10} />
         <ThemedButton title="Remove" onPress={() => handleRemove()} style={{ backgroundColor: colors.error }} />
-      </View>
+      </View>}
     </ThemedView>
   )
 }

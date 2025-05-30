@@ -4,7 +4,6 @@ const BASE_URL = "https://n24tjyszxraupd5cuogxf377i40xiltl.lambda-url.ap-south-1
 
 export const get = (path, queryParams) => {
   console.log("GET",BASE_URL + path, queryParams);
-        console.log(process.env.EXPO_PUBLIC_AUTH_TOKEN)
   const response = axios.get(BASE_URL + path, {
     params: { ...queryParams },
     headers: {

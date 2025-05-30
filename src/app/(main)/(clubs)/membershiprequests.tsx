@@ -55,7 +55,7 @@ const MembershipRequests = () => {
         {!(isLoading || isUpdating) && <FlatList
           data={data}
           keyExtractor={(item) => item.memberId}
-          ListEmptyComponent={<ThemedText style={{alignSelf: "center"}}>No requests found.</ThemedText>}
+          ListEmptyComponent={() => <ThemedText style={{alignSelf: "center"}}>No requests found.</ThemedText>}
           ItemSeparatorComponent={() => <Spacer space={2} />}
           renderItem={({ item }) => <TouchableCard onPress={() => showApproveModal(item.memberId, item.clubId)}>
             <View style={{ flexDirection: "row", alignItems: "center", width: '80%' }}>
