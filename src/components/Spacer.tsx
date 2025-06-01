@@ -1,9 +1,9 @@
 import { View } from 'react-native'
 import React from 'react'
 
-const Spacer = (props: {space?: number}) => {
+const Spacer = (props: {space?: number, hspace?: number}) => {
   return (
-    <View style={{marginVertical: props.space ?? 5}}/>
+    <View style={{marginVertical: props.space ?? 5, marginHorizontal: props.hspace ?? 0}}/>
   )
 }
 

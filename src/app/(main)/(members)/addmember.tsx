@@ -198,7 +198,7 @@ const AddMember = () => {
                         </>
                     }
                     {showExistingPlayer && <>
-                        <MemberItem showDetails={() => addMemberToClub(memberDetails)} firstName={memberDetails?.firstName} dateOfBirth={memberDetails?.dateOfBirth} lastName={memberDetails?.lastName} memberId={0} />
+                        <MemberItem showDetails={() => addMemberToClub(memberDetails)} firstName={memberDetails?.firstName} lastName={memberDetails?.lastName} memberId={0} />
                     </>}
                     {(showRegisterForm || showAddNewMemberForm) && <>
                         {!showRegisterForm && <ThemedText style={{ alignSelf: "center", fontSize: 12, color: "grey", width: "80%" }}>No member found with the given phone number. Please add new member</ThemedText>}

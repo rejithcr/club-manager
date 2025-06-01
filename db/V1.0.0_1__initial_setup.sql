@@ -15,6 +15,8 @@ create table member (
     email varchar(100) not null unique,
     phone varchar(13) not null unique,
     photo text, 
+    is_registered numeric(1) default 0,
+    is_super_user numeric(1) default 0,
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,

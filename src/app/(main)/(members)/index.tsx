@@ -47,6 +47,7 @@ export default function Home() {
             data={members}
             initialNumToRender={8}
             ListFooterComponent={<Spacer space={10} />}
+            ItemSeparatorComponent={() => <Spacer space={4} />}
             refreshControl={<RefreshControl refreshing={false} onRefresh={loadMembers} />}
             renderItem={({ item }) => (
               <MemberItem {...item} key={item.member_id} showDetails={showDetails} />

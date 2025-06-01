@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { AuthContext } from '@/src/context/AuthContext'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { appStyles } from '@/src/utils/styles'
@@ -21,10 +21,10 @@ const Profile = () => {
     const { theme, setTheme } = useContext(ThemeContext);
     const { colors } = useTheme()
     const [isMembershipRequestShown, setIsMembershipRequestShown] = React.useState(false)
-    const handleToggleMembershipRequests = () => {
-        console.log(isMembershipRequestShown)
+    const handleToggleMembershipRequests = () => {        
         setIsMembershipRequestShown(prev => !prev)
     }
+    
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
@@ -84,8 +84,19 @@ const Profile = () => {
                 </View>                
                 <ThemedText style={appStyles.heading}>Other</ThemedText>
                 <TouchableCard onPress={() => router.push(`/(main)/(profile)/editmember?memberId=${userInfo?.memberId}`)}>
-                    <ThemedText>Edit your details</ThemedText>
+                    <ThemedText>Edit your info</ThemedText>
                 </TouchableCard>
+                {userInfo?.isSuperUser === 1 && <>
+                <ThemedText style={appStyles.heading}>Super User Options</ThemedText>
+                {/* <TouchableCard onPress={() => router.push(`/(main)/(profile)/clubs`)}>
+                    <ThemedText>Show Clubs</ThemedText>
+                </TouchableCard> */}
+                <Spacer space={4}/>
+                <TouchableCard onPress={() => router.push(`/(main)/(profile)/users`)}>
+                    <ThemedText>Show Users</ThemedText>
+                </TouchableCard>
+                </>
+                }
             </GestureHandlerRootView>
         </ThemedView>
     )

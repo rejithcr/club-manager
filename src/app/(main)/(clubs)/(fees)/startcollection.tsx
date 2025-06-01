@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Button, TextInput } from 'react-native'
+import { View, Text, FlatList, Button, TextInput, Platform } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { getNextPeriodFeeMemberList, getNextPeriods, saveNextPeriodFeeCollection } from '@/src/helpers/fee_helper';
@@ -90,7 +90,8 @@ const StartNextPeriod = () => {
             <GestureHandlerRootView>
                 <View style={{
                     flexDirection: "row", width: "80%", justifyContent: "space-between",
-                    alignSelf: "center", marginBottom: 10, alignItems: "center"
+                    alignSelf: "center", marginBottom: 10, alignItems: "center",
+                    marginTop: Platform.OS === 'web' ? 10 : 0
                 }}>
                     <ThemedText style={{ width: "35%", fontWeight: "bold" }}>Select Period</ThemedText>
                     <View style={{ width: "65%", flexDirection: "row", justifyContent: "flex-end", alignItems: "center" }}>

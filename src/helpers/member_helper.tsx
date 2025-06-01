@@ -9,7 +9,9 @@ export interface Member {
     photo?: string;
     updatedBy?: string | undefined;
     role?: string;
-    isRegistered?: number
+    isRegistered?: number,
+    createdTs?: string,
+    updatedTs?: string
 }
 
 
@@ -42,4 +44,8 @@ export const saveMemberDetails = (memberId: number, firstName: string | undefine
 
 export const verifyMemberAndUpdate = (memberInfo: Member | null) => {
     return put("/member", null, {...memberInfo, isRegistered: 1, updatedBy: memberInfo?.email, verify:true})
+}
+
+export const getUsers = (limit: number, offset: number) => {
+    return get("/member", {limit, offset})
 }
