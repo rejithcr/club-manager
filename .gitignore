@@ -12,7 +12,7 @@ android/
 dist/
 
 #firebase
-firebase/
+firebase/public/
 
 # Native
 *.orig.*
