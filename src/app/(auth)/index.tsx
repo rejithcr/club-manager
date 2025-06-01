@@ -49,13 +49,12 @@ const AuthHome = () => {
     setLoading(true)
     getMemberByEmail(userInfoFromCache.email)
       .then(response => {
-        console.log(response.data)
         if (response.data?.isRegistered === 1) {
           setUserInfo({...userInfoFromCache,...response.data})
           router.replace('/(main)')
         } else if (response.data?.isRegistered === 0) {
-          setUserInfo(userInfoFromCache)
-          router.replace(`/(main)/(profile)/editmember?memberId=${response.data?.memberId}`)
+          const memberInfo = {...response.data, photo: userInfoFromCache.photo}
+          router.replace(`/(auth)/verify?memberInfo=${JSON.stringify(memberInfo)}`)
         } else {
           setUserInfo(userInfoFromCache)
           router.replace(`/(main)/(members)/addmember?createMember=true&name=${userInfoFromCache.name}&email=${userInfoFromCache.email}`)

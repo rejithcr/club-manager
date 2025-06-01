@@ -1,4 +1,3 @@
-import { View, Text } from 'react-native'
 import React from 'react'
 import { Stack } from 'expo-router'
 import { useTheme } from '@/src/hooks/use-theme';
@@ -8,7 +7,7 @@ const AuthStack = () => {
   return (
     <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text }}>
       <Stack.Screen  name='index' options={{title: "Login", headerShown:false}}/>
-      <Stack.Screen  name='register' options={{title: "Register"}}/>
+      <Stack.Screen  name='verify' options={{title: "Verify"}}/>
     </Stack>
   )
 }

@@ -26,6 +26,7 @@ const Editmember = () => {
     const [phone, setPhone] = useState<number | undefined>();
     const [email, setEmail] = useState<string | undefined>();
     const [role, setRole] = useState<string | undefined>();
+    const [isRegistered, setIsRegistered] = useState<number | undefined>();
     const { colors } = useTheme();
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
@@ -36,6 +37,7 @@ const Editmember = () => {
         setPhone(memberDetails?.phone)
         setEmail(memberDetails?.email)
         setRole(memberDetails?.role)
+        setIsRegistered(memberDetails?.isRegistered)
         setUpdatedBy(memberDetails?.updatedBy)
     }
     useEffect(() => {
@@ -82,11 +84,15 @@ const Editmember = () => {
         <ThemedView style={{ flex: 1 }}>
             {isMemberLoading && <LoadingSpinner />}
             {!isMemberLoading && 
-                <View>
-                    <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
+                <View>                    
+                    {isRegistered === 0 ? <>
+                    <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName}/>
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                     <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
                     <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />
+                    </> : <ThemedText style={{ width: "80%", alignSelf: "center", marginVertical: 20 }}>
+                        Registered member's personal information is not editable. Please contact the member to update
+                        </ThemedText>}
                     <Spacer space={4} />
                     <ThemedText style={{ width: "80%", alignSelf:"center", fontSize:10 }}>Role</ThemedText>
                     <Spacer space={5} />

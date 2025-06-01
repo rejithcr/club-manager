@@ -1,15 +1,15 @@
 import { del, get, post, put } from '@/src/utils/api'
 
 export interface Member {
-    memberId: number;
+    memberId: number | string | undefined;
     firstName: string;
     lastName?: string;
     phone?: number;
     email?: string;
     photo?: string;
-    updatedBy?: string;
+    updatedBy?: string | undefined;
     role?: string;
-    isRegistered: number
+    isRegistered?: number
 }
 
 
@@ -40,3 +40,6 @@ export const saveMemberDetails = (memberId: number, firstName: string | undefine
     return put("/member", null, { memberId, firstName, lastName, phone, email, updatedBy })
 }
 
+export const verifyMemberAndUpdate = (memberInfo: Member | null) => {
+    return put("/member", null, {...memberInfo, isRegistered: 1, updatedBy: memberInfo?.email, verify:true})
+}

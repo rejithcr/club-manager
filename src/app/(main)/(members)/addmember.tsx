@@ -127,6 +127,7 @@ const AddMember = () => {
                 "email": userInfo.email,
                 "createdBy": userInfo.email,
                 "photo": userInfo.photo,
+                "isRegistered": 1,
                 "phone": phone
             }
             regirsterMember(payload)
