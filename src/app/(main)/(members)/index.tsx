@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { View, FlatList, Alert, RefreshControl } from "react-native";
+import { View, FlatList, RefreshControl } from "react-native";
 import MemberItem from "@/src/components/MemberItem";
 import { router, useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
@@ -10,9 +10,11 @@ import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
+import Alert, { AlertProps } from "@/src/components/Alert";
 
 export default function Home() {
   const [members, setMembers] = useState<any>([]);
+  const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const [isLoading, setIsLoading] = useState(true)
   const { clubInfo } = useContext(ClubContext)
 
@@ -22,7 +24,10 @@ export default function Home() {
     setIsLoading(true)
     getClubMembers(clubInfo.clubId)
       .then(response => setMembers(response.data))
-      .catch(err => Alert.alert("Error", err.response.data.error))
+      .catch(error => setAlertConfig({
+                    visible: true, title: 'Error', message: error.response.data.error,
+                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+                }))
       .finally(()=> setIsLoading(false))
   }
 
@@ -56,6 +61,7 @@ export default function Home() {
          // onPressMain={(name: string | undefined) => handleMenuPress(name)}
           icon={<MaterialIcons name={"add"} size={32} color={"white"} />} />
       }
+      {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
   );
 }

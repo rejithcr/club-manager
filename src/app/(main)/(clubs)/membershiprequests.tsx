@@ -1,4 +1,4 @@
-import { Alert, FlatList, View } from 'react-native'
+import { FlatList, View } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { useHttpGet } from '@/src/hooks/use-http'
 import { ClubContext } from '@/src/context/ClubContext'
@@ -18,6 +18,7 @@ import { useTheme } from '@/src/hooks/use-theme'
 import { isValidLength } from '@/src/utils/validators'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import { membershipRequestPut } from '@/src/helpers/club_helper'
+import Alert, { AlertProps } from '@/src/components/Alert'
 
 const MembershipRequests = () => {
   const { colors } = useTheme()
@@ -28,6 +29,7 @@ const MembershipRequests = () => {
   const [comments, setComments] = useState("")
   const [statusChangeRequest, setStatusChangeRequest] = useState({ clubId: 0, memberId: 0 });
   const { data, isLoading, refetch} = useHttpGet('/club', { clubId: clubInfo.clubId, membershipRequests: "true" })
+  const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
   const handleStatusChange = (status: string) => {
     if (validate(comments)) {    
@@ -35,7 +37,7 @@ const MembershipRequests = () => {
       setIsUpdating(true);
       membershipRequestPut({ clubId: statusChangeRequest.clubId, memberId: statusChangeRequest.memberId, status, comments, email: userInfo.email })
           .then(() => refetch())
-          .catch(error => Alert.alert("Error", error.response.data.error))
+          .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
           .finally(() => setIsUpdating(false))
     } 
   }
@@ -84,11 +86,13 @@ const MembershipRequests = () => {
           </View>
         </ThemedView>
       </Modal>}
+      {alertConfig?.visible && <Alert {...alertConfig}/>}
     </GestureHandlerRootView>
   )
 }
 
 export default MembershipRequests
+
 const validate = (comments: string) => {
   if (!isValidLength(comments, 2)) {
     alert("Enter atleast 2 characters for comments")

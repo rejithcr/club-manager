@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, FlatList, Alert, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, FlatList, StyleSheet } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
@@ -10,10 +10,12 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import { useTheme } from '@/src/hooks/use-theme';
 import Spacer from '@/src/components/Spacer';
 import ShadowBox from '@/src/components/ShadowBox';
+import Alert, { AlertProps } from '@/src/components/Alert';
 
 const ClubDues = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [duesByMembers, setDuesByMembers] = useState<any[] | undefined>(undefined);
+  const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
   const { clubInfo } = useContext(ClubContext)
 
@@ -21,7 +23,7 @@ const ClubDues = () => {
     setIsLoading(true);
     getClubDues(clubInfo.clubId)
       .then(response => { console.log(response.data); setDuesByMembers(response.data) })
-      .catch(error => Alert.alert("Error", error.response.data.message))
+      .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
       .finally(() => setIsLoading(false));
   }
   useEffect(() => {
@@ -41,7 +43,8 @@ const ClubDues = () => {
             ListFooterComponent={() => <Spacer space={4} />}
             renderItem={({ item }) => <MemberDue key={item.memberId} member={item} />}
           />}
-        </View>
+        </View>        
+        {alertConfig?.visible && <Alert {...alertConfig}/>}
         {/* <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => null} /> */}
       </GestureHandlerRootView>
     </ThemedView>

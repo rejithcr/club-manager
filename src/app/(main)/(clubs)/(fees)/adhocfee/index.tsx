@@ -1,8 +1,8 @@
-import { View, ScrollView, TouchableOpacity, Alert } from 'react-native'
+import { View, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useCallback, useContext, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { appStyles } from '@/src/utils/styles'
-import { getFeeStructure, getAdhocFee } from '@/src/helpers/fee_helper'
+import { getAdhocFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router, useFocusEffect } from 'expo-router'
 import TouchableCard from '@/src/components/TouchableCard'
@@ -13,9 +13,11 @@ import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
+import Alert, { AlertProps } from '@/src/components/Alert'
 
 const AdocFeesHome = () => {
   const [isLoadingAdhoc, setIsLoadingAdhoc] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const [adhocFees, setAdhocFees] = useState<any[]>([])
   const { clubInfo } = useContext(ClubContext)
   const { colors } = useTheme();
@@ -31,7 +33,8 @@ const AdocFeesHome = () => {
     setIsLoadingAdhoc(true)
     getAdhocFee(Number(clubInfo.clubId))
       .then(response => setAdhocFees(response.data))
-      .catch(error => Alert.alert("Error", error.response.data.error))
+      .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
+                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
       .finally(() => setIsLoadingAdhoc(false));
   }
 
@@ -82,6 +85,7 @@ const AdocFeesHome = () => {
           </View>
           )}
         </ScrollView>
+        {alertConfig?.visible && <Alert {...alertConfig}/>}
       </GestureHandlerRootView>
     </ThemedView>
   )

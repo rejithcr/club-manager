@@ -1,9 +1,9 @@
-import { Alert, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import { View } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import Spacer from '@/src/components/Spacer'
 import ThemedButton from '@/src/components/ThemedButton'
-import { Member, getMemberDetails, saveMemberDetails } from '@/src/helpers/member_helper'
+import { Member, getMemberDetails, regirsterMember, saveMemberDetails } from '@/src/helpers/member_helper'
 import { useSearchParams } from 'expo-router/build/hooks'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import ThemedView from '@/src/components/themed-components/ThemedView'
@@ -11,6 +11,8 @@ import { router } from 'expo-router'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import { useTheme } from '@/src/hooks/use-theme'
 import { isValidPhoneNumber } from '@/src/utils/validators'
+import Alert, { AlertProps } from '@/src/components/Alert'
+import { AuthContext } from '@/src/context/AuthContext'
 
 const Editmember = () => {
     const params = useSearchParams()
@@ -18,10 +20,11 @@ const Editmember = () => {
     const [firstName, setFirstName] = useState<string|undefined>();
     const [lastName, setLastName] = useState<string|undefined>();
     const [updatedBy, setUpdatedBy] = useState<string|undefined>();
-    const [phone, setPhone] = useState<number|undefined>();
+    const [phone, setPhone] = useState<number|undefined>();    
     const [email, setEmail] = useState<string|undefined>();
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const {colors} = useTheme();
-
+    
     const setDetails = (memberDetails: Member) => {
         setFirstName(memberDetails?.firstName)
         setLastName(memberDetails?.lastName)
@@ -41,8 +44,14 @@ const Editmember = () => {
         setIsMemberLoading(true)
         if(validate()){
          saveMemberDetails(Number(params.get("memberId")), firstName, lastName, phone, email, email)
-            .then(response => Alert.alert("Success",response.data.message))
-            .catch(error => alert(error?.response?.data?.error || "Error fetching member details"))
+            .then(response => setAlertConfig({
+                    visible: true, title: 'Success', message: response.data.message,
+                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+                }))
+            .catch(error => setAlertConfig({
+                    visible: true, title: 'Error', message: error?.response?.data?.error || "Error fetching member details",
+                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+                }))
             .finally(() => setIsMemberLoading(false));
         } else {
             setIsMemberLoading(false)
@@ -84,6 +93,7 @@ const Editmember = () => {
                         <ThemedButton title="Cancel" onPress={() => router.dismissTo('/(main)/(profile)')} />
                     </View>
                 </View>}
+            {alertConfig?.visible && <Alert {...alertConfig} />}
         </ThemedView>
     )
 }

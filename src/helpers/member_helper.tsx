@@ -8,7 +8,8 @@ export interface Member {
     email?: string;
     photo?: string;
     updatedBy?: string;
-    role?: string
+    role?: string;
+    isRegistered: number
 }
 
 
@@ -33,7 +34,9 @@ export const getMyRequests = (memberId: number) => {
     return get("/member", { memberId, requests: "true" })
 }
 
-export const saveMemberDetails = (memberId: number, firstName: string | undefined, lastName: string | undefined, phone: number | undefined, email: string | undefined, updatedBy: string | undefined) => {
+export const saveMemberDetails = (memberId: number, firstName: string | undefined, 
+    lastName: string | undefined, phone: number | undefined, 
+    email: string | undefined, updatedBy: string | undefined) => {
     return put("/member", null, { memberId, firstName, lastName, phone, email, updatedBy })
 }
 

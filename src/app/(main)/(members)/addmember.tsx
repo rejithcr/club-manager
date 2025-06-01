@@ -2,7 +2,7 @@ import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
 import { useContext, useEffect, useState } from 'react'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import { Alert, View } from 'react-native';
+import { View } from 'react-native';
 import { getMemberByPhone, regirsterMember } from '@/src/helpers/member_helper';
 import MemberItem from '@/src/components/MemberItem';
 import { useSearchParams } from 'expo-router/build/hooks';
@@ -16,9 +16,11 @@ import ThemedView from '@/src/components/themed-components/ThemedView';
 import Spacer from '@/src/components/Spacer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ThemedText from '@/src/components/themed-components/ThemedText';
+import Alert, { AlertProps } from '@/src/components/Alert';
 
 const AddMember = () => {
     const [isLoading, setIsLoading] = useState(false)
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const [showExistingPlayer, setShowExistingPlayer] = useState<boolean>(false);
     const [showRegisterForm, setShowRegisterForm] = useState<boolean>(false);
     const [showPhoneSearch, setShowPhoneSearch] = useState<boolean>(true);
@@ -44,23 +46,21 @@ const AddMember = () => {
     }
 
     const addMemberToClub = (member: any | undefined) => {
-        Alert.alert(
-            'Are you sure!',
-            "Clck 'OK' to add the member to club.",
-            [
-                {
-                    text: 'OK', onPress: () => {
-                        setIsLoading(true)
-                        addToClub(member.memberId, Number(params.get("clubId") || clubInfo.clubId), member.email)
+        setAlertConfig({
+            visible: true, 
+            title: 'Are you sure!', 
+            message: "Clck 'OK' to add the member to club.",
+            buttons: [{
+                text: 'OK', onPress: () => {
+                    setAlertConfig({visible: false}); 
+                    setIsLoading(true);
+                    addToClub(member.memberId, Number(params.get("clubId") || clubInfo.clubId), member.email)
                             .then(response => { alert(`${response?.data.message}`); clearForm() })
-                            .catch((err) => { Alert.alert('Error', err.response.data.error); })
+                            .catch((err) => { alert(err.response.data.error); })
                             .finally(() => { setIsLoading(false) })
-                    }
-                },
-                { text: 'cancel', onPress: () => null },
-            ],
-            { cancelable: true },
-        );
+                }
+            },{ text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+        });
     }
 
     const createAndAddToClub = () => {
@@ -133,9 +133,9 @@ const AddMember = () => {
                 .then(_ => {
                     router.replace('/(auth)')
                 })
-                .catch(error => {
-                    Alert.alert("Error", error.response.data.error)
-                }).finally(() => {
+                .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
+                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+                .finally(() => {
                     setIsLoading(false)
                 })
         } else {
@@ -215,6 +215,7 @@ const AddMember = () => {
                     </>}
                 </ScrollView>
                 }
+                {alertConfig?.visible && <Alert {...alertConfig}/>}
             </GestureHandlerRootView>
         </ThemedView>
     )

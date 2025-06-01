@@ -1,12 +1,11 @@
-import { View, GestureResponderEvent, Alert, TouchableOpacity, RefreshControl } from 'react-native'
+import { View, GestureResponderEvent, TouchableOpacity, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
 import { getClubCounts, getFundBalance, getTotalDue } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { router } from 'expo-router'
-import FloatingMenu from '@/src/components/FloatingMenu'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
@@ -17,10 +16,12 @@ import TouchableCard from '@/src/components/TouchableCard'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import { useTheme } from '@/src/hooks/use-theme'
 import { getFeeStructure } from '@/src/helpers/fee_helper'
+import Alert, { AlertProps } from '@/src/components/Alert'
 
 const ClubHome = () => {
     const router = useRouter()
     const params = useSearchParams()
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const { setClubInfo } = useContext(ClubContext)
     
     const { colors } = useTheme();
@@ -39,21 +40,21 @@ const ClubHome = () => {
         setIsFundBalanceLoading(true)
         getFundBalance(params.get("clubId"))
             .then(response => setFundBalance(response.data.fundBalance))
-            .catch(error => Alert.alert("Error", error.response.data.error))
+            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
             .finally(() => setIsFundBalanceLoading(false))
     }
     const fetchTotalDue = () => {
         setIsTotalDueLoading(true)
         getTotalDue(params.get("clubId"))
             .then(response => setTotalDue(response.data.totalDue))
-            .catch(error => Alert.alert("Error", error.response.data.error))
+            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
             .finally(() => setIsTotalDueLoading(false))
     }
     const fetchClubCounts = () => {
         setIsClubCountsLoading(true)
         getClubCounts(params.get("clubId"))
             .then(response => {console.log(response.data); setClubCounts(response.data)})
-            .catch(error => Alert.alert("Error", error.response.data.error))
+            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
             .finally(() => setIsClubCountsLoading(false))
     }
     const showFeeTypeDetails = (fee: any) => {
@@ -67,7 +68,7 @@ const ClubHome = () => {
         setIsLoadingCurrent(true)
         getFeeStructure(Number(params.get('clubId')))
             .then(response => setCurrentFeeStructure(response.data))
-            .catch(error => Alert.alert("Error", error.response.data.error))
+            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
             .finally(() => setIsLoadingCurrent(false));
     }
 
@@ -165,6 +166,7 @@ const ClubHome = () => {
                     </TouchableCard>
                     <Spacer space={50} />
                 </ScrollView>
+                {alertConfig?.visible && <Alert {...alertConfig}/>}
                 {/* <FloatingMenu actions={actions} position={"left"} color='black'
                     icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
                     onPressItem={(name: string | undefined) => handleMenuPress(name)}

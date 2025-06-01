@@ -4,24 +4,26 @@ import { useRouter } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import * as Google from 'expo-auth-session/providers/google'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { ActivityIndicator, Alert, Image, View } from 'react-native'
+import { ActivityIndicator, Image, View } from 'react-native'
 import { appStyles } from '@/src/utils/styles'
 import { AuthContext } from '../../context/AuthContext';
 import { getMemberByEmail } from '@/src/helpers/member_helper'
 import ThemedView from '@/src/components/themed-components/ThemedView'
+import Alert, { AlertProps } from '@/src/components/Alert'
 
 
 WebBrowser.maybeCompleteAuthSession()
 
 const AuthHome = () => {
   const { setUserInfo } = useContext(AuthContext)
+  const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
   const [isLoading, setLoading] = useState(false)
   const [_, response, promptAsyc] = Google.useAuthRequest({
     //scopes: ['https://www.googleapis.com/auth/user.phonenumbers.read'],
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
     iosClientId: "",
-    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+    webClientId: "586660286227-j9a6t8mh8g0c8s3brt7cn413ckcnlj3b.apps.googleusercontent.com",
   })
   const router = useRouter()
 
@@ -48,15 +50,18 @@ const AuthHome = () => {
     getMemberByEmail(userInfoFromCache.email)
       .then(response => {
         console.log(response.data)
-        if (response.data?.memberId) {
+        if (response.data?.isRegistered === 1) {
           setUserInfo({...userInfoFromCache,...response.data})
           router.replace('/(main)')
+        } else if (response.data?.isRegistered === 0) {
+          setUserInfo(userInfoFromCache)
+          router.replace(`/(main)/(profile)/editmember?memberId=${response.data?.memberId}`)
         } else {
           setUserInfo(userInfoFromCache)
           router.replace(`/(main)/(members)/addmember?createMember=true&name=${userInfoFromCache.name}&email=${userInfoFromCache.email}`)
         }
       })
-      .catch(error => Alert.alert("Error", error.response.data.error))
+      .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
       .finally(() => setLoading(false))
   }
 
@@ -91,6 +96,7 @@ const AuthHome = () => {
         <Image source={require("../../assets/images/app-icon.png")} style={{height: 300, width: 300, marginBottom: 50}}/>
         {isLoading ? <ActivityIndicator size="large" color={"black"} /> : <ThemedButton title="Sign in with Google" onPress={() => promptAsyc()} />}
       </View>
+      {alertConfig?.visible && <Alert {...alertConfig}/>}
     </ThemedView>
   )
 }

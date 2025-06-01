@@ -1,4 +1,4 @@
-import { View, Text, Alert } from 'react-native'
+import { View } from 'react-native'
 import React, { useContext, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import { Picker } from '@react-native-picker/picker'
@@ -12,10 +12,11 @@ import { AuthContext } from '@/src/context/AuthContext'
 import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
+import Alert, { AlertProps } from '@/src/components/Alert'
 
 const DefineFee = () => {
     const [isLoading, setIsLoading] = useState(false);
-
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const [feeType, setFeeType] = useState("");
     const [feeTypeInterval, setFeeTypeInterval] = useState("MONTHLY");
     const [feeAmount, setFeeAmount] = useState("");
@@ -27,14 +28,13 @@ const DefineFee = () => {
             setIsLoading(true)
             addRegularFee(clubInfo.clubId, feeType, feeTypeInterval, feeAmount, userInfo.email)
                 .then((response) => {
-                    console.log(response.data)
-                    Alert.alert("Success", "Fee added successfully")
+                    setAlertConfig({visible: true, title: 'Success', message: response.data.message, 
+                                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]});
                     router.dismissTo(`/(main)/(clubs)`)
                 })
-                .catch((error: any) => {
-                    Alert.alert("Error", error.response.data.error)
-                    console.log(error)
-                }).finally(() => setIsLoading(false))
+                .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
+                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+                .finally(() => setIsLoading(false))
         }
     }
     return (
@@ -65,12 +65,12 @@ const DefineFee = () => {
                             keyboardType={'numeric'}
                             defaultValue={feeAmount}
                         />
-
                         <View style={{ marginBottom: 40 }} />
                         <ThemedButton title='Add Fee' onPress={handleAddFee} />
                     </View>
                 }
-            </ScrollView>
+            </ScrollView>            
+            {alertConfig?.visible && <Alert {...alertConfig}/>}
         </GestureHandlerRootView>
         </ThemedView>
     )

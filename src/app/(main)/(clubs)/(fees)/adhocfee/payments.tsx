@@ -1,4 +1,4 @@
-import { View, FlatList, TouchableOpacity, Alert } from 'react-native'
+import { View, FlatList, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { deleteAdhocFeeCollection, getAdhocFeePayments, saveAdhocFeePayments } from '@/src/helpers/fee_helper';
@@ -19,6 +19,7 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import Spacer from '@/src/components/Spacer';
 import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
 import { ROLE_ADMIN } from '@/src/utils/constants';
+import Alert, { AlertProps } from '@/src/components/Alert';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -30,6 +31,7 @@ const Payments = () => {
         firstName?: string;
         paymentDate: Date
     }[]>([])
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
     const { colors } = useTheme()
@@ -42,7 +44,8 @@ const Payments = () => {
         setPaymentStatusUpdates([]);
         getAdhocFeePayments(feeObj?.clubAdhocFeeId)
             .then(response => { console.log(response.data.memberAdhocFees); setFeeByMembers(response.data.memberAdhocFees) })
-            .catch(error => console.error(error))
+            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
+                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
             .finally(() => setIsLoading(false));
     }, [])
 
@@ -60,28 +63,27 @@ const Payments = () => {
         setIsConfirmVisible(false)
         saveAdhocFeePayments(paymentStatusUpdates, clubInfo.clubId, "true", userInfo.email)
             .then(() => router.back())
-            .catch(error => Alert.alert("Error", error.response.data.error))
+            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
+                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
             .finally(() => setIsLoading(false));
     }
 
     const deleteCollection = () => {
-        Alert.alert(
-            'Are you sure!',
-            'This will delete the transcations of this collecton. This cannot be recovered.',
-            [
-                {
-                    text: 'OK', onPress: () => {
-                        setIsLoading(true)
-                        deleteAdhocFeeCollection(feeObj?.clubAdhocFeeId, userInfo.email)
-                            .then((response) => { Alert.alert("Success", response.data.message); router.dismissTo('/(main)/(clubs)/(fees)/adhocfee') })
-                            .catch(error => Alert.alert("Error", error.response.data.error))
-                            .finally(() => setIsLoading(false));
-                    }
-                },
-                { text: 'cancel', onPress: () => null },
-            ],
-            { cancelable: true },
-        );
+        setAlertConfig({
+            visible: true, 
+            title: 'Are you sure!', 
+            message: 'This will delete the transcations of this collecton. This cannot be recovered.',
+            buttons: [{
+                text: 'OK', onPress: () => {
+                    setAlertConfig({visible: false}); 
+                    setIsLoading(true);
+                    deleteAdhocFeeCollection(feeObj?.clubAdhocFeeId, userInfo.email)
+                        .then((response) => { alert(response.data.message); router.dismissTo('/(main)/(clubs)/(fees)/adhocfee') })
+                        .catch(error => alert(error.response.data.error))
+                        .finally(() => setIsLoading(false));
+                }
+            },{ text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+        });
     }
     
     return (
@@ -139,7 +141,8 @@ const Payments = () => {
             {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
                 <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
                 <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} color={colors.error}/>
-            </View>}
+            </View>}       
+            {alertConfig?.visible && <Alert {...alertConfig}/>}
         </GestureHandlerRootView>
         </ThemedView>
     )

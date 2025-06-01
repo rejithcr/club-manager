@@ -1,4 +1,4 @@
-import { View, Text, FlatList, TouchableOpacity,  Alert } from 'react-native'
+import { View, FlatList, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { deleteFeeCollection, getFeePayments, saveFeePayments } from '@/src/helpers/fee_helper';
@@ -18,10 +18,12 @@ import { useTheme } from '@/src/hooks/use-theme';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import Spacer from '@/src/components/Spacer';
 import { ROLE_ADMIN } from '@/src/utils/constants';
+import Alert, { AlertProps } from '@/src/components/Alert';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const [feeByMembers, setFeeByMembers] = useState<any | undefined>(undefined);
     const [paymentStatusUpdates, setPaymentStatusUpdates] = useState<{
         clubFeePaymentId: number;
@@ -57,67 +59,69 @@ const Payments = () => {
         setIsConfirmVisible(false)
         saveFeePayments(paymentStatusUpdates, clubInfo.clubId, "true", userInfo.email)
             .then(() => router.back())
-            .catch(error => Alert.alert("Error", error.response.data.error))
+            .catch(error => setAlertConfig({
+                visible: true, title: 'Error', message: error.response.data.error,
+                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+            }))
             .finally(() => setIsLoading(false));
     }
 
     const deleteCollection = () => {
-        Alert.alert(
-            'Are you sure!',
-            'This will delete the transcations of this collecton. This cannot be recovered.',
-            [
-                {
-                    text: 'OK', onPress: () => {
-                        setIsLoading(true)
-                        deleteFeeCollection(params.get("clubFeeCollectionId"), userInfo.email)
-                            .then(() => router.back())
-                            .catch(error => Alert.alert("Error", error.response.data.error))
-                            .finally(() => setIsLoading(false));
-                    }
-                },
-                { text: 'cancel', onPress: () => null},
-            ],
-            { cancelable: true },
-        );
+        setAlertConfig({
+            visible: true,
+            title: 'Are you sure!',
+            message: 'This will delete the transcations of this collecton. This cannot be recovered.',
+            buttons: [{
+                text: 'OK', onPress: () => {
+                    setAlertConfig({ visible: false });
+                    setIsLoading(true);
+                    deleteFeeCollection(params.get("clubFeeCollectionId"), userInfo.email)
+                        .then(() => router.back())
+                        .catch(error => alert(error.response.data.error))
+                        .finally(() => setIsLoading(false));
+                }
+            }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+        });
     }
     return (
         <ThemedView style={{ flex: 1 }}>
-        <GestureHandlerRootView>
-            <ThemedText style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</ThemedText>            
-            <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the member to update payment status</ThemedText>
-            <Spacer space={5} />
-            <View>
-                {isLoading && <LoadingSpinner />}
-                {!isLoading &&
-                    <FlatList style={{ width: "100%" }}
-                        data={feeByMembers}
-                        initialNumToRender={8}
-                        ListFooterComponent={() => <Spacer space={80}/>}
-                        ItemSeparatorComponent={()=> <Spacer space={4}/>}
-                        renderItem={({ item }) => (
-                            <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
-                        )}
-                    />}
-            </View>
-            <Modal isVisible={isConfirmVisible}>
-                <ScrollView>
-                    <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
-                        <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
-                        {paymentStatusUpdates.map((item) => {
-                            return <PaymentUpdates key={item.clubFeePaymentId} {...item} />
-                        })}
-                        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                            <ThemedButton title="Update" onPress={() => savePaymentUpdates()} />
-                            <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
-                        </View>
-                    </ThemedView>
-                </ScrollView>
-            </Modal>
-            {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30}}>
-                <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
-                <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => deleteCollection()} color={colors.error}/>
-            </View> }
-        </GestureHandlerRootView>
+            <GestureHandlerRootView>
+                <ThemedText style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</ThemedText>
+                <ThemedText style={{ width: "80%", alignSelf: "center", fontSize: 10 }}>Select the member to update payment status</ThemedText>
+                <Spacer space={5} />
+                <View>
+                    {isLoading && <LoadingSpinner />}
+                    {!isLoading &&
+                        <FlatList style={{ width: "100%" }}
+                            data={feeByMembers}
+                            initialNumToRender={8}
+                            ListFooterComponent={() => <Spacer space={80} />}
+                            ItemSeparatorComponent={() => <Spacer space={4} />}
+                            renderItem={({ item }) => (
+                                <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
+                            )}
+                        />}
+                </View>
+                <Modal isVisible={isConfirmVisible}>
+                    <ScrollView>
+                        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+                            <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
+                            {paymentStatusUpdates.map((item) => {
+                                return <PaymentUpdates key={item.clubFeePaymentId} {...item} />
+                            })}
+                            <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                                <ThemedButton title="Update" onPress={() => savePaymentUpdates()} />
+                                <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
+                            </View>
+                        </ThemedView>
+                    </ScrollView>
+                </Modal>
+                {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30 }}>
+                    <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
+                    <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => deleteCollection()} color={colors.error} />
+                </View>}
+                {alertConfig?.visible && <Alert {...alertConfig} />}
+            </GestureHandlerRootView>
         </ThemedView>
     )
 }
@@ -134,7 +138,7 @@ const MemberFeeItem = (props: {
     const selectItem = () => {
         setIsSelected(prev => !prev)
 
-        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName?: string | undefined; amount: number; paymentDate: Date})[]) => {
+        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName?: string | undefined; amount: number; paymentDate: Date })[]) => {
 
             let item = prev.find(item => item.clubFeePaymentId == props.clubFeePaymentId)
             const initialPaymentStatus = props.feeByMembers?.find((item: { clubFeePaymentId: number; }) => item.clubFeePaymentId == props.clubFeePaymentId)
@@ -157,7 +161,7 @@ const MemberFeeItem = (props: {
                 <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName} {props?.lastName}</ThemedText>
                 <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</ThemedText>
                 <View style={{ width: "10%" }}>
-                    <ThemedCheckBox checked={isSelected}/>
+                    <ThemedCheckBox checked={isSelected} />
                 </View>
             </ShadowBox>
         </TouchableOpacity>
@@ -169,7 +173,7 @@ const PaymentUpdates = (props: { clubFeePaymentId: number | undefined; firstName
     return (
         <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
             <ThemedText numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName}</ThemedText>
-            <ThemedCheckBox checked={props?.paid} /> 
+            <ThemedCheckBox checked={props?.paid} />
         </ShadowBox>
     )
 }

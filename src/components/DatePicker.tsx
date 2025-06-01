@@ -1,11 +1,13 @@
-import { View, StyleSheet, Pressable } from 'react-native'
+import { View, StyleSheet, Pressable, Platform } from 'react-native'
 import React, { useState } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker';
 import ThemedIcon from './themed-components/ThemedIcon';
 import ThemedText from './themed-components/ThemedText';
+import { useTheme } from '../hooks/use-theme';
 
 const DatePicker = (props: { date: Date; setDate: any }) => {
     const [show, setShow] = useState(false);
+    const { colors } = useTheme()
 
     const onChange = (_: any, selectedDate?: Date) => {
         setShow(false);
@@ -16,6 +18,23 @@ const DatePicker = (props: { date: Date; setDate: any }) => {
         setShow(true);
     };
 
+    const getWebFormattedDate = (date: Date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0'); 
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    if (Platform.OS == 'web') {
+        console.log(props.date.toLocaleDateString())
+        return (
+            <View style={styles.webContainer}>
+                <input style={{...styles.webInput, backgroundColor: colors.background, color: colors.text}} 
+                    type='date' value={getWebFormattedDate(props.date)}
+                    onChange={(e) => props.setDate(new Date(e.target.value))} />
+            </View>
+        )
+    }
     return (
         <>
             <Pressable onPress={() => showDatepicker()}>
@@ -51,5 +70,15 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         margin: 10,
         paddingLeft: 5
+    },
+    webContainer: {
+        flexDirection: "row",
+        width: "80%",
+        alignSelf: "center",
+        alignItems: "center",
+        paddingVertical: 20,
+    },
+    webInput: {
+        padding: 10
     }
 })

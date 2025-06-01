@@ -1,4 +1,4 @@
-import { View, Text, Alert } from 'react-native'
+import { View, Text } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
@@ -11,6 +11,7 @@ import { router } from 'expo-router'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
+import Alert, { AlertProps } from '@/src/components/Alert'
 
 const EditFeeType = () => {
     const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -18,6 +19,7 @@ const EditFeeType = () => {
     const [clubFeeType, setClubFeeType] = useState<string | null>()
     const [clubFeeAmount, setClubFeeAmount] = useState<string>("")
     const [clubFeeTypeInterval, setClubFeeTypeInterval] = useState<string | null>()
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const { userInfo } = useContext(AuthContext)
     const params = useSearchParams()
 
@@ -28,39 +30,37 @@ const EditFeeType = () => {
         setIsEditable(params.get("isEditable") == "true" ? true : false)
     }, [])
 
-    const handleSaveFeeType = () => {        
-        if(validate(clubFeeType, clubFeeAmount)) {
+    const handleSaveFeeType = () => {
+        if (validate(clubFeeType, clubFeeAmount)) {
             setIsLoading(true)
             editFee(params.get("clubFeeTypeId"), clubFeeType, clubFeeTypeInterval, clubFeeAmount, userInfo.email)
                 .then(() => router.dismissTo('/(main)/(clubs)'))
-                .catch((error) => alert(JSON.stringify(error.response.data)))
+                .catch(error => setAlertConfig({
+                    visible: true, title: 'Error', message: error.response.data.error,
+                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+                }))
                 .finally(() => setIsLoading(false))
         }
     }
     const handleDeleteFeeType = () => {
-        Alert.alert(
-                    'Are you sure!',
-                    'This will delete the fee type and all its exception types.',
-                    [
-                        {
-                            text: 'OK', onPress: () => {
-                                setIsLoading(true)
-                                deleteFee(params.get("clubFeeTypeId"), userInfo.email)
-                                    .then((response) => {
-                                        Alert.alert("Success", response.data.message);
-                                        router.dismissTo(`/(main)/(clubs)`)
-                                    })
-                                    .catch((error) => Alert.alert("Error", error.response.data.error))
-                                    .finally(() => setIsLoading(false))
-                            }
-                        },
-                        { text: 'cancel', onPress: () => null},
-                    ],
-                    { cancelable: true },
-                );
+        setAlertConfig({
+            visible: true, 
+            title: 'Are you sure!', 
+            message: 'This will delete the fee type and all its exception types.',
+            buttons: [{
+                text: 'OK', onPress: () => {
+                    setAlertConfig({visible: false}); 
+                    setIsLoading(true);
+                    deleteFee(params.get("clubFeeTypeId"), userInfo.email)
+                        .then((response) => { alert(response.data.message); router.dismissTo(`/(main)/(clubs)`)})
+                        .catch((error) => alert(error.response.data.error))
+                        .finally(() => setIsLoading(false))
+                }
+            },{ text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+        });
     }
     return (
-        <ThemedView style={{ flex: 1}}>
+        <ThemedView style={{ flex: 1 }}>
             <InputText label='Fee Type' onChangeText={setClubFeeType} defaultValue={params.get("clubFeeType")} />
             {!isEditable && <Text style={{ alignSelf: "center", fontSize: 10, color: "grey", width: "80%" }}>
                 Interval not editable as some collections are already using this value. You can create a new fee type with different interval</Text>}
@@ -82,6 +82,7 @@ const EditFeeType = () => {
                     <ThemedButton title='Update Fee' onPress={handleSaveFeeType} />
                     {isEditable && <ThemedButton title='Delete Fee' onPress={handleDeleteFeeType} />}
                 </View>}
+            {alertConfig?.visible && <Alert {...alertConfig} />}
         </ThemedView>
     )
 }

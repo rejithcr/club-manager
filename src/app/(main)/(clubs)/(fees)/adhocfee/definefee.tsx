@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Alert } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import { MaterialIcons } from '@expo/vector-icons'
@@ -16,6 +16,7 @@ import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ShadowBox from '@/src/components/ShadowBox'
 import { useTheme } from '@/src/hooks/use-theme'
+import Alert, { AlertProps } from '@/src/components/Alert'
 
 const DefineFee = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -26,6 +27,7 @@ const DefineFee = () => {
     const [amountPerMember, setAmountPerMember] = useState(0);
     const [feeAmount, setFeeAmount] = useState("");
     const [feeDescription, setFeeDescription] = useState("")
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const { userInfo } = useContext(AuthContext)
     const { clubInfo } = useContext(ClubContext)
     const { colors } = useTheme()
@@ -40,7 +42,8 @@ const DefineFee = () => {
         setIsLoadingMembers(true)
         getClubMembers(clubInfo.clubId)
             .then((response) => setMembers(response.data))
-            .catch(error => Alert.alert("Error", error.response.data.error))
+            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
+                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
             .finally(() => setIsLoadingMembers(false))
     }, [])
     const addFee = () => {
@@ -50,13 +53,12 @@ const DefineFee = () => {
             addAdhocFee(clubInfo.clubId, feeName, feeDescription, feeAmount, feeAddedMembers,userInfo.email)
                 .then((response) => {
                     console.log(response.data)
-                    Alert.alert("Success", "Fee added successfully")
+                    alert("Fee added successfully")
                     router.dismissTo(`/(main)/(clubs)/(fees)/adhocfee`)
                 })
-                .catch((error: any) => {
-                    Alert.alert("Error", error.response.data.error) 
-                    console.log(error)
-                }).finally(() => setIsLoading(false))
+                .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
+                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+                .finally(() => setIsLoading(false))
         }
     }
 
@@ -122,6 +124,7 @@ const DefineFee = () => {
                 </View>
             </ScrollView>
             <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 30 }} title='Start Collection' onPress={addFee} />
+            {alertConfig?.visible && <Alert {...alertConfig}/>}
         </GestureHandlerRootView>
         </ThemedView>
     )

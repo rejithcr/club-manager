@@ -1,8 +1,7 @@
-import { View, Image, StyleSheet, Alert } from 'react-native'
+import { View, Image, StyleSheet } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
-import { MaterialIcons } from '@expo/vector-icons';
-import { getMemberDetails, Member } from '@/src/helpers/member_helper';
+import { Member } from '@/src/helpers/member_helper';
 import KeyValueUI from '@/src/components/KeyValueUI';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
@@ -16,11 +15,13 @@ import { getClubMember, removeMember } from '@/src/helpers/club_helper';
 import { ClubContext } from '@/src/context/ClubContext';
 import { AuthContext } from '@/src/context/AuthContext';
 import { ROLE_ADMIN } from '@/src/utils/constants';
+import Alert, { AlertProps } from '@/src/components/Alert';
 
 const Profile = () => {
   const params = useSearchParams()
   const [isMemberLoading, setIsMemberLoading] = useState(false)
   const [memberDetails, setMemberDetails] = useState<Member>()
+  const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const { colors } = useTheme()
   const { clubInfo } = useContext(ClubContext)
   const { userInfo } = useContext(AuthContext)
@@ -35,24 +36,21 @@ const Profile = () => {
 
 
   const handleRemove = () => {
-    Alert.alert(
-      'Are you sure!',
-      "Clck 'OK' to remove the member.",
-      [
-        {
-          text: 'OK', onPress: () => {
-            setIsMemberLoading(true)
-            removeMember(clubInfo.clubId, Number(params.get("memberId")), userInfo.email)
-              .then(response => { Alert.alert("Success", response.data.message); router.back() })
-              .catch(error => alert(error?.response?.data?.error || "Error fetching member details"))
-              .finally(() => setIsMemberLoading(false));
-          }
-        },
-        { text: 'cancel', onPress: () => null },
-      ],
-      { cancelable: true },
-    );
-
+    setAlertConfig({
+      visible: true,
+      title: 'Are you sure!',
+      message: "Clck 'OK' to remove the member.",
+      buttons: [{
+        text: 'OK', onPress: () => {
+          setAlertConfig({ visible: false });
+          setIsMemberLoading(true)
+          removeMember(clubInfo.clubId, Number(params.get("memberId")), userInfo.email)
+            .then(response => { alert(response.data.message); router.back() })
+            .catch(error => alert(error?.response?.data?.error || "Error fetching member details"))
+            .finally(() => setIsMemberLoading(false));
+        }
+      }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+    });
   }
 
   return (
@@ -68,11 +66,12 @@ const Profile = () => {
       </>}
       <Spacer space={10} />
       {clubInfo.role === ROLE_ADMIN &&
-      <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-        <ThemedButton title="    Edit    " onPress={() => router.push(`/(main)/(members)/editmember?memberId=${params.get("memberId")}`)} />
-        <Spacer space={10} />
-        <ThemedButton title="Remove" onPress={() => handleRemove()} style={{ backgroundColor: colors.error }} />
-      </View>}
+        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+          <ThemedButton title="    Edit    " onPress={() => router.push(`/(main)/(members)/editmember?memberId=${params.get("memberId")}`)} />
+          <Spacer space={10} />
+          <ThemedButton title="Remove" onPress={() => handleRemove()} style={{ backgroundColor: colors.error }} />
+        </View>}
+      {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
   )
 }

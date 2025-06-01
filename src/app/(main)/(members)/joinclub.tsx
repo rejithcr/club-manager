@@ -8,12 +8,14 @@ import { AuthContext } from '@/src/context/AuthContext';
 import { requestMembership, searchClubsByName } from '@/src/helpers/club_helper';
 import { router } from 'expo-router';
 import React, { useContext, useState } from 'react';
-import { FlatList, StyleSheet, Alert } from 'react-native';
+import { FlatList, StyleSheet } from 'react-native';
+import Alert, {AlertProps} from '@/src/components/Alert'
 
 const JoinClub = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [filteredClubs, setFilteredClubs] = useState<{ clubId: number, clubName: string }[]>([]);
     const [debounceTimeout, setDebounceTimeout] = useState<number | null>(null);
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
     const { userInfo } = useContext(AuthContext)
 
@@ -31,7 +33,7 @@ const JoinClub = () => {
             setIsLoading(true);
             searchClubsByName(query)
                 .then(response => setFilteredClubs(response.data))
-                .catch(error => Alert.alert("Error", error.resoinse.data.message))
+                .catch(error => alert(error.resoinse.data.message))
                 .finally(() => setIsLoading(false));
         }, 500); // 500ms delay
 
@@ -39,23 +41,25 @@ const JoinClub = () => {
     };
 
     const handleSelectClub = (club: { clubId: number; clubName: string }) => {
-        Alert.alert(
-            'Are you sure!',
-            `This will send your membership request for ${club.clubName} to the club admin`,
-            [
+        setAlertConfig({
+            visible: true,
+            title: 'Are you sure!',
+            message: `This will send your membership request for ${club.clubName} to the club admin`,
+            buttons: [
                 {
                     text: 'OK', onPress: () => {
+                        setAlertConfig({visible: false}); 
                         setIsLoading(true);
                         requestMembership(club.clubId, userInfo.memberId, userInfo.email)
-                            .then((response) => { Alert.alert("Info", response.data.message); router.dismissTo('/(main)/(profile)') })
-                            .catch(error => Alert.alert("Error", error.response.data.error))
-                            .finally(() => setIsLoading(false));
+                            .then((response) => { alert(response.data.message); router.dismissTo('/(main)/(profile)') })
+                            .catch(error => alert(error.response.data.error))
+                            .finally(() =>{ setIsLoading(false)});
                     }
                 },
-                { text: 'cancel', onPress: () => null },
+                { text: 'Cancel', style: 'cancel', onPress: () => setAlertConfig({visible: false}) },
             ]
-        );
-    };
+        })
+    }
 
     return (
         <ThemedView style={{ flex: 1 }}>
@@ -79,6 +83,7 @@ const JoinClub = () => {
                 ListEmptyComponent={<ThemedText style={styles.emptyText}>No clubs found</ThemedText>}
                 ItemSeparatorComponent={() => <Spacer space={2} />}
             />}
+            {alertConfig?.visible && <Alert {...alertConfig}/>}
         </ThemedView>
     );
 };

@@ -1,4 +1,4 @@
-import { View, ScrollView, TouchableOpacity, Alert } from 'react-native'
+import { View, ScrollView, TouchableOpacity } from 'react-native'
 import React, { useCallback, useContext, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { appStyles } from '@/src/utils/styles'
@@ -13,10 +13,12 @@ import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
+import Alert, { AlertProps } from '@/src/components/Alert'
 
 const Fees = () => {
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
   const [currentFeeStructure, setCurrentFeeStructure] = useState<any>([])
+  const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const { clubInfo } = useContext(ClubContext)
   const { colors } = useTheme();
 
@@ -31,7 +33,10 @@ const Fees = () => {
     setIsLoadingCurrent(true)
     getFeeStructure(Number(clubInfo.clubId))
       .then(response => setCurrentFeeStructure(response.data))
-      .catch(error => Alert.alert("Error", error.response.data.error))
+      .catch(error => setAlertConfig({
+                    visible: true, title: 'Error', message: error.response.data.error,
+                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+                }))
       .finally(() => setIsLoadingCurrent(false));
   }
 
@@ -74,6 +79,7 @@ const Fees = () => {
           </View>
         })}
       </ScrollView>
+      {alertConfig?.visible && <Alert {...alertConfig}/>}
     </GestureHandlerRootView>
     </ThemedView>
   )
