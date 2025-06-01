@@ -23,7 +23,7 @@ const AuthHome = () => {
     //scopes: ['https://www.googleapis.com/auth/user.phonenumbers.read'],
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
     iosClientId: "",
-    webClientId: "586660286227-j9a6t8mh8g0c8s3brt7cn413ckcnlj3b.apps.googleusercontent.com",
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
   })
   const router = useRouter()
 
