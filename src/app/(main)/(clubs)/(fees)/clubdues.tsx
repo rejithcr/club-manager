@@ -35,7 +35,7 @@ const ClubDues = () => {
       <GestureHandlerRootView>
         <Spacer space={5} />
         {isLoading && <LoadingSpinner />}
-        <View style={{ width: "90%", alignSelf: "center" }}>
+        <View style={{ width: "85%", alignSelf: "center" }}>
           {!isLoading && <FlatList
             data={duesByMembers}
             keyExtractor={(item) => item.memberId.toString()}
@@ -100,7 +100,7 @@ const MemberFeeItem = (props: { paymentId: number; fee: string; feeType: string,
 
 const styles = StyleSheet.create({
   item: {
-    width: "85%",
+    width: "95%",
     flexDirection: "row",
     flexWrap: "wrap", alignSelf:"center",
     alignItems: "center",

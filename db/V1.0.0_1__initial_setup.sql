@@ -206,3 +206,33 @@ create table membership_requests (
     CONSTRAINT membership_status_check CHECK (status in ('REQUESTED','APPROVED','REJECTED')),
     CONSTRAINT unique_membership_request UNIQUE (club_id,member_id)
 );
+
+create table club_member_attributes (
+    club_member_attribute_id integer primary key,
+    club_id integer not null,
+    attribute varchar(100) not null,
+    required numeric(1) default 0,
+    created_by varchar(100) not null,
+    created_ts timestamp  default now(),
+    updated_by varchar(100) not null,
+    updated_ts timestamp  default now(),
+    FOREIGN KEY (club_id) REFERENCES club(club_id),
+    CONSTRAINT required_check CHECK (required in (0,1)),
+    CONSTRAINT unique_mmember_attribute UNIQUE (club_id,attribute)
+);
+CREATE SEQUENCE club_member_attribute_id_seq START 1;
+
+create table club_member_attribute_value (
+    club_member_attribute_value_id integer primary key,
+    club_member_attribute_id integer,
+    membership_id integer not null,
+    attribute_value varchar(100) not null,
+    created_by varchar(100) not null,
+    created_ts timestamp  default now(),
+    updated_by varchar(100) not null,
+    updated_ts timestamp  default now(),
+    FOREIGN KEY (club_member_attribute_id) REFERENCES club_member_attributes(club_member_attribute_id),
+    FOREIGN KEY (membership_id) REFERENCES membership(membership_id),
+    CONSTRAINT unique_mmember_attribute_value UNIQUE (club_member_attribute_id,membership_id)
+);
+CREATE SEQUENCE club_member_attribute_value_id_seq START 1;

@@ -127,7 +127,7 @@ const FeeTypeDetails = () => {
                             <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
                         </TouchableOpacity>}
                     </View>
-                    {showAddException && <View style={{ width: "90%", alignSelf: "center" }}>
+                    {showAddException && <View style={{ width: "95%", alignSelf: "center" }}>
                         {(!exceptionTypes?.length || exceptionTypes?.length < 1) &&
                             <ThemedText style={{ alignSelf: "center", width: "80%" }}>No exceptions present for this fee type. You can add exceptions by pressing the + icon above. With this feature you can configure special fees for some members for this fee type (eg. in case of leave)</ThemedText>}
                         {exceptionTypes?.map((et: any) =>

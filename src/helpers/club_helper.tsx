@@ -68,3 +68,16 @@ export const getClubMember = async ( clubId: number, memberId: number) => {
 export const saveClubMember = (clubId: string, memberId: number, firstName: string | undefined, lastName: string | undefined, phone: number | undefined, email: string | undefined, role: string | undefined, updatedBy: string | undefined) => {
     return put("/club/member", null, {clubId, memberId, firstName, lastName, phone, email, updatedBy, role})
 }
+
+export const addClubMemberAttribute = async (clubId: string, attributeName: string, required: boolean, email: string) => {
+    return post("/club/member/attribute", null, {clubId, attributeName, required, email, addClubMemberAttribute: true})
+}
+
+
+export const saveClubMemberAttribute = async (clubMemberAttributeId: number | null, attributeName: string, required: boolean, email: string) => {
+    return put("/club/member/attribute", null, {clubMemberAttributeId, attributeName, required, email, editClubMemberAttribute: true})
+}
+
+export const deleteClubMemberAttribute = async (clubMemberAttributeId: number | null) => {
+    return del("/club/member/attribute", {clubMemberAttributeId, deleteClubMemberAttribute: true}, null)
+}

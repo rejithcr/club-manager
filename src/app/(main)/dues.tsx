@@ -6,6 +6,7 @@ import { useState } from 'react';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import { useTheme } from '@/src/hooks/use-theme';
 import Spacer from '@/src/components/Spacer';
+import ThemedButton from '@/src/components/ThemedButton';
 
 const FeeSummary = (props: { duesByMember: [] }) => {
   const [showDues, setShowDues] = useState(true)
@@ -37,6 +38,9 @@ const FeeSummary = (props: { duesByMember: [] }) => {
                 <ThemedText style={styles.amount}>Rs. {due.amount}</ThemedText>
               </View>
             )}
+            
+             {/* {showDues && <ThemedButton title='Pay Now' onPress={()=>{ Linking.openURL(`upi://pay?pa=8281478849@ybl&pn=Rejith C R&cu=INR&am=100&tn=${club.clubName}: due payment`)}} />}
+             <Link href='upi://pay?pa=8281478849@ybl&pn=Rejith C R&cu=INR&am=100'>Pay Now</Link> */}
             <Spacer space={4} />
           </View>
         )

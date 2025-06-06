@@ -1,68 +1,156 @@
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native'
-import React, { useEffect, useRef, useState } from 'react'
+import { View, TouchableOpacity, Switch } from 'react-native'
+import React, { useContext, useState } from 'react'
 import InputText from '@/src/components/InputText';
 import ThemedButton from '@/src/components/ThemedButton';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useSearchParams } from 'expo-router/build/hooks';
 import ThemedView from '@/src/components/themed-components/ThemedView';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
+import ThemedText from '@/src/components/themed-components/ThemedText';
+import { ClubContext } from '@/src/context/ClubContext';
+import { useHttpGet } from '@/src/hooks/use-http';
+import { AuthContext } from '@/src/context/AuthContext';
+import Modal from 'react-native-modal';
+import { appStyles } from '@/src/utils/styles';
+import Spacer from '@/src/components/Spacer';
+import { addClubMemberAttribute, deleteClubMemberAttribute, saveClubMemberAttribute } from '@/src/helpers/club_helper';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
+import Alert, { AlertProps } from '@/src/components/Alert';
+import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { isAplhaNumeric } from '@/src/utils/validators';
+import TouchableCard from '@/src/components/TouchableCard';
+import { useTheme } from '@/src/hooks/use-theme';
 
 const MemberAttributes = () => {
-  const [inputs, setInputs] = useState(['1']);
-  const [values, setValues] = useState<any>({});
-  const inputRef = useRef(1)
-  const params = useSearchParams()
+  const { userInfo } = useContext(AuthContext)
+  const { clubInfo } = useContext(ClubContext)
+  const [isAttributeModalVisible, setIsAttributeModalVisible] = useState(false)
+  const [clubMemberAttributeId, setClubMemberAttributeId] = useState(null)
+  const [isEdit, setIsEdit] = useState(false)
+  const [attributeName, setAttributeName] = useState('');
+  const [requried, setRequired] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [alertConfig, setAlertConfig] = useState<AlertProps>();
+  const { colors } = useTheme()
 
-  useEffect(()=> {
-    
-  },[])
+  const {
+    data: cmaList,
+    isLoading: isLoadingCMA,
+    refetch: refetchCMA
+  } = useHttpGet("/club/member/attribute", { clubId: clubInfo.clubId, getClubMemberAttribute: true })
 
-  const addInput = () => {
-    inputRef.current  = inputRef.current + 1
-    setInputs(prev => [...prev, `${inputRef.current + 1}`]);
-  };
+  const handleSave = () => {
+    if (!isAplhaNumeric(attributeName)) {
+      setAlertConfig({
+        visible: true, title: 'Error', message: "Enter only alphanumeric with min 2 characters.",
+        buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+      })
+    } else {
+      setIsSaving(true)
+      setIsAttributeModalVisible(false)
+      if (isEdit) {
+        saveClubMemberAttribute(clubMemberAttributeId, attributeName, requried, userInfo.email)
+          .then(() => refetchCMA())
+          .catch(error => {
+            console.log(error.response.data); setAlertConfig({
+              visible: true, title: 'Error', message: error.response.data.error,
+              buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+            })
+          })
+          .finally(() => { setIsSaving(false) })
+      } else {
+        addClubMemberAttribute(clubInfo.clubId, attributeName, requried, userInfo.email)
+          .then(() => refetchCMA())
+          .catch(error => {
+            console.log(error.response.data); setAlertConfig({
+              visible: true, title: 'Error', message: error.response.data.error,
+              buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+            })
+          })
+          .finally(() => { setIsSaving(false) })
+      }
+    }
+  }
+  const handleDelete = () => {
+    setAlertConfig({
+      visible: true,
+      title: 'Are you sure!',
+      message: 'This will delete the attribute. This cannot be recovered.',
+      buttons: [{
+        text: 'OK', onPress: () => {
+          setAlertConfig({ visible: false });
+          setIsSaving(true);
+          setIsAttributeModalVisible(false)
+          deleteClubMemberAttribute(clubMemberAttributeId)
+            .then(() => refetchCMA())
+            .catch((error: { response: { data: { error: string | undefined } } }) => alert(error.response.data.error))
+            .finally(() => setIsSaving(false))
+        }
+      }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+    });
+  }
 
-  const removeInput = (inputToRemove: string) => {
-    setInputs(inputs.filter(input => input !== inputToRemove));
-    const { [inputToRemove]: removedValue, ...remainingValues } = values;
-    setValues(remainingValues);
-  };
+  const handleShowEdit = (item: any) => {
+    setIsEdit(true)
+    setAttributeName(item.attribute)
+    setRequired(item.required)
+    setClubMemberAttributeId(item.clubMemberAttributeId)
+    setIsAttributeModalVisible(true)
+  }
 
-  const handleInputChange = (inputName: string, text: string) => {
-    setValues({ ...values, [inputName]: text });
-  };
-
-  const handleSubmit = () => {
-    console.log('Form values:', values);
-  };
+  const showAddAttributeModal = () => {
+    setAttributeName('')
+    setRequired(false)
+    setIsEdit(false)
+    setIsAttributeModalVisible(true)
+  }
 
   return (
     <ThemedView style={{ flex: 1 }}>
-    <ScrollView>
-      <Text style={{textAlign:"right",margin: 15}}>{params.get("clubName")}</Text>
-      <View>
-        {inputs.map((input, _) => (
-          <View key={input} style={styles.attributeContainer}>
-            <View style={styles.input}>
-              <InputText
-                onChangeText={(text: string) => handleInputChange(input, text)}
-                //value={values[input] || ''}
-                label={`Enter text for ${input}`}
-              />
+      <GestureHandlerRootView>
+        <Spacer space={10} />
+        {!isLoadingCMA && cmaList?.length == 0 &&
+          <ThemedText style={{ width: "80%", alignSelf: "center" }}>Define club level attributes which need to be collected from each member. Eg. tshirt size, blood group, id number etc.</ThemedText>
+        }
+        {isLoadingCMA && <LoadingSpinner />}
+        {!isLoadingCMA &&
+          <FlatList
+            data={cmaList}
+            ItemSeparatorComponent={() => <Spacer space={4} />}
+            renderItem={({ item }) => {
+              return <TouchableCard style={{ justifyContent: "space-between" }} onPress={() => handleShowEdit(item)}
+                icon={<ThemedIcon name={"MaterialCommunityIcons:square-edit-outline"} />}>
+                <ThemedText>{item.attribute} {item.required === 1 ? "*" : ""}</ThemedText>
+              </TouchableCard>
+            }}
+          />}
+        <Spacer space={10} />
+        {isSaving && <LoadingSpinner />}
+        {!isSaving && <TouchableOpacity style={{ alignSelf: "center" }} onPress={showAddAttributeModal}>
+          <ThemedIcon name={"MaterialIcons:add-circle"} size={50} />
+        </TouchableOpacity>}
+        <View style={{ marginBottom: 30 }} />
+      </GestureHandlerRootView>
+      <Modal isVisible={isAttributeModalVisible}>
+        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+          <Spacer space={5} />
+          <ThemedText style={appStyles.heading}>{isEdit ? "Edit" : "Add"} Attribute</ThemedText>
+          <Spacer space={5} />
+          <View style={{ flexDirection: 'row', alignItems: "center", alignSelf: "center", width: "80%" }}>
+            <InputText label="Attribtue Name" defaultValue={attributeName} onChangeText={(value: string) => setAttributeName(value)} />
+            <Spacer hspace={5} />
+            <View>
+              <ThemedText style={{ fontSize: 10 }}>Required*</ThemedText>
+              <Spacer space={4} />
+              <Switch onValueChange={() => setRequired(prev => !prev)} value={requried} />
             </View>
-            {inputs.length > 1 && (
-              <TouchableOpacity style={styles.icon} onPress={() => removeInput(input)}>
-                <MaterialIcons name={"delete"} size={25} />
-              </TouchableOpacity>
-            )}
           </View>
-        ))}
-        <TouchableOpacity style={{ alignSelf: "center" }} onPress={addInput}>
-          <MaterialIcons name={"add-circle"} size={50} />
-        </TouchableOpacity>
-        <View style={{marginBottom: 30}}/>
-        <ThemedButton title="Submit" onPress={handleSubmit} />
-      </View>
-    </ScrollView>
+          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>
+            <ThemedButton title={"   Save   "} onPress={() => handleSave()} />
+            <ThemedButton title="Cancel" onPress={() => setIsAttributeModalVisible(false)} />
+            {isEdit && <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => handleDelete()} color={colors.error} />}
+          </View>
+        </ThemedView>
+      </Modal>
+      {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
   );
 };
@@ -70,20 +158,3 @@ const MemberAttributes = () => {
 
 export default MemberAttributes
 
-
-const styles = StyleSheet.create({
-  attributeContainer: {
-    width: "80%",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    justifyContent: "space-between",
-    alignSelf: "center"
-  },
-  icon: {
-    width: "10%",
-  },
-  input: {
-    width: "90%",
-  }
-});

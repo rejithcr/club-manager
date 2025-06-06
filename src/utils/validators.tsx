@@ -23,3 +23,7 @@ export const isCurrency = (value: string) => {
 export const isValidYear = (year: string) => {
   return /^\d{4}$/.test(year) && +year >= 2000 && +year <= 2200;
 }
+
+export const isAplhaNumeric = (value: string) => {
+  return /^[a-zA-Z0-9 -_]{2,}$/.test(value)
+}

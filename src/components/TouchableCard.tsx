@@ -1,4 +1,4 @@
-import { StyleSheet, TouchableOpacity } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import React, { ReactNode } from 'react'
 import ShadowBox from './ShadowBox';
 import ThemedIcon from './themed-components/ThemedIcon';
@@ -14,9 +14,9 @@ const TouchableCard = (props: {
 
     return (
         <TouchableOpacity onPress={() => props.onPress && props.onPress(props.id)}>
-            <ShadowBox style={{ ...styles.container, ...props.style }}>               
-                {props.children}                
-                { props.onPress && (props.icon ? props.icon : <ThemedIcon name="MaterialCommunityIcons:chevron-right-circle" color={colors.nav}/>) }
+            <ShadowBox style={{ ...styles.container, ...props.style }}>  
+                {props.children}       
+                {props.onPress && (props.icon ? props.icon : <ThemedIcon style={styles.icon} name="MaterialCommunityIcons:chevron-right-circle" color={colors.nav}/>) }
             </ShadowBox>
         </TouchableOpacity>
     )
@@ -32,5 +32,10 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center"
+    },
+    icon: {
+        position: "absolute",
+        right: 10,
+        width: 20
     }
 });

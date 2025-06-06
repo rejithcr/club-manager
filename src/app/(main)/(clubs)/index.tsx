@@ -23,7 +23,7 @@ const ClubHome = () => {
     const params = useSearchParams()
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const { setClubInfo } = useContext(ClubContext)
-    
+
     const { colors } = useTheme();
 
     const [isFundBalanceLoading, setIsFundBalanceLoading] = useState(false)
@@ -40,21 +40,21 @@ const ClubHome = () => {
         setIsFundBalanceLoading(true)
         getFundBalance(params.get("clubId"))
             .then(response => setFundBalance(response.data.fundBalance))
-            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+            .catch(error => setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }))
             .finally(() => setIsFundBalanceLoading(false))
     }
     const fetchTotalDue = () => {
         setIsTotalDueLoading(true)
         getTotalDue(params.get("clubId"))
             .then(response => setTotalDue(response.data.totalDue))
-            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+            .catch(error => setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }))
             .finally(() => setIsTotalDueLoading(false))
     }
     const fetchClubCounts = () => {
         setIsClubCountsLoading(true)
         getClubCounts(params.get("clubId"))
-            .then(response => {console.log(response.data); setClubCounts(response.data)})
-            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+            .then(response => { console.log(response.data); setClubCounts(response.data) })
+            .catch(error => setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }))
             .finally(() => setIsClubCountsLoading(false))
     }
     const showFeeTypeDetails = (fee: any) => {
@@ -68,7 +68,7 @@ const ClubHome = () => {
         setIsLoadingCurrent(true)
         getFeeStructure(Number(params.get('clubId')))
             .then(response => setCurrentFeeStructure(response.data))
-            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+            .catch(error => setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }))
             .finally(() => setIsLoadingCurrent(false));
     }
 
@@ -86,8 +86,8 @@ const ClubHome = () => {
 
     const onRefresh = () => {
         fetchFundBalance();
-        fetchTotalDue();    
-        fetchFees();    
+        fetchTotalDue();
+        fetchFees();
     };
 
     return (
@@ -100,17 +100,17 @@ const ClubHome = () => {
                 }}>
                     <ThemedText style={{ ...appStyles.heading, width: "50%" }}>Fund Balance</ThemedText>
                     {isFundBalanceLoading && <LoadingSpinner />}
-                    {!isFundBalanceLoading && 
-                        <ThemedText style={{ fontWeight: "bold", fontSize: 16, color: fundBalance > 0 ? colors.success: colors.error }}>Rs. {fundBalance || 0}</ThemedText>}
+                    {!isFundBalanceLoading &&
+                        <ThemedText style={{ fontWeight: "bold", fontSize: 16, color: fundBalance > 0 ? colors.success : colors.error }}>Rs. {fundBalance || 0}</ThemedText>}
                 </View>
                 <Spacer space={5} />
                 <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
                     <TouchableCard onPress={Number(totalDue) > 0 ? showClubDues : null}>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "90%" }}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%"}}>
                             <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
                             {isTotalDueLoading && <LoadingSpinner />}
                             {!isTotalDueLoading &&
-                                <ThemedText style={{ fontWeight: "bold", fontSize: 15, paddingRight: 10 }}> Rs. {totalDue} </ThemedText>
+                                <ThemedText style={{ fontWeight: "bold", fontSize: 15, position: "absolute", right: Number(totalDue) > 0 ? 30 : 5}}> Rs. {totalDue}</ThemedText>
                             }
                         </View>
                     </TouchableCard>
@@ -123,12 +123,16 @@ const ClubHome = () => {
                     <TouchableCard onPress={() => router.push(`/(main)/(clubs)/membershiprequests`)}>
                         <ThemedText>Membership Requests</ThemedText>
                         {isClubCountsLoading && <LoadingSpinner />}
-                        {!isClubCountsLoading && clubCounts?.find(i=>i.countType==="openMembershipRequests")?.count > 0 && <View style={{ alignItems: "center", borderRadius: 100, width:20, backgroundColor: colors.button}}>  
-                        <ThemedText>{clubCounts?.find(i=>i.countType==="openMembershipRequests")?.count}</ThemedText></View>}
+                        {!isClubCountsLoading && clubCounts?.find(i => i.countType === "openMembershipRequests")?.count > 0 && <View style={{ alignItems: "center", borderRadius: 100, width: 20, backgroundColor: colors.button }}>
+                            <ThemedText>{clubCounts?.find(i => i.countType === "openMembershipRequests")?.count}</ThemedText></View>}
                     </TouchableCard>
                     <Spacer space={4} />
                     <TouchableCard onPress={() => router.push('/(main)/(members)')}>
                         <ThemedText>Members</ThemedText>
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <TouchableCard onPress={() => router.push('/(main)/(members)/memberattributes')}>
+                        <ThemedText>Member Attributes</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
                     <View style={{
@@ -137,26 +141,27 @@ const ClubHome = () => {
                     }}>
                         <ThemedText style={{ ...appStyles.heading }}>Fees</ThemedText>
                         <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
-                        {params.get("role") == ROLE_ADMIN && <TouchableOpacity
-                            onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
-                            <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
-                        </TouchableOpacity>}</View>
+                            {params.get("role") == ROLE_ADMIN && <TouchableOpacity
+                                onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
+                                <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
+                            </TouchableOpacity>}</View>
                     </View>
                     {isLoadingCurrent && <LoadingSpinner />}
                     {!isLoadingCurrent && currentFeeStructure?.length == 0 && <ThemedText style={{ alignSelf: "center", width: "80%" }}>No fees defined. To define a fee type (eg. Membership fee), press the + icon.</ThemedText>}
                     {!isLoadingCurrent && currentFeeStructure?.map((fee: any) => {
-                        return <View key={fee.clubFeeTypeId}><TouchableCard onPress={showFeeTypeDetails} id={fee}>
-                            <View style={{
-                                flexDirection: "row", width: "90%",
-                                justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
-                            }}>
-                                <View>
-                                    <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
-                                    <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
+                        return <View key={fee.clubFeeTypeId}>
+                            <TouchableCard onPress={showFeeTypeDetails} id={fee}>
+                                <View style={{
+                                    flexDirection: "row", width: "100%", 
+                                    justifyContent: "space-between", alignItems: "center"
+                                }}>
+                                    <View>
+                                        <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
+                                        <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
+                                    </View>
+                                    <ThemedText style={{ fontWeight: "bold", fontSize: 15,position: "absolute", right: 30 }}>Rs. {fee.clubFeeAmount}</ThemedText>
                                 </View>
-                                <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubFeeAmount}</ThemedText>
-                            </View>
-                        </TouchableCard>
+                            </TouchableCard>
                             <Spacer space={4} />
                         </View>
                     })}
@@ -166,7 +171,7 @@ const ClubHome = () => {
                     </TouchableCard>
                     <Spacer space={50} />
                 </ScrollView>
-                {alertConfig?.visible && <Alert {...alertConfig}/>}
+                {alertConfig?.visible && <Alert {...alertConfig} />}
                 {/* <FloatingMenu actions={actions} position={"left"} color='black'
                     icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
                     onPressItem={(name: string | undefined) => handleMenuPress(name)}

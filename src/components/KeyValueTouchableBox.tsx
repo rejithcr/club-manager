@@ -20,7 +20,7 @@ const KeyValueTouchableBox = (props: {
                 ...appStyles.shadowBox, width: "80%", flexWrap: "wrap"
             }}>
                 <ThemedText numberOfLines={1} style={{ width: "60%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props.keyName}</ThemedText>
-                <ThemedText style={{ width: "30%", fontSize: 15, textAlign: "right" }}>{props.keyValue}</ThemedText>
+                <ThemedText style={{ width: "30%", fontSize: 15, textAlign: "right" }}>{props.keyValue}  </ThemedText>
                 <ThemedIcon style={{ width: "10%", paddingLeft: 5}} name={props.edit ? 'MaterialCommunityIcons:square-edit-outline': 'MaterialCommunityIcons:chevron-right-circle'} color={props.edit ? colors.warning : colors.nav}/>                
             </View>
         </TouchableOpacity>

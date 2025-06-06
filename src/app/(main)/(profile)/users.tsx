@@ -15,7 +15,6 @@ const users = () => {
     const [users, setUsers] = useState<any>([])
     const [isLoading, setIsLoading] = useState(false)
     const [isFectching, setIsFetching] = useState(false)
-    const [resfresh, setRefresh] = useState(false)
     const [hasMoreData, setHasMoreData] = useState(false)
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
@@ -38,7 +37,7 @@ const users = () => {
     }
     useEffect(() => {
         onRefresh()
-    }, [resfresh])
+    }, [])
 
     const fetchNextPage = () => {
         if (hasMoreData && !isFectching) {
@@ -97,15 +96,14 @@ const UserInfoView = (props: Member) => {
                     <View style={{ flexDirection: "row"}}>
                         <ThemedText>{props.firstName} {props.lastName}</ThemedText>
                         <Spacer hspace={2} />
-                        {props.isRegistered === 1 && <ThemedIcon name='MaterialIcons:verified-user' color={colors.success}/>}                    
+                        {props.isRegistered === 1 && <ThemedIcon name='MaterialIcons:verified-user' color={colors.success} size={12}/>}                    
                     </View>                    
-                    <ThemedText style={{ fontSize: 10 }}>{props.phone}</ThemedText>
                     <ThemedText style={{ fontSize: 10 }}>{props.email}</ThemedText>
                 </View>
             </View>
-            <View style={{alignItems: "center"}} >                
-                <ThemedText style={{ fontSize: 12 }}>cts: {props.createdTs}</ThemedText>
-                <ThemedText style={{ fontSize: 12 }}>uts: {props.updatedTs}</ThemedText>
+            <View style={{alignItems: "flex-end"}}>                
+                <ThemedText style={{ fontSize: 12 }}>{props.phone}</ThemedText>
+                <ThemedText style={{ fontSize: 9 }}>{props.updatedTs}</ThemedText>
             </View>
         </ThemedView>
     )

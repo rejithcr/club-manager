@@ -31,7 +31,7 @@ const MemberItem = (props: {
         <View style={{ flexDirection: "row" }}>
           <ThemedText>{props.firstName} {props.lastName}</ThemedText>
           <Spacer hspace={2} />
-          {props.isRegistered === 1 && <ThemedIcon name='MaterialIcons:verified-user' color={colors.success} />}
+          {props.isRegistered === 1 && <ThemedIcon name='MaterialIcons:verified-user' color={colors.success} size={12}/>}
         </View>
       </ShadowBox>
     </TouchableOpacity>
