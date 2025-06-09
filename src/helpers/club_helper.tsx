@@ -1,3 +1,4 @@
+import { ClubMemberAttribute } from "../types/member";
 import { del, get, post, put } from "../utils/api";
 
 export const getClubs = (memberId: number) => {
@@ -80,4 +81,8 @@ export const saveClubMemberAttribute = async (clubMemberAttributeId: number | nu
 
 export const deleteClubMemberAttribute = async (clubMemberAttributeId: number | null) => {
     return del("/club/member/attribute", {clubMemberAttributeId, deleteClubMemberAttribute: true}, null)
+}
+
+export const saveClubMemberAttributeValues = (clubId: any, memberId: number, updatedCMAList: ClubMemberAttribute[], email:string) => {
+    return put("/club/member/attribute", null, { clubId, memberId, updatedCMAList, saveClubMemberAttributeValues: true, email})
 }

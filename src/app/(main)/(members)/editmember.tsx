@@ -16,6 +16,9 @@ import { ClubContext } from '@/src/context/ClubContext'
 import { getClubMember, saveClubMember } from '@/src/helpers/club_helper'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import { Picker } from '@react-native-picker/picker'
+import EditClubLevelAttributes from './editclublevelattributes'
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
+import { appStyles } from '@/src/utils/styles'
 
 const Editmember = () => {
     const params = useSearchParams()
@@ -40,6 +43,7 @@ const Editmember = () => {
         setIsRegistered(memberDetails?.isRegistered)
         setUpdatedBy(memberDetails?.updatedBy)
     }
+    
     useEffect(() => {
         setIsMemberLoading(true);
         getClubMember(clubInfo.clubId, Number(params.get("memberId")))
@@ -82,6 +86,8 @@ const Editmember = () => {
 
     return (
         <ThemedView style={{ flex: 1 }}>
+            <GestureHandlerRootView>
+            <ScrollView>
             {isMemberLoading && <LoadingSpinner />}
             {!isMemberLoading && 
                 <View>                    
@@ -112,6 +118,12 @@ const Editmember = () => {
                         <ThemedButton title="Cancel" onPress={() => router.back()} />
                     </View>
                 </View>}
+                <Spacer space={20} />
+                <ThemedText style={appStyles.heading}>Club level attributes</ThemedText>
+                <EditClubLevelAttributes/>
+                <Spacer space={20} />
+                </ScrollView>
+                </GestureHandlerRootView>
         </ThemedView>
     )
 }

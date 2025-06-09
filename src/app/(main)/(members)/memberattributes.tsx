@@ -26,7 +26,7 @@ const MemberAttributes = () => {
   const [clubMemberAttributeId, setClubMemberAttributeId] = useState(null)
   const [isEdit, setIsEdit] = useState(false)
   const [attributeName, setAttributeName] = useState('');
-  const [requried, setRequired] = useState(false)
+  const [required, setRequired] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const { colors } = useTheme()
@@ -47,7 +47,7 @@ const MemberAttributes = () => {
       setIsSaving(true)
       setIsAttributeModalVisible(false)
       if (isEdit) {
-        saveClubMemberAttribute(clubMemberAttributeId, attributeName, requried, userInfo.email)
+        saveClubMemberAttribute(clubMemberAttributeId, attributeName, required, userInfo.email)
           .then(() => refetchCMA())
           .catch(error => {
             console.log(error.response.data); setAlertConfig({
@@ -57,7 +57,7 @@ const MemberAttributes = () => {
           })
           .finally(() => { setIsSaving(false) })
       } else {
-        addClubMemberAttribute(clubInfo.clubId, attributeName, requried, userInfo.email)
+        addClubMemberAttribute(clubInfo.clubId, attributeName, required, userInfo.email)
           .then(() => refetchCMA())
           .catch(error => {
             console.log(error.response.data); setAlertConfig({
@@ -91,7 +91,7 @@ const MemberAttributes = () => {
   const handleShowEdit = (item: any) => {
     setIsEdit(true)
     setAttributeName(item.attribute)
-    setRequired(item.required)
+    setRequired(item.required === 1)
     setClubMemberAttributeId(item.clubMemberAttributeId)
     setIsAttributeModalVisible(true)
   }
@@ -140,7 +140,8 @@ const MemberAttributes = () => {
             <View>
               <ThemedText style={{ fontSize: 10 }}>Required*</ThemedText>
               <Spacer space={4} />
-              <Switch onValueChange={() => setRequired(prev => !prev)} value={requried} />
+              {!required && <ThemedIcon name={"FontAwesome:toggle-off"} size={30} onPress={() => setRequired(true)}/>}
+              {required && <ThemedIcon name={"FontAwesome:toggle-on"} size={30} onPress={() => setRequired(false)}/>}
             </View>
           </View>
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>
@@ -157,4 +158,5 @@ const MemberAttributes = () => {
 
 
 export default MemberAttributes
+
 

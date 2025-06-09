@@ -13,18 +13,22 @@ import { useTheme } from '@/src/hooks/use-theme'
 import { isValidPhoneNumber } from '@/src/utils/validators'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import { AuthContext } from '@/src/context/AuthContext'
+import { appStyles } from '@/src/utils/styles'
+import TouchableCard from '@/src/components/TouchableCard'
+import { useHttpGet } from '@/src/hooks/use-http'
+import { ClubContext } from '@/src/context/ClubContext'
 
 const Editmember = () => {
     const params = useSearchParams()
     const [isMemberLoading, setIsMemberLoading] = useState(false)
-    const [firstName, setFirstName] = useState<string|undefined>();
-    const [lastName, setLastName] = useState<string|undefined>();
-    const [updatedBy, setUpdatedBy] = useState<string|undefined>();
-    const [phone, setPhone] = useState<number|undefined>();    
-    const [email, setEmail] = useState<string|undefined>();
+    const [firstName, setFirstName] = useState<string | undefined>();
+    const [lastName, setLastName] = useState<string | undefined>();
+    const [updatedBy, setUpdatedBy] = useState<string | undefined>();
+    const [phone, setPhone] = useState<number | undefined>();
+    const [email, setEmail] = useState<string | undefined>();
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
-    const {colors} = useTheme();
-    
+    const { colors } = useTheme();
+
     const setDetails = (memberDetails: Member) => {
         setFirstName(memberDetails?.firstName)
         setLastName(memberDetails?.lastName)
@@ -42,17 +46,17 @@ const Editmember = () => {
 
     const handleSave = () => {
         setIsMemberLoading(true)
-        if(validate()){
-         saveMemberDetails(Number(params.get("memberId")), firstName, lastName, phone, email, email)
-            .then(response => setAlertConfig({
+        if (validate()) {
+            saveMemberDetails(Number(params.get("memberId")), firstName, lastName, phone, email, email)
+                .then(response => setAlertConfig({
                     visible: true, title: 'Success', message: response.data.message,
                     buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
                 }))
-            .catch(error => setAlertConfig({
+                .catch(error => setAlertConfig({
                     visible: true, title: 'Error', message: error?.response?.data?.error || "Error fetching member details",
                     buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
                 }))
-            .finally(() => setIsMemberLoading(false));
+                .finally(() => setIsMemberLoading(false));
         } else {
             setIsMemberLoading(false)
         }
@@ -75,6 +79,18 @@ const Editmember = () => {
         return true
     }
 
+    const {
+        data: clubs,
+        isLoading: isLoadingMyClubs,
+    } = useHttpGet("/club", { memberId: Number(params.get("memberId")) })
+
+    
+    const { setClubInfo } = useContext(ClubContext)
+    const showDetails = (club: any) => {
+        setClubInfo({ clubId: club.clubId, clubName: club.clubName, role: club.role });
+        router.push(`/(main)/(members)/editclublevelattributes?memberId=${params.get("memberId")}`);
+    }
+
     return (
         <ThemedView style={{ flex: 1 }}>
             {isMemberLoading && <LoadingSpinner />}
@@ -84,14 +100,25 @@ const Editmember = () => {
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                     <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
                     <InputText label="Email" defaultValue={email} keyboardType={"email-address"} editable={false} />
-                    { updatedBy !== email &&
-                    <ThemedText style={{alignSelf:"center", color:colors.warning}}>Last updated by: {updatedBy} </ThemedText> }
+                    {updatedBy !== email &&
+                        <ThemedText style={{ alignSelf: "center", color: colors.warning }}>Last updated by: {updatedBy} </ThemedText>}
                     <Spacer space={10} />
                     <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
                         <ThemedButton title="Save" onPress={handleSave} />
                         <Spacer space={10} />
                         <ThemedButton title="Cancel" onPress={() => router.dismissTo('/(main)/(profile)')} />
                     </View>
+                    <Spacer space={10} />
+                    <ThemedText style={appStyles.heading}>Club level attributes</ThemedText>
+                    {isLoadingMyClubs && <LoadingSpinner />}
+                    {!isLoadingMyClubs && clubs?.map((item: any) =>
+                        <View key={item.clubId}>
+                            <TouchableCard onPress={() => showDetails(item)} id={item.clubId}>
+                                <ThemedText style={{ fontWeight: "bold" }}>{item.clubName}</ThemedText>
+                            </TouchableCard>
+                            <Spacer space={4} />
+                        </View>
+                    )}
                 </View>}
             {alertConfig?.visible && <Alert {...alertConfig} />}
         </ThemedView>

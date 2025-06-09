@@ -1,4 +1,4 @@
-import { View, Image, StyleSheet } from 'react-native'
+import { View, Image, StyleSheet, FlatList } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { Member } from '@/src/helpers/member_helper';
@@ -16,6 +16,9 @@ import { ClubContext } from '@/src/context/ClubContext';
 import { AuthContext } from '@/src/context/AuthContext';
 import { ROLE_ADMIN } from '@/src/utils/constants';
 import Alert, { AlertProps } from '@/src/components/Alert';
+import { useHttpGet } from '@/src/hooks/use-http';
+import { ClubMemberAttribute } from '@/src/types/member';
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 
 const Profile = () => {
   const params = useSearchParams()
@@ -39,7 +42,7 @@ const Profile = () => {
     setAlertConfig({
       visible: true,
       title: 'Are you sure!',
-      message: "Clck 'OK' to remove the member.",
+      message: "Clck 'OK' to remove the member from the club.",
       buttons: [{
         text: 'OK', onPress: () => {
           setAlertConfig({ visible: false });
@@ -53,8 +56,17 @@ const Profile = () => {
     });
   }
 
+
+  const {
+      data: cmaList,
+      isLoading: isLoadingCMA,
+      refetch: refetchCMA
+  } = useHttpGet("/club/member/attribute", { clubId: clubInfo.clubId, memberId: Number(params.get("memberId")), getClubMemberAttributeValues: true })
+
   return (
     <ThemedView style={{ flex: 1 }}>
+      <GestureHandlerRootView>
+      <ScrollView>
       {isMemberLoading && <LoadingSpinner />}
       {!isMemberLoading && memberDetails && <>
         <ThemedView style={styles.photoContainer}>
@@ -63,7 +75,17 @@ const Profile = () => {
         </ThemedView>
         <ThemedText style={styles.title}>{memberDetails?.firstName} {memberDetails?.lastName}</ThemedText>
         <KeyValueUI data={memberDetails} hideKeys={["photo", "firstName", "lastName"]} />
+        
       </>}
+      {isLoadingCMA && <LoadingSpinner />}
+      {!isLoadingCMA && cmaList && cmaList.length > 0 && (
+          cmaList.map((cma: ClubMemberAttribute, index: number) => (
+            <View key={index} style={{...styles.detailsTable, ...styles.divider}}>
+              <ThemedText>{cma.attribute}</ThemedText>
+              <ThemedText>{cma.attributeValue}</ThemedText>
+            </View>
+          ))
+      )}
       <Spacer space={10} />
       {clubInfo.role === ROLE_ADMIN &&
         <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
@@ -71,7 +93,10 @@ const Profile = () => {
           <Spacer space={10} />
           <ThemedButton title="Remove" onPress={() => handleRemove()} style={{ backgroundColor: colors.error }} />
         </View>}
+        <Spacer space={10} />
       {alertConfig?.visible && <Alert {...alertConfig} />}
+      </ScrollView>
+      </GestureHandlerRootView>
     </ThemedView>
   )
 }
@@ -100,22 +125,14 @@ const styles = StyleSheet.create({
   detailsTable: {
     width: "80%",
     alignSelf: "center",
-    alignItems: "stretch",
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: "space-between",padding: 10,
     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-  },
-  label: {
-    width: "30%",
-    padding: 10,
-  },
-  value: {
-    width: "70%",
-    padding: 10,
   },
   divider: {
     borderBottomColor: 'rgba(136, 136, 136, 0.2)',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    width: "100%"
+    width: "80%"
   }
 });
