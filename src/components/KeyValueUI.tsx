@@ -3,6 +3,7 @@ import React from 'react'
 import { camelCaseToWords } from '../utils/string'
 import ThemedView from './themed-components/ThemedView';
 import ThemedText from './themed-components/ThemedText';
+import Divider from './Divider';
 
 const KeyValueUI = (props: { data: any; hideKeys?: string[] }) => {
     const list = Object.keys(props?.data || {})
@@ -14,7 +15,7 @@ const KeyValueUI = (props: { data: any; hideKeys?: string[] }) => {
                 <View key={item.key} style={styles.item}>
                     <ThemedText style={styles.label}>{camelCaseToWords(item.key)}</ThemedText>
                     <ThemedText style={styles.value}>{item.value}</ThemedText>
-                    <ThemedView style={styles.divider} />
+                    <Divider/>
                 </View>
             )}
         </ThemedView>
@@ -28,7 +29,6 @@ const styles = StyleSheet.create({
     detailsTable: {
         width: "80%",
         alignSelf: "center",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
         borderRadius: 5
     },
     item: {

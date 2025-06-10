@@ -7,6 +7,7 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import { useTheme } from '@/src/hooks/use-theme';
 import Spacer from '@/src/components/Spacer';
 import ThemedButton from '@/src/components/ThemedButton';
+import Divider from '@/src/components/Divider';
 
 const FeeSummary = (props: { duesByMember: [] }) => {
   const [showDues, setShowDues] = useState(true)
@@ -20,7 +21,7 @@ const FeeSummary = (props: { duesByMember: [] }) => {
           <View key={club.clubId}>
             <ShadowBox >
               <TouchableOpacity onPress={() => setShowDues(prev => !prev)} style={{
-                flexDirection: "row", width: "100%", 
+                flexDirection: "row", width: "100%",
                 justifyContent: "space-between", alignItems: "center"
               }}>
                 <ThemedIcon size={20} name={showDues ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
@@ -30,7 +31,7 @@ const FeeSummary = (props: { duesByMember: [] }) => {
             </ShadowBox>
             {showDues && club.dues.map((due: any) =>
               <View key={due.paymentId.toString() + due.feeType} style={styles.item}>
-                <View style={styles.divider} />
+                <Divider />
                 <View style={{ paddingVertical: 5 }}>
                   <ThemedText style={styles.label}>{due.fee} </ThemedText>
                   <ThemedText style={styles.subLabel}>{due.feeDesc} </ThemedText>
@@ -38,8 +39,8 @@ const FeeSummary = (props: { duesByMember: [] }) => {
                 <ThemedText style={styles.amount}>Rs. {due.amount}</ThemedText>
               </View>
             )}
-            
-             {/* {showDues && <ThemedButton title='Pay Now' onPress={()=>{ Linking.openURL(`upi://pay?pa=8281478849@ybl&pn=Rejith C R&cu=INR&am=100&tn=${club.clubName}: due payment`)}} />}
+
+            {/* {showDues && <ThemedButton title='Pay Now' onPress={()=>{ Linking.openURL(`upi://pay?pa=8281478849@ybl&pn=Rejith C R&cu=INR&am=100&tn=${club.clubName}: due payment`)}} />}
              <Link href='upi://pay?pa=8281478849@ybl&pn=Rejith C R&cu=INR&am=100'>Pay Now</Link> */}
             <Spacer space={4} />
           </View>
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
   item: {
     width: "75%",
     flexDirection: "row",
-    flexWrap: "wrap", alignSelf:"center",
+    flexWrap: "wrap", alignSelf: "center",
     alignItems: "center",
     justifyContent: "space-between"
   },

@@ -11,6 +11,7 @@ import { useTheme } from '@/src/hooks/use-theme';
 import Spacer from '@/src/components/Spacer';
 import ShadowBox from '@/src/components/ShadowBox';
 import Alert, { AlertProps } from '@/src/components/Alert';
+import Divider from '@/src/components/Divider';
 
 const ClubDues = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -75,7 +76,7 @@ const MemberDue = (props: { member: any }) => {
           ListHeaderComponent={() => <Spacer space={2} />}
           ListFooterComponent={() => <Spacer space={4} />}
           renderItem={({ item }) => <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />}
-          ItemSeparatorComponent={() => <View style={styles.divider} />}
+          ItemSeparatorComponent={() => <Divider />}
         />
       }
     </>

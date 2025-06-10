@@ -19,6 +19,8 @@ import Alert, { AlertProps } from '@/src/components/Alert';
 import { useHttpGet } from '@/src/hooks/use-http';
 import { ClubMemberAttribute } from '@/src/types/member';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+import Divider from '@/src/components/Divider';
+import { appStyles } from '@/src/utils/styles';
 
 const Profile = () => {
   const params = useSearchParams()
@@ -77,13 +79,15 @@ const Profile = () => {
         <KeyValueUI data={memberDetails} hideKeys={["photo", "firstName", "lastName"]} />
         
       </>}
+      <Spacer space={10} />
+      <ThemedText style={appStyles.heading}>Club level attributes</ThemedText>
       {isLoadingCMA && <LoadingSpinner />}
       {!isLoadingCMA && cmaList && cmaList.length > 0 && (
           cmaList.map((cma: ClubMemberAttribute, index: number) => (
-            <View key={index} style={{...styles.detailsTable, ...styles.divider}}>
+            <Divider key={index} style={styles.detailsTable}>
               <ThemedText>{cma.attribute}</ThemedText>
               <ThemedText>{cma.attributeValue}</ThemedText>
-            </View>
+            </Divider>
           ))
       )}
       <Spacer space={10} />
@@ -128,11 +132,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",padding: 10,
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-  },
-  divider: {
-    borderBottomColor: 'rgba(136, 136, 136, 0.2)',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    width: "80%"
   }
 });
