@@ -34,8 +34,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     borderBottomColor: "grey",
     borderBottomWidth: 1,
-    margin: 10,
-    
+    margin: 10,    
   },
   label:{
     fontSize: 10

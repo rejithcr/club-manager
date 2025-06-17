@@ -12,11 +12,11 @@ import ThemedText from '@/src/components/themed-components/ThemedText'
 import { useTheme } from '@/src/hooks/use-theme'
 import { isValidPhoneNumber } from '@/src/utils/validators'
 import Alert, { AlertProps } from '@/src/components/Alert'
-import { AuthContext } from '@/src/context/AuthContext'
 import { appStyles } from '@/src/utils/styles'
 import TouchableCard from '@/src/components/TouchableCard'
 import { useHttpGet } from '@/src/hooks/use-http'
 import { ClubContext } from '@/src/context/ClubContext'
+import DatePicker from '@/src/components/DatePicker'
 
 const Editmember = () => {
     const params = useSearchParams()
@@ -26,6 +26,7 @@ const Editmember = () => {
     const [updatedBy, setUpdatedBy] = useState<string | undefined>();
     const [phone, setPhone] = useState<number | undefined>();
     const [email, setEmail] = useState<string | undefined>();
+    const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const { colors } = useTheme();
 
@@ -47,7 +48,7 @@ const Editmember = () => {
     const handleSave = () => {
         setIsMemberLoading(true)
         if (validate()) {
-            saveMemberDetails(Number(params.get("memberId")), firstName, lastName, phone, email, email)
+            saveMemberDetails(Number(params.get("memberId")), firstName, lastName, phone, dateOfBirth, email, email)
                 .then(response => setAlertConfig({
                     visible: true, title: 'Success', message: response.data.message,
                     buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
@@ -100,6 +101,7 @@ const Editmember = () => {
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                     <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
                     <InputText label="Email" defaultValue={email} keyboardType={"email-address"} editable={false} />
+                    <DatePicker label={"Date of Birth"} date={dateOfBirth ? new Date(dateOfBirth) : new Date()} setDate={setDateOfBirth} />
                     {updatedBy !== email &&
                         <ThemedText style={{ alignSelf: "center", color: colors.warning }}>Last updated by: {updatedBy} </ThemedText>}
                     <Spacer space={10} />

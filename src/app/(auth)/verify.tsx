@@ -12,16 +12,18 @@ import LoadingSpinner from '@/src/components/LoadingSpinner'
 import Spacer from '@/src/components/Spacer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
+import DatePicker from '@/src/components/DatePicker'
 
 const Register = () => {
     const [memberInfo, setMemberInfo] = useState<Member | null>(null)
     const [memberSaving, setMemberSaving] = useState(false)
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const params = useSearchParams()
-    
+
     useEffect(() => {
-        console.log(params.get('memberInfo'))
-        setMemberInfo(JSON.parse(params.get('memberInfo') || ''))
+        const memberInfoFromParams = JSON.parse(params.get('memberInfo') || '');
+        memberInfoFromParams.dateOfBirth || (memberInfoFromParams.dateOfBirth = new Date());
+        setMemberInfo(memberInfoFromParams)
     }, [])
 
     const handleVerify = () => {
@@ -30,7 +32,7 @@ const Register = () => {
             verifyMemberAndUpdate(memberInfo)
                 .then(() => setAlertConfig({
                     visible: true, title: 'Success', message: "Verified",
-                    buttons: [{ text: 'OK', onPress: () => {setAlertConfig({ visible: false }); router.replace('/(auth)')}}]
+                    buttons: [{ text: 'OK', onPress: () => { setAlertConfig({ visible: false }); router.replace('/(auth)') } }]
                 }))
                 .catch(error => setAlertConfig({
                     visible: true, title: 'Error', message: error?.response?.data?.error || "Error fetching member details",
@@ -71,7 +73,9 @@ const Register = () => {
     const handlePhoneChange = (text: string) => {
         setMemberInfo(prev => prev && Number(text) ? { ...prev, phone: Number(text) } : null);
     }
-
+    const setDateOfBirth = (date: Date) => {
+        setMemberInfo(prev => prev ? { ...prev, dateOfBirth: date } : null);
+    }
     return (
         <ThemedView style={{ flex: 1 }}>
             {memberSaving && <LoadingSpinner />}
@@ -81,6 +85,7 @@ const Register = () => {
                 <InputText placeholder='Last Name' defaultValue={memberInfo?.lastName} onChangeText={handleLastNameChange} />
                 <InputText placeholder='Phone' defaultValue={memberInfo?.phone} onChangeText={handlePhoneChange} />
                 <InputText placeholder='Email' defaultValue={memberInfo?.email} editable={false} />
+                <DatePicker label={"Date of Birth"} date={memberInfo?.dateOfBirth ? new Date(memberInfo?.dateOfBirth) : new Date()} setDate={setDateOfBirth} />
                 <View style={{ marginTop: 25 }} />
                 <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
                     <ThemedButton title="Verify" onPress={handleVerify} />

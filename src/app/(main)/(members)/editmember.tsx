@@ -19,6 +19,7 @@ import { Picker } from '@react-native-picker/picker'
 import EditClubLevelAttributes from './editclublevelattributes'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { appStyles } from '@/src/utils/styles'
+import DatePicker from '@/src/components/DatePicker'
 
 const Editmember = () => {
     const params = useSearchParams()
@@ -29,6 +30,7 @@ const Editmember = () => {
     const [phone, setPhone] = useState<number | undefined>();
     const [email, setEmail] = useState<string | undefined>();
     const [role, setRole] = useState<string | undefined>();
+    const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
     const [isRegistered, setIsRegistered] = useState<number | undefined>();
     const { colors } = useTheme();
     const { userInfo } = useContext(AuthContext)
@@ -55,7 +57,7 @@ const Editmember = () => {
     const handleSave = () => {
         setIsMemberLoading(true)
         if (validate()) {
-            saveClubMember(clubInfo.clubId, Number(params.get("memberId")), firstName, lastName, phone, email, role, userInfo.email)
+            saveClubMember(clubInfo.clubId, Number(params.get("memberId")), firstName, lastName, phone, email, role, dateOfBirth, userInfo.email)
                 .then(response => {alert(response.data.message); router.back()})
                 .catch(error => alert(error?.response?.data?.error || "Error fetching member details"))
                 .finally(() => setIsMemberLoading(false));
@@ -96,6 +98,7 @@ const Editmember = () => {
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                     <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
                     <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />
+                    <DatePicker label={"Date of Birth"} date={dateOfBirth ? new Date(dateOfBirth) : new Date()} setDate={setDateOfBirth} />
                     </> : <ThemedText style={{ width: "80%", alignSelf: "center", marginVertical: 20 }}>
                         Registered member's personal information is not editable. Please contact the member to update
                         </ThemedText>}

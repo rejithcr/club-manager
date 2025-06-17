@@ -66,8 +66,8 @@ export const getClubMember = async ( clubId: number, memberId: number) => {
     return get("/club/member", {memberId, clubId})
 }
 
-export const saveClubMember = (clubId: string, memberId: number, firstName: string | undefined, lastName: string | undefined, phone: number | undefined, email: string | undefined, role: string | undefined, updatedBy: string | undefined) => {
-    return put("/club/member", null, {clubId, memberId, firstName, lastName, phone, email, updatedBy, role})
+export const saveClubMember = (clubId: string, memberId: number, firstName: string | undefined, lastName: string | undefined, phone: number | undefined, email: string | undefined, role: string | undefined, dateOfBirth: Date | undefined, updatedBy: string | undefined) => {
+    return put("/club/member", null, {clubId, memberId, firstName, lastName, phone, email, updatedBy, role, dateOfBirth})
 }
 
 export const addClubMemberAttribute = async (clubId: string, attributeName: string, required: boolean, email: string) => {

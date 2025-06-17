@@ -7,14 +7,15 @@ create table club (
     updated_ts timestamp  default now()
 );
 CREATE SEQUENCE club_id_seq START 1;
-
+ALTER TABLE public."member" ADD date_of_birth date NULL;
 create table member (
     member_id integer primary key,
     first_name varchar(50) not null,
     last_name varchar(50) not null,
     email varchar(100) not null unique,
     phone varchar(13) not null unique,
-    photo text, 
+    photo text,
+    date_of_birth date,
     is_registered numeric(1) default 0,
     is_super_user numeric(1) default 0,
     created_by varchar(100) not null,

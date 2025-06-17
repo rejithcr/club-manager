@@ -8,6 +8,7 @@ export interface Member {
     email?: string;
     photo?: string;
     updatedBy?: string | undefined;
+    dateOfBirth?: Date;
     role?: string;
     isRegistered?: number,
     createdTs?: string,
@@ -37,9 +38,9 @@ export const getMyRequests = (memberId: number) => {
 }
 
 export const saveMemberDetails = (memberId: number, firstName: string | undefined, 
-    lastName: string | undefined, phone: number | undefined, 
+    lastName: string | undefined, phone: number | undefined, dateOfBirth: Date | undefined,
     email: string | undefined, updatedBy: string | undefined) => {
-    return put("/member", null, { memberId, firstName, lastName, phone, email, updatedBy })
+    return put("/member", null, { memberId, firstName, lastName, phone, dateOfBirth, email, updatedBy })
 }
 
 export const verifyMemberAndUpdate = (memberInfo: Member | null) => {
