@@ -35,6 +35,7 @@ const Editmember = () => {
         setLastName(memberDetails?.lastName)
         setPhone(memberDetails?.phone)
         setEmail(memberDetails?.email)
+        setDateOfBirth(memberDetails?.dateOfBirth)
         setUpdatedBy(memberDetails?.updatedBy)
     }
     useEffect(() => {
