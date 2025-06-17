@@ -113,7 +113,7 @@ const Editmember = () => {
                         <ThemedText style={{ alignSelf: "center", color: colors.warning }}>Last updated by: {updatedBy} </ThemedText>}
                     <Spacer space={15} />
                     <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                        <ThemedButton title="  Save  " onPress={handleSave} />
+                        <ThemedButton title="   Save   " onPress={handleSave} />
                         <Spacer space={10} />
                         <ThemedButton title="Cancel" onPress={() => router.back()} />
                     </View>

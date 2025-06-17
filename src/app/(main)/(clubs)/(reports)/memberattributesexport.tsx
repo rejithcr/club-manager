@@ -18,7 +18,7 @@ import { getClubMemberAttributesReport } from '@/src/helpers/club_helper'
 import Alert, { AlertProps } from '@/src/components/Alert'
 
 
-const MemberAttributes = () => {
+const MemberAttributesExport = () => {
     const { clubInfo } = useContext(ClubContext);
     const [isReportFetching, setIsReportFetching] = React.useState(false)
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
@@ -100,6 +100,7 @@ const MemberAttributes = () => {
                         </ThemedView>
                     )}
                     <Spacer space={20} />
+                    {isReportFetching && <LoadingSpinner />}
                     {!(isLoadingCMA || isReportFetching) && <ThemedButton title=' Export ' onPress={() => handleExport()} />}
                     <Spacer space={20} />
                 </ScrollView>
@@ -109,7 +110,7 @@ const MemberAttributes = () => {
     )
 }
 
-export default MemberAttributes
+export default MemberAttributesExport
 
 function setAlertConfig(arg0: { visible: boolean; title: string; message: any; buttons: { text: string; onPress: () => any }[] }): any {
     throw new Error('Function not implemented.')

@@ -154,12 +154,11 @@ const ClubHome = () => {
                         <ThemedText>Expense Splits</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
-                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Reports</ThemedText>
-                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(reports)/memberattributes`)}>
-                        <ThemedText>Member Attributes</ThemedText>
+                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Membership</ThemedText>
+                    <TouchableCard onPress={() => router.push('/(main)/(members)')}>
+                        <ThemedText>Show Members</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
-                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Membership</ThemedText>
                     <TouchableCard onPress={() => router.push(`/(main)/(clubs)/membershiprequests`)}>
                         <ThemedText>Membership Requests</ThemedText>
                         {isClubCountsLoading && <LoadingSpinner />}
@@ -167,12 +166,12 @@ const ClubHome = () => {
                             <ThemedText>{clubCounts?.find(i => i.countType === "openMembershipRequests")?.count}</ThemedText></View>}
                     </TouchableCard>
                     <Spacer space={4} />
-                    <TouchableCard onPress={() => router.push('/(main)/(members)')}>
-                        <ThemedText>Show Members</ThemedText>
-                    </TouchableCard>
-                    <Spacer space={4} />
                     <TouchableCard onPress={() => router.push('/(main)/(members)/memberattributes')}>
                         <ThemedText>Member Attributes</ThemedText>
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(reports)/memberattributesexport`)}>
+                        <ThemedText>Export</ThemedText>
                     </TouchableCard>
                     <Spacer space={50} />
                 </ScrollView>

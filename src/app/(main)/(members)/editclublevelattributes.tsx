@@ -100,6 +100,7 @@ const EditClubLevelAttributes = () => {
                         :
                         <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>
                             <ThemedButton title={"   Save   "} onPress={() => handleShowSaveModal()} />
+                            <Spacer space={10} />
                             <ThemedButton title="Cancel" onPress={() => router.back()} />
                         </View>
                     }
