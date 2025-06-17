@@ -86,3 +86,7 @@ export const deleteClubMemberAttribute = async (clubMemberAttributeId: number | 
 export const saveClubMemberAttributeValues = (clubId: any, memberId: number, updatedCMAList: ClubMemberAttribute[], email:string) => {
     return put("/club/member/attribute", null, { clubId, memberId, updatedCMAList, saveClubMemberAttributeValues: true, email})
 }
+
+export const getClubMemberAttributesReport = (clubId: number, clubMemberAttributeIds: number[]) => {
+    return get("/club/report/memberattribute", { clubId, clubMemberAttributeIds:  clubMemberAttributeIds.join(',') })
+}

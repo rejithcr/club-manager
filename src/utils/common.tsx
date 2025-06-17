@@ -63,3 +63,32 @@ export const getCurrentQuarterItem = (quarters : { period: string; startDate: st
   const currentQuarterIndex = Math.floor(currentMonth / 3); // 0-based index
   return quarters && quarters[currentQuarterIndex];
 }
+
+
+export const jsonToCSV = (jsonArray: any[]) => {
+  if (!jsonArray.length) return '';
+
+  const headers = Object.keys(jsonArray[0]);
+  const csvRows = [];
+
+  // Add headers
+  csvRows.push(headers.join(','));
+
+  // Add rows
+  for (const obj of jsonArray) {
+    const values = headers.map(header => {
+      let val = obj[header];
+      // Escape quotes and wrap in quotes if needed
+      if (typeof val === 'string') {
+        val = val.replace(/"/g, '""');
+        if (val.search(/("|,|\n)/g) >= 0) {
+          val = `"${val}"`;
+        }
+      }
+      return val;
+    });
+    csvRows.push(values.join(','));
+  }
+
+  return csvRows.join('\n');
+}

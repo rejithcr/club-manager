@@ -5,7 +5,7 @@ import { useTheme } from '@/src/hooks/use-theme'
 const ThemedCheckBox = (props: { checked?: boolean }) => {
     const { colors } = useTheme()
     return (
-        <MaterialIcons name={props.checked ? 'check-circle' : 'circle'} size={20} color={props.checked ? colors.success : colors.text} />
+       <MaterialIcons name={props.checked ? 'check-circle' : 'circle'} size={20} color={props.checked ? colors.success : colors.text} />
     )
 }
 

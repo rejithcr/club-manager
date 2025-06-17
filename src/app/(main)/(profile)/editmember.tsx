@@ -114,7 +114,7 @@ const Editmember = () => {
                     {!isLoadingMyClubs && clubs?.map((item: any) =>
                         <View key={item.clubId}>
                             <TouchableCard onPress={() => showDetails(item)} id={item.clubId}>
-                                <ThemedText style={{ fontWeight: "bold" }}>{item.clubName}</ThemedText>
+                                <ThemedText>{item.clubName}</ThemedText>
                             </TouchableCard>
                             <Spacer space={4} />
                         </View>

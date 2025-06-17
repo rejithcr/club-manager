@@ -18,5 +18,5 @@ export const useHttpGet = (url: string, params: {}) => {
         fetchData();
     }, [url]);
 
-    return { data, isLoading, error, refetch: fetchData };
+    return { data, isLoading, error, refetch: fetchData, setData };
 }

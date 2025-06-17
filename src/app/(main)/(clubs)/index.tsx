@@ -119,22 +119,6 @@ const ClubHome = () => {
                         <ThemedText>Transactions</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
-                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Membership</ThemedText>
-                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/membershiprequests`)}>
-                        <ThemedText>Membership Requests</ThemedText>
-                        {isClubCountsLoading && <LoadingSpinner />}
-                        {!isClubCountsLoading && clubCounts?.find(i => i.countType === "openMembershipRequests")?.count > 0 && <View style={{ alignItems: "center", borderRadius: 100, width: 20, backgroundColor: colors.button }}>
-                            <ThemedText>{clubCounts?.find(i => i.countType === "openMembershipRequests")?.count}</ThemedText></View>}
-                    </TouchableCard>
-                    <Spacer space={4} />
-                    <TouchableCard onPress={() => router.push('/(main)/(members)')}>
-                        <ThemedText>Members</ThemedText>
-                    </TouchableCard>
-                    <Spacer space={4} />
-                    <TouchableCard onPress={() => router.push('/(main)/(members)/memberattributes')}>
-                        <ThemedText>Member Attributes</ThemedText>
-                    </TouchableCard>
-                    <Spacer space={4} />
                     <View style={{
                         flexDirection: "row", alignItems: "center", width: "80%",
                         justifyContent: "space-between", alignSelf: "center",
@@ -168,6 +152,27 @@ const ClubHome = () => {
                     <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Expenses</ThemedText>
                     <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
                         <ThemedText>Expense Splits</ThemedText>
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Reports</ThemedText>
+                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(reports)/memberattributes`)}>
+                        <ThemedText>Member Attributes</ThemedText>
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Membership</ThemedText>
+                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/membershiprequests`)}>
+                        <ThemedText>Membership Requests</ThemedText>
+                        {isClubCountsLoading && <LoadingSpinner />}
+                        {!isClubCountsLoading && clubCounts?.find(i => i.countType === "openMembershipRequests")?.count > 0 && <View style={{ alignItems: "center", borderRadius: 100, width: 20, backgroundColor: colors.button }}>
+                            <ThemedText>{clubCounts?.find(i => i.countType === "openMembershipRequests")?.count}</ThemedText></View>}
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <TouchableCard onPress={() => router.push('/(main)/(members)')}>
+                        <ThemedText>Show Members</ThemedText>
+                    </TouchableCard>
+                    <Spacer space={4} />
+                    <TouchableCard onPress={() => router.push('/(main)/(members)/memberattributes')}>
+                        <ThemedText>Member Attributes</ThemedText>
                     </TouchableCard>
                     <Spacer space={50} />
                 </ScrollView>

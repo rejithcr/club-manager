@@ -3,4 +3,5 @@ export type ClubMemberAttribute = {
   attribute: string;
   attributeValue: string;
   required: number;
+  selected?: boolean;
 };
