@@ -29,7 +29,7 @@ const DatePicker = (props: { date: Date; setDate: any, label?: string }) => {
         console.log(props.date.toLocaleDateString())
         return (
             <View style={styles.webContainer}>
-                <div>{props.label}</div>
+                <div style={{ color: colors.text }}>{props.label}</div>
                 <input style={{ ...styles.webInput, backgroundColor: colors.background, color: colors.text }}
                     type='date' value={getWebFormattedDate(props.date)}
                     onChange={(e) => props.setDate(new Date(e.target.value))} />
