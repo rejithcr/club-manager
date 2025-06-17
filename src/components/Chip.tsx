@@ -13,7 +13,7 @@ const Chip = (props: {
     return (
         <TouchableOpacity style={{ ...styles.chip, backgroundColor: colors.primary, ...props.style }} onPress={props.onPress}>
             {props.children}
-            {props.selected && <><Spacer hspace={5} /><ThemedCheckBox checked={true}/> </>}
+            {props.selected && <><Spacer hspace={5} /><ThemedCheckBox checked={true} /></>}
         </TouchableOpacity>
     )
 }
