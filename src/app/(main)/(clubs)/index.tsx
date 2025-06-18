@@ -156,7 +156,7 @@ const ClubHome = () => {
                     <Spacer space={4} />
                     <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Membership</ThemedText>
                     <TouchableCard onPress={() => router.push('/(main)/(members)')}>
-                        <ThemedText>Show Members</ThemedText>
+                        <ThemedText>Members</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
                     <TouchableCard onPress={() => router.push(`/(main)/(clubs)/membershiprequests`)}>
