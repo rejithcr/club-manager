@@ -39,14 +39,14 @@ export const appStyles = StyleSheet.create({
         marginVertical: 10,
         fontWeight: "bold",
         fontSize: 25,
-        width: "80%",
+        width: "90%",
         alignSelf: "center",
     },
     heading: {
         marginVertical: 10,
         fontWeight: "bold",
         fontSize: 20,
-        width: "80%",
+        width: "90%",
         alignSelf: "center",
     },
     shadowBox: {

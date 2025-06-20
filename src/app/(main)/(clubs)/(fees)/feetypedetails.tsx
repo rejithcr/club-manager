@@ -115,7 +115,7 @@ const FeeTypeDetails = () => {
                 </TouchableCard>
                 <View>
                     <View style={{
-                        flexDirection: "row", width: "70%", alignItems: "center",
+                        flexDirection: "row", width: "80%", alignItems: "center",
                         justifyContent: "space-between", alignSelf: "center",
                     }}>
                         <TouchableOpacity onPress={() => setShowAddException(!showAddException)}
@@ -143,7 +143,7 @@ const FeeTypeDetails = () => {
                     <ThemedText style={appStyles.heading}>Collections</ThemedText>
                     {isFeeCollectionsLoading && <LoadingSpinner />}
                     {!isFeeCollectionsLoading && feeCollections.length == 0 &&
-                        <ThemedText style={{ alignSelf: "center", width: "80%" }}>No collections present. To start collecting fee for a period, press the below button.</ThemedText>}
+                        <ThemedText style={{ alignSelf: "center", width: "85%" }}>No collections present. To start collecting fee for a period, press the below button.</ThemedText>}
                     {!isFeeCollectionsLoading && feeCollections &&
                         <FlatList style={{ width: "100%" }}
                             data={feeCollections}

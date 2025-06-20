@@ -91,7 +91,7 @@ const MemberAttributesExport = () => {
                     {isLoadingCMA ? (
                         <LoadingSpinner />
                     ) : (
-                        <ThemedView style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, alignSelf: 'center', width: "80%" }}>
+                        <ThemedView style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, alignSelf: 'center', width: "85%" }}>
                             {cmaList?.map((cma: ClubMemberAttribute) => (
                                 <Chip key={cma.clubMemberAttributeId} selected={cma.selected} onPress={() => handleSelection(cma.clubMemberAttributeId)}>
                                     <ThemedText>{cma.attribute}</ThemedText>
@@ -111,7 +111,3 @@ const MemberAttributesExport = () => {
 }
 
 export default MemberAttributesExport
-
-function setAlertConfig(arg0: { visible: boolean; title: string; message: any; buttons: { text: string; onPress: () => any }[] }): any {
-    throw new Error('Function not implemented.')
-}

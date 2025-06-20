@@ -91,7 +91,7 @@ const Payments = () => {
         <GestureHandlerRootView>
             <Spacer space={5} />
             <View style={{
-                flexDirection: "row",  width: "80%", alignItems: "center",
+                flexDirection: "row",  width: "85%", alignItems: "center",
                 justifyContent: "space-between", alignSelf: "center"
             }}>
                 <View>
@@ -104,12 +104,12 @@ const Payments = () => {
                 </View>
             </View>
             <Spacer space={5}/>
-            <View style={{ flexDirection: "row",  alignItems: "center", width: "80%", alignSelf: "center" }}>
+            <View style={{ flexDirection: "row",  alignItems: "center", width: "85%", alignSelf: "center" }}>
                 <ThemedIcon name={Math.round(feeObj?.completionPercentage) !=100 ? 'MaterialIcons:warning' : 'MaterialIcons:check-circle'} size={25} 
                     color={Math.round(feeObj?.completionPercentage) !=100 ? colors.warning : colors.success}/>
                 <ThemedText style={{marginLeft:10, fontSize: 20}}>Status</ThemedText>                
             </View>
-            <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the member to update payment status</ThemedText>
+            <ThemedText style={{width: "85%", alignSelf: "center", fontSize: 10}}>Select the member to update payment status</ThemedText>
             <Spacer space={5} />
             <View style={{ height: "90%" }}>
                 {isLoading && <LoadingSpinner />}
@@ -179,7 +179,7 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%"}}>                
+            <ShadowBox style={{ ...appStyles.shadowBox, width: "85%"}}>                
                 <ThemedText style={{ width: "70%", fontSize: 15 }}>{props?.firstName}</ThemedText>
                 <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
                 <View style={{ width: "10%", flexDirection: "row", justifyContent:"center" }}>

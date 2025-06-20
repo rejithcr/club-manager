@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { AuthContext } from '@/src/context/AuthContext'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { appStyles } from '@/src/utils/styles'
@@ -14,6 +14,8 @@ import { FlatList, TouchableOpacity, View } from 'react-native'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import { useTheme } from '@/src/hooks/use-theme'
 import { router } from 'expo-router'
+import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
+import Chip from '@/src/components/Chip'
 
 const Profile = () => {
     const { userInfo } = useContext(AuthContext)
@@ -21,28 +23,33 @@ const Profile = () => {
     const { theme, setTheme } = useContext(ThemeContext);
     const { colors } = useTheme()
     const [isMembershipRequestShown, setIsMembershipRequestShown] = React.useState(false)
-    const handleToggleMembershipRequests = () => {        
+    const handleToggleMembershipRequests = () => {
         setIsMembershipRequestShown(prev => !prev)
     }
-    
+
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
-                <ThemedText style={appStyles.heading}>Theme</ThemedText>
-                <TouchableCard onPress={() => setTheme("dark")} icon={<ThemedCheckBox checked={theme == "dark"} />}>
-                    <ThemedText>Dark</ThemedText>
+                <ThemedHeading>Theme</ThemedHeading>
+                <ThemedView style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10, alignSelf: 'center', width: "85%" }}>
+                    <Chip onPress={() => setTheme("dark")} selected={theme == 'dark'}>
+                        <ThemedText>Dark</ThemedText>
+                    </Chip>
+                    <Chip onPress={() => setTheme("light")} selected={theme == 'light'}>
+                        <ThemedText>Light</ThemedText>
+                    </Chip>
+                    <Chip onPress={() => setTheme("system")} selected={theme == 'system'}>
+                        <ThemedText>System</ThemedText>
+                    </Chip>
+                </ThemedView>
+                <ThemedHeading>Other</ThemedHeading>
+                <TouchableCard onPress={() => router.push(`/(main)/(profile)/editmember?memberId=${userInfo?.memberId}`)}>
+                    <ThemedText>Edit Your Info</ThemedText>
                 </TouchableCard>
                 <Spacer space={4} />
-                <TouchableCard onPress={() => setTheme("light")} icon={<ThemedCheckBox checked={!theme || theme == "light"} />}>
-                    <ThemedText>Light</ThemedText>
-                </TouchableCard>
-                <Spacer space={4} />
-                <TouchableCard onPress={() => setTheme("system")} icon={<ThemedCheckBox checked={theme == "system"} />}>
-                    <ThemedText>System</ThemedText>
-                </TouchableCard>
                 <View>
                     <View style={{
-                        flexDirection: "row", width: "80%", alignItems: "center",
+                        flexDirection: "row", width: "90%", alignItems: "center",
                         justifyContent: "space-between", alignSelf: "center",
                     }}>
                         <TouchableOpacity onPress={() => handleToggleMembershipRequests()}
@@ -53,7 +60,7 @@ const Profile = () => {
                         <TouchableOpacity style={{ alignItems: "center" }} onPress={() => router.push(`/(main)/(members)/joinclub`)}>
                             <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
                         </TouchableOpacity>
-                    </View>                    
+                    </View>
                     <View>
                         {isLoadingMyRequests && <LoadingSpinner />}
                         {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length > 0 &&
@@ -81,20 +88,16 @@ const Profile = () => {
                             />}
                         {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length === 0 && <ThemedText style={{ alignSelf: "center" }}>No requests found</ThemedText>}
                     </View>
-                </View>                
-                <ThemedText style={appStyles.heading}>Other</ThemedText>
-                <TouchableCard onPress={() => router.push(`/(main)/(profile)/editmember?memberId=${userInfo?.memberId}`)}>
-                    <ThemedText>Edit your info</ThemedText>
-                </TouchableCard>
+                </View>
                 {userInfo?.isSuperUser === 1 && <>
-                <ThemedText style={appStyles.heading}>Super User Options</ThemedText>
-                {/* <TouchableCard onPress={() => router.push(`/(main)/(profile)/clubs`)}>
+                    <ThemedHeading>Super User Options</ThemedHeading>
+                    {/* <TouchableCard onPress={() => router.push(`/(main)/(profile)/clubs`)}>
                     <ThemedText>Show Clubs</ThemedText>
                 </TouchableCard> */}
-                <Spacer space={4}/>
-                <TouchableCard onPress={() => router.push(`/(main)/(profile)/users`)}>
-                    <ThemedText>Show Users</ThemedText>
-                </TouchableCard>
+                    <Spacer space={4} />
+                    <TouchableCard onPress={() => router.push(`/(main)/(profile)/users`)}>
+                        <ThemedText>Show Users</ThemedText>
+                    </TouchableCard>
                 </>
                 }
             </GestureHandlerRootView>

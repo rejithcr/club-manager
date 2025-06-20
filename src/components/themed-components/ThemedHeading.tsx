@@ -8,7 +8,7 @@ const ThemedHeading = (props: any) => {
 
   return (
     <View>
-      <Text style={{...appStyles.heading, color: colors.text}}>{props.children}</Text>
+      <Text style={{...appStyles.heading, color: colors.text, ...props.style}}>{props.children}</Text>
     </View>
   )
 }

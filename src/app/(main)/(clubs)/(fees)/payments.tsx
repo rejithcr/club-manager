@@ -87,7 +87,7 @@ const Payments = () => {
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
                 <ThemedText style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</ThemedText>
-                <ThemedText style={{ width: "80%", alignSelf: "center", fontSize: 10 }}>Select the member to update payment status</ThemedText>
+                <ThemedText style={{ width: "85%", alignSelf: "center", fontSize: 10 }}>Select the member to update payment status</ThemedText>
                 <Spacer space={5} />
                 <View>
                     {isLoading && <LoadingSpinner />}
@@ -157,7 +157,7 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", flexWrap: "wrap" }}>
+            <ShadowBox style={{ ...appStyles.shadowBox, width: "85%", flexWrap: "wrap" }}>
                 <ThemedText style={{ width: "70%", fontSize: 15, paddingLeft: 15 }}>{props?.firstName} {props?.lastName}</ThemedText>
                 <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.amount}</ThemedText>
                 <View style={{ width: "10%" }}>

@@ -116,7 +116,7 @@ const EditFeeException = () => {
                     }) => <View key={member?.memberId?.toString() + member?.endDate}>
                             <ShadowBox style={{
                                 flexDirection: "row", justifyContent: "space-between",
-                                width: "70%", padding: 10, 
+                                width: "75%", padding: 10, 
                             }}>
                                 <View>
                                     <ThemedText style={{ textDecorationLine: getStrikeOut(member.endDate || member.endDateAdded) }}>{member.firstName} {member.lastName}</ThemedText>
@@ -135,9 +135,9 @@ const EditFeeException = () => {
                 {!isLoadingMembers &&
                     members.map((item: any) =><>
                         <TouchableOpacity key={item.memberId} onPress={() => addToException(item)}>
-                            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", flexWrap: "wrap" }}>
+                            <ShadowBox style={{ width: "80%", flexWrap: "wrap" }}>
                                 <ThemedIcon name="MaterialIcons:add-circle" size={20} color={colors.add}/>
-                                <ThemedText style={{ width: "85%", fontSize: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
+                                <ThemedText style={{ width: "85%", fontSize: 15, paddingLeft: 10 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>
                         <Spacer space={4} />

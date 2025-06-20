@@ -17,7 +17,7 @@ const KeyValueTouchableBox = (props: {
     return (        
         <TouchableOpacity onPress={props.onPress}>
             <View style={{ backgroundColor: colors.primary, 
-                ...appStyles.shadowBox, width: "80%", flexWrap: "wrap"
+                ...appStyles.shadowBox, width: "85%", flexWrap: "wrap"
             }}>
                 <ThemedText numberOfLines={1} style={{ width: "60%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props.keyName}</ThemedText>
                 <ThemedText style={{ width: "30%", fontSize: 15, textAlign: "right" }}>{props.keyValue}  </ThemedText>

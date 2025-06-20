@@ -18,7 +18,7 @@ export default ShadowBox
 const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
-        width: "80%",
+        width: "85%",
         borderColor: "#eee",
         alignItems: "center",
         alignSelf: "center",

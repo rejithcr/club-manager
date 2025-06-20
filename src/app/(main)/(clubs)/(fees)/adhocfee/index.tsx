@@ -14,6 +14,7 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
 import Alert, { AlertProps } from '@/src/components/Alert'
+import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 
 const AdocFeesHome = () => {
   const [isLoadingAdhoc, setIsLoadingAdhoc] = useState(false);
@@ -49,10 +50,10 @@ const AdocFeesHome = () => {
       <GestureHandlerRootView>
         <ScrollView>
           <View style={{
-            flexDirection: "row", alignItems: "center", width: "80%",
+            flexDirection: "row", alignItems: "center", width: "85%",
             justifyContent: "space-between", alignSelf: "center", marginTop: 10
           }}>
-            <ThemedText style={{ ...appStyles.heading }}>Expense Splits</ThemedText>
+            <ThemedHeading style={{width: 200}}>Expense Splits</ThemedHeading>
 
             <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
               {clubInfo.role == ROLE_ADMIN && <TouchableOpacity

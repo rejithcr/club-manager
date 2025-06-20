@@ -17,6 +17,7 @@ import { ROLE_ADMIN } from '@/src/utils/constants'
 import { useTheme } from '@/src/hooks/use-theme'
 import { getFeeStructure } from '@/src/helpers/fee_helper'
 import Alert, { AlertProps } from '@/src/components/Alert'
+import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 
 const ClubHome = () => {
     const router = useRouter()
@@ -95,10 +96,10 @@ const ClubHome = () => {
             <GestureHandlerRootView>
                 <Spacer space={5} />
                 <View style={{
-                    flexDirection: "row", width: "80%", alignSelf: "center",
+                    flexDirection: "row", width: "90%", alignSelf: "center",
                     justifyContent: "space-between", alignItems: "center"
                 }}>
-                    <ThemedText style={{ ...appStyles.heading, width: "50%" }}>Fund Balance</ThemedText>
+                    <ThemedHeading style={{width: 200}}>Fund Balance</ThemedHeading>
                     {isFundBalanceLoading && <LoadingSpinner />}
                     {!isFundBalanceLoading &&
                         <ThemedText style={{ fontWeight: "bold", fontSize: 16, color: fundBalance > 0 ? colors.success : colors.error }}>Rs. {fundBalance || 0}</ThemedText>}
@@ -120,10 +121,10 @@ const ClubHome = () => {
                     </TouchableCard>
                     <Spacer space={4} />
                     <View style={{
-                        flexDirection: "row", alignItems: "center", width: "80%",
+                        flexDirection: "row", alignItems: "center", width: "90%",
                         justifyContent: "space-between", alignSelf: "center",
                     }}>
-                        <ThemedText style={{ ...appStyles.heading }}>Fees</ThemedText>
+                        <ThemedHeading style={{width: 200}}>Fees</ThemedHeading>
                         <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
                             {params.get("role") == ROLE_ADMIN && <TouchableOpacity
                                 onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
@@ -149,12 +150,12 @@ const ClubHome = () => {
                             <Spacer space={4} />
                         </View>
                     })}
-                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Expenses</ThemedText>
+                    <ThemedHeading>Expenses</ThemedHeading>
                     <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
                         <ThemedText>Expense Splits</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
-                    <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Membership</ThemedText>
+                    <ThemedHeading>Membership</ThemedHeading>
                     <TouchableCard onPress={() => router.push('/(main)/(members)')}>
                         <ThemedText>Members</ThemedText>
                     </TouchableCard>
