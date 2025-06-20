@@ -102,7 +102,7 @@ const Editmember = () => {
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                     <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
                     <InputText label="Email" defaultValue={email} keyboardType={"email-address"} editable={false} />
-                    <DatePicker label={"Date of Birth"} date={dateOfBirth ? new Date(dateOfBirth) : new Date()} setDate={setDateOfBirth} />
+                    <DatePicker label={"Date of Birth"} date={dateOfBirth ? new Date(dateOfBirth) : null} setDate={setDateOfBirth} />
                     {updatedBy !== email &&
                         <ThemedText style={{ alignSelf: "center", color: colors.warning }}>Last updated by: {updatedBy} </ThemedText>}
                     <Spacer space={10} />

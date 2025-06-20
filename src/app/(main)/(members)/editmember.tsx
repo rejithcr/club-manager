@@ -98,7 +98,7 @@ const Editmember = () => {
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                     <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
                     <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />
-                    <DatePicker label={"Date of Birth"} date={dateOfBirth ? new Date(dateOfBirth) : new Date()} setDate={setDateOfBirth} />
+                    <DatePicker label={"Date of Birth"} date={dateOfBirth ? new Date(dateOfBirth) : null} setDate={setDateOfBirth} />
                     </> : <ThemedText style={{ width: "80%", alignSelf: "center", marginVertical: 20 }}>
                         Registered member's personal information is not editable. Please contact the member to update
                         </ThemedText>}

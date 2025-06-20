@@ -5,12 +5,16 @@ import ThemedIcon from './themed-components/ThemedIcon';
 import ThemedText from './themed-components/ThemedText';
 import { useTheme } from '../hooks/use-theme';
 
-const DatePicker = (props: { date: Date; setDate: any, label?: string }) => {
+const DatePicker = (props: { date: Date | null; setDate: any, label?: string }) => {
     const [show, setShow] = useState(false);
     const { colors } = useTheme()
 
-    const onChange = (_: any, selectedDate?: Date) => {
+    const onChange = (event: any, selectedDate?: Date) => {
         setShow(false);
+        if (event.type === 'neutralButtonPressed') {
+            props.setDate(null); // Clear date if picker is dismissed
+            return;
+        }
         props.setDate(selectedDate);
     };
 
@@ -18,7 +22,8 @@ const DatePicker = (props: { date: Date; setDate: any, label?: string }) => {
         setShow(true);
     };
 
-    const getWebFormattedDate = (date: Date) => {
+    const getWebFormattedDate = (date: Date | null) => {
+        if (!date) return '';
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
@@ -26,7 +31,6 @@ const DatePicker = (props: { date: Date; setDate: any, label?: string }) => {
     };
 
     if (Platform.OS == 'web') {
-        console.log(props.date.toLocaleDateString())
         return (
             <View style={styles.webContainer}>
                 <div style={{ color: colors.text, fontFamily:"Roboto" }}>{props.label}</div>
@@ -39,10 +43,10 @@ const DatePicker = (props: { date: Date; setDate: any, label?: string }) => {
     return (
         <>
             <Pressable onPress={() => showDatepicker()}>
-                <View style={{margin: 10}}>
+                <View style={{marginVertical: 10}}>
                     <ThemedText style={styles.label}>{props.label || ""}</ThemedText>
                     <View style={styles.container}>
-                        <ThemedText>{props.date.toLocaleDateString()} </ThemedText>
+                        <ThemedText>{props.date?.toLocaleDateString()} </ThemedText>
                         <ThemedIcon name={"MaterialIcons:edit-calendar"} size={32} />
                     </View>
                 </View>
@@ -50,8 +54,9 @@ const DatePicker = (props: { date: Date; setDate: any, label?: string }) => {
             {show && (
                 <DateTimePicker
                     testID="dateTimePicker"
-                    value={props.date}
+                    value={props.date || new Date()}
                     mode={"date"}
+                    neutralButton = {{ label: "Clear"}}
                     onChange={onChange}
                 />
             )}

@@ -173,7 +173,7 @@ const ClubHome = () => {
                     <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(reports)/memberattributesexport`)}>
                         <ThemedText>Export</ThemedText>
                     </TouchableCard>
-                    <Spacer space={50} />
+                    <Spacer space={20} />
                 </ScrollView>
                 {alertConfig?.visible && <Alert {...alertConfig} />}
                 {/* <FloatingMenu actions={actions} position={"left"} color='black'

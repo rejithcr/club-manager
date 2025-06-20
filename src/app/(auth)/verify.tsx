@@ -85,7 +85,7 @@ const Register = () => {
                 <InputText placeholder='Last Name' defaultValue={memberInfo?.lastName} onChangeText={handleLastNameChange} />
                 <InputText placeholder='Phone' defaultValue={memberInfo?.phone} onChangeText={handlePhoneChange} />
                 <InputText placeholder='Email' defaultValue={memberInfo?.email} editable={false} />
-                <DatePicker label={"Date of Birth"} date={memberInfo?.dateOfBirth ? new Date(memberInfo?.dateOfBirth) : new Date()} setDate={setDateOfBirth} />
+                <DatePicker label={"Date of Birth"} date={memberInfo?.dateOfBirth ? new Date(memberInfo?.dateOfBirth) : null} setDate={setDateOfBirth} />
                 <View style={{ marginTop: 25 }} />
                 <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
                     <ThemedButton title="Verify" onPress={handleVerify} />
