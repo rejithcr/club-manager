@@ -148,10 +148,10 @@ GET_LATEST_COLLECTION_PERIOD = """
 """
 
 GET_NEXT_PAYTMENT_COLLECTION_LIST = """
-    select s.member_id, s.first_name, s.membership_id, 
+    select s.member_id, s.first_name, s.last_name, s.membership_id, 
         json_agg(distinct jsonb_build_object('club_fee_amount', s.club_fee_amount, 'club_fee_type_exception_member_id', s.club_fee_type_exception_member_id)) exceptions
     from (
-    select m.member_id, m.first_name, ms.membership_id,
+    select m.member_id, m.first_name, m.last_name, ms.membership_id,
         (case when cftem.membership_id is not null then cfte.club_fee_exception_amount else cft.club_fee_amount end) as club_fee_amount,
         cftem.club_fee_type_exception_member_id
     from club c 
@@ -161,9 +161,9 @@ GET_NEXT_PAYTMENT_COLLECTION_LIST = """
         left join club_fee_type_exception cfte on cfte.club_fee_type_id = cft.club_fee_type_id 
         left join club_fee_type_exception_member cftem on cftem.club_fee_type_exception_id = cfte.club_fee_type_exception_id 
             and cftem.membership_id = ms.membership_id and cftem.end_date is null 
-    where cft.club_fee_type_id = %s
+    where cft.club_fee_type_id = %s and ms.is_active = 1
     ) s
-    group by s.member_id, s.first_name, s.membership_id 
+    group by s.member_id, s.first_name, s.last_name, s.membership_id 
     order by s.first_name asc
 """
 

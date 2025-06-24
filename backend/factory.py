@@ -9,6 +9,7 @@ from ServiceFeeException import FeeExceptionService
 from ServiceFeeCollection import FeeCollectionService
 from ServiceFeeAdhoc import FeeAdhocService
 from ServiceClubTransaction import ClubTransactionService
+from ServiceClubReport import ClubReportService
 
 
 def get_params(event):
@@ -33,6 +34,8 @@ def get_service(event):
                 return ClubMemberService()
             if len(paths) > 2 and paths[2] =="transaction":
                 return ClubTransactionService()
+            if len(paths) > 2 and paths[2] =="report":
+                return ClubReportService()
             return ClubService()
         if paths[1] == "member":
             return MemberService()

@@ -10,6 +10,7 @@ def connect():
         host="",
         port=6543
     )
+    #engine = db.create_engine('postgresql://user:%s@host:6543/postgres' % quote_plus('pwd'))
     return conn
 
 
