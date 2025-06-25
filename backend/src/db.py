@@ -14,9 +14,9 @@ def connect():
     print("Connecting to PostgreSQL")
     connection = psycopg2.connect(
         dbname="postgres",
-        user="postgres.idgqxnsqcsigrehkxurd",
-        password="DNSFUO9qROtW2iAN",
-        host="aws-0-ap-south-1.pooler.supabase.com",
+        user="",
+        password="",
+        host="",
         port=6543
     )
     #engine = db.create_engine('postgresql://postgres.idgqxnsqcsigrehkxurd:%s@aws-0-ap-south-1.pooler.supabase.com:6543/postgres' % quote_plus('supa@base123*'))

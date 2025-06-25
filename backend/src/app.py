@@ -21,7 +21,7 @@ from src.member.routes import member_bp
 def create_app():
     cm_app = Flask(__name__)
     # Auth
-    cm_app.config["FLASK_JWT_SECRET_KEY"] = "super-secret"  # Change this in production!
+    cm_app.config["FLASK_JWT_SECRET_KEY"] = ""  # Change this in production!
     jwt = JWTManager(cm_app)
     CORS(cm_app, origins=constants.CORS_ORIGINS)
     # Register the blueprint with an optional URL prefix
