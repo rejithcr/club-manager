@@ -50,6 +50,3 @@ def verify_google_access_token(token: str, email: str):
             return True
 
     return False
-
-#token_v = "ya29.a0AS3H6Nwt7_cpM2rpb3jRDfnwjTZUxE8CUsUNzuTWubMjvQzxi83yszT28z3XbBP5IQOQREhqaDc_mCuVAVEuEZt3Qov3qT_G-GDzeDdcrNhhfvUorgMNI2Rq1ub5baMQCP47bUt3siowhG1BgjDKoGpE3N3W7unHnufZOj3aqMYaCgYKAZ0SARYSFQHGX2MicRpBPboHK9RJC25ibrd9jA0178"
-#print(verify_google_access_token(token_v, "rejithramakrishnan@1gmail.com"))
