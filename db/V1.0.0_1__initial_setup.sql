@@ -16,8 +16,8 @@ create table member (
     phone varchar(13) not null unique,
     photo text,
     date_of_birth date,
-    is_registered numeric(1) default 0,
-    is_super_user numeric(1) default 0,
+    is_registered smallint default 0,
+    is_super_user smallint default 0,
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
@@ -45,7 +45,7 @@ create table membership (
     club_id integer not null,
     member_id integer not null,
     role_id integer not null,
-    is_active integer default 1;
+    is_active smallint default 1;
     start_date date not null,
     end_date date,
     created_by varchar(100) not null,
@@ -129,7 +129,7 @@ create table club_fee_payment (
     club_fee_collection_id integer not null,
     membership_id integer not null,
     club_fee_payment_amount numeric(7,2) not null, -- 300
-    paid integer not null default 0,
+    paid smallint not null default 0,
     club_fee_type_exception_member_id integer,
     club_fee_comments text,
     created_by varchar(100) not null,
@@ -163,7 +163,7 @@ create table club_adhoc_fee_payment (
     club_adhoc_fee_id integer not null,
     membership_id integer not null,
     club_adhoc_fee_payment_amount numeric(7,2) not null, -- 300
-    paid integer not null default 0,
+    paid smallint not null default 0,
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
@@ -212,7 +212,7 @@ create table club_member_attributes (
     club_member_attribute_id integer primary key,
     club_id integer not null,
     attribute varchar(100) not null,
-    required numeric(1) default 0,
+    required smallint default 0,
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,

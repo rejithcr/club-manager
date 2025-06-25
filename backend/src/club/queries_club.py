@@ -7,23 +7,38 @@ GET_CLUB = """
 """
 
 SEARCH_CLUB = """
-    select club_id, club_name from club where upper(club_name) like %s
+    select club_id, club_name from club 
+    where upper(club_name) like %s 
+    limit 10
 """
 
-GET_CLUBS_BY_MEMBER = """
+GET_CLUBS_BY_MEMBER = """ 
     select c.club_id, c.club_name , r.role_id ,r.role_name
     from club c
-        join membership m on c.club_id=m.club_id     
-        join role r on m.role_id = r.role_id      
-    where m.member_id = %s
+        join membership ms on c.club_id=ms.club_id     
+        join role r on ms.role_id = r.role_id      
+    where ms.member_id = %s and ms.is_active = 1
 """
-
+GET_CLUB_MEMBER = """
+    select m.first_name, m.last_name, m.email, m.phone, m.photo, m.is_registered, r.role_name role, m.updated_by, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth
+    from "member" m 
+        join membership m2 on m.member_id = m2.member_id
+        join club c on c.club_id = m2.club_id
+        join "role" r on m2.role_id = r.role_id
+    where m.member_id = %s and c.club_id = %s
+"""
 GET_CLUB_MEMBERS = """
-    select ms.membership_id, m.member_id, m.first_name,m.last_name, m.email , m.phone 
+    select ms.membership_id, m.member_id, m.first_name,m.last_name, m.email , m.phone, m.photo , m.is_registered, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth
     from club c
         join membership ms on c.club_id=ms.club_id     
         join member m on m.member_id  = ms.member_id    
-    where c.club_id = %s
+    where c.club_id = %s and ms.is_active = 1
+"""
+
+UPDATE_CLUB_MEMBER_ROLE = """
+    update membership 
+    set role_id = (select role_id from role where role_name = %s)
+    where club_id = %s and member_id = %s
 """
 
 GET_CLUB_SEQ_NEXT_VAL="select nextval('club_id_seq')"
@@ -179,4 +194,10 @@ GET_CLUB_COUNTS = """
     select 'openMembershipRequests' count_type, count(*) 
     from membership_requests mr
     where mr.club_id = %s and mr.status = 'REQUESTED'
+"""
+
+REMOVE_MEMBERSHIP = """
+    update membership
+    set is_active = 0, updated_by = %s, updated_ts = now()
+    where club_id = %s and member_id = %s
 """
