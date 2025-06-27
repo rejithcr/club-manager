@@ -1,4 +1,4 @@
-import { del, get, post, put } from "../utils/api"
+import { del, get, post, put } from "../utils/http/api"
 
 export const getTransactions = async (clubId: string | null, txnType: string, showFees: boolean, limit: number, offset: number) => {
     return get("/club/transaction", { clubId, txnType, showFees, limit, offset })

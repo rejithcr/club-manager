@@ -1,5 +1,5 @@
 import React from "react";
-import { get } from "../utils/api";
+import { get } from "../utils/http/api";
 
 export const useHttpGet = (url: string, params: {}) => {
     const [data, setData] = React.useState<any>(null);

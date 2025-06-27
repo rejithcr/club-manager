@@ -1,5 +1,5 @@
 .env
 .vscode
-build/
 .idea
+build/
 __pycache__

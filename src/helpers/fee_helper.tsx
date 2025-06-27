@@ -1,4 +1,4 @@
-import { del, get, post, put } from "../utils/api";
+import { del, get, post, put } from "../utils/http/api";
 
 
 export const getFeeStructure = async (clubId: number) => {

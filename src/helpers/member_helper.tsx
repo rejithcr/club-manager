@@ -1,4 +1,4 @@
-import { del, get, post, put } from '@/src/utils/api'
+import { get, post, put } from '@/src/utils/http/api'
 
 export interface Member {
     memberId: number | string | undefined;

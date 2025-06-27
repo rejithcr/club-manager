@@ -1,3 +1,6 @@
+import datetime
+import os
+
 import serverless_wsgi
 
 from flask import Flask
@@ -21,7 +24,8 @@ from src.member.routes import member_bp
 def create_app():
     cm_app = Flask(__name__)
     # Auth
-    cm_app.config["FLASK_JWT_SECRET_KEY"] = ""  # Change this in production!
+    cm_app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY')
+    cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(days=30)
     jwt = JWTManager(cm_app)
     CORS(cm_app, origins=constants.CORS_ORIGINS)
     # Register the blueprint with an optional URL prefix

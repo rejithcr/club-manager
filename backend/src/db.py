@@ -1,27 +1,25 @@
+import os
+
 import psycopg2
 import psycopg2.extras
 
-conn = None
-
 def get_connection():
-    global conn
-    if not conn:
-        conn = connect()
-        return conn
-    return conn
+    return connect()
+
+def close_connection(connection):
+    connection.close()
 
 def connect():
     print("Connecting to PostgreSQL")
     connection = psycopg2.connect(
         dbname="postgres",
-        user="",
-        password="",
-        host="",
-        port=6543
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        host=os.getenv('DB_HOST'),
+        port=os.getenv('DB_PORT')
     )
-    #engine = db.create_engine('postgresql://postgres.idgqxnsqcsigrehkxurd:%s@aws-0-ap-south-1.pooler.supabase.com:6543/postgres' % quote_plus('supa@base123*'))
+    #engine = db.create_engine("postgresql://os.getenv('DB_USER'):%s@=os.getenv('DB_HOST'):=os.getenv('DB_PORT')/postgres' % quote_plus(os.getenv('DB_PASSWORD')))
     return connection
-
 
 def fetch(connection, query, params):
     with connection.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:

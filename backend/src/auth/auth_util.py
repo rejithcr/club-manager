@@ -1,26 +1,12 @@
 # Hypothetical user roles
+import requests
+
 from functools import wraps
 
-import requests
-from flask import jsonify
+from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from src import constants
-
-USER_ROLES = {
-    "john_doe": ["user"],
-    "jane_admin": ["user", "admin"]
-}
-
-
-def token_required(func):
-    @wraps(func) # This preserves the original function's metadata
-    def wrapper(*args, **kwargs):
-        print(f"Executing before {func.__name__}")
-        result = func(*args, **kwargs) # Call the original function
-        print(f"Executing after {func.__name__}")
-        return result
-    return wrapper
+from src.auth.service import get_user_role
 
 
 def role_required(allowed_roles):
@@ -29,14 +15,11 @@ def role_required(allowed_roles):
         @jwt_required()  # Ensures token is present and valid
         def wrapper(*args, **kwargs):
             current_user_id = get_jwt_identity()
-            user_roles = USER_ROLES.get(current_user_id, [])
-
+            user_roles = get_user_role(current_user_id, request)
             if not any(role in user_roles for role in allowed_roles):
                 return jsonify({"msg": "Insufficient permissions"}), 403
             return fn(*args, **kwargs)
-
         return wrapper
-
     return decorator
 
 
@@ -50,3 +33,4 @@ def verify_google_access_token(token: str, email: str):
             return True
 
     return False
+

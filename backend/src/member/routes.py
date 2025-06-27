@@ -1,7 +1,6 @@
 from flask import Blueprint, request
 
-from src import util
-from src.db import get_connection
+from src import util, db
 from src.member.ServiceMember import MemberService
 
 member_bp = Blueprint('member', __name__, url_prefix='/member')
@@ -10,17 +9,29 @@ member_bp = Blueprint('member', __name__, url_prefix='/member')
 def get_members():
     service = MemberService()
     params = util.get_params(request)
-    return service.get(get_connection(), params), 200
+    conn = db.get_connection()
+    try:
+        return service.get(conn, params), 200
+    finally:
+        db.close_connection(conn)
 
 @member_bp.route('/', methods=['POST'], strict_slashes=False)
 def post_members():
     service = MemberService()
     params = util.get_params(request)
-    return service.post(get_connection(), params), 200
+    conn = db.get_connection()
+    try:
+        return service.post(conn, params), 200
+    finally:
+        db.close_connection(conn)
 
 
 @member_bp.route('/', methods=['PUT'], strict_slashes=False)
 def put_members():
     service = MemberService()
     params = util.get_params(request)
-    return service.put(get_connection(), params), 200
+    conn = db.get_connection()
+    try:
+        return service.put(conn, params), 200
+    finally:
+        db.close_connection(conn)

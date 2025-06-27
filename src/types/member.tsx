@@ -5,3 +5,11 @@ export type ClubMemberAttribute = {
   required: number;
   selected?: boolean;
 };
+
+type UserInfo = {
+    email: string;
+    name: string;
+    authToken: string;
+    photo?: string;
+    phone?: string;
+}
