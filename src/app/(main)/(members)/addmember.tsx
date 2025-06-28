@@ -178,7 +178,7 @@ const AddMember = () => {
             })
     }
     const handleCancel = () => {
-        AsyncStorage.removeItem("userInfo")
+        AsyncStorage.removeItem("authInfo")
             .then(() => router.dismissTo("/(auth)"));
     }
     const handleSearchNumberChange = (text: string) => {

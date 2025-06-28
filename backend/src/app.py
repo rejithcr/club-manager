@@ -25,8 +25,9 @@ def create_app():
     cm_app = Flask(__name__)
     # Auth
     cm_app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY')
-    cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(days=30)
-    jwt = JWTManager(cm_app)
+    cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=15)
+    cm_app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=365)
+    JWTManager(cm_app)
     CORS(cm_app, origins=constants.CORS_ORIGINS)
     # Register the blueprint with an optional URL prefix
     cm_app.register_blueprint(member_bp)

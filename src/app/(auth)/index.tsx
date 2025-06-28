@@ -32,9 +32,9 @@ const AuthHome = () => {
   }, [response])
 
   const authenticate = async () => {
-    const userInfoFromAsyncStorage = await AsyncStorage.getItem("userInfo");
+    const userInfoFromAsyncStorage = await AsyncStorage.getItem("authInfo");
     const userInfoFromAsyncStorageParsed = userInfoFromAsyncStorage ? JSON.parse(userInfoFromAsyncStorage) : null;
-    if (userInfoFromAsyncStorageParsed?.authToken) {
+    if (userInfoFromAsyncStorageParsed?.accessToken && userInfoFromAsyncStorageParsed?.refreshToken) {
       setUserInfo(userInfoFromAsyncStorageParsed)
       router.replace('/(main)')
     } else {
@@ -42,7 +42,6 @@ const AuthHome = () => {
       setLoading(true)
       authenticateMember(gInfo.email, gInfo.gtoken)
         .then(response => {
-          console.log("member response", response.data)
           if (response.data?.isRegistered === 1) {
             setUserInfo({ ...gInfo, ...response.data })
             router.replace('/(main)')
@@ -54,10 +53,11 @@ const AuthHome = () => {
             router.replace(`/(main)/(members)/addmember?createMember=true&name=${gInfo.name}&email=${gInfo.email}`)
           }
           delete gInfo.gtoken; // Remove gtoken from user info before saving
-          AsyncStorage.setItem("userInfo", JSON.stringify({ 
+          AsyncStorage.setItem("authInfo", JSON.stringify({ 
             ...gInfo, 
-            memberId: response.data['memberId'], 
-            authToken: response.data['authToken'] 
+            memberId: response.data['memberId'],
+            accessToken: response.data['accessToken'],
+            refreshToken: response.data['refreshToken']
           }))
         })
         .catch(error => setAlertConfig({

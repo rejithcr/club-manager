@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
 
 from src import util, db
 from src.club.member.ServiceClubMember import ClubMemberService
@@ -6,6 +7,7 @@ from src.club.member.ServiceClubMember import ClubMemberService
 club_member_bp = Blueprint('club_member', __name__, url_prefix='/club/member')
 
 @club_member_bp.route('/', methods=['GET'], strict_slashes=False)
+@jwt_required()
 def get_club_member():
     service = ClubMemberService()
     params = util.get_params(request)
@@ -17,6 +19,7 @@ def get_club_member():
 
 
 @club_member_bp.route('/', methods=['POST'], strict_slashes=False)
+@jwt_required()
 def post_club_member():
     service = ClubMemberService()
     params = util.get_params(request)
@@ -27,6 +30,7 @@ def post_club_member():
         db.close_connection(conn)
 
 @club_member_bp.route('/', methods=['PUT'], strict_slashes=False)
+@jwt_required()
 def put_club_member():
     service = ClubMemberService()
     params = util.get_params(request)
@@ -37,6 +41,7 @@ def put_club_member():
         db.close_connection(conn)
 
 @club_member_bp.route('/', methods=['DELETE'], strict_slashes=False)
+@jwt_required()
 def delete_club_member():
     service = ClubMemberService()
     params = util.get_params(request)
@@ -47,6 +52,7 @@ def delete_club_member():
         db.close_connection(conn)
 
 @club_member_bp.route('/attribute', methods=['GET'], strict_slashes=False)
+@jwt_required()
 def get_club_member_attribute():
     service = ClubMemberService()
     params = util.get_params(request)
@@ -57,6 +63,7 @@ def get_club_member_attribute():
         db.close_connection(conn)
 
 @club_member_bp.route('/attribute', methods=['POST'], strict_slashes=False)
+@jwt_required()
 def post_club_member_attribute():
     service = ClubMemberService()
     params = util.get_params(request)
@@ -67,6 +74,7 @@ def post_club_member_attribute():
         db.close_connection(conn)
 
 @club_member_bp.route('/attribute', methods=['PUT'], strict_slashes=False)
+@jwt_required()
 def put_club_member_attribute():
     service = ClubMemberService()
     params = util.get_params(request)
@@ -77,6 +85,7 @@ def put_club_member_attribute():
         db.close_connection(conn)
 
 @club_member_bp.route('/attribute', methods=['DELETE'], strict_slashes=False)
+@jwt_required()
 def delete_club_member_attribute():
     service = ClubMemberService()
     params = util.get_params(request)

@@ -41,7 +41,7 @@ const ClubHome = () => {
         setIsFundBalanceLoading(true)
         getFundBalance(params.get("clubId"))
             .then(response => setFundBalance(response.data.fundBalance))
-            .catch(error => setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }))
+            .catch(error => { console.log(error.response); setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }) })
             .finally(() => setIsFundBalanceLoading(false))
     }
     const fetchTotalDue = () => {
@@ -54,7 +54,7 @@ const ClubHome = () => {
     const fetchClubCounts = () => {
         setIsClubCountsLoading(true)
         getClubCounts(params.get("clubId"))
-            .then(response => { console.log(response.data); setClubCounts(response.data) })
+            .then(response => { setClubCounts(response.data) })
             .catch(error => setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }))
             .finally(() => setIsClubCountsLoading(false))
     }

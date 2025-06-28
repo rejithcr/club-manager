@@ -23,7 +23,7 @@ const ClubDues = () => {
   const fetchClubDues = () => {
     setIsLoading(true);
     getClubDues(clubInfo.clubId)
-      .then(response => { console.log(response.data); setDuesByMembers(response.data) })
+      .then(response => { setDuesByMembers(response.data) })
       .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
       .finally(() => setIsLoading(false));
   }

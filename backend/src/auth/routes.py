@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 
 from src import db
 from src.auth.auth_util import verify_google_access_token
@@ -15,13 +15,25 @@ def get_token():
     # check if user registered
     if verify_google_access_token(google_access_token, email):
         access_token = create_access_token(identity=email)
+        refresh_token = create_refresh_token(identity=email)
         m_service = MemberService()
         conn = db.get_connection()
         try:
             member_info = m_service.get(conn, {'email': email})
-            member_info['authToken'] = access_token
+            member_info['accessToken'] = access_token
+            member_info['refreshToken'] = refresh_token
             return member_info, 200
         finally:
             db.close_connection(conn)
 
     return jsonify({"message": "bad user"}), 401
+
+
+# If we are refreshing a token here we have not verified the users password in
+# a while, so mark the newly created access token as not fresh
+@auth_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh():
+    identity = get_jwt_identity()
+    access_token = create_access_token(identity=identity)
+    return jsonify(accessToken=access_token)

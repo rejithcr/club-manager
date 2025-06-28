@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
 
 from src import util, db
 from src.fee.ServiceFee import FeeService
@@ -6,6 +7,7 @@ from src.fee.ServiceFee import FeeService
 fee_bp = Blueprint('fee', __name__, url_prefix='/fee')
 
 @fee_bp.route('/', methods=['GET'], strict_slashes=False)
+@jwt_required()
 def get_fee():
     service = FeeService()
     params = util.get_params(request)
@@ -16,6 +18,7 @@ def get_fee():
         db.close_connection(conn)
 
 @fee_bp.route('/', methods=['POST'], strict_slashes=False)
+@jwt_required()
 def post_fee():
     service = FeeService()
     params = util.get_params(request)
@@ -26,6 +29,7 @@ def post_fee():
         db.close_connection(conn)
 
 @fee_bp.route('/', methods=['PUT'], strict_slashes=False)
+@jwt_required()
 def put_fee():
     service = FeeService()
     params = util.get_params(request)
@@ -36,6 +40,7 @@ def put_fee():
         db.close_connection(conn)
 
 @fee_bp.route('/', methods=['DELETE'], strict_slashes=False)
+@jwt_required()
 def delete_fee():
     service = FeeService()
     params = util.get_params(request)

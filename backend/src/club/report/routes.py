@@ -1,4 +1,5 @@
 from flask import Blueprint, request
+from flask_jwt_extended import jwt_required
 
 from src import util, db
 from src.club.report.ServiceClubReport import ClubReportService
@@ -7,6 +8,7 @@ club_report_bp = Blueprint('club_report', __name__, url_prefix='/club/report')
 
 
 @club_report_bp.route('/', methods=['GET'], strict_slashes=False)
+@jwt_required()
 def get_club_report():
     service = ClubReportService()
     params = util.get_params(request)
@@ -18,6 +20,7 @@ def get_club_report():
 
 
 @club_report_bp.route('/memberattribute', methods=['GET'], strict_slashes=False)
+@jwt_required()
 def get_club_member_attribute():
     service = ClubReportService()
     params = util.get_params(request)
