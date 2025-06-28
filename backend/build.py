@@ -8,10 +8,11 @@ dir_dst = "build/"
 src_files = os.listdir(src)
 
 #cleanup
-shutil.rmtree(dir_dst)
+if os.path.exists(dir_dst) and os.path.isdir(dir_dst):
+    shutil.rmtree(dir_dst)
 os.mkdir(dir_dst)
 try:
-    os.remove("main.zip")
+    os.remove("app.zip")
 except OSError:
     pass
 

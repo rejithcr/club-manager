@@ -6,6 +6,7 @@ import serverless_wsgi
 from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from flask_compress import Compress
 
 from src import constants
 from src.auth.routes import auth_bp
@@ -29,6 +30,7 @@ def create_app():
     cm_app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=365)
     JWTManager(cm_app)
     CORS(cm_app, origins=constants.CORS_ORIGINS)
+    Compress(cm_app)
     # Register the blueprint with an optional URL prefix
     cm_app.register_blueprint(member_bp)
     cm_app.register_blueprint(root_bp)
