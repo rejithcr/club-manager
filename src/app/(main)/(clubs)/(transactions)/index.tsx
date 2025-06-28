@@ -115,7 +115,7 @@ const Transactions = () => {
           deleteTransaction(txnValues.txnId)
             .then(() => {offset.current = 0; setRefresh(prev => !prev)})
             .catch((error: { response: { data: { error: string | undefined } } }) => alert(error.response.data.error))
-            .finally(() => { setIsLoading(true); setIsAddTxnVisible(false) })
+            .finally(() => { setIsLoading(false); setIsAddTxnVisible(false) })
         }
       }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
     });

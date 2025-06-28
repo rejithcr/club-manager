@@ -47,19 +47,19 @@ const AddMember = () => {
 
     const addMemberToClub = (member: any | undefined) => {
         setAlertConfig({
-            visible: true, 
-            title: 'Are you sure!', 
+            visible: true,
+            title: 'Are you sure!',
             message: "Clck 'OK' to add the member to club.",
             buttons: [{
                 text: 'OK', onPress: () => {
-                    setAlertConfig({visible: false}); 
+                    setAlertConfig({ visible: false });
                     setIsLoading(true);
                     addToClub(member.memberId, Number(params.get("clubId") || clubInfo.clubId), member.email)
-                            .then(response => { alert(`${response?.data.message}`); clearForm() })
-                            .catch((err) => { alert(err.response.data.error); })
-                            .finally(() => { setIsLoading(false) })
+                        .then(response => { alert(`${response?.data.message}`); clearForm() })
+                        .catch((err) => { alert(err.response.data.error); })
+                        .finally(() => { setIsLoading(false) })
                 }
-            },{ text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+            }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
         });
     }
 
@@ -131,11 +131,20 @@ const AddMember = () => {
                 "phone": phone
             }
             regirsterMember(payload)
-                .then(_ => {
-                    router.replace('/(auth)')
+                .then(response => {
+                    AsyncStorage.getItem("authInfo")
+                        .then(authInfoLocalStorage => {
+                            const authInfo = JSON.parse(authInfoLocalStorage || '{}');
+                            AsyncStorage.setItem("authInfo", JSON.stringify({
+                                ...authInfo,
+                                memberId: response.data['memberId']
+                            })).then(() => router.replace('/(auth)'));
+                        })
                 })
-                .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
-                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+                .catch(error => setAlertConfig({
+                    visible: true, title: 'Error', message: error.response.data.error,
+                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+                }))
                 .finally(() => {
                     setIsLoading(false)
                 })
@@ -216,7 +225,7 @@ const AddMember = () => {
                     </>}
                 </ScrollView>
                 }
-                {alertConfig?.visible && <Alert {...alertConfig}/>}
+                {alertConfig?.visible && <Alert {...alertConfig} />}
             </GestureHandlerRootView>
         </ThemedView>
     )
