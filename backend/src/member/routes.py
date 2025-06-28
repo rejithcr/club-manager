@@ -30,6 +30,7 @@ def post_members():
 
 
 @member_bp.route('/', methods=['PUT'], strict_slashes=False)
+@jwt_required()
 def put_members():
     service = MemberService()
     params = util.get_params(request)
