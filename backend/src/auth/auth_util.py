@@ -17,7 +17,7 @@ def role_required(allowed_roles):
             current_user_id = get_jwt_identity()
             user_roles = get_user_role(current_user_id, request)
             if not any(role in user_roles for role in allowed_roles):
-                return jsonify({"msg": "Insufficient permissions"}), 403
+                return jsonify({"error": "Insufficient permissions"}), 403
             return fn(*args, **kwargs)
         return wrapper
     return decorator

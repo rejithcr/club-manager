@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 
-from src import util
+from src import util, constants
+from src.auth.auth_util import role_required
 from src.club.transaction.ServiceClubTransaction import ClubTransactionService
 from src.db import get_connection
 
@@ -15,7 +16,7 @@ def get_club_transaction():
     return service.get(get_connection(), params), 200
 
 @club_transaction_bp.route('/', methods=['POST'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def post_club_transaction():
     service = ClubTransactionService()
     params = util.get_params(request)
@@ -23,14 +24,14 @@ def post_club_transaction():
 
 
 @club_transaction_bp.route('/', methods=['PUT'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def put_club_transaction():
     service = ClubTransactionService()
     params = util.get_params(request)
     return service.put(get_connection(), params), 200
 
 @club_transaction_bp.route('/', methods=['DELETE'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def delete_club_transaction():
     service = ClubTransactionService()
     params = util.get_params(request)

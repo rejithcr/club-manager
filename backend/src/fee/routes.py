@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 
-from src import util, db
+from src import util, db, constants
+from src.auth.auth_util import role_required
 from src.fee.ServiceFee import FeeService
 
 fee_bp = Blueprint('fee', __name__, url_prefix='/fee')
@@ -18,7 +19,7 @@ def get_fee():
         db.close_connection(conn)
 
 @fee_bp.route('/', methods=['POST'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def post_fee():
     service = FeeService()
     params = util.get_params(request)
@@ -29,7 +30,7 @@ def post_fee():
         db.close_connection(conn)
 
 @fee_bp.route('/', methods=['PUT'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def put_fee():
     service = FeeService()
     params = util.get_params(request)
@@ -40,7 +41,7 @@ def put_fee():
         db.close_connection(conn)
 
 @fee_bp.route('/', methods=['DELETE'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def delete_fee():
     service = FeeService()
     params = util.get_params(request)

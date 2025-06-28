@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 
-from src import util, db
+from src import util, db, constants
+from src.auth.auth_util import role_required
 from src.club.ServiceClub import ClubService
 
 club_bp = Blueprint('club', __name__, url_prefix='/club')
@@ -19,7 +20,7 @@ def get_club():
         db.close_connection(conn)
 
 @club_bp.route('/', methods=['POST'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def post_club():
     service = ClubService()
     params = util.get_params(request)
@@ -31,7 +32,7 @@ def post_club():
 
 
 @club_bp.route('/', methods=['PUT'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def put_club():
     service = ClubService()
     params = util.get_params(request)

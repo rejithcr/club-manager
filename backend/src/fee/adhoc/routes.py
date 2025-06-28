@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
 
-from src import util, db
+from src import util, db, constants
+from src.auth.auth_util import role_required
 from src.db import get_connection
 from src.fee.adhoc.ServiceFeeAdhoc import FeeAdhocService
 
@@ -19,7 +20,7 @@ def get_fee_adhoc():
         db.close_connection(conn)
 
 @fee_adhoc_bp.route('/', methods=['POST'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def post_fee_adhoc():
     service = FeeAdhocService()
     params = util.get_params(request)
@@ -30,7 +31,7 @@ def post_fee_adhoc():
         db.close_connection(conn)
 
 @fee_adhoc_bp.route('/', methods=['PUT'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def put_fee_adhoc():
     service = FeeAdhocService()
     params = util.get_params(request)
@@ -41,7 +42,7 @@ def put_fee_adhoc():
         db.close_connection(conn)
 
 @fee_adhoc_bp.route('/', methods=['DELETE'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MAINTAINER])
 def delete_fee_adhoc():
     service = FeeAdhocService()
     params = util.get_params(request)
