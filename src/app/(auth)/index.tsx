@@ -32,9 +32,10 @@ const AuthHome = () => {
   }, [response])
 
   const authenticate = async () => {
-    const userInfoFromAsyncStorage = await AsyncStorage.getItem("authInfo");
+    const userInfoFromAsyncStorage = await AsyncStorage.getItem("userInfo");
+    const accessToken = await AsyncStorage.getItem("accessToken");
     const userInfoFromAsyncStorageParsed = userInfoFromAsyncStorage ? JSON.parse(userInfoFromAsyncStorage) : null;
-    if (userInfoFromAsyncStorageParsed?.accessToken && userInfoFromAsyncStorageParsed?.refreshToken) {
+    if (accessToken) {
       setUserInfo(userInfoFromAsyncStorageParsed)
       router.replace('/(main)')
     } else {
@@ -53,13 +54,13 @@ const AuthHome = () => {
             router.replace(`/(main)/(members)/addmember?createMember=true&name=${gInfo.name}&email=${gInfo.email}`)
           }
           delete gInfo.gtoken; // Remove gtoken from user info before saving
-          AsyncStorage.setItem("authInfo", JSON.stringify({ 
+          AsyncStorage.setItem("userInfo", JSON.stringify({ 
             ...gInfo, 
             memberId: response.data['memberId'],
-            isSuperUser: response.data['isSuperUser'],
-            accessToken: response.data['accessToken'],
-            refreshToken: response.data['refreshToken']
+            isSuperUser: response.data['isSuperUser']
           }))
+          AsyncStorage.setItem("accessToken", response.data['accessToken'])
+          AsyncStorage.setItem("refreshToken", response.data['refreshToken'])
         })
         .catch(error => setAlertConfig({
           visible: true,

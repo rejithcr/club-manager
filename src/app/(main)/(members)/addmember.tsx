@@ -132,11 +132,11 @@ const AddMember = () => {
             }
             regirsterMember(payload)
                 .then(response => {
-                    AsyncStorage.getItem("authInfo")
-                        .then(authInfoLocalStorage => {
-                            const authInfo = JSON.parse(authInfoLocalStorage || '{}');
-                            AsyncStorage.setItem("authInfo", JSON.stringify({
-                                ...authInfo,
+                    AsyncStorage.getItem("userInfo")
+                        .then(userInfoLocalStorage => {
+                            const userInfo = JSON.parse(userInfoLocalStorage || '{}');
+                            AsyncStorage.setItem("userInfo", JSON.stringify({
+                                ...userInfo,
                                 memberId: response.data['memberId']
                             })).then(() => router.replace('/(auth)'));
                         })
@@ -187,7 +187,7 @@ const AddMember = () => {
             })
     }
     const handleCancel = () => {
-        AsyncStorage.removeItem("authInfo")
+        AsyncStorage.removeItem("userInfo")
             .then(() => router.dismissTo("/(auth)"));
     }
     const handleSearchNumberChange = (text: string) => {

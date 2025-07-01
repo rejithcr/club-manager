@@ -18,6 +18,7 @@ import { useTheme } from '@/src/hooks/use-theme'
 import { getFeeStructure } from '@/src/helpers/fee_helper'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
+import { useHttpGet } from '@/src/hooks/use-http'
 
 const ClubHome = () => {
     const router = useRouter()
@@ -27,23 +28,20 @@ const ClubHome = () => {
 
     const { colors } = useTheme();
 
-    const [isFundBalanceLoading, setIsFundBalanceLoading] = useState(false)
     const [isTotalDueLoading, setIsTotalDueLoading] = useState(false)
     const [isClubCountsLoading, setIsClubCountsLoading] = useState(false)
-    const [fundBalance, setFundBalance] = useState(0)
     const [totalDue, setTotalDue] = useState<number | undefined>(0);
     const [clubCounts, setClubCounts] = useState<any[]>([]);
 
     const [currentFeeStructure, setCurrentFeeStructure] = useState<any>([])
     const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
 
-    const fetchFundBalance = () => {
-        setIsFundBalanceLoading(true)
-        getFundBalance(params.get("clubId"))
-            .then(response => setFundBalance(response.data.fundBalance))
-            .catch(error => { console.log(error.response); setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }) })
-            .finally(() => setIsFundBalanceLoading(false))
-    }
+     const { 
+        data: fbr, 
+        isLoading: isFundBalanceLoading, 
+        refetch: fetchFundBalance 
+      } = useHttpGet("/club", {clubId: params.get("clubId"), fundBalance: "true"})
+
     const fetchTotalDue = () => {
         setIsTotalDueLoading(true)
         getTotalDue(params.get("clubId"))
@@ -102,7 +100,7 @@ const ClubHome = () => {
                     <ThemedHeading style={{width: 200}}>Fund Balance</ThemedHeading>
                     {isFundBalanceLoading && <LoadingSpinner />}
                     {!isFundBalanceLoading &&
-                        <ThemedText style={{ fontWeight: "bold", fontSize: 16, color: fundBalance > 0 ? colors.success : colors.error }}>Rs. {fundBalance || 0}</ThemedText>}
+                        <ThemedText style={{ fontWeight: "bold", fontSize: 16, color: fbr?.fundBalance > 0 ? colors.success : colors.error }}>Rs. {fbr?.fundBalance || 0}</ThemedText>}
                 </View>
                 <Spacer space={5} />
                 <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>

@@ -44,7 +44,7 @@ const Register = () => {
         }
     }
     const handleCancel = () => {
-        AsyncStorage.removeItem("authInfo")
+        AsyncStorage.removeItem("userInfo")
             .then(() => router.dismissTo("/(auth)"));
     }
 

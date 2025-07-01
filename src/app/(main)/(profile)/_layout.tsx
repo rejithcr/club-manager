@@ -10,7 +10,6 @@ const ProfileStack = () => {
       <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Profile"} />, headerShown: true }} />
       <Stack.Screen name="editmember" options={{ headerTitle: () => <StackHeader header={"Edit details"} />, headerShown: true }} />
       <Stack.Screen name="users" options={{ headerTitle: () => <StackHeader header={"Users"} />, headerShown: true }} />
-      <Stack.Screen name="clubs" options={{ headerTitle: () => <StackHeader header={"Clubs"} />, headerShown: true }} />
     </Stack>
   )
 }

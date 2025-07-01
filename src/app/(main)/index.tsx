@@ -34,7 +34,9 @@ const Main = () => {
     refetchClubs()
   };
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("authInfo")
+    await AsyncStorage.removeItem("userInfo")
+    await AsyncStorage.removeItem('accessToken')
+    await AsyncStorage.removeItem('refreshToken')
     router.replace("/(auth)")
   }
 
