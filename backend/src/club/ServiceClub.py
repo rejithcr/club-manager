@@ -42,12 +42,14 @@ class ClubService():
 
     def post(self, conn, params):
         club_name = params.get('clubName')
+        club_description = params.get('clubDescription')
+        location = params.get('location')
         email = params.get('email')
-        memberId = params.get('memberId')
+        member_id = params.get('memberId')
 
         club_id = db.fetch_one(conn, queries_club.GET_CLUB_SEQ_NEXT_VAL, None)['nextval']
-        db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, email, email))
-        db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, memberId, '1', email, email))
+        db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, club_description, location, email, email))
+        db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id, '1', email, email))
         conn.commit()
 
         return {"clubId": club_id}

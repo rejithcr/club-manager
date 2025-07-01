@@ -12,7 +12,8 @@ export interface Member {
     role?: string;
     isRegistered?: number,
     createdTs?: string,
-    updatedTs?: string
+    updatedTs?: string,
+    lastAccessedOn?: string,
 }
 
 

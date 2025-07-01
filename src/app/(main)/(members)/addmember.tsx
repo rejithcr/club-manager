@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import { getMemberByPhone, regirsterMember } from '@/src/helpers/member_helper';
 import MemberItem from '@/src/components/MemberItem';
 import { useSearchParams } from 'expo-router/build/hooks';
-import { AuthContext } from '@/src/context/AuthContext';
+import { UserContext } from '@/src/context/UserContext';
 import { router } from 'expo-router';
 import { isValidEmail, isValidPhoneNumber } from '@/src/utils/validators';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
@@ -32,7 +32,7 @@ const AddMember = () => {
     const [phone, setPhone] = useState("");
     const [email, setEmail] = useState("")
 
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
     const params = useSearchParams()
 

@@ -3,6 +3,7 @@ from flask_jwt_extended import create_access_token, create_refresh_token, jwt_re
 
 from src import db
 from src.auth.auth_util import verify_google_access_token
+from src.auth.service import update_last_access
 from src.member.ServiceMember import MemberService
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -22,6 +23,7 @@ def get_token():
             member_info = m_service.get(conn, {'email': email})
             member_info['accessToken'] = access_token
             member_info['refreshToken'] = refresh_token
+            update_last_access(email)
             return member_info, 200
         finally:
             db.close_connection(conn)
@@ -36,4 +38,5 @@ def get_token():
 def refresh():
     identity = get_jwt_identity()
     access_token = create_access_token(identity=identity)
+    update_last_access(identity)
     return jsonify(accessToken=access_token)

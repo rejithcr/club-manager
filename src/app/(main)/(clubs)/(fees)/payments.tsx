@@ -7,7 +7,7 @@ import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
 import ThemedButton from '@/src/components/ThemedButton';
 import Modal from 'react-native-modal';
-import { AuthContext } from '@/src/context/AuthContext';
+import { UserContext } from '@/src/context/UserContext';
 import { router } from 'expo-router';
 import { ClubContext } from '@/src/context/ClubContext';
 import ThemedView from '@/src/components/themed-components/ThemedView';
@@ -31,7 +31,7 @@ const Payments = () => {
         firstName?: string;
         paymentDate?: Date
     }[]>([])
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
     const { colors } = useTheme()
 

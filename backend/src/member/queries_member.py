@@ -18,9 +18,10 @@ GET_MEMBER_BY_PHONE = """
 
 GET_USERS = """
     select member_id, first_name, last_name, email, phone, photo, is_registered, is_super_user, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth,
-      updated_by, created_by, to_char(created_ts, 'YYYY-MM-DD HH24:MI:SS') created_ts, to_char(updated_ts, 'YYYY-MM-DD HH24:MI:SS') updated_ts
+      updated_by, created_by, to_char(created_ts, 'YYYY-MM-DD HH24:MI:SS') created_ts, to_char(updated_ts, 'YYYY-MM-DD HH24:MI:SS') updated_ts,
+      to_char(last_accessed_on, 'YYYY-MM-DD HH24:MI:SS') last_accessed_on
     from member
-    order by member_id asc
+    order by last_accessed_on desc
     limit %s offset %s
 """
 

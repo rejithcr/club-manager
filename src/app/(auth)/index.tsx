@@ -6,7 +6,7 @@ import * as Google from 'expo-auth-session/providers/google'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { ActivityIndicator, Image, View } from 'react-native'
 import { appStyles } from '@/src/utils/styles'
-import { AuthContext } from '../../context/AuthContext';
+import { UserContext } from '../../context/UserContext';
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import { authenticateMember } from '@/src/helpers/auth_helper'
@@ -15,7 +15,7 @@ import { authenticateMember } from '@/src/helpers/auth_helper'
 WebBrowser.maybeCompleteAuthSession()
 
 const AuthHome = () => {
-  const { setUserInfo } = useContext(AuthContext)
+  const { setUserInfo } = useContext(UserContext)
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const [isLoading, setLoading] = useState(false)
 
@@ -56,6 +56,7 @@ const AuthHome = () => {
           AsyncStorage.setItem("authInfo", JSON.stringify({ 
             ...gInfo, 
             memberId: response.data['memberId'],
+            isSuperUser: response.data['isSuperUser'],
             accessToken: response.data['accessToken'],
             refreshToken: response.data['refreshToken']
           }))

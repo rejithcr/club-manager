@@ -7,8 +7,8 @@ import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles, colors } from '@/src/utils/styles';
 import ThemedButton from '@/src/components/ThemedButton';
 import Modal from 'react-native-modal';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import { AuthContext } from '@/src/context/AuthContext';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { UserContext } from '@/src/context/UserContext';
 import { router } from 'expo-router';
 import { ClubContext } from '@/src/context/ClubContext';
 import ShadowBox from '@/src/components/ShadowBox';
@@ -32,7 +32,7 @@ const Payments = () => {
         paymentDate: Date
     }[]>([])
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
     const { colors } = useTheme()
 

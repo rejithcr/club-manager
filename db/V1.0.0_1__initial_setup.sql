@@ -1,6 +1,8 @@
 create table club (
     club_id integer primary key,
-    club_name varchar(50) not null unique,
+    club_name varchar(50) not null,
+    description varchar(100),
+    location varchar(50),
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
@@ -21,7 +23,8 @@ create table member (
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
-    updated_ts timestamp  default now()
+    updated_ts timestamp default now(),
+    last_accessed_on timestamp default now()
 );
 CREATE SEQUENCE member_id_seq START 1;
 

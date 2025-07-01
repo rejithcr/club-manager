@@ -8,7 +8,7 @@ import { addRegularFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router } from 'expo-router'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
@@ -20,7 +20,7 @@ const DefineFee = () => {
     const [feeType, setFeeType] = useState("");
     const [feeTypeInterval, setFeeTypeInterval] = useState("MONTHLY");
     const [feeAmount, setFeeAmount] = useState("");
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
 
     const handleAddFee = () => {

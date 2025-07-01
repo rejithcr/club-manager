@@ -7,7 +7,7 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import { ClubContext } from '@/src/context/ClubContext';
 import { useHttpGet } from '@/src/hooks/use-http';
-import { AuthContext } from '@/src/context/AuthContext';
+import { UserContext } from '@/src/context/UserContext';
 import Modal from 'react-native-modal';
 import { appStyles } from '@/src/utils/styles';
 import Spacer from '@/src/components/Spacer';
@@ -20,7 +20,7 @@ import TouchableCard from '@/src/components/TouchableCard';
 import { useTheme } from '@/src/hooks/use-theme';
 
 const MemberAttributes = () => {
-  const { userInfo } = useContext(AuthContext)
+  const { userInfo } = useContext(UserContext)
   const { clubInfo } = useContext(ClubContext)
   const [isAttributeModalVisible, setIsAttributeModalVisible] = useState(false)
   const [clubMemberAttributeId, setClubMemberAttributeId] = useState(null)

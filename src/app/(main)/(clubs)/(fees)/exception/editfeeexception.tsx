@@ -4,7 +4,7 @@ import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
 import { getExceptionDetails, updateExceptionType } from '@/src/helpers/fee_helper'
 import { useSearchParams } from 'expo-router/build/hooks'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { router } from 'expo-router'
 import { getClubMembers } from '@/src/helpers/club_helper'
@@ -26,7 +26,7 @@ const EditFeeException = () => {
     const [exceptionAmount, setExceptionAmount] = useState<string>("0")
     const [exceptionMembers, setExceptionMembers] = useState<any>([])
     const [members, setMembers] = useState<any>([]);
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
     const { colors } = useTheme();
 

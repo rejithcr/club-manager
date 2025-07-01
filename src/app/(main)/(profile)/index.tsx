@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { appStyles } from '@/src/utils/styles'
 import { useHttpGet } from '@/src/hooks/use-http'
@@ -8,7 +8,6 @@ import ThemedText from '@/src/components/themed-components/ThemedText'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import Spacer from '@/src/components/Spacer'
 import TouchableCard from '@/src/components/TouchableCard'
-import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox'
 import { ThemeContext } from '@/src/context/ThemeContext'
 import { FlatList, TouchableOpacity, View } from 'react-native'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
@@ -18,7 +17,7 @@ import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 import Chip from '@/src/components/Chip'
 
 const Profile = () => {
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { data: myRequests, isLoading: isLoadingMyRequests } = useHttpGet("/member", { memberId: userInfo?.memberId, requests: "true" })
     const { theme, setTheme } = useContext(ThemeContext);
     const { colors } = useTheme()
@@ -89,7 +88,7 @@ const Profile = () => {
                         {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length === 0 && <ThemedText style={{ alignSelf: "center" }}>No requests found</ThemedText>}
                     </View>
                 </View>
-                {userInfo?.isSuperUser === 1 && <>
+                {userInfo?.isSuperUser == 1 && <>
                     <ThemedHeading>Super User Options</ThemedHeading>
                     {/* <TouchableCard onPress={() => router.push(`/(main)/(profile)/clubs`)}>
                     <ThemedText>Show Clubs</ThemedText>

@@ -11,7 +11,7 @@ import { router } from 'expo-router'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import { useTheme } from '@/src/hooks/use-theme'
 import { isValidEmail, isValidPhoneNumber } from '@/src/utils/validators'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import { ClubContext } from '@/src/context/ClubContext'
 import { getClubMember, saveClubMember } from '@/src/helpers/club_helper'
 import { ROLE_ADMIN } from '@/src/utils/constants'
@@ -33,7 +33,7 @@ const Editmember = () => {
     const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
     const [isRegistered, setIsRegistered] = useState<number | undefined>();
     const { colors } = useTheme();
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
 
     const setDetails = (memberDetails: Member) => {

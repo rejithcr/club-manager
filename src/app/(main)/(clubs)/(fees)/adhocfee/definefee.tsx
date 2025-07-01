@@ -8,7 +8,7 @@ import { addAdhocFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router } from 'expo-router'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import { ClubContext } from '@/src/context/ClubContext'
 import { getClubMembers } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
@@ -28,7 +28,7 @@ const DefineFee = () => {
     const [feeAmount, setFeeAmount] = useState("");
     const [feeDescription, setFeeDescription] = useState("")
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
     const { colors } = useTheme()
 

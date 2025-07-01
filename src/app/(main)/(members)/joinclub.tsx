@@ -4,7 +4,7 @@ import Spacer from '@/src/components/Spacer';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import TouchableCard from '@/src/components/TouchableCard';
-import { AuthContext } from '@/src/context/AuthContext';
+import { UserContext } from '@/src/context/UserContext';
 import { requestMembership, searchClubsByName } from '@/src/helpers/club_helper';
 import { router } from 'expo-router';
 import React, { useContext, useState } from 'react';
@@ -17,7 +17,7 @@ const JoinClub = () => {
     const [debounceTimeout, setDebounceTimeout] = useState<number | null>(null);
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
 
     const handleSearch = (query: string) => {
         if (query.length < 2) {

@@ -13,7 +13,7 @@ import { router } from 'expo-router';
 import { useTheme } from '@/src/hooks/use-theme';
 import { getClubMember, removeMember } from '@/src/helpers/club_helper';
 import { ClubContext } from '@/src/context/ClubContext';
-import { AuthContext } from '@/src/context/AuthContext';
+import { UserContext } from '@/src/context/UserContext';
 import { ROLE_ADMIN } from '@/src/utils/constants';
 import Alert, { AlertProps } from '@/src/components/Alert';
 import { useHttpGet } from '@/src/hooks/use-http';
@@ -29,7 +29,7 @@ const Profile = () => {
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const { colors } = useTheme()
   const { clubInfo } = useContext(ClubContext)
-  const { userInfo } = useContext(AuthContext)
+  const { userInfo } = useContext(UserContext)
 
   useEffect(() => {
     setIsMemberLoading(true);

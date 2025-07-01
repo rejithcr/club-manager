@@ -4,7 +4,7 @@ import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
 import { addExceptionType } from '@/src/helpers/fee_helper'
 import { useSearchParams } from 'expo-router/build/hooks'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { router } from 'expo-router'
 import { getClubMembers } from '@/src/helpers/club_helper'
@@ -21,7 +21,7 @@ const AddFeeException = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [exceptionType, setExceptionType] = useState<string>("")
     const [exceptionAmount, setExceptionAmount] = useState<string>("")
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
 
     const params = useSearchParams()

@@ -44,8 +44,8 @@ UPDATE_CLUB_MEMBER_ROLE = """
 GET_CLUB_SEQ_NEXT_VAL="select nextval('club_id_seq')"
 
 SAVE_CLUB = """
-   insert into club (club_id, club_name, created_by, updated_by) values
-    (%s, %s, %s, %s)
+   insert into club (club_id, club_name, description, location, created_by, updated_by) values
+    (%s, %s, %s, %s, %s, %s)
 """
 
 GET_TRANSACTIONS = """

@@ -13,7 +13,7 @@ import TouchableCard from '@/src/components/TouchableCard'
 import { appStyles } from '@/src/utils/styles'
 import Spacer from '@/src/components/Spacer'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import { useTheme } from '@/src/hooks/use-theme'
 import { isValidLength } from '@/src/utils/validators'
 import { ROLE_ADMIN } from '@/src/utils/constants'
@@ -23,7 +23,7 @@ import Alert, { AlertProps } from '@/src/components/Alert'
 const MembershipRequests = () => {
   const { colors } = useTheme()
   const { clubInfo } = useContext(ClubContext);
-  const { userInfo } = useContext(AuthContext);
+  const { userInfo } = useContext(UserContext);
   const [isUpdating, setIsUpdating] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [comments, setComments] = useState("")

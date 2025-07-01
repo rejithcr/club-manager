@@ -6,3 +6,9 @@ GET_ROLE_BY_CLUB = """
 		join club c on m.club_id = c.club_id
 	where (%s is null or m.club_id = %s)  and m2.email = %s
 """
+
+UPDATE_LAST_ACCESS = """
+    update member 
+    set last_accessed_on = now()
+    where email = %s
+"""

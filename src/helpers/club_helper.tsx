@@ -5,8 +5,8 @@ export const getClubs = (memberId: number) => {
     return get("/club", {memberId: memberId})
 }
 
-export const createClub = (clubName: string | null, memberId: string, email: string) => {
-    return post("/club", null, {clubName, memberId, email})
+export const createClub = (clubName: string | null, clubDescription: string | null, location: string | null, clubmemberId: string, email: string) => {
+    return post("/club", null, {clubName, clubDescription, location, memberId: clubmemberId, email})
 }
 
 export const getClubDetails = (clubId: number) => {

@@ -26,8 +26,8 @@ def create_app():
     cm_app = Flask(__name__)
     # Auth
     cm_app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY')
-    cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=15)
-    cm_app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=365)
+    cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=1)
+    cm_app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(minutes=3)
     JWTManager(cm_app)
     CORS(cm_app, origins=constants.CORS_ORIGINS)
     Compress(cm_app)

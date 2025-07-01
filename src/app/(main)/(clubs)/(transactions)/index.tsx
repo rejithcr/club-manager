@@ -11,7 +11,7 @@ import ThemedButton from '@/src/components/ThemedButton'
 import { appStyles, colors } from '@/src/utils/styles'
 import InputText from '@/src/components/InputText'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
@@ -34,7 +34,7 @@ const Transactions = () => {
   const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnCategory: "", txnComment: "", txnAmount: "" })
   const [date, setDate] = useState(new Date())
   const { clubInfo } = useContext(ClubContext)
-  const { userInfo } = useContext(AuthContext)
+  const { userInfo } = useContext(UserContext)
   const { colors } = useTheme()
 
   const offset = useRef(0)
@@ -186,7 +186,7 @@ const Transactions = () => {
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
           </Picker>
-          <DatePicker date={date} setDate={setDate} />
+          <DatePicker date={date} setDate={setDate} label='Date'/>
           <InputText label="Category" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnCategory: value }))} defaultValue={txnValues?.txnCategory} />
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />

@@ -15,13 +15,13 @@ import Modal from 'react-native-modal'
 import Spacer from '@/src/components/Spacer'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import { saveClubMemberAttributeValues } from '@/src/helpers/club_helper'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 
 const EditClubLevelAttributes = () => {
     const params = useSearchParams()
     const { clubInfo } = useContext(ClubContext)
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const [updatedCMAList, setUpdatedCMAList] = React.useState<any[]>([])
     const [isAttributeModalVisible, setIsAttributeModalVisible] = React.useState(false)
     const [changes, setChanges] = React.useState<any[]>([])

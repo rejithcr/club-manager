@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router/build/hooks';
 import FloatingMenu from '@/src/components/FloatingMenu';
 import FeeSummary from './dues';
 import { useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
+import { UserContext } from '../../context/UserContext';
 import {  MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyClubs from './myclubs';
@@ -17,7 +17,7 @@ import ThemedHeading from '@/src/components/themed-components/ThemedHeading';
 
 const Main = () => {
   const router = useRouter()  
-  const { userInfo } = useContext(AuthContext)
+  const { userInfo } = useContext(UserContext)
   const { 
     data: duesByMember, 
     isLoading: isLoadingMemberDues, 

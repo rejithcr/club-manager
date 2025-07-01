@@ -4,7 +4,7 @@ import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
 import { useSearchParams } from 'expo-router/build/hooks'
 import { Picker } from '@react-native-picker/picker'
-import { AuthContext } from '@/src/context/AuthContext'
+import { UserContext } from '@/src/context/UserContext'
 import { deleteFee, editFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router } from 'expo-router'
@@ -20,7 +20,7 @@ const EditFeeType = () => {
     const [clubFeeAmount, setClubFeeAmount] = useState<string>("")
     const [clubFeeTypeInterval, setClubFeeTypeInterval] = useState<string | null>()
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const params = useSearchParams()
 
     useEffect(() => {

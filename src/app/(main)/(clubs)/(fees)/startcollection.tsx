@@ -7,7 +7,7 @@ import LoadingSpinner from '@/src/components/LoadingSpinner';
 import ThemedButton from '@/src/components/ThemedButton';
 import { Picker } from '@react-native-picker/picker';
 import Modal from 'react-native-modal';
-import { AuthContext } from '@/src/context/AuthContext';
+import { UserContext } from '@/src/context/UserContext';
 import { router } from 'expo-router';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
@@ -26,7 +26,7 @@ const StartNextPeriod = () => {
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
     const [nextPeriodDate, setNextPeriodDate] = useState<string>();
     const [nextPeriodFee, setNextPeriodFee] = useState<any>(undefined);
-    const { userInfo } = useContext(AuthContext)
+    const { userInfo } = useContext(UserContext)
     const { colors } = useTheme()
     const params = useSearchParams()
     const interval = JSON.parse(params.get('fee') || '').clubFeeTypeInterval;

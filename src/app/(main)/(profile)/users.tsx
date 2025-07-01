@@ -103,7 +103,7 @@ const UserInfoView = (props: Member) => {
             </View>
             <View style={{alignItems: "flex-end"}}>                
                 <ThemedText style={{ fontSize: 12 }}>{props.phone}</ThemedText>
-                <ThemedText style={{ fontSize: 9 }}>{props.updatedTs}</ThemedText>
+                <ThemedText style={{ fontSize: 9 }}>{props.lastAccessedOn}</ThemedText>
             </View>
         </ThemedView>
     )
