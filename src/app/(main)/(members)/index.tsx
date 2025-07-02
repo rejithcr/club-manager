@@ -25,7 +25,7 @@ export default function Home() {
     getClubMembers(clubInfo.clubId)
       .then(response => setMembers(response.data))
       .catch(error => setAlertConfig({
-                    visible: true, title: 'Error', message: JSON.stringify(error.response),
+                    visible: true, title: 'Error', message: error.response.data.error,
                     buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
                 }))
       .finally(()=> setIsLoading(false))

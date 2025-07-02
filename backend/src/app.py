@@ -14,6 +14,7 @@ from src.club.member.routes import club_member_bp
 from src.club.report.routes import club_report_bp
 from src.club.routes import club_bp
 from src.club.transaction.routes import club_transaction_bp
+from src.error_handlers import generic_error_handler
 from src.fee.adhoc.routes import fee_adhoc_bp
 from src.fee.collection.routes import fee_collection_bp
 from src.fee.exception.routes import fee_exception_bp
@@ -26,8 +27,8 @@ def create_app():
     cm_app = Flask(__name__)
     # Auth
     cm_app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY')
-    cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=1)
-    cm_app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(minutes=3)
+    cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=15)
+    cm_app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=365)
     JWTManager(cm_app)
     CORS(cm_app, origins=constants.CORS_ORIGINS)
     Compress(cm_app)
@@ -44,12 +45,14 @@ def create_app():
     cm_app.register_blueprint(fee_exception_bp)
     cm_app.register_blueprint(fee_collection_bp)
 
+    #Error handlers
+    cm_app.register_error_handler(500, generic_error_handler)
     return cm_app
 
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    app.run(debug=False)
 
 
 def lambda_handler(event, context):
