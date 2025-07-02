@@ -10,7 +10,7 @@ export const useHttpGet = (url: string, params: {}) => {
         setIsLoading(true);
         get(url, params)
             .then(response => setData(response.data))
-            .catch(error => setError(error.response.data.error))      
+            .catch(error => setError(error))      
             .finally(() => setIsLoading(false))
     };
 

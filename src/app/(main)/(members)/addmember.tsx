@@ -186,9 +186,11 @@ const AddMember = () => {
                 setIsLoading(false)
             })
     }
-    const handleCancel = () => {
-        AsyncStorage.removeItem("userInfo")
-            .then(() => router.dismissTo("/(auth)"));
+    const handleCancel = async () => {
+        await AsyncStorage.removeItem("userInfo")
+        await AsyncStorage.removeItem("accessToken")
+        await AsyncStorage.removeItem("resfreshToken")
+        router.dismissTo("/(auth)");
     }
     const handleSearchNumberChange = (text: string) => {
         setSearchNumber(text)

@@ -51,7 +51,7 @@ const MemberAttributes = () => {
           .then(() => refetchCMA())
           .catch(error => {
             console.log(error.response.data); setAlertConfig({
-              visible: true, title: 'Error', message: error.response.data.error,
+              visible: true, title: 'Error', message: error,
               buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
             })
           })

@@ -20,7 +20,10 @@ axiosInstance.interceptors.request.use(
         return config;
     },
     (error) => {
-        return Promise.reject(error);
+        if (error.response && error.response.data) {
+            return Promise.reject(error.response.data);
+        }
+        return Promise.reject(error.message);
     }
 );
 
@@ -38,8 +41,9 @@ axiosInstance.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return axiosInstance(originalRequest);
             } catch (refreshError: any) {
-                console.log("refresh error",refreshError);
-                if(refreshError.status === 401) {
+                console.log("refresh error", refreshError);
+                if (refreshError.status === 401) {
+                    alert('Session expired! Please login again.')
                     await AsyncStorage.removeItem('accessToken')
                     await AsyncStorage.removeItem('refreshToken')
                     router.dismissTo('/(auth)');
