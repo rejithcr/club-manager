@@ -91,7 +91,7 @@ const MemberAttributes = () => {
   const handleShowEdit = (item: any) => {
     setIsEdit(true)
     setAttributeName(item.attribute)
-    setRequired(item.required === 1)
+    setRequired(item.required == 1)
     setClubMemberAttributeId(item.clubMemberAttributeId)
     setIsAttributeModalVisible(true)
   }
@@ -118,7 +118,7 @@ const MemberAttributes = () => {
             renderItem={({ item }) => {
               return <TouchableCard style={{ justifyContent: "space-between" }} onPress={() => handleShowEdit(item)}
                 icon={<ThemedIcon name={"MaterialCommunityIcons:square-edit-outline"} />}>
-                <ThemedText>{item.attribute} {item.required === 1 ? "*" : ""}</ThemedText>
+                <ThemedText>{item.attribute} {item.required == 1 ? "*" : ""}</ThemedText>
               </TouchableCard>
             }}
           />}
