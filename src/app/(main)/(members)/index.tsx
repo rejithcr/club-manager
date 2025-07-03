@@ -40,7 +40,7 @@ export default function Home() {
   return (    
     <ThemedView style={{ flex: 1 }}>
       <Spacer space={5}/>
-      <View style={{ height:"90%", justifyContent: "center", alignContent: "center" }}>
+      <View style={{ height:"100%", justifyContent: "center", alignContent: "center" }}>
         {isLoading && <LoadingSpinner />}
         {!isLoading &&
           <FlatList

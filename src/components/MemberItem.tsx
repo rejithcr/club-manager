@@ -43,7 +43,7 @@ export default MemberItem;
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    width: "80%",
+    width: "85%",
     flexDirection: "row",
     alignSelf: "center"
   }
