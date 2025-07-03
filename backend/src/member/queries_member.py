@@ -42,7 +42,7 @@ GET_MEMBERSHIP_ID = """
 """
 
 GET_DUES_BY_MEMBER = """
-   select a.club_id, a.club_name, sum(a.amount) due_amount,
+   select a.club_id, a.club_name, sum(a.amount)::REAL due_amount,
       json_agg(jsonb_build_object(	
          'fee', a.fee,
          'fee_desc', a.fee_desc,
@@ -51,7 +51,7 @@ GET_DUES_BY_MEMBER = """
          'fee_type', a.fee_type
       )) dues
    from (
-      select c.club_id, c.club_name, m.member_id, m.first_name, m.last_name , caf.club_adhoc_fee_name fee, caf.club_adhoc_fee_desc fee_desc, cafp.club_adhoc_fee_payment_amount amount, cafp.club_adhoc_fee_payment_id payment_id, 'ADHOC-FEE' fee_type
+      select c.club_id, c.club_name, m.member_id, m.first_name, m.last_name , caf.club_adhoc_fee_name fee, caf.club_adhoc_fee_desc fee_desc, cafp.club_adhoc_fee_payment_amount::REAL amount, cafp.club_adhoc_fee_payment_id payment_id, 'ADHOC-FEE' fee_type
       from club_adhoc_fee_payment cafp 
          join club_adhoc_fee caf on caf.club_adhoc_fee_id =cafp.club_adhoc_fee_id
          join membership ms on ms.membership_id = cafp.membership_id
@@ -59,7 +59,7 @@ GET_DUES_BY_MEMBER = """
          join club c on c.club_id = ms.club_id
       where cafp.paid = 0  and m.member_id = %s     
       union 
-      select c.club_id, c.club_name, m.member_id, m.first_name, m.last_name , cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type
+      select c.club_id, c.club_name, m.member_id, m.first_name, m.last_name , cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount::REAL amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type
       from club_fee_payment cfp 
          join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id
          join club_fee_type cft on cft.club_fee_type_id =cfc.club_fee_type_id

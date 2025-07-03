@@ -60,14 +60,17 @@ const MemberDue = (props: { member: any }) => {
   }
   return (
     <>
-      <ShadowBox style={{ width: "100%" }}>
+      <ShadowBox style={{ width: "100%"}}>
         <TouchableOpacity onPress={showMemberDues} style={{
           flexDirection: "row", width: "100%",
           justifyContent: "space-between", alignItems: "center"
         }}>
+          <View style={{flexDirection: "row",  width: "70%"}}>
           <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
-          <ThemedText style={{ width: "65%", fontSize: 15 }}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
-          <ThemedText style={{ width: "25%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}> Rs. {props?.member.totalDue} </ThemedText>
+          <Spacer hspace={5}/>
+          <ThemedText style={{fontSize: 15 }}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
+          </View>
+          <ThemedText style={{ width: "30%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}> Rs. {props?.member.totalDue} </ThemedText>
         </TouchableOpacity>
       </ShadowBox>
       {isShown &&

@@ -6,7 +6,6 @@ import { useState } from 'react';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import { useTheme } from '@/src/hooks/use-theme';
 import Spacer from '@/src/components/Spacer';
-import ThemedButton from '@/src/components/ThemedButton';
 import Divider from '@/src/components/Divider';
 
 const FeeSummary = (props: { duesByMember: [] }) => {
@@ -19,7 +18,7 @@ const FeeSummary = (props: { duesByMember: [] }) => {
       {props.duesByMember?.map((club: any) => {
         return (
           <View key={club.clubId}>
-            <ShadowBox >
+            <ShadowBox>
               <TouchableOpacity onPress={() => setShowDues(prev => !prev)} style={{
                 flexDirection: "row", width: "100%",
                 justifyContent: "space-between", alignItems: "center"

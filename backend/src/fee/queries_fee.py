@@ -4,7 +4,7 @@ GET_FEES = """
                   club_fee_type, \
                   club_fee_type_interval,
                   club_fee_is_active, \
-                  club_fee_amount, \
+                  club_fee_amount::REAL, \
                   club_fee_type_desc,
                   json_agg(json_build_object(
                           'club_fee_type_exception_id', cfte.club_fee_type_exception_id,
@@ -24,7 +24,7 @@ GET_FEES_BY_ID = """
                         club_fee_type, \
                         club_fee_type_interval,
                         club_fee_is_active, \
-                        club_fee_amount, \
+                        club_fee_amount::REAL, \
                         club_fee_type_desc
                  from club_fee_type
                  where club_fee_type_id = %s \
@@ -65,7 +65,7 @@ GET_FEE_TYPE_EXCEPTIONS = """
                           select club_fee_type_exception_id, \
                                  club_fee_type_id, \
                                  club_fee_type_exception_reason,
-                                 club_fee_exception_amount
+                                 club_fee_exception_amount::REAL
                           from club_fee_type_exception
                           where club_fee_type_id = %s \
                           """
@@ -86,7 +86,7 @@ GET_FEE_TYPE_EXCEPTION = """
                          select cfte.club_fee_type_exception_id, \
                                 cfte.club_fee_type_id, \
                                 cfte.club_fee_type_exception_reason,
-                                cfte.club_fee_exception_amount,
+                                cfte.club_fee_exception_amount::REAL,
                                 json_agg(distinct jsonb_build_object(
 			'club_fee_type_exception_member_id', cftem.club_fee_type_exception_member_id,
 			'membership_id', cftem.membership_id,
@@ -111,7 +111,7 @@ GET_FEE_TYPE_EXCEPTIONS = """
                           select club_fee_type_exception_id, \
                                  club_fee_type_id, \
                                  club_fee_type_exception_reason,
-                                 club_fee_exception_amount
+                                 club_fee_exception_amount::REAL
                           from club_fee_type_exception
                           where club_fee_type_id = %s \
                           """
@@ -185,7 +185,7 @@ GET_NEXT_PAYTMENT_COLLECTION_LIST = """
                                            s.first_name, \
                                            s.last_name, \
                                            s.membership_id,
-                                           json_agg(distinct jsonb_build_object('club_fee_amount', s.club_fee_amount, 'club_fee_type_exception_member_id', s.club_fee_type_exception_member_id)) exceptions
+                                           json_agg(distinct jsonb_build_object('club_fee_amount', s.club_fee_amount::REAL, 'club_fee_type_exception_member_id', s.club_fee_type_exception_member_id)) exceptions
                                     from (select m.member_id, \
                                                  m.first_name, \
                                                  m.last_name, \
@@ -216,8 +216,8 @@ GET_FEE_COLLECTION_BY_FEE_TYPE_ID = """
                                     select s.club_fee_collection_id, \
                                            s.club_fee_type_period, \
                                            s.club_fee_type_date,
-                                           sum(s.club_fee_payment_amount)          total, \
-                                           sum(s.paid * s.club_fee_payment_amount) collected
+                                           sum(s.club_fee_payment_amount)::REAL          total, \
+                                           sum(s.paid * s.club_fee_payment_amount)::REAL collected
                                     from (select cfc.club_fee_collection_id, \
                                                  cfc.club_fee_type_period, \
                                                  to_char(cfc.club_fee_type_date, 'YYYY-MM-DD') club_fee_type_date, \
@@ -236,7 +236,7 @@ GET_FEE_PAYMENT_BY_FEE_COLLECTION_ID = """
                                               m.first_name, \
                                               m.last_name, \
                                               cfp.paid, \
-                                              cfp.club_fee_payment_amount as amount
+                                              cfp.club_fee_payment_amount::REAL as amount
                                        from club_fee_payment cfp
                                                 inner join club_fee_collection cfc \
                                                            on cfc.club_fee_collection_id = cfp.club_fee_collection_id
@@ -353,7 +353,7 @@ GET_FEE_ADHOC_COLLECTIONS = """
                                    caf.club_adhoc_fee_name, \
                                    caf.club_adhoc_fee_desc,
                                    caf.club_adhoc_fee_is_active, \
-                                   sum(cafp.club_adhoc_fee_payment_amount)          club_adhoc_fee_payment_amount,
+                                   sum(cafp.club_adhoc_fee_payment_amount)::REAL          club_adhoc_fee_payment_amount,
                                    cast(sum(cafp.paid) as numeric) / count(*) * 100 completion_percentage
                             from club_adhoc_fee caf
                                      join club_adhoc_fee_payment cafp on caf.club_adhoc_fee_id = cafp.club_adhoc_fee_id
@@ -368,7 +368,7 @@ GET_FEE_ADHOC_COLLECTION_BY_ID = """
                                         caf.club_adhoc_fee_name, \
                                         caf.club_adhoc_fee_desc,
                                         caf.club_adhoc_fee_is_active, \
-                                        sum(cafp.club_adhoc_fee_payment_amount) club_adhoc_fee_payment_amount,
+                                        sum(cafp.club_adhoc_fee_payment_amount)::REAL club_adhoc_fee_payment_amount,
                                         json_agg(json_build_object(
                                                 'club_adhoc_fee_payment_id', cafp.club_adhoc_fee_payment_id,
                                                 'paid', cafp.paid,

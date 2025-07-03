@@ -49,7 +49,7 @@ SAVE_CLUB = """
 """
 
 GET_TRANSACTIONS = """
-    select t.club_transaction_id, t.club_transaction_amount, t.club_transcation_type, 
+    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, 
         t.club_transaction_category, t.club_transaction_comment, t.created_by, to_char(t.club_transaction_date, 'YYYY-mm-dd') club_transaction_date,
         coalesce(caf.club_adhoc_fee_name, coalesce(cft.club_fee_type, t.club_transaction_category, concat(cft.club_fee_type, '(', cfc.club_fee_type_period, ')'))) fee_name,
         coalesce(m.first_name, am.first_name) member_name
@@ -71,7 +71,7 @@ GET_TRANSACTIONS = """
 """
 
 GET_TRANSACTIONS_ALL = """
-    select t.club_transaction_id, t.club_transaction_amount, t.club_transcation_type, 
+    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, 
         t.club_transaction_category, t.club_transaction_comment, t.created_by, to_char(t.club_transaction_date, 'YYYY-mm-dd') club_transaction_date,
         coalesce(caf.club_adhoc_fee_name, coalesce(cft.club_fee_type, t.club_transaction_category, concat(cft.club_fee_type, '(', cfc.club_fee_type_period, ')'))) fee_name,
         coalesce(m.first_name, am.first_name) member_name
@@ -109,7 +109,7 @@ DELETE_TRANSACTION = """
 """
 
 GET_FUND_BALANCE = """
-    select (c.credit - d.debit) fund_balance
+    select (c.credit - d.debit)::REAL fund_balance
     from (
         select coalesce(sum(t.club_transaction_amount), 0) credit
         from "club_transaction" t
@@ -124,7 +124,7 @@ GET_FUND_BALANCE = """
 """
 
 TOTAL_DUE = """
-	select (c.adhoc + d.regular) total_due
+	select (c.adhoc + d.regular)::REAL total_due
     from (
        select coalesce(sum(club_adhoc_fee_payment_amount),0) adhoc
 		from club_adhoc_fee_payment cafp 
@@ -142,7 +142,7 @@ TOTAL_DUE = """
 
 
 GET_DUES = """
-   select a.member_id, a.first_name, a.last_name, sum(a.amount) total_due, 
+   select a.member_id, a.first_name, a.last_name, sum(a.amount)::REAL total_due, 
       json_agg(jsonb_build_object(	
          'fee', a.fee,
          'fee_desc', a.fee_desc,
