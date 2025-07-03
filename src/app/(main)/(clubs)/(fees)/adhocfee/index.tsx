@@ -50,7 +50,7 @@ const AdocFeesHome = () => {
       <GestureHandlerRootView>
         <ScrollView>
           <View style={{
-            flexDirection: "row", alignItems: "center", width: "85%",
+            flexDirection: "row", alignItems: "center", width: "90%",
             justifyContent: "space-between", alignSelf: "center", marginTop: 10
           }}>
             <ThemedHeading style={{width: 200}}>Expense Splits</ThemedHeading>

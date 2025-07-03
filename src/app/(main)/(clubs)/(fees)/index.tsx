@@ -14,6 +14,7 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
 import Alert, { AlertProps } from '@/src/components/Alert'
+import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 
 const Fees = () => {
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
@@ -51,11 +52,11 @@ const Fees = () => {
     <GestureHandlerRootView>
       <ScrollView>
         <View style={{
-          flexDirection: "row", alignItems: "center", width: "80%",
+          flexDirection: "row", alignItems: "center",  width: "90%",
           justifyContent: "space-between", alignSelf: "center",
         }}>
-          <ThemedText style={{ ...appStyles.heading, marginLeft: 0, width: "80%" }}>Recurring Fees</ThemedText>
-          {clubInfo.role == ROLE_ADMIN && <TouchableOpacity style={{ width: "10%" }}
+          <ThemedHeading style={{width: 200}}>Recurring Fees</ThemedHeading>
+          {clubInfo.role == ROLE_ADMIN && <TouchableOpacity 
             onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
             <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add}/>
           </TouchableOpacity> }
