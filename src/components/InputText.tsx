@@ -8,6 +8,7 @@ const InputText = (props: {
   label?: string; 
   placeholder?: string; 
   defaultValue?: any; 
+  value?: any;
   keyboardType?: any;
   ref?: any; 
   onSubmitEditing?: any; 

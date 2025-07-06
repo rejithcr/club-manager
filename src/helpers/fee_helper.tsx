@@ -11,11 +11,11 @@ export const getNextPeriodFeeMemberList = async (feeTypeId: string | null, listN
 
 
 export const addRegularFee = (clubId: string | null, feeType: any, feeTypeInterval: any, feeAmount: any, email: string) => {
-    return post("/fee", { clubId, feeType, feeTypeInterval, feeAmount, email }, null)
+    return post("/fee", null, { clubId, feeType, feeTypeInterval, feeAmount, email })
 }
 
 export const editFee = (feeTypeId: string | null, feeType: any, feeTypeInterval: any, feeAmount: any, email: string) => {
-    return put("/fee", { feeTypeId, feeType, feeTypeInterval, feeAmount, email }, null)
+    return put("/fee", null, { feeTypeId, feeType, feeTypeInterval, feeAmount, email })
 }
 
 export const deleteFee = (feeTypeId: string | null, email: string) => {

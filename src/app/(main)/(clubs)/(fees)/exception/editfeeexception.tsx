@@ -23,7 +23,7 @@ const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
     const [isLoadingException, setIsLoadingException] = useState(false)
     const [exceptionType, setExceptionType] = useState<string>("")
-    const [exceptionAmount, setExceptionAmount] = useState<string>("0")
+    const [exceptionAmount, setExceptionAmount] = useState<string>("")
     const [exceptionMembers, setExceptionMembers] = useState<any>([])
     const [members, setMembers] = useState<any>([]);
     const { userInfo } = useContext(UserContext)
@@ -51,19 +51,17 @@ const EditFeeException = () => {
             .then(response => {
                 const exceptionType = response.data
                 setExceptionType(exceptionType.clubFeeTypeExceptionReason)
-                setExceptionAmount(exceptionType.clubFeeExceptionAmount)
+                setExceptionAmount(exceptionType.clubFeeExceptionAmount.toString())
                 setExceptionMembers(exceptionType.members)
                 setIsLoadingMembers(true)
                 getClubMembers(clubInfo.clubId)
                     .then(response => {
                         const members = response.data
-                        console.log(members)
                         const activeExceptions = exceptionType.members.filter((e: any) => !e.endDate)
                         const difference = members.filter(
                             (m: any) => !activeExceptions.some(
                                 (e: any) => e.memberId == m.memberId)
                         );
-                        console.log(difference)
                         setMembers(difference)
                     })
                     .finally(() => setIsLoadingMembers(false))
@@ -72,7 +70,6 @@ const EditFeeException = () => {
     }, []);
 
     const addToException = (member: any) => {
-        console.log(member)
         setExceptionMembers((prevItems: any[]) => {
             const m = prevItems.find(item => item.memberId == member.memberId)
             return (!m || (m && m.endDate)) ? [...prevItems, member] : [...prevItems]
@@ -83,7 +80,6 @@ const EditFeeException = () => {
     };
 
     const endException = (memberEdit: any) => {
-        console.log(memberEdit.clubFeeTypeExceptionMemberId, memberEdit.memberId)
         setExceptionMembers((prev: { memberId: number, endDateAdded: string, clubFeeTypeExceptionMemberId: number, endDate: string }[]) => {
             if (memberEdit?.clubFeeTypeExceptionMemberId) {
                 return prev.map((member: { memberId: number, endDateAdded: string | null, endDate: string }) => {
@@ -105,7 +101,7 @@ const EditFeeException = () => {
             <ScrollView>
                 <View style={{ marginBottom: 20 }}>
                     <InputText label='Exception Type' onChangeText={setExceptionType} defaultValue={exceptionType} />
-                    <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setExceptionAmount} defaultValue={exceptionAmount.toString()} />
+                    <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setExceptionAmount} value={exceptionAmount} />
                 </View>
 
                 {isLoadingException && <LoadingSpinner />}
