@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
 import { getClubCounts, getFundBalance, getTotalDue } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
-import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
+import { FlatList, GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
@@ -19,6 +19,7 @@ import { getFeeStructure } from '@/src/helpers/fee_helper'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 import { useHttpGet } from '@/src/hooks/use-http'
+import Card from '@/src/components/Card'
 
 const ClubHome = () => {
     const router = useRouter()
@@ -36,11 +37,17 @@ const ClubHome = () => {
     const [currentFeeStructure, setCurrentFeeStructure] = useState<any>([])
     const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
 
-     const { 
-        data: fbr, 
-        isLoading: isFundBalanceLoading, 
-        refetch: fetchFundBalance 
-      } = useHttpGet("/club", {clubId: params.get("clubId"), fundBalance: "true"})
+    const {
+        data: fbr,
+        isLoading: isFundBalanceLoading,
+        refetch: fetchFundBalance
+    } = useHttpGet("/club", { clubId: params.get("clubId"), fundBalance: "true" })
+
+    const {
+        data: expenseSplits,
+        isLoading: isLoadingSplits,
+        refetch: fetchSplits
+    } = useHttpGet("/fee/adhoc", { clubId: Number(params.get("clubId")) })
 
     const fetchTotalDue = () => {
         setIsTotalDueLoading(true)
@@ -89,6 +96,13 @@ const ClubHome = () => {
         fetchFees();
     };
 
+      const showAdhocFeeDetails = (adhocFee: any) => {
+        router.push({
+          pathname: "/(main)/(clubs)/(fees)/adhocfee/payments",
+          params: { adhocFee: JSON.stringify(adhocFee) }
+        })
+      }
+
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
@@ -97,7 +111,7 @@ const ClubHome = () => {
                     flexDirection: "row", width: "90%", alignSelf: "center",
                     justifyContent: "space-between", alignItems: "center"
                 }}>
-                    <ThemedHeading style={{width: 200}}>Fund Balance</ThemedHeading>
+                    <ThemedHeading style={{ width: 200 }}>Fund Balance</ThemedHeading>
                     {isFundBalanceLoading && <LoadingSpinner />}
                     {!isFundBalanceLoading &&
                         <ThemedText style={{ fontWeight: "bold", fontSize: 16, color: fbr?.fundBalance > 0 ? colors.success : colors.error }}>Rs. {fbr?.fundBalance || 0}</ThemedText>}
@@ -105,11 +119,11 @@ const ClubHome = () => {
                 <Spacer space={5} />
                 <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
                     <TouchableCard onPress={Number(totalDue) > 0 ? showClubDues : null}>
-                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%"}}>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
                             <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
                             {isTotalDueLoading && <LoadingSpinner />}
                             {!isTotalDueLoading &&
-                                <ThemedText style={{ fontWeight: "bold", fontSize: 15, position: "absolute", right: Number(totalDue) > 0 ? 30 : 5}}> Rs. {totalDue}</ThemedText>
+                                <ThemedText style={{ fontWeight: "bold", fontSize: 15, position: "absolute", right: Number(totalDue) > 0 ? 30 : 5 }}> Rs. {totalDue}</ThemedText>
                             }
                         </View>
                     </TouchableCard>
@@ -122,7 +136,7 @@ const ClubHome = () => {
                         flexDirection: "row", alignItems: "center", width: "90%",
                         justifyContent: "space-between", alignSelf: "center",
                     }}>
-                        <ThemedHeading style={{width: 200}}>Fees</ThemedHeading>
+                        <ThemedHeading style={{ width: 200 }}>Fees</ThemedHeading>
                         <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
                             {params.get("role") == ROLE_ADMIN && <TouchableOpacity
                                 onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
@@ -135,23 +149,45 @@ const ClubHome = () => {
                         return <View key={fee.clubFeeTypeId}>
                             <TouchableCard onPress={showFeeTypeDetails} id={fee}>
                                 <View style={{
-                                    flexDirection: "row", width: "100%", 
+                                    flexDirection: "row", width: "100%",
                                     justifyContent: "space-between", alignItems: "center"
                                 }}>
                                     <View>
                                         <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
                                         <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
                                     </View>
-                                    <ThemedText style={{ fontWeight: "bold", fontSize: 15,position: "absolute", right: 30 }}>Rs. {fee.clubFeeAmount}</ThemedText>
+                                    <ThemedText style={{ fontWeight: "bold", fontSize: 15, position: "absolute", right: 30 }}>Rs. {fee.clubFeeAmount}</ThemedText>
                                 </View>
                             </TouchableCard>
                             <Spacer space={4} />
                         </View>
                     })}
-                    <ThemedHeading>Expenses</ThemedHeading>
-                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
-                        <ThemedText>Expense Splits</ThemedText>
-                    </TouchableCard>
+                    <Spacer space={4} />
+                    <ThemedHeading>Expense Splits</ThemedHeading>
+                    {isLoadingSplits && <LoadingSpinner />}
+                    {!isLoadingSplits && <View style={{ width: "85%", alignSelf: "center", flexDirection:"row"}}>
+                        <View style={{ width: 100, alignItems:"center", justifyContent:"center"}}>
+                            {params.get("role") == ROLE_ADMIN && <TouchableOpacity
+                                onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
+                                <ThemedIcon size={35} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
+                            </TouchableOpacity>}</View>
+                        <FlatList
+                            data={expenseSplits}
+                            onEndReachedThreshold={0.2}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity onPress={() => showAdhocFeeDetails(item)}>
+                                <Card style={{ height: 100 }}>
+                                    <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
+                                    <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{item.clubAdhocFeeDate} {item.clubAdhocFeeDesc}</ThemedText>
+                                    <ThemedText style={{ fontSize: 12, marginTop: 5 }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>
+                                    <ThemedText style={{ fontSize: 10, marginTop: 5, position:"absolute", bottom: 10}}>Collected {Math.round(item.completionPercentage)}%</ThemedText>
+                                </Card>
+                                </TouchableOpacity>
+                            )}
+                            horizontal
+                        />
+                    </View>
+                    }
                     <Spacer space={4} />
                     <ThemedHeading>Membership</ThemedHeading>
                     <TouchableCard onPress={() => router.push('/(main)/(members)')}>

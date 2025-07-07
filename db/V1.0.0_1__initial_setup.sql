@@ -151,6 +151,7 @@ create table club_adhoc_fee (
     club_id integer not null,
     club_adhoc_fee_name varchar(50) unique not null, -- Akme cup reg fee
     club_adhoc_fee_desc varchar, 
+    club_adhoc_fee_date date,
     club_adhoc_fee_is_active smallint not null, -- 1,0
     created_by varchar(100) not null,
     created_ts timestamp  default now(),

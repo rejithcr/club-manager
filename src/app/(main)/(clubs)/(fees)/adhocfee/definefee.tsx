@@ -17,6 +17,7 @@ import ThemedText from '@/src/components/themed-components/ThemedText'
 import ShadowBox from '@/src/components/ShadowBox'
 import { useTheme } from '@/src/hooks/use-theme'
 import Alert, { AlertProps } from '@/src/components/Alert'
+import DatePicker from '@/src/components/DatePicker'
 
 const DefineFee = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -31,6 +32,7 @@ const DefineFee = () => {
     const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
     const { colors } = useTheme()
+    const [ date, setDate] = useState(new Date())
 
     useEffect(()=>{
         if (feeAmount && addedMembers?.length > 0) {
@@ -50,7 +52,7 @@ const DefineFee = () => {
         if (validate(feeName, feeAmount, addedMembers)) {
             setIsLoading(true)
             const feeAddedMembers = addedMembers.map( m=> {return {...m, clubAdocFeePaymentAmount: amountPerMember}})            
-            addAdhocFee(clubInfo.clubId, feeName, feeDescription, feeAmount, feeAddedMembers,userInfo.email)
+            addAdhocFee(clubInfo.clubId, feeName, feeDescription, feeAmount, date, feeAddedMembers,userInfo.email)
                 .then((response) => {
                     console.log(response.data)
                     alert("Fee added successfully")
@@ -91,6 +93,7 @@ const DefineFee = () => {
                             label={`Description`}
                             defaultValue={feeDescription}
                         />
+                        <DatePicker date={date} setDate={setDate} label='Date'/>
                         <InputText
                             onChangeText={(text: string) => setFeeAmount(text)}
                             label={`Fee Amount`}

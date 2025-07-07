@@ -338,8 +338,8 @@ GET_FEE_ADHOC_ID_SEQ_NEXT_VAL = "select nextval('club_adhoc_fee_id_seq')"
 
 ADD_FEE_ADHOC = """
                 insert into club_adhoc_fee(club_adhoc_fee_id, club_id, club_adhoc_fee_name,
-                                           club_adhoc_fee_desc, club_adhoc_fee_is_active, created_by, updated_by)
-                values (%s, %s, %s, %s, %s, %s, %s) \
+                                           club_adhoc_fee_desc, club_adhoc_fee_date, club_adhoc_fee_is_active, created_by, updated_by)
+                values (%s, %s, %s, %s, %s, %s, %s, %s) \
                 """
 
 ADD_FEE_ADHOC_PAYMENT = """
@@ -351,22 +351,24 @@ ADD_FEE_ADHOC_PAYMENT = """
 GET_FEE_ADHOC_COLLECTIONS = """
                             select caf.club_adhoc_fee_id, \
                                    caf.club_adhoc_fee_name, \
-                                   caf.club_adhoc_fee_desc,
+                                   caf.club_adhoc_fee_desc, \
+                                   to_char(caf.club_adhoc_fee_date, 'YYYY-mm-dd') club_adhoc_fee_date, \
                                    caf.club_adhoc_fee_is_active, \
-                                   sum(cafp.club_adhoc_fee_payment_amount)::REAL          club_adhoc_fee_payment_amount,
+                                   sum(cafp.club_adhoc_fee_payment_amount)::REAL club_adhoc_fee_payment_amount,
                                    cast(sum(cafp.paid) as numeric) / count(*) * 100 completion_percentage
                             from club_adhoc_fee caf
                                      join club_adhoc_fee_payment cafp on caf.club_adhoc_fee_id = cafp.club_adhoc_fee_id
                             where caf.club_id = %s
                             group by caf.club_adhoc_fee_id, caf.club_adhoc_fee_name, caf.club_adhoc_fee_desc, \
-                                     caf.club_adhoc_fee_is_active
+                                     caf.club_adhoc_fee_date, caf.club_adhoc_fee_is_active
                             order by 6 \
                             """
 
 GET_FEE_ADHOC_COLLECTION_BY_ID = """
                                  select caf.club_id, \
                                         caf.club_adhoc_fee_name, \
-                                        caf.club_adhoc_fee_desc,
+                                        caf.club_adhoc_fee_desc, \
+                                        to_char(caf.club_adhoc_fee_date, 'YYYY-mm-dd') club_adhoc_fee_date, \
                                         caf.club_adhoc_fee_is_active, \
                                         sum(cafp.club_adhoc_fee_payment_amount)::REAL club_adhoc_fee_payment_amount,
                                         json_agg(json_build_object(
@@ -383,7 +385,7 @@ GET_FEE_ADHOC_COLLECTION_BY_ID = """
                                           join "member" m on m.member_id = ms.member_id
                                  where caf.club_adhoc_fee_id = %s
                                  group by caf.club_id, caf.club_adhoc_fee_name, caf.club_adhoc_fee_desc,
-                                          caf.club_adhoc_fee_is_active \
+                                          caf.club_adhoc_fee_date, caf.club_adhoc_fee_is_active \
                                  """
 
 GET_ADHOC_TRANSACTION_IDS_TO_BE_DELETED = """

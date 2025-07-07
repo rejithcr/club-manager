@@ -74,7 +74,7 @@ const AdocFeesHome = () => {
               }}>
                 <View>
                   <ThemedText style={{ fontWeight: "bold" }}>{fee.clubAdhocFeeName}</ThemedText>
-                  <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubAdhocFeeDesc}</ThemedText>
+                  <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubAdhocFeeDate} {fee.clubAdhocFeeDesc}</ThemedText>
                 </View>
                 <View >
                   <ThemedText style={{ textAlign: "right" }}>Rs. {fee.clubAdhocFeePaymentAmount}</ThemedText>

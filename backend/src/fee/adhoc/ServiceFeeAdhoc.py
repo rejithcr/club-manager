@@ -18,14 +18,14 @@ class FeeAdhocService():
     def post(self, conn, params):
         clubId = params["clubId"]
         adhocFeeName = params.get("adhocFeeName")
-        adhocFeeAmount = params.get("adhocFeeAmount")
+        adhocFeeDate = params.get("adhocFeeDate")
         adhocFeeDesc = params.get("adhocFeeDesc")
         addedMembers = params.get("addedMembers")
         email = params.get("email")
 
         clubAdhocFeeId = db.fetch_one(conn, queries_fee.GET_FEE_ADHOC_ID_SEQ_NEXT_VAL, None)['nextval']
         db.execute(conn, queries_fee.ADD_FEE_ADHOC,
-                   (clubAdhocFeeId, clubId, adhocFeeName, adhocFeeDesc, 1, email, email))
+                   (clubAdhocFeeId, clubId, adhocFeeName, adhocFeeDesc, adhocFeeDate, 1, email, email))
 
         for member in addedMembers:
             db.execute(conn, queries_fee.ADD_FEE_ADHOC_PAYMENT,
