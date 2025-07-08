@@ -165,7 +165,7 @@ const ClubHome = () => {
                     <Spacer space={4} />
                     <ThemedHeading>Expense Splits</ThemedHeading>
                     {isLoadingSplits && <LoadingSpinner />}
-                    {!isLoadingSplits && expenseSplits.length === 0 &&
+                    {!isLoadingSplits && expenseSplits?.length === 0 &&
                         <View style={{ width: "85%", height: 30, alignItems: "center", 
                             flexDirection: "row", justifyContent: "space-around" }}>
                             <ThemedText>No Splits defined</ThemedText>
@@ -174,7 +174,7 @@ const ClubHome = () => {
                                 <ThemedIcon size={35} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
                             </TouchableOpacity>}</View>
                     }
-                    {!isLoadingSplits && expenseSplits.length > 0 && <View style={{ width: "85%", alignSelf: "center", flexDirection: "row" }}>
+                    {!isLoadingSplits && expenseSplits?.length > 0 && <View style={{ width: "85%", alignSelf: "center", flexDirection: "row" }}>
                         <FlatList
                             data={expenseSplits}
                             onEndReachedThreshold={0.2}
