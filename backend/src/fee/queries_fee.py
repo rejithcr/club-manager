@@ -361,7 +361,8 @@ GET_FEE_ADHOC_COLLECTIONS = """
                             where caf.club_id = %s
                             group by caf.club_adhoc_fee_id, caf.club_adhoc_fee_name, caf.club_adhoc_fee_desc, \
                                      caf.club_adhoc_fee_date, caf.club_adhoc_fee_is_active
-                            order by 6 \
+                            order by 7 
+                            limit %s offset %s 
                             """
 
 GET_FEE_ADHOC_COLLECTION_BY_ID = """

@@ -47,7 +47,7 @@ const ClubHome = () => {
         data: expenseSplits,
         isLoading: isLoadingSplits,
         refetch: fetchSplits
-    } = useHttpGet("/fee/adhoc", { clubId: Number(params.get("clubId")) })
+    } = useHttpGet("/fee/adhoc", { clubId: Number(params.get("clubId")), limit: 10, offset: 0 })
 
     const fetchTotalDue = () => {
         setIsTotalDueLoading(true)
@@ -96,12 +96,12 @@ const ClubHome = () => {
         fetchFees();
     };
 
-      const showAdhocFeeDetails = (adhocFee: any) => {
+    const showAdhocFeeDetails = (adhocFee: any) => {
         router.push({
-          pathname: "/(main)/(clubs)/(fees)/adhocfee/payments",
-          params: { adhocFee: JSON.stringify(adhocFee) }
+            pathname: "/(main)/(clubs)/(fees)/adhocfee/payments",
+            params: { adhocFee: JSON.stringify(adhocFee) }
         })
-      }
+    }
 
     return (
         <ThemedView style={{ flex: 1 }}>
@@ -165,25 +165,44 @@ const ClubHome = () => {
                     <Spacer space={4} />
                     <ThemedHeading>Expense Splits</ThemedHeading>
                     {isLoadingSplits && <LoadingSpinner />}
-                    {!isLoadingSplits && <View style={{ width: "85%", alignSelf: "center", flexDirection:"row"}}>
-                        <View style={{ width: 100, alignItems:"center", justifyContent:"center"}}>
+                    {!isLoadingSplits && expenseSplits.length === 0 &&
+                        <View style={{ width: "85%", height: 30, alignItems: "center", 
+                            flexDirection: "row", justifyContent: "space-around" }}>
+                            <ThemedText>No Splits defined</ThemedText>
                             {params.get("role") == ROLE_ADMIN && <TouchableOpacity
                                 onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
                                 <ThemedIcon size={35} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
                             </TouchableOpacity>}</View>
+                    }
+                    {!isLoadingSplits && expenseSplits.length > 0 && <View style={{ width: "85%", alignSelf: "center", flexDirection: "row" }}>
                         <FlatList
                             data={expenseSplits}
                             onEndReachedThreshold={0.2}
+                            ListHeaderComponent={() =>
+                                <View style={{ width: 50, height: 100, margin: 10, alignItems: "center", justifyContent: "center" }}>
+                                    {params.get("role") == ROLE_ADMIN && <TouchableOpacity
+                                        onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
+                                        <ThemedIcon size={35} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
+                                    </TouchableOpacity>}</View>
+                            }
                             renderItem={({ item }) => (
                                 <TouchableOpacity onPress={() => showAdhocFeeDetails(item)}>
-                                <Card style={{ height: 100 }}>
-                                    <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
-                                    <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{item.clubAdhocFeeDate} {item.clubAdhocFeeDesc}</ThemedText>
-                                    <ThemedText style={{ fontSize: 12, marginTop: 5 }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>
-                                    <ThemedText style={{ fontSize: 10, marginTop: 5, position:"absolute", bottom: 10}}>Collected {Math.round(item.completionPercentage)}%</ThemedText>
-                                </Card>
+                                    <Card style={{ height: 100 }}>
+                                        <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
+                                        <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{item.clubAdhocFeeDate} {item.clubAdhocFeeDesc}</ThemedText>
+                                        <ThemedText style={{ fontSize: 12, marginTop: 5 }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>
+                                        <ThemedText style={{ fontSize: 10, marginTop: 5, position: "absolute", bottom: 10 }}>Collected {Math.round(item.completionPercentage)}%</ThemedText>
+                                    </Card>
                                 </TouchableOpacity>
                             )}
+                            ListFooterComponent={() =>
+                                <View style={{ width: 50, height: 100, margin: 10, alignItems: "center", justifyContent: "center" }}>
+                                    {params.get("role") == ROLE_ADMIN && <TouchableOpacity
+                                        onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
+                                        <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
+                                    </TouchableOpacity>}
+                                </View>
+                            }
                             horizontal
                         />
                     </View>

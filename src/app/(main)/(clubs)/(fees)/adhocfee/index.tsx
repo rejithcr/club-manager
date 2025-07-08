@@ -1,5 +1,5 @@
-import { View, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useCallback, useContext, useState } from 'react'
+import { View, ScrollView, TouchableOpacity, FlatList, RefreshControl } from 'react-native'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { appStyles } from '@/src/utils/styles'
 import { getAdhocFee } from '@/src/helpers/fee_helper'
@@ -25,18 +25,47 @@ const AdocFeesHome = () => {
 
   useFocusEffect(
     useCallback(() => {
-      showFees()
+      onRefresh()
       return () => { console.log('Screen is unfocused'); };
     }, [])
   );
 
-  const showFees = () => {
+
+  const offset = useRef(0)
+  const limit = 20
+  const [hasMoreData, setHasMoreData] = useState(false)
+  const [isFectching, setIsFetching] = useState(false)
+
+  const onRefresh = () => {
     setIsLoadingAdhoc(true)
-    getAdhocFee(Number(clubInfo.clubId))
-      .then(response => setAdhocFees(response.data))
-      .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
-                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
-      .finally(() => setIsLoadingAdhoc(false));
+    offset.current = 0
+    getAdhocFee(clubInfo.clubId, limit, offset.current)
+      .then(response => {
+        setHasMoreData(response.data?.length > 0);
+        setAdhocFees(response.data)
+      })
+      .catch(error => setAlertConfig({
+        visible: true, title: 'Error', message: error.response.data.error,
+        buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+      }))
+      .finally(() => setIsLoadingAdhoc(false))
+  }
+
+  const fetchNextPage = () => {
+    if (hasMoreData && !isFectching) {
+      setIsFetching(true)
+      offset.current = offset.current + limit
+      getAdhocFee(clubInfo.clubId, limit, offset.current)
+        .then(response => {
+          setHasMoreData(response.data?.length > 0);
+          setAdhocFees((prev: any) => [...prev, ...response.data])
+        })
+        .catch(error => setAlertConfig({
+          visible: true, title: 'Error', message: error.response.data.error,
+          buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+        }))
+        .finally(() => setIsFetching(false))
+    }
   }
 
   const showAdhocFeeDetails = (adhocFee: any) => {
@@ -48,45 +77,52 @@ const AdocFeesHome = () => {
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
-        <ScrollView>
-          <View style={{
-            flexDirection: "row", alignItems: "center", width: "90%",
-            justifyContent: "space-between", alignSelf: "center", marginTop: 10
-          }}>
-            <ThemedHeading style={{width: 200}}>Expense Splits</ThemedHeading>
+        <View style={{
+          flexDirection: "row", alignItems: "center", width: "90%",
+          justifyContent: "space-between", alignSelf: "center", marginTop: 10
+        }}>
+          <ThemedHeading style={{ width: 200 }}>Expense Splits</ThemedHeading>
 
-            <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
-              {clubInfo.role == ROLE_ADMIN && <TouchableOpacity
-                onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
-                <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
-              </TouchableOpacity>}</View>
-          </View>
-          {isLoadingAdhoc && <LoadingSpinner />}
-          {!isLoadingAdhoc && adhocFees?.length == 0 &&
-            <ThemedText style={{ alignSelf: "center", width: "80%" }}>No splits defined.
-              This will be a one time collection from selected members.
-              For eg. splitting expense among members who participated in an event. Press the + icon to define collection</ThemedText>}
-          {!isLoadingAdhoc && adhocFees?.map(fee => <View key={fee.clubAdhocFeeId}>
-            <TouchableCard onPress={showAdhocFeeDetails} id={fee}>
-              <View style={{
-                flexDirection: "row", width: "90%",
-                justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
-              }}>
-                <View>
-                  <ThemedText style={{ fontWeight: "bold" }}>{fee.clubAdhocFeeName}</ThemedText>
-                  <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubAdhocFeeDate} {fee.clubAdhocFeeDesc}</ThemedText>
+          <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
+            {clubInfo.role == ROLE_ADMIN && <TouchableOpacity
+              onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
+              <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
+            </TouchableOpacity>}</View>
+        </View>
+        {isLoadingAdhoc && <LoadingSpinner />}
+        {!isLoadingAdhoc && adhocFees?.length == 0 &&
+          <ThemedText style={{ alignSelf: "center", width: "80%" }}>No splits defined.
+            This will be a one time collection from selected members.
+            For eg. splitting expense among members who participated in an event. Press the + icon to define collection</ThemedText>}
+        {!isLoadingAdhoc && adhocFees?.length > 0 &&
+          <FlatList style={{ flex: 1 }}
+            ItemSeparatorComponent={() => <Spacer space={4} />}
+            ListFooterComponent={() => isFectching && <><Spacer space={10} /><LoadingSpinner /></> || <Spacer space={4} />}
+            data={adhocFees}
+            initialNumToRender={8}
+            onEndReached={fetchNextPage}
+            onEndReachedThreshold={0.2}
+            refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
+            renderItem={({ item }) => (
+              <TouchableCard onPress={showAdhocFeeDetails} id={item}>
+                <View style={{
+                  flexDirection: "row", width: "90%",
+                  justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
+                }}>
+                  <View>
+                    <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
+                    <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{item.clubAdhocFeeDate} {item.clubAdhocFeeDesc}</ThemedText>
+                  </View>
+                  <View >
+                    <ThemedText style={{ textAlign: "right" }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>
+                    <ThemedText style={{ fontSize: 10, marginTop: 5, textAlign: "right" }}>Completed {Math.round(item.completionPercentage)}%</ThemedText>
+                  </View>
                 </View>
-                <View >
-                  <ThemedText style={{ textAlign: "right" }}>Rs. {fee.clubAdhocFeePaymentAmount}</ThemedText>
-                  <ThemedText style={{ fontSize: 10, marginTop: 5, textAlign: "right" }}>Completed {Math.round(fee.completionPercentage)}%</ThemedText>
-                </View>
-              </View>
-            </TouchableCard>
-            <Spacer space={4} />
-          </View>
-          )}
-        </ScrollView>
-        {alertConfig?.visible && <Alert {...alertConfig}/>}
+              </TouchableCard>
+            )}
+          />
+        }
+        {alertConfig?.visible && <Alert {...alertConfig} />}
       </GestureHandlerRootView>
     </ThemedView>
   )

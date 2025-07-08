@@ -7,12 +7,14 @@ class FeeAdhocService():
     def get(self, conn, params):
         clubId = params.get("clubId")
         adhocFeeId = params.get("adhocFeeId")
+        limit = params.get("limit")
+        offset = params.get("offset")
 
         if adhocFeeId:
             adhocFeeDetails = db.fetch_one(conn, queries_fee.GET_FEE_ADHOC_COLLECTION_BY_ID, (adhocFeeId,))
             return helper.convert_to_camel_case(adhocFeeDetails) if adhocFeeDetails else None
         else:
-            collectionList = db.fetch(conn, queries_fee.GET_FEE_ADHOC_COLLECTIONS, (clubId,))
+            collectionList = db.fetch(conn, queries_fee.GET_FEE_ADHOC_COLLECTIONS, (clubId,limit, offset))
             return [helper.convert_to_camel_case(item) for item in collectionList]
 
     def post(self, conn, params):

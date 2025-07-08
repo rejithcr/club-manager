@@ -68,8 +68,8 @@ export const addAdhocFee = (clubId: string | null, adhocFeeName: any, adhocFeeDe
     return post("/fee/adhoc", null, { clubId, adhocFeeName, adhocFeeDesc, adhocFeeAmount, adhocFeeDate, addedMembers, email })
 }
 
-export const getAdhocFee = (clubId: number) => {
-    return get("/fee/adhoc", { clubId })
+export const getAdhocFee = (clubId: number, limit: number, offset: number) => {
+    return get("/fee/adhoc", { clubId, limit, offset})
 }
 
 export const getAdhocFeePayments = async (adhocFeeId: string | null) => {
