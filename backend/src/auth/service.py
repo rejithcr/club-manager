@@ -13,10 +13,14 @@ def get_user_role(email, request):
     finally:
         conn.close()
     roles = [constants.ROLE_MEMBER]
-    if member_role['role_id'] == constants.ROLE_ADMIN:
+
+    if not member_role:
+        return  roles
+
+    if member_role.get('role_id') == constants.ROLE_ADMIN:
         roles.append(constants.ROLE_MAINTAINER)
         roles.append(constants.ROLE_ADMIN)
-    elif member_role['role_id'] == constants.ROLE_MAINTAINER:
+    elif member_role.get('role_id') == constants.ROLE_MAINTAINER:
         roles.append(constants.ROLE_MAINTAINER)
 
     return roles

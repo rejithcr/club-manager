@@ -47,7 +47,7 @@ export const searchClubsByName = (clubName: string | null) => {
 }
 
 export const requestMembership = async ( clubId: number, memberId: number, email: string) => {
-    return post("/club/member", null, {memberId, clubId, membershipRequest: true, email})
+    return post("/club/member/request", null, {memberId, clubId, membershipRequest: true, email})
 }
 
 export const membershipRequestPut = (params: {clubId: Number, memberId: Number, status: string, comments: string, email: any}) => {

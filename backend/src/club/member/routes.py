@@ -30,6 +30,17 @@ def post_club_member():
     finally:
         db.close_connection(conn)
 
+@club_member_bp.route('/request', methods=['POST'], strict_slashes=False)
+@role_required([constants.ROLE_MEMBER])
+def request_club_member():
+    service = ClubMemberService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.request(conn, params), 200
+    finally:
+        db.close_connection(conn)
+
 @club_member_bp.route('/', methods=['PUT'], strict_slashes=False)
 @role_required([constants.ROLE_MAINTAINER])
 def put_club_member():

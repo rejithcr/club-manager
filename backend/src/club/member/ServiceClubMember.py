@@ -41,7 +41,6 @@ class ClubMemberService():
         email = params.get('email')
         member_id = params.get('memberId')
         addToClub = params.get('addToClub')
-        membershipRequest = params.get('membershipRequest')
         addClubMemberAttribute = params.get('addClubMemberAttribute')
         attributeName = params.get('attributeName')
         required = params.get('required')
@@ -58,14 +57,6 @@ class ClubMemberService():
             conn.commit()
             return {"message": f"Member with id {member_id} added to the club {club_id}"}
 
-        if membershipRequest and club_id and member_id:
-            membership = db.fetch_one(conn, queries_member.GET_MEMBERSHIP_ID, (club_id, member_id))
-            if membership:
-                return {"message": f"You are already a member of the club"}
-            db.execute(conn, queries_member.REQUEST_MEMBERSHIP, (club_id, member_id, email, email))
-            conn.commit()
-            return {"message": f"Member with id {member_id} request to join club {club_id}"}
-
         if not member_id:
             first_name = params.get('firstName')
             last_name = params.get('lastName')
@@ -80,6 +71,19 @@ class ClubMemberService():
             return {"message": f"Member with id {member_id} mapped to the club {club_id}"}
 
         return "Did not met any conditions"
+
+    def request(self, conn, params):
+        club_id = params.get('clubId')
+        email = params.get('email')
+        member_id = params.get('memberId')
+
+        membership = db.fetch_one(conn, queries_member.GET_MEMBERSHIP_ID, (club_id, member_id))
+        if membership:
+            return {"message": f"You are already a member of the club"}
+        db.execute(conn, queries_member.REQUEST_MEMBERSHIP, (club_id, member_id, email, email))
+        conn.commit()
+        return {"message": f"Member with id {member_id} request to join club {club_id}"}
+
 
     def put(self, conn, params):
         email = params.get('email')

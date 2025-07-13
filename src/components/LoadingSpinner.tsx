@@ -22,12 +22,10 @@ const LoadingSpinner = () => {
 
 
   return (
-    <View style={{ ...appStyles.centerify }}>
       <ActivityIndicator
         size="small"
         color={spinnerColors[colorIndex] || colors.text}
       />
-    </View>
   );
 };
 

@@ -4,15 +4,16 @@ import { useRouter } from 'expo-router'
 import * as WebBrowser from 'expo-web-browser'
 import * as Google from 'expo-auth-session/providers/google'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { ActivityIndicator, Image, View } from 'react-native'
+import { Image, View } from 'react-native'
 import { appStyles } from '@/src/utils/styles'
 import { UserContext } from '../../context/UserContext';
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import { authenticateMember } from '@/src/helpers/auth_helper'
 import * as AuthSession from 'expo-auth-session';
+import LoadingSpinner from '@/src/components/LoadingSpinner'
 
-WebBrowser.maybeCompleteAuthSession()
+WebBrowser.maybeCompleteAuthSession();
 
 const AuthHome = () => {
   const { setUserInfo } = useContext(UserContext)
@@ -24,11 +25,12 @@ const AuthHome = () => {
   });
 
   const [_, response, promptAsyc] = Google.useAuthRequest({
+    scopes: ['profile', 'email'],
     //scopes: ['https://www.googleapis.com/auth/user.phonenumbers.read'],
-    redirectUri: redirectUri,
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
     iosClientId: "",
     webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+    redirectUri: redirectUri
   })
   const router = useRouter()
 
@@ -160,7 +162,7 @@ const AuthHome = () => {
     <ThemedView style={{ flex: 1 }}>
       <View style={appStyles.centerify}>
         <Image source={require("../../assets/images/app-icon.png")} style={{ height: 300, width: 300, marginBottom: 50 }} />
-        {isLoading ? <ActivityIndicator size="large" color={"black"} /> : <ThemedButton title="Sign in with Google" onPress={() => promptAsyc()} />}
+        {isLoading ? <LoadingSpinner /> : <ThemedButton title="Sign in with Google" onPress={() => promptAsyc()} />}
       </View>
       {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
