@@ -33,7 +33,7 @@ const JoinClub = () => {
             setIsLoading(true);
             searchClubsByName(query)
                 .then(response => setFilteredClubs(response.data))
-                .catch(error => alert(error.resoinse.data.message))
+                .catch(error => alert(error.response.data.message))
                 .finally(() => setIsLoading(false));
         }, 500); // 500ms delay
 

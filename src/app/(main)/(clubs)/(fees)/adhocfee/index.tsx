@@ -99,7 +99,7 @@ const AdocFeesHome = () => {
             ItemSeparatorComponent={() => <Spacer space={4} />}
             ListFooterComponent={() => isFectching && <><Spacer space={10} /><LoadingSpinner /></> || <Spacer space={4} />}
             data={adhocFees}
-            initialNumToRender={8}
+            initialNumToRender={20}
             onEndReached={fetchNextPage}
             onEndReachedThreshold={0.2}
             refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}

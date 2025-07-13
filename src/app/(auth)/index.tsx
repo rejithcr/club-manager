@@ -62,12 +62,13 @@ const AuthHome = () => {
           AsyncStorage.setItem("accessToken", response.data['accessToken'])
           AsyncStorage.setItem("refreshToken", response.data['refreshToken'])
         })
-        .catch(error => setAlertConfig({
+        .catch(error => {console.log(error); setAlertConfig({
           visible: true,
           title: 'Error',
           message: error.response.data.error,
           buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-        })).finally(() => setLoading(false))
+        })})
+        .finally(() => setLoading(false))
     }
   }
 

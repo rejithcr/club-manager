@@ -71,10 +71,10 @@ const FeeTypeDetails = () => {
             params: { fee: params.get('fee'), clubFeeTypeId: fee?.clubFeeTypeId }
         })
     }
-    const gotoPayments = (clubFeeCollectionId: string, clubFeeTypePeriod: string) => {
+    const gotoPayments = (clubFeeCollectionId: string, clubFeeTypePeriod: string, collected: number, total: number) => {
         router.push({
             pathname: "/(main)/(clubs)/(fees)/payments",
-            params: { fee: params.get('fee'), clubFeeCollectionId, clubFeeTypePeriod }
+            params: { fee: params.get('fee'), clubFeeCollectionId, clubFeeTypePeriod, collected, total }
         })
     }
     const gotoAddFeeExceptions = () => {
@@ -150,7 +150,7 @@ const FeeTypeDetails = () => {
                             initialNumToRender={8}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
-                                <KeyValueTouchableBox onPress={() => gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod)} 
+                                <KeyValueTouchableBox onPress={() => gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod, item.collected, item.total)} 
                                     keyName={item.clubFeeTypePeriod}
                                     keyValue={item.total != 0 ? `${Math.round(item.collected / item.total * 100)}%` : 'NA'} goto />
                             )}

@@ -3,7 +3,7 @@ import { View, FlatList, RefreshControl } from "react-native";
 import MemberItem from "@/src/components/MemberItem";
 import { router, useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
-import { MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { getClubMembers } from "@/src/helpers/club_helper";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
@@ -57,10 +57,9 @@ export default function Home() {
       </View>
       {clubInfo.role == ROLE_ADMIN &&
         <FloatingMenu
-         // actions={actions}
-          onPressMain={() => {router.push(`/(main)/(members)/addmember`) }}
-         // onPressMain={(name: string | undefined) => handleMenuPress(name)}
-          icon={<MaterialIcons name={"add"} size={32} color={"white"} />} />
+          actions={actions}
+          onPressItem={(name: string | undefined) => handleMenuPress(name)}
+          icon={<MaterialIcons name={"menu"} size={32} color={"white"} />} />
       }
       {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
@@ -70,27 +69,43 @@ export default function Home() {
 
 const handleMenuPress = (name: string | undefined) => {
   if (name == "attributes") {
-    router.push(`/(main)/(members)/memberattributes`)
-  } else if (name == "addMember") {
+    router.push(`/(main)/(clubs)/(reports)/memberattributesexport`)
+  } else if (name == "add") {
     router.push(`/(main)/(members)/addmember`)
+  } else if (name == "editAttributes") {
+    router.push(`/(main)/(members)/memberattributes`)
+  } else if (name == "requests") {
+    router.push(`/(main)/(clubs)/membershiprequests`)
   } else {
     throw ("Error")
   }
 }
 
 const actions = [
-  // {
-  //   color: "black",
-  //   text: "Edit Member Attributes",
-  //   icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
-  //   name: "attributes",
-  //   position: 1
-  // },
+  {
+    color: "black",
+    text: "Member Attributes",
+    icon: <MaterialCommunityIcons name={"account-details"} size={15} color={"white"} />,
+    name: "attributes",
+    position: 1
+  },{
+    color: "black",
+    text: "Edit Attributes",
+    icon: <MaterialIcons name={"edit-note"} size={15} color={"white"} />,
+    name: "editAttributes",
+    position: 1
+  },{
+    color: "black",
+    text: "Membership Requests",
+    icon: <MaterialCommunityIcons name={"account-details"} size={15} color={"white"} />,
+    name: "requests",
+    position: 1
+  }, 
   {
     color: "black",
     text: "Add Memeber",
-    icon: <MaterialIcons name={"add"} size={15} color={"white"} />,
-    name: "addMember",
+    icon: <AntDesign name={"adduser"} size={15} color={"white"} />,
+    name: "add",
     position: 1
   },
 ];

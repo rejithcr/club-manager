@@ -19,6 +19,8 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import Spacer from '@/src/components/Spacer';
 import { ROLE_ADMIN } from '@/src/utils/constants';
 import Alert, { AlertProps } from '@/src/components/Alert';
+import ThemedHeading from '@/src/components/themed-components/ThemedHeading';
+import CircularProgress from '@/src/components/charts/CircularProgress';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -86,8 +88,18 @@ const Payments = () => {
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
-                <ThemedText style={{ ...appStyles.heading }}>{params.get("clubFeeTypePeriod")}</ThemedText>
-                <ThemedText style={{ width: "85%", alignSelf: "center", fontSize: 10 }}>Select the member to update payment status</ThemedText>
+                <View style={{
+                    flexDirection: "row", alignItems: "center", width: "90%",
+                    justifyContent: "space-between", alignSelf: "center",
+                }}>
+                    <ThemedHeading style={{ width: 200 }}>{params.get("clubFeeTypePeriod")}</ThemedHeading>
+                    <ThemedText style={{ textAlign: "right" }}>Rs. {params.get("total")}</ThemedText>
+                </View>
+                <View style={{ flexDirection: "row", alignItems: "center", width: "85%", alignSelf: "center" }}>
+                    <CircularProgress value={Math.round(Number(params.get("collected")) / Number(params.get("total")) * 100)} strokeWidth={6} size={35} />
+                    <Spacer hspace={4} />
+                    <ThemedText style={{ fontSize: 10 }}>Select the member to update payment status</ThemedText>
+                </View>
                 <Spacer space={5} />
                 <View>
                     {isLoading && <LoadingSpinner />}
