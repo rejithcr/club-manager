@@ -31,7 +31,7 @@ const Transactions = () => {
   const [showFees, setShowFees] = useState(false)
   const [resfresh, setRefresh] = useState(false)
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
-  const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnCategory: "", txnComment: "", txnAmount: "" })
+  const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnDate: new Date(), txnCategory: "", txnComment: "", txnAmount: "" })
   const [date, setDate] = useState(new Date())
   const { clubInfo } = useContext(ClubContext)
   const { userInfo } = useContext(UserContext)
@@ -46,6 +46,7 @@ const Transactions = () => {
     getTransactions(clubInfo.clubId, txnTypeFilter, showFees, limit, offset.current)
       .then(response => {
         setHasMoreData(response.data?.length > 0);
+        console.log(response.data)
         setTransactions(response.data)
       })
       .catch(error => setAlertConfig({
@@ -122,7 +123,8 @@ const Transactions = () => {
   }
 
   const handleEdit = (item: any) => {
-    setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount })
+    setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnDate: new Date(item.clubTransactionDate), 
+      txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount })
     setIsAddTxnVisible(true)
   }
   const handleTxnTypeChange = (value: string) => {
@@ -186,7 +188,7 @@ const Transactions = () => {
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
           </Picker>
-          <DatePicker date={date} setDate={setDate} label='Date'/>
+          <DatePicker date={txnValues?.txnDate} setDate={setDate} label='Date'/>
           <InputText label="Category" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnCategory: value }))} defaultValue={txnValues?.txnCategory} />
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />

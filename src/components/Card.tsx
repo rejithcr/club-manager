@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
         borderColor: "#eee",
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
         borderRadius: 5,
-        padding: 10,
-        margin: 10
+        padding: 10
     }
 });

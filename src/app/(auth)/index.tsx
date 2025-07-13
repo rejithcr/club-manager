@@ -10,7 +10,7 @@ import { UserContext } from '../../context/UserContext';
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import { authenticateMember } from '@/src/helpers/auth_helper'
-
+import * as AuthSession from 'expo-auth-session';
 
 WebBrowser.maybeCompleteAuthSession()
 
@@ -19,8 +19,13 @@ const AuthHome = () => {
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const [isLoading, setLoading] = useState(false)
 
+  const redirectUri = AuthSession.makeRedirectUri({
+    path: '/',
+  });
+
   const [_, response, promptAsyc] = Google.useAuthRequest({
     //scopes: ['https://www.googleapis.com/auth/user.phonenumbers.read'],
+    redirectUri: redirectUri,
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
     iosClientId: "",
     webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,

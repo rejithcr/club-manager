@@ -15,6 +15,7 @@ import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
+import ProgressBar from '@/src/components/charts/ProgressBar'
 
 const AdocFeesHome = () => {
   const [isLoadingAdhoc, setIsLoadingAdhoc] = useState(false);
@@ -106,16 +107,17 @@ const AdocFeesHome = () => {
             renderItem={({ item }) => (
               <TouchableCard onPress={showAdhocFeeDetails} id={item}>
                 <View style={{
-                  flexDirection: "row", width: "90%",
+                  flexDirection: "row", width: "90%", 
                   justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
                 }}>
-                  <View>
+                  <View style={{ width: "75%" }}>
                     <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
                     <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{item.clubAdhocFeeDate} {item.clubAdhocFeeDesc}</ThemedText>
                   </View>
-                  <View >
-                    <ThemedText style={{ textAlign: "right" }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>
-                    <ThemedText style={{ fontSize: 10, marginTop: 5, textAlign: "right" }}>Completed {Math.round(item.completionPercentage)}%</ThemedText>
+                  <View style={{ width: "25%" }}>
+                    <ThemedText style={{ textAlign: "right" }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>         
+                    <Spacer space={2} />           
+                    <ProgressBar height={8} value={Math.round(item.completionPercentage)} />
                   </View>
                 </View>
               </TouchableCard>

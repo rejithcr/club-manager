@@ -15,7 +15,7 @@ class CircleOmitter extends Circle {
             ...this.props,
             collapsable: undefined
         };
-        return <Circle { ...newProps } />;
+        return <Circle {...newProps} />;
     }
 }
 
@@ -28,8 +28,7 @@ const CircularProgress = ({
     duration = 1000,
     color = null,
     ringBgColor = '#eee',
-    fillBgColor = "transparent",
-    textColor = '#333',
+    fillBgColor = "transparent"
 }) => {
     const animatedValue = useRef(new Animated.Value(0)).current;
     const [displayValue, setDisplayValue] = useState(0); // ✅ integer value for text
@@ -58,8 +57,8 @@ const CircularProgress = ({
     }, [value]);
 
     const interpolatedColor = animatedValue.interpolate({
-        inputRange: [0, 100],
-        outputRange: ['rgb(246, 255, 119)', 'rgb(90, 201, 131)'],
+        inputRange: [0, 25, 50, 100],
+        outputRange: ['rgb(246, 255, 119)', 'rgb(255,165,0)', 'rgb(255, 248, 91)', 'rgb(90, 201, 131)'],
     });
 
     const strokeDashoffset = animatedValue.interpolate({
