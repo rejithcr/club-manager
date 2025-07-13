@@ -60,46 +60,46 @@ const Profile = () => {
 
 
   const {
-      data: cmaList,
-      isLoading: isLoadingCMA,
-      refetch: refetchCMA
+    data: cmaList,
+    isLoading: isLoadingCMA,
+    refetch: refetchCMA
   } = useHttpGet("/club/member/attribute", { clubId: clubInfo.clubId, memberId: Number(params.get("memberId")), getClubMemberAttributeValues: true })
 
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
-      <ScrollView>
-      {isMemberLoading && <LoadingSpinner />}
-      {!isMemberLoading && memberDetails && <>
-        <ThemedView style={styles.photoContainer}>
-          {memberDetails?.photo ? <Image source={{ uri: memberDetails?.photo }} style={{ width: 100, height: 100, borderRadius: 100 }} />
-            : <ThemedIcon name={"MaterialIcons:account-circle"} size={100} />}
-        </ThemedView>
-        <ThemedText style={styles.title}>{memberDetails?.firstName} {memberDetails?.lastName}</ThemedText>
-        <KeyValueUI data={memberDetails} hideKeys={["photo", "firstName", "lastName"]} />
-        
-      </>}
-      <Spacer space={10} />
-      <ThemedText style={appStyles.heading}>Club level attributes</ThemedText>
-      {isLoadingCMA && <LoadingSpinner />}
-      {!isLoadingCMA && cmaList && cmaList.length > 0 && (
-          cmaList.map((cma: ClubMemberAttribute, index: number) => (
-            <Divider key={index} style={styles.detailsTable}>
-              <ThemedText>{cma.attribute}</ThemedText>
-              <ThemedText>{cma.attributeValue}</ThemedText>
-            </Divider>
-          ))
-      )}
-      <Spacer space={10} />
-      {clubInfo.role === ROLE_ADMIN &&
-        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-          <ThemedButton title="    Edit    " onPress={() => router.push(`/(main)/(members)/editmember?memberId=${params.get("memberId")}`)} />
+        <ScrollView>
+          {isMemberLoading && <LoadingSpinner />}
+          {!isMemberLoading && memberDetails && <>
+            <ThemedView style={styles.photoContainer}>
+              {memberDetails?.photo ? <Image source={{ uri: memberDetails?.photo }} style={{ width: 100, height: 100, borderRadius: 100 }} />
+                : <ThemedIcon name={"MaterialIcons:account-circle"} size={100} />}
+            </ThemedView>
+            <ThemedText style={appStyles.heading}>{memberDetails?.firstName} {memberDetails?.lastName}</ThemedText>
+            <KeyValueUI data={memberDetails} hideKeys={["photo", "firstName", "lastName"]} />
+
+          </>}
           <Spacer space={10} />
-          <ThemedButton title="Remove" onPress={() => handleRemove()} style={{ backgroundColor: colors.error }} />
-        </View>}
-        <Spacer space={10} />
-      {alertConfig?.visible && <Alert {...alertConfig} />}
-      </ScrollView>
+          <ThemedText style={appStyles.heading}>Club level attributes</ThemedText>
+          {isLoadingCMA && <LoadingSpinner />}
+          {!isLoadingCMA && cmaList && cmaList.length > 0 && (
+            cmaList.map((cma: ClubMemberAttribute, index: number) => (
+              <Divider key={index} style={styles.detailsTable}>
+                <ThemedText>{cma.attribute}</ThemedText>
+                <ThemedText>{cma.attributeValue}</ThemedText>
+              </Divider>
+            ))
+          )}
+          <Spacer space={10} />
+          {clubInfo.role === ROLE_ADMIN &&
+            <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+              <ThemedButton title="    Edit    " onPress={() => router.push(`/(main)/(members)/editmember?memberId=${params.get("memberId")}`)} />
+              <Spacer space={10} />
+              <ThemedButton title="Remove" onPress={() => handleRemove()} style={{ backgroundColor: colors.error }} />
+            </View>}
+          <Spacer space={10} />
+          {alertConfig?.visible && <Alert {...alertConfig} />}
+        </ScrollView>
       </GestureHandlerRootView>
     </ThemedView>
   )
@@ -127,10 +127,10 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   detailsTable: {
-    width: "80%",
+    width: "85%",
     alignSelf: "center",
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "space-between",padding: 10,
+    justifyContent: "space-between", padding: 10,
   }
 });

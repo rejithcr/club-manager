@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { View, FlatList, RefreshControl } from "react-native";
-import MemberItem from "@/src/components/MemberItem";
+import { View, FlatList, RefreshControl, Touchable } from "react-native";
 import { router, useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import { AntDesign, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
@@ -11,6 +10,8 @@ import { ClubContext } from "@/src/context/ClubContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
 import Alert, { AlertProps } from "@/src/components/Alert";
+import UserInfoView from "./UserInfoView";
+import TouchableCard from "@/src/components/TouchableCard";
 
 export default function Home() {
   const [members, setMembers] = useState<any>([]);
@@ -39,7 +40,7 @@ export default function Home() {
 
   return (    
     <ThemedView style={{ flex: 1 }}>
-      <Spacer space={5}/>
+      <Spacer space={10}/>
       <View style={{ height:"100%", justifyContent: "center", alignContent: "center" }}>
         {isLoading && <LoadingSpinner />}
         {!isLoading &&
@@ -50,7 +51,9 @@ export default function Home() {
             ItemSeparatorComponent={() => <Spacer space={4} />}
             refreshControl={<RefreshControl refreshing={false} onRefresh={loadMembers} />}
             renderItem={({ item }) => (
-              <MemberItem {...item} key={item.member_id} showDetails={showDetails} />
+              <TouchableCard onPress={() => showDetails(item.memberId)}>
+                <UserInfoView {...item} key={item.memberId} />
+              </TouchableCard>
             )}
           />
         }

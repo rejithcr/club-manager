@@ -47,7 +47,7 @@ const ClubHome = () => {
         data: expenseSplits,
         isLoading: isLoadingSplits,
         refetch: fetchSplits
-    } = useHttpGet("/fee/adhoc", { clubId: Number(params.get("clubId")), limit: 10, offset: 0 })
+    } = useHttpGet("/fee/adhoc", { clubId: Number(params.get("clubId")), limit: 5, offset: 0 })
 
     const fetchTotalDue = () => {
         setIsTotalDueLoading(true)

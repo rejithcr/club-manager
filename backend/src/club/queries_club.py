@@ -28,10 +28,13 @@ GET_CLUB_MEMBER = """
     where m.member_id = %s and c.club_id = %s
 """
 GET_CLUB_MEMBERS = """
-    select ms.membership_id, m.member_id, m.first_name,m.last_name, m.email , m.phone, m.photo , m.is_registered, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth
+    select ms.membership_id, m.member_id, m.first_name,m.last_name, m.email , m.phone, m.photo , 
+        m.is_registered, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth,
+        r.role_name
     from club c
         join membership ms on c.club_id=ms.club_id     
-        join member m on m.member_id  = ms.member_id    
+        join member m on m.member_id  = ms.member_id  
+        join role r on ms.role_id = r.role_id    
     where c.club_id = %s and ms.is_active = 1
 """
 

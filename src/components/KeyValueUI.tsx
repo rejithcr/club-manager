@@ -27,7 +27,7 @@ export default KeyValueUI
 
 const styles = StyleSheet.create({
     detailsTable: {
-        width: "80%",
+        width: "85%",
         alignSelf: "center",
         borderRadius: 5
     },

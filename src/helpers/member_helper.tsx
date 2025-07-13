@@ -14,6 +14,7 @@ export interface Member {
     createdTs?: string,
     updatedTs?: string,
     lastAccessedOn?: string,
+    roleName?: string;
 }
 
 
