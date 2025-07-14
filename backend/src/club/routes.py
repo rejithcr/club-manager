@@ -20,7 +20,7 @@ def get_club():
         db.close_connection(conn)
 
 @club_bp.route('/', methods=['POST'], strict_slashes=False)
-@role_required([constants.ROLE_MAINTAINER])
+@role_required([constants.ROLE_MEMBER])
 def post_club():
     service = ClubService()
     params = util.get_params(request)

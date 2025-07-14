@@ -35,129 +35,76 @@ const AuthHome = () => {
   const router = useRouter()
 
   useEffect(() => {
-    authenticate()
+    if (response?.type === 'success') {
+      authenticate()
+    } else {
+      login()
+    }
   }, [response])
 
-  const authenticate = async () => {
+  const login = async () => {
     const userInfoFromAsyncStorage = await AsyncStorage.getItem("userInfo");
     const accessToken = await AsyncStorage.getItem("accessToken");
     const userInfoFromAsyncStorageParsed = userInfoFromAsyncStorage ? JSON.parse(userInfoFromAsyncStorage) : null;
     if (accessToken) {
       setUserInfo(userInfoFromAsyncStorageParsed)
       router.replace('/(main)')
-    } else {
-      const gInfo = await getGoogleAuthResponse();
+    } 
+  }
+
+  const authenticate = async () => {
       setLoading(true)
+      const gInfo = await getGoogleProfile();
       authenticateMember(gInfo.email, gInfo.gtoken)
-        .then(response => {
-          if (response.data?.isRegistered === 1) {
-            setUserInfo({ ...gInfo, ...response.data })
+        .then(authResponse => {
+          if (authResponse.data?.isRegistered === 1) {
+            setUserInfo({ ...gInfo, ...authResponse.data })
             router.replace('/(main)')
-          } else if (response.data?.isRegistered === 0) {
-            const memberInfo = { ...response.data, photo: gInfo.photo }
+          } else if (authResponse.data?.isRegistered === 0) {
+            const memberInfo = { ...authResponse.data, photo: gInfo.photo }
             router.replace(`/(auth)/verify?memberInfo=${JSON.stringify(memberInfo)}`)
           } else {
             setUserInfo(gInfo)
             router.replace(`/(main)/(members)/addmember?createMember=true&name=${gInfo.name}&email=${gInfo.email}`)
           }
           delete gInfo.gtoken; // Remove gtoken from user info before saving
-          AsyncStorage.setItem("userInfo", JSON.stringify({ 
-            ...gInfo, 
-            memberId: response.data['memberId'],
-            isSuperUser: response.data['isSuperUser']
+          AsyncStorage.setItem("userInfo", JSON.stringify({
+            ...gInfo,
+            memberId: authResponse.data['memberId'],
+            isSuperUser: authResponse.data['isSuperUser']
           }))
-          AsyncStorage.setItem("accessToken", response.data['accessToken'])
-          AsyncStorage.setItem("refreshToken", response.data['refreshToken'])
+          AsyncStorage.setItem("accessToken", authResponse.data['accessToken'])
+          AsyncStorage.setItem("refreshToken", authResponse.data['refreshToken'])
         })
-        .catch(error => {console.log(error); setAlertConfig({
-          visible: true,
-          title: 'Error',
-          message: error.response.data.error,
-          buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-        })})
-        .finally(() => setLoading(false))
-    }
+        .catch(error => {
+          setAlertConfig({
+            visible: true,
+            title: 'Error',
+            message: error.response.data.error,
+            buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+          })
+        })
+        .finally(() => setLoading(false))    
   }
 
-  const getGoogleAuthResponse = async () => {
-    const url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
-    if (response?.type == "success") {
-      const gResponse = await fetch(url + response?.authentication?.accessToken);
-      const gInfoJson = await gResponse.json();
-      const gInfo = {
-        email: gInfoJson?.email,
-        name: gInfoJson?.name,
-        photo: gInfoJson?.picture,
-        gtoken: response?.authentication?.accessToken,
-        phone: undefined
-      }
-      return gInfo;
-    } else {
-      throw "Authentication error. Try again. " + JSON.stringify(response)
+  const getGoogleProfile = async () => {
+    if (!response || response.type !== 'success') {
+      throw new Error("Authentication error. Try again.");
     }
+    const accessToken = response?.authentication?.accessToken;
+    const url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
+    const gResponse = await fetch(url + accessToken);
+    const gInfoJson = await gResponse.json();
+    const gInfo = {
+      email: gInfoJson?.email,
+      name: gInfoJson?.name,
+      photo: gInfoJson?.picture,
+      gtoken: accessToken,
+      phone: undefined
+    }
+    return gInfo;
   }
-  /*
-   const validateLogin = async () => {
-     const userInfoFromCache = await AsyncStorage.getItem("userInfo");
-     //const userInfoFromCache = "{\"email\": \"rejithramakrishnan@gmail.com\",\"name\": \"Rejith\"}"
-     //const userInfoFromCache = "{\"email\": \"test@babu.com\",\"name\": \"Test\"}"
-     console.log(userInfoFromCache)
-     if (userInfoFromCache) {
-       setUserInfo(JSON.parse(userInfoFromCache))
-       registerMember(JSON.parse(userInfoFromCache))
-     } else {
-       console.log("going to google auth")
-       gettUserInfo()
-     }
-   }
- 
-   const registerMember = (userInfoFromCache: any) => {
-     setLoading(true)
-     authenticateMember(userInfoFromCache.email, userInfoFromCache.gtoken)
-       .then(response => {
-         if (response.data?.isRegistered === 1) {
-           console.log("User is registered", response.data)
-           setUserInfo({...userInfoFromCache,...response.data})
-           router.replace('/(main)')
-         } else if (response.data?.isRegistered === 0) {
-           const memberInfo = {...response.data, photo: userInfoFromCache.photo}
-           router.replace(`/(auth)/verify?memberInfo=${JSON.stringify(memberInfo)}`)
-         } else {
-           setUserInfo(userInfoFromCache)
-           router.replace(`/(main)/(members)/addmember?createMember=true&name=${userInfoFromCache.name}&email=${userInfoFromCache.email}`)
-         }
-       })
-       .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
-       .finally(() => setLoading(false))
-   }
- 
-   const gettUserInfo = async () => {
-     setLoading(true)
-     const url = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
-     try {
-       if (response?.type == "success") {
-         console.log("response", response)
-         const userInfoResponse = await fetch(url + response?.authentication?.accessToken);
-         const userInfoJson = await userInfoResponse.json();
-         const userInfo = {
-           email: userInfoJson?.email,
-           name: userInfoJson?.name,
-           photo: userInfoJson?.picture,
-           gtoken: response?.authentication?.accessToken,
-           phone: undefined
-         }
-         await AsyncStorage.setItem("userInfo", JSON.stringify(userInfo))
-         registerMember(userInfo)
-       } else if (response) {
-         throw "Authentication error. Try again. " + JSON.stringify(response)
-       }
-     } catch (error) {
-       throw "Authentication error. Try again. " + JSON.stringify(error)
-     } finally {
-       setLoading(false)
-     }
-   }
- */
+  
   return (
     <ThemedView style={{ flex: 1 }}>
       <View style={appStyles.centerify}>

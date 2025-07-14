@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
 import { getClubCounts, getFundBalance, getTotalDue } from '@/src/helpers/club_helper'
 import { FlatList, GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { router } from 'expo-router'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { ClubContext } from '@/src/context/ClubContext'
@@ -20,6 +20,7 @@ import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 import { useHttpGet } from '@/src/hooks/use-http'
 import Card from '@/src/components/Card'
 import CircularProgress from '@/src/components/charts/CircularProgress'
+import FloatingMenu from '@/src/components/FloatingMenu'
 
 const ClubHome = () => {
     const router = useRouter()
@@ -103,6 +104,19 @@ const ClubHome = () => {
         })
     }
 
+    const handleDeleteClub = () => {
+        setAlertConfig({
+            visible: true,
+            title: 'Delete Club',
+            message: 'Are you sure you want to delete this club? This action cannot be undone.',
+            buttons: [{
+                text: 'OK', onPress: () => {
+                    setAlertConfig({ visible: false });
+                    router.dismissTo('/(main)');
+                }
+            }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+        });
+    }
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
@@ -187,7 +201,7 @@ const ClubHome = () => {
                             ItemSeparatorComponent={() => <Spacer hspace={4} />}
                             renderItem={({ item }) => (
                                 <TouchableOpacity onPress={() => showAdhocFeeDetails(item)}>
-                                    <Card style={{minHeight:100}}>
+                                    <Card style={{ minHeight: 100 }}>
                                         <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
                                         <ThemedText style={{ fontSize: 10 }}>{item.clubAdhocFeeDesc}</ThemedText>
                                         <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10, alignItems: "center", minWidth: 100 }}>
@@ -197,8 +211,8 @@ const ClubHome = () => {
                                                 <ThemedText style={{ fontSize: 10, textAlign: "right" }}>{item.clubAdhocFeeDate}</ThemedText>
                                             </View>
                                         </View>
-                                    </Card> 
-                                    <Spacer hspace={0} />                                     
+                                    </Card>
+                                    <Spacer hspace={0} />
                                 </TouchableOpacity>
                             )}
                             ListFooterComponent={() =>
@@ -206,7 +220,7 @@ const ClubHome = () => {
                                     {params.get("role") == ROLE_ADMIN && <TouchableOpacity
                                         onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
                                         <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
-                                    </TouchableOpacity>}                                  
+                                    </TouchableOpacity>}
                                 </View>
                             }
                             horizontal
@@ -216,18 +230,18 @@ const ClubHome = () => {
                     <Spacer space={20} />
                 </ScrollView>
                 {alertConfig?.visible && <Alert {...alertConfig} />}
-                {/* <FloatingMenu actions={actions} position={"left"} color='black'
+                {/*<FloatingMenu actions={actions} position={"left"} color='black'
                     icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-                    onPressItem={(name: string | undefined) => handleMenuPress(name)}
-                /> */}
+                    onPressItem={(name: string | undefined) => handleMenuPress(name, handleDeleteClub)}
+                />*/}
             </GestureHandlerRootView>
         </ThemedView>
     )
 }
 
-const handleMenuPress = (name: string | undefined) => {
-    if (name == "attendance") {
-        router.push(`/(main)/(clubs)/(attendance)`)
+const handleMenuPress = (name: string | undefined, handleDeleteClub: any) => {
+    if (name == "delete") {
+        handleDeleteClub();
     } else if (name == "members") {
         router.push(`/(main)/(members)`)
     } else if (name == "transactions") {
@@ -247,9 +261,9 @@ const actions = [
     // },
     {
         color: "black",
-        text: "Memebers",
-        icon: <MaterialCommunityIcons name={"account-circle"} size={15} color={"white"} />,
-        name: "members",
+        text: "Delete Club",
+        icon: <MaterialCommunityIcons name={"delete"} size={15} color={"red"} />,
+        name: "delete",
         position: 4
     }
 ];
