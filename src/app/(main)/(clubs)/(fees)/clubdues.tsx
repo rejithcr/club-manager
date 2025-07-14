@@ -1,6 +1,5 @@
-import { TouchableOpacity, View, FlatList, StyleSheet } from 'react-native';
+import { TouchableOpacity, View, FlatList, StyleSheet, ScrollView } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react'
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { getClubDues } from '@/src/helpers/club_helper';
 import { ClubContext } from '@/src/context/ClubContext';
@@ -33,7 +32,7 @@ const ClubDues = () => {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <GestureHandlerRootView>
+      <ScrollView>
         <Spacer space={5} />
         {isLoading && <LoadingSpinner />}
         <View style={{ width: "85%", alignSelf: "center" }}>
@@ -47,7 +46,7 @@ const ClubDues = () => {
         </View>        
         {alertConfig?.visible && <Alert {...alertConfig}/>}
         {/* <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => null} /> */}
-      </GestureHandlerRootView>
+      </ScrollView>
     </ThemedView>
   )
 }

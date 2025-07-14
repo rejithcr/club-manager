@@ -1,9 +1,9 @@
-import { View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import Spacer from '@/src/components/Spacer'
 import ThemedButton from '@/src/components/ThemedButton'
-import { Member, getMemberDetails, regirsterMember, saveMemberDetails } from '@/src/helpers/member_helper'
+import { Member, getMemberDetails, saveMemberDetails } from '@/src/helpers/member_helper'
 import { useSearchParams } from 'expo-router/build/hooks'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import ThemedView from '@/src/components/themed-components/ThemedView'
@@ -97,7 +97,7 @@ const Editmember = () => {
         <ThemedView style={{ flex: 1 }}>
             {isMemberLoading && <LoadingSpinner />}
             {!isMemberLoading &&
-                <View>
+                <ScrollView>
                     <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
                     <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                     <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
@@ -121,8 +121,9 @@ const Editmember = () => {
                             </TouchableCard>
                             <Spacer space={4} />
                         </View>
-                    )}
-                </View>}
+                    )}                    
+                    <Spacer space={10} />
+                </ScrollView>}
             {alertConfig?.visible && <Alert {...alertConfig} />}
         </ThemedView>
     )
