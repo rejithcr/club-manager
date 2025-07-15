@@ -86,7 +86,7 @@ const FeeTypeDetails = () => {
 
 
     const offset = useRef(0)
-    const limit = 20
+    const limit = 12
     const [hasMoreData, setHasMoreData] = useState(false)
     const [isFectching, setIsFetching] = useState(false)
     
