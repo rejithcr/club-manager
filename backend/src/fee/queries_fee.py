@@ -217,7 +217,8 @@ GET_FEE_COLLECTION_BY_FEE_TYPE_ID = """
                                            s.club_fee_type_period, \
                                            s.club_fee_type_date,
                                            sum(s.club_fee_payment_amount)::REAL          total, \
-                                           sum(s.paid * s.club_fee_payment_amount)::REAL collected
+                                           sum(s.paid * s.club_fee_payment_amount)::REAL collected,
+                                           sum(s.paid * s.club_fee_payment_amount)/sum(s.club_fee_payment_amount)*100 as percentage
                                     from (select cfc.club_fee_collection_id, \
                                                  cfc.club_fee_type_period, \
                                                  to_char(cfc.club_fee_type_date, 'YYYY-MM-DD') club_fee_type_date, \
@@ -228,7 +229,7 @@ GET_FEE_COLLECTION_BY_FEE_TYPE_ID = """
                                                               on cfc.club_fee_collection_id = cfp.club_fee_collection_id \
                                           where cfc.club_fee_type_id = %s) s
                                     group by s.club_fee_collection_id, s.club_fee_type_period, s.club_fee_type_date
-                                    order by collected, club_fee_type_date desc \
+                                    order by percentage, club_fee_type_date desc \
                                     limit %s offset %s 
                                     """
 
