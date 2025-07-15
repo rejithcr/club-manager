@@ -170,7 +170,7 @@ const Payments = () => {
                 </Modal>
                 <Modal isVisible={isEditVisible}>
                     <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
-                        <ThemedText style={appStyles.heading}>Update Payment Details</ThemedText>
+                        <ThemedText style={appStyles.heading}>Update Split Details</ThemedText>
                         <InputText
                             onChangeText={(text: string) => setFeeName(text)}
                             label={`Fee Name`}

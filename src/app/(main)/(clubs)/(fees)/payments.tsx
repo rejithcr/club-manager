@@ -107,8 +107,8 @@ const Payments = () => {
                         <FlatList style={{ width: "100%" }}
                             data={feeByMembers}
                             initialNumToRender={8}
-                            ListFooterComponent={() => <Spacer space={4} />}
-                            ItemSeparatorComponent={() => <Spacer space={40} />}
+                            ListFooterComponent={() => <Spacer space={40} />}
+                            ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
                             )}
