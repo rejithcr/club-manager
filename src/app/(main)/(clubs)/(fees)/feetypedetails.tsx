@@ -1,10 +1,9 @@
-import { View, Text, TouchableOpacity, FlatList } from 'react-native'
-import React, { useCallback, useContext, useEffect, useState } from 'react'
+import { View, TouchableOpacity, FlatList, RefreshControl } from 'react-native'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks'
 import ThemedButton from '@/src/components/ThemedButton'
 import { appStyles } from '@/src/utils/styles'
 import { getExceptionTypes, getCollectionsOfFeeType } from '@/src/helpers/fee_helper'
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { router, useFocusEffect } from 'expo-router'
@@ -18,9 +17,10 @@ import { useTheme } from '@/src/hooks/use-theme'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import { ClubContext } from '@/src/context/ClubContext'
 import ProgressBar from '@/src/components/charts/ProgressBar'
+import Alert, { AlertProps } from '@/src/components/Alert'
 
 const FeeTypeDetails = () => {
-    const [isLoading, setIsLoading] = useState(false)
+    const [isExceptionTypesLoading, setIsExceptionTypesLoading] = useState(false)
     const [showAddException, setShowAddException] = useState(false)
     const [fee, setFee] = useState<any>()
     const [exceptionTypes, setExceptionTypes] = useState<[{}]>()
@@ -28,38 +28,21 @@ const FeeTypeDetails = () => {
     const [isFeeCollectionsLoading, setIsFeeCollectionsLoading] = useState(false)
     const { colors } = useTheme();
     const { clubInfo } = useContext(ClubContext)
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const params = useSearchParams()
 
     const feeObj = JSON.parse(params.get('fee') || "")
 
     const setExceptionTypesValue = () => {
+        setIsExceptionTypesLoading(true)
         getExceptionTypes(feeObj.clubFeeTypeId)
             .then(response => {
                 console.log(response.data)
                 setExceptionTypes(response.data)
             })
             .catch((error) => alert(error?.message))
-            .finally(() => setIsLoading(false))
+            .finally(() => setIsExceptionTypesLoading(false))
     }
-
-    const setFeeCollectionsValue = () => {
-        setIsFeeCollectionsLoading(true)
-        getCollectionsOfFeeType(feeObj.clubFeeTypeId, "true")
-            .then(response => {
-                console.log(response.data)
-                setFeeCollections(response.data)
-            })
-            .catch((error) => alert(error?.message))
-            .finally(() => setIsFeeCollectionsLoading(false))
-    }
-
-    useFocusEffect(
-        useCallback(() => {
-            setFeeCollectionsValue()
-            setExceptionTypesValue()
-            return () => { console.log('Screen is unfocused'); };
-        }, [])
-    );
 
     useEffect(() => {
         setFee(feeObj)
@@ -100,6 +83,52 @@ const FeeTypeDetails = () => {
             }
         })
     }
+
+
+    const offset = useRef(0)
+    const limit = 20
+    const [hasMoreData, setHasMoreData] = useState(false)
+    const [isFectching, setIsFetching] = useState(false)
+    
+    useFocusEffect(
+        useCallback(() => {
+            onRefresh()
+            setExceptionTypesValue()
+            return () => { console.log('Screen is unfocused'); };
+        }, [])
+    );
+
+    const fetchNextPage = () => {
+        if (hasMoreData && !isFectching) {
+            setIsFetching(true)
+            offset.current = offset.current + limit
+            getCollectionsOfFeeType(feeObj.clubFeeTypeId, "true", limit, offset.current)
+                .then(response => {
+                    setHasMoreData(response.data?.length > 0);
+                    setFeeCollections((prev: any) => [...prev, ...response.data])
+                })
+                .catch(error => setAlertConfig({
+                    visible: true, title: 'Error', message: error.response.data.error,
+                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+                }))
+                .finally(() => setIsFetching(false))
+        }
+    }
+    const onRefresh = () => {
+        setIsFeeCollectionsLoading(true)
+        offset.current = 0
+        getCollectionsOfFeeType(feeObj.clubFeeTypeId, "true", limit, offset.current)
+            .then(response => {
+                setHasMoreData(response.data?.length > 0);
+                setFeeCollections(response.data);
+            })
+            .catch(error => setAlertConfig({
+                visible: true, title: 'Error', message: error.response.data.error,
+                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+            }))
+            .finally(() => setIsFeeCollectionsLoading(false))
+    }
+    
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
@@ -129,9 +158,10 @@ const FeeTypeDetails = () => {
                         </TouchableOpacity>}
                     </View>
                     {showAddException && <View style={{ width: "95%", alignSelf: "center" }}>
-                        {(!exceptionTypes?.length || exceptionTypes?.length < 1) &&
+                        {isExceptionTypesLoading && <LoadingSpinner />}
+                        {!isExceptionTypesLoading && (!exceptionTypes?.length || exceptionTypes?.length < 1) &&
                             <ThemedText style={{ alignSelf: "center", width: "80%" }}>No exceptions present for this fee type. You can add exceptions by pressing the + icon above. With this feature you can configure special fees for some members for this fee type (eg. in case of leave)</ThemedText>}
-                        {exceptionTypes?.map((et: any) =>
+                        {!isExceptionTypesLoading && exceptionTypes?.map((et: any) =>
                             <View key={et.clubFeeTypeExceptionId}><KeyValueTouchableBox edit onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
                                 keyName={et.clubFeeTypeExceptionReason} keyValue={`Rs. ${et.clubFeeExceptionAmount}`} />
                                 <Spacer space={4} />
@@ -148,13 +178,16 @@ const FeeTypeDetails = () => {
                     {!isFeeCollectionsLoading && feeCollections &&
                         <FlatList style={{ width: "100%" }}
                             data={feeCollections}
-                            initialNumToRender={8}
-                            ListFooterComponent={() => <Spacer space={4} />}
+                            initialNumToRender={20}
+                            onEndReached={fetchNextPage}
+                            onEndReachedThreshold={0.2}
+                            refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
+                            ListFooterComponent={() => isFectching && <><Spacer space={10} /><LoadingSpinner /></> || <Spacer space={4} />}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <TouchableCard onPress={() => gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod, item.collected, item.total)} id={item}>
                                     <View style={{
-                                        flexDirection: "row", width: "90%", 
+                                        flexDirection: "row", width: "90%",
                                         justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
                                     }}>
                                         <View style={{ width: "50%" }}>
@@ -190,10 +223,12 @@ const FeeTypeDetails = () => {
                     <ThemedButton title='Cancel' onPress={() => setIsSelectPeriodVisible(false)}/>
                     </View>
                 </View>
-            </Modal>  */}
+            </Modal> */}
+                {alertConfig?.visible && <Alert {...alertConfig} />}
             </GestureHandlerRootView>
         </ThemedView>
     )
 }
 
-export default FeeTypeDetails
+export default FeeTypeDetails;
+

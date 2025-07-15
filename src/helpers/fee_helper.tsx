@@ -43,8 +43,8 @@ export const deleteFeeCollection = (clubFeeCollectionId: string | null, email: s
     return del("/fee/collection", { clubFeeCollectionId, email }, null)
 }
 
-export const getCollectionsOfFeeType = (feeTypeId: string | null, listCollectionsOfFeetType: string) => {
-    return get("/fee/collection", { feeTypeId, listCollectionsOfFeetType })
+export const getCollectionsOfFeeType = (feeTypeId: string | null, listCollectionsOfFeetType: string, limit: number, offset: number) => {
+    return get("/fee/collection", { feeTypeId, listCollectionsOfFeetType, limit, offset })
 }
 
 
