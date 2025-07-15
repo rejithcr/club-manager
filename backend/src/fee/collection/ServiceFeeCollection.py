@@ -9,6 +9,8 @@ class FeeCollectionService():
         listNextPeriods = params.get("listNextPeriods")
         listCollectionsOfFeetType = params.get("listCollectionsOfFeetType")
         listPayments = params.get("listPayments")
+        limit = params.get("limit")
+        offset = params.get("offset")
 
         if listNextPeriods and listNextPeriods == "true":
             latestPeriod = db.fetch_one(conn, queries_fee.GET_LATEST_COLLECTION_PERIOD, (feeTypeId, feeTypeId))
@@ -29,7 +31,7 @@ class FeeCollectionService():
             return [helper.convert_to_camel_case(item) for item in nextList]
 
         if listCollectionsOfFeetType and listCollectionsOfFeetType == "true":
-            collectionList = db.fetch(conn, queries_fee.GET_FEE_COLLECTION_BY_FEE_TYPE_ID, (feeTypeId,))
+            collectionList = db.fetch(conn, queries_fee.GET_FEE_COLLECTION_BY_FEE_TYPE_ID, (feeTypeId, limit, offset))
             return [helper.convert_to_camel_case(item) for item in collectionList]
 
         if listPayments and listPayments == "true":

@@ -229,6 +229,7 @@ GET_FEE_COLLECTION_BY_FEE_TYPE_ID = """
                                           where cfc.club_fee_type_id = %s) s
                                     group by s.club_fee_collection_id, s.club_fee_type_period, s.club_fee_type_date
                                     order by collected, club_fee_type_date desc \
+                                    limit %s offset %s 
                                     """
 
 GET_FEE_PAYMENT_BY_FEE_COLLECTION_ID = """
