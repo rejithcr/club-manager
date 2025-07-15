@@ -108,12 +108,11 @@ const Payments = () => {
                             data={feeByMembers}
                             initialNumToRender={8}
                             ListFooterComponent={() => <Spacer space={4} />}
-                            ItemSeparatorComponent={() => <Spacer space={4} />}
+                            ItemSeparatorComponent={() => <Spacer space={40} />}
                             renderItem={({ item }) => (
                                 <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
                             )}
                         />}
-                    <Spacer space={35} />
                 </View>
                 <Modal isVisible={isConfirmVisible}>
                     <ScrollView>

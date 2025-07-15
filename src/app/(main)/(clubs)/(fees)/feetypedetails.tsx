@@ -182,7 +182,7 @@ const FeeTypeDetails = () => {
                             onEndReached={fetchNextPage}
                             onEndReachedThreshold={0.2}
                             refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
-                            ListFooterComponent={() => isFectching && <><Spacer space={10} /><LoadingSpinner /></> || <Spacer space={4} />}
+                            ListFooterComponent={() => isFectching && <><Spacer space={10} /><LoadingSpinner /></> || <Spacer space={40} />}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <TouchableCard onPress={() => gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod, item.collected, item.total)} id={item}>
@@ -202,7 +202,6 @@ const FeeTypeDetails = () => {
                             )}
                         />
                     }
-                    <Spacer space={35} />
                 </View>
                 {clubInfo.role === ROLE_ADMIN &&
                     <ThemedButton style={{ position: "absolute", bottom: 20, alignSelf: "center" }} title='Start new collection' onPress={showStartCollectionPage} />

@@ -117,13 +117,12 @@ const StartNextPeriod = () => {
                         <FlatList style={{ width: "100%" }}
                             data={nextPeriodFee}
                             initialNumToRender={8}
-                            ListFooterComponent={() => <Spacer space={4} />}
+                            ListFooterComponent={() => <Spacer space={40} />}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <MemberFeeItem {...item} key={item.memberId} />
                             )}
                         />}
-                    <Spacer space={35} />
                 </View>
                 <Modal isVisible={isConfirmVisible}>
                     <View style={{ backgroundColor: "white" }}>
