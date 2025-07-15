@@ -83,3 +83,7 @@ export const saveAdhocFeePayments = (paymentStatusUpadtes: any | undefined, club
 export const deleteAdhocFeeCollection = (clubAdhocFeeId: string | null, email: string) => {
     return del("/fee/adhoc", { clubAdhocFeeId, email }, null)
 }
+
+export const editeAdhocFee= (clubAdhocFeeId: string | null, adhocFeeName: any, adhocFeeDesc: any, adhocFeeDate: Date, email: string) => {
+    return put("/fee/adhoc", null, { clubAdhocFeeId, updateFee: "true", adhocFeeName, adhocFeeDesc, adhocFeeDate, email })
+}

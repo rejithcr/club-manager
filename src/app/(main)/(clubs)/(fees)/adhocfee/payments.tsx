@@ -1,7 +1,7 @@
 import { View, FlatList, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
-import { deleteAdhocFeeCollection, getAdhocFeePayments, saveAdhocFeePayments } from '@/src/helpers/fee_helper';
+import { deleteAdhocFeeCollection, editeAdhocFee, getAdhocFeePayments, saveAdhocFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles, colors } from '@/src/utils/styles';
@@ -21,6 +21,8 @@ import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
 import { ROLE_ADMIN } from '@/src/utils/constants';
 import Alert, { AlertProps } from '@/src/components/Alert';
 import CircularProgress from '@/src/components/charts/CircularProgress';
+import InputText from '@/src/components/InputText';
+import DatePicker from '@/src/components/DatePicker';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -91,6 +93,26 @@ const Payments = () => {
         });
     }
 
+    const [isEditVisible, setIsEditVisible] = useState(false)
+    const [feeName, setFeeName] = useState(feeObj?.clubAdhocFeeName)
+    const [feeDescription, setFeeDescription] = useState(feeObj?.clubAdhocFeeDesc)
+    const [feeDate, setFeeDate] = useState(new Date(feeObj?.clubAdhocFeeDate))
+
+    const handleEdit = () => {
+        setIsEditVisible(false)
+        setIsLoading(true)
+        editeAdhocFee(feeObj?.clubAdhocFeeId, feeName, feeDescription, feeDate, userInfo.email)
+            .then(response => setAlertConfig({
+                visible: true, title: 'Success', message: response.data.message,
+                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+            }))
+            .catch(error => setAlertConfig({
+                visible: true, title: 'Error', message: error.response.data.error,
+                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+            }))
+            .finally(() => setIsLoading(false));
+    }
+
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
@@ -100,12 +122,16 @@ const Payments = () => {
                     justifyContent: "space-between", alignSelf: "center"
                 }}>
                     <View>
-                        <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>{feeObj?.clubAdhocFeeName}</ThemedText>
-                        <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeObj?.clubAdhocFeeDesc}</ThemedText>
+                        <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => setIsEditVisible(true)}>
+                            <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>{feeName}</ThemedText>
+                            <Spacer hspace={2} />
+                            <ThemedIcon name='MaterialCommunityIcons:square-edit-outline' size={12}/>                   
+                        </TouchableOpacity>    
+                        <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeDescription}</ThemedText>
                     </View>
                     <View>
                         <ThemedText style={{ textAlign: "right" }}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
-                        <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeObj?.clubAdhocFeeDate}</ThemedText>
+                        <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeDate.toDateString()}</ThemedText>
                     </View>
                 </View>
                 <Spacer space={5} />
@@ -141,6 +167,26 @@ const Payments = () => {
                             </View>
                         </ThemedView>
                     </ScrollView>
+                </Modal>
+                <Modal isVisible={isEditVisible}>
+                    <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+                        <ThemedText style={appStyles.heading}>Update Payment Details</ThemedText>
+                        <InputText
+                            onChangeText={(text: string) => setFeeName(text)}
+                            label={`Fee Name`}
+                            defaultValue={feeName}
+                        />
+                        <InputText
+                            onChangeText={(text: string) => setFeeDescription(text)}
+                            label={`Description`}
+                            defaultValue={feeDescription}
+                        />
+                        <DatePicker date={feeDate} setDate={setFeeDate} label='Date'/>
+                        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                            <ThemedButton title="Update" onPress={() => handleEdit()} />
+                            <ThemedButton title="Cancel" onPress={() => setIsEditVisible(false)} />
+                        </View>
+                    </ThemedView>
                 </Modal>
                 {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30 }}>
                     <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />

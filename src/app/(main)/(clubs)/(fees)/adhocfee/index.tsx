@@ -82,7 +82,6 @@ const AdocFeesHome = () => {
           justifyContent: "space-between", alignSelf: "center", marginTop: 10
         }}>
           <ThemedHeading style={{ width: 200 }}>Expense Splits</ThemedHeading>
-
           <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
             {clubInfo.role == ROLE_ADMIN && <TouchableOpacity
               onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>

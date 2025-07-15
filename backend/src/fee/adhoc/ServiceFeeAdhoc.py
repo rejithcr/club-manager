@@ -41,7 +41,18 @@ class FeeAdhocService():
         clubId = params.get("clubId")
         email = params.get("email")
         paymentStatusUpadtes = params.get("paymentStatusUpadtes")
+        updateFee = params.get("updateFee")
+        clubAdhocFeeId = params.get("clubAdhocFeeId")
+        adhocFeeDate = params.get("adhocFeeDate")
+        adhocFeeDesc = params.get("adhocFeeDesc")
+        adhocFeeName = params.get("adhocFeeName")
         club_transaction_id = None
+        if updateFee:
+            db.execute(conn, queries_fee.UPDATE_FEE_ADHOC,
+                       (adhocFeeName, adhocFeeDesc, adhocFeeDate, email, clubAdhocFeeId))
+            conn.commit()
+            return {"message": "Fee updated."}
+
         for item in paymentStatusUpadtes:
             if item["paid"]:
                 # club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_SEQ_NEXT_VAL, None)['nextval']
