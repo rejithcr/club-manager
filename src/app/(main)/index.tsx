@@ -4,7 +4,7 @@ import FloatingMenu from '@/src/components/FloatingMenu';
 import FeeSummary from './dues';
 import { useContext } from 'react';
 import { UserContext } from '../../context/UserContext';
-import {  MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import MyClubs from './myclubs';
 import { router } from 'expo-router';
@@ -13,22 +13,23 @@ import { useHttpGet } from '@/src/hooks/use-http';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import Spacer from '@/src/components/Spacer';
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 const Main = () => {
-  const router = useRouter()  
+  const router = useRouter()
   const { userInfo } = useContext(UserContext)
-  const { 
-    data: duesByMember, 
-    isLoading: isLoadingMemberDues, 
-    refetch: refetchMemberDues 
-  } = useHttpGet("/club/member", {memberId: userInfo?.memberId, duesByMember: "true"})
-  const { 
-    data: clubs, 
-    isLoading: isLoadingMyClubs, 
-    refetch: refetchClubs 
-  } = useHttpGet("/club", {memberId: userInfo?.memberId})
-  
+  const {
+    data: duesByMember,
+    isLoading: isLoadingMemberDues,
+    refetch: refetchMemberDues
+  } = useHttpGet("/club/member", { memberId: userInfo?.memberId, duesByMember: "true" })
+  const {
+    data: clubs,
+    isLoading: isLoadingMyClubs,
+    refetch: refetchClubs,
+  } = useHttpGet("/club", { memberId: userInfo?.memberId })
+
   const onRefresh = () => {
     refetchMemberDues()
     refetchClubs()
@@ -41,21 +42,23 @@ const Main = () => {
   }
 
   return (
-    <ThemedView style={{flex: 1}}>      
-      <Spacer space={5} />
-      <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
-        <ThemedHeading>My Clubs</ThemedHeading>
-        {isLoadingMyClubs && <LoadingSpinner />}
-        {!isLoadingMemberDues && <MyClubs clubs={clubs} />}
+    <ThemedView style={{ flex: 1 }}>
+      <GestureHandlerRootView>
+        <Spacer space={5} />
+        <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
+          <ThemedHeading>My Clubs</ThemedHeading>
+          {isLoadingMyClubs && <LoadingSpinner />}
+          {!isLoadingMemberDues && <MyClubs clubs={clubs} />}
 
-        {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading> }
-        {isLoadingMemberDues && <LoadingSpinner />}
-        {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
-        {/* <UpcomingMatches memberEmail={userInfo?.email} />
+          {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
+          {isLoadingMemberDues && <LoadingSpinner />}
+          {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
+
+          {/*<UpcomingMatches memberEmail={userInfo?.email} />
         <UpcomingEvents memberEmail={userInfo?.email} /> */}
-        <Spacer space={50} />
-      </ScrollView >
-
+          <Spacer space={50} />
+        </ScrollView >
+      </GestureHandlerRootView>
       <FloatingMenu actions={actions} position={"left"} color='black'
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
         onPressItem={(name: string | undefined) => handleMenuPress(name, handleLogout)}
@@ -74,7 +77,7 @@ const handleMenuPress = (name: string | undefined, handleLogout: { (): void }) =
     handleLogout()
   } else if (name == "profile") {
     router.push(`/(main)/(profile)`)
-  }else {
+  } else {
     throw ("Error")
   }
 }

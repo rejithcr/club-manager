@@ -101,18 +101,19 @@ const Payments = () => {
                     <ThemedText style={{ fontSize: 10 }}>Select the member to update payment status</ThemedText>
                 </View>
                 <Spacer space={5} />
-                <View>
+                <View style={{ flex: 1 }}>
                     {isLoading && <LoadingSpinner />}
                     {!isLoading &&
                         <FlatList style={{ width: "100%" }}
                             data={feeByMembers}
                             initialNumToRender={8}
-                            ListFooterComponent={() => <Spacer space={80} />}
+                            ListFooterComponent={() => <Spacer space={4} />}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
                             )}
                         />}
+                    <Spacer space={35} />
                 </View>
                 <Modal isVisible={isConfirmVisible}>
                     <ScrollView>

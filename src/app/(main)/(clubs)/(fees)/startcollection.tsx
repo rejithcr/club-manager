@@ -111,18 +111,19 @@ const StartNextPeriod = () => {
 
                     </View>
                 </View>
-                <View style={{ height: "100%" }}>
+                <View style={{ flex: 1 }}>
                     {isLoadingPeriods && <LoadingSpinner />}
                     {!isLoadingPeriods &&
                         <FlatList style={{ width: "100%" }}
                             data={nextPeriodFee}
                             initialNumToRender={8}
-                            ListFooterComponent={() => <Spacer space={80}/>}
+                            ListFooterComponent={() => <Spacer space={4} />}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <MemberFeeItem {...item} key={item.memberId} />
                             )}
                         />}
+                    <Spacer space={35} />
                 </View>
                 <Modal isVisible={isConfirmVisible}>
                     <View style={{ backgroundColor: "white" }}>
@@ -130,9 +131,7 @@ const StartNextPeriod = () => {
                         <Button title="Hide modal" onPress={() => setIsConfirmVisible(false)} />
                     </View>
                 </Modal>
-                <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30 }}>
-                    {!isLoadingPeriods && <ThemedButton title='Start Collection' onPress={handleStartCollection} disabled={!isStartCollectionEnabled} />}
-                </View>
+                {!isLoadingPeriods && <ThemedButton style={{ position: "absolute", bottom: 20, alignSelf: "center" }} title='Start Collection' onPress={handleStartCollection} disabled={!isStartCollectionEnabled} />}
             </GestureHandlerRootView>
         </ThemedView>
     )

@@ -27,13 +27,9 @@ const FeeSummary = (props: { duesByMember: ClubDueType[] }) => {
   return (
     <ThemedView>
       {props.duesByMember?.length == 0 ? <ThemedText style={{ textAlign: "center" }}>Yay!! You are all clear 👏</ThemedText> :
-        <FlatList
-          data={props.duesByMember}
-          keyExtractor={(item) => item.clubId}
-          ItemSeparatorComponent={() => <Spacer space={4} />}
-          ListFooterComponent={() => <Spacer space={4} />}
-          renderItem={({ item }) => <ClubDue club={item} />}
-        />}
+      props.duesByMember.map(item => {
+        return <View key={item.clubId}><Spacer space={4} /><ClubDue club={item} /></View>
+      })}
     </ThemedView>
   )
 }

@@ -140,7 +140,7 @@ const FeeTypeDetails = () => {
                     </View>
                     }
                 </View>
-                <View style={{ height: 450 }}>
+                <View style={{ flex: 1 }}>
                     <ThemedText style={appStyles.heading}>Collections</ThemedText>
                     {isFeeCollectionsLoading && <LoadingSpinner />}
                     {!isFeeCollectionsLoading && feeCollections.length == 0 &&
@@ -149,11 +149,12 @@ const FeeTypeDetails = () => {
                         <FlatList style={{ width: "100%" }}
                             data={feeCollections}
                             initialNumToRender={8}
+                            ListFooterComponent={() => <Spacer space={4} />}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <TouchableCard onPress={() => gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod, item.collected, item.total)} id={item}>
                                     <View style={{
-                                        flexDirection: "row", width: "90%",
+                                        flexDirection: "row", width: "90%", 
                                         justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
                                     }}>
                                         <View style={{ width: "50%" }}>
@@ -168,11 +169,11 @@ const FeeTypeDetails = () => {
                             )}
                         />
                     }
+                    <Spacer space={35} />
                 </View>
                 {clubInfo.role === ROLE_ADMIN &&
-                    <View style={{ position: "absolute", bottom: 30, alignSelf: "center" }} >
-                        <ThemedButton title='Start new collection' onPress={showStartCollectionPage} />
-                    </View>}
+                    <ThemedButton style={{ position: "absolute", bottom: 20, alignSelf: "center" }} title='Start new collection' onPress={showStartCollectionPage} />
+                }
                 {/*  <Modal isVisible={isSelectPeriodVisible}>
                 <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
                     <Text style={appStyles.heading}>Select Period</Text>

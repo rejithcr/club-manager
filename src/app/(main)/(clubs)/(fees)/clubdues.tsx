@@ -23,7 +23,7 @@ const ClubDues = () => {
     setIsLoading(true);
     getClubDues(clubInfo.clubId)
       .then(response => { setDuesByMembers(response.data) })
-      .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+      .catch(error => setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }))
       .finally(() => setIsLoading(false));
   }
   useEffect(() => {
@@ -36,17 +36,13 @@ const ClubDues = () => {
         <Spacer space={5} />
         {isLoading && <LoadingSpinner />}
         <View style={{ width: "85%", alignSelf: "center" }}>
-          {!isLoading && <FlatList
-            data={duesByMembers}
-            keyExtractor={(item) => item.memberId.toString()}
-            ItemSeparatorComponent={() => <Spacer space={4} />}
-            ListFooterComponent={() => <Spacer space={4} />}
-            renderItem={({ item }) => <MemberDue key={item.memberId} member={item} />}
-          />}
-        </View>        
-        {alertConfig?.visible && <Alert {...alertConfig}/>}
-        {/* <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => null} /> */}
+          {!isLoading && duesByMembers?.map((item: any) => {
+            return <View key={item.memberId}><MemberDue key={item.memberId} member={item} /><Spacer space={4} /></View>
+          })}
+        </View>
       </ScrollView>
+      {alertConfig?.visible && <Alert {...alertConfig} />}
+      {/* <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => null} /> */}
     </ThemedView>
   )
 }
@@ -59,27 +55,25 @@ const MemberDue = (props: { member: any }) => {
   }
   return (
     <>
-      <ShadowBox style={{ width: "100%"}}>
+      <ShadowBox style={{ width: "100%" }}>
         <TouchableOpacity onPress={showMemberDues} style={{
           flexDirection: "row", width: "100%",
           justifyContent: "space-between", alignItems: "center"
         }}>
-          <View style={{flexDirection: "row",  width: "70%"}}>
-          <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
-          <Spacer hspace={5}/>
-          <ThemedText style={{fontSize: 15 }}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
+          <View style={{ flexDirection: "row", width: "70%" }}>
+            <ThemedIcon size={20} name={isShown ? 'MaterialCommunityIcons:chevron-down-circle' : 'MaterialCommunityIcons:chevron-right-circle'} color={colors.nav} />
+            <Spacer hspace={5} />
+            <ThemedText style={{ fontSize: 15 }}>{props?.member.firstName} {props?.member.lastName}</ThemedText>
           </View>
           <ThemedText style={{ width: "30%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}> Rs. {props?.member.totalDue} </ThemedText>
         </TouchableOpacity>
       </ShadowBox>
-      {isShown &&
-        <FlatList
-          data={props?.member.dues}
-          ListHeaderComponent={() => <Spacer space={2} />}
-          ListFooterComponent={() => <Spacer space={4} />}
-          renderItem={({ item }) => <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />}
-          ItemSeparatorComponent={() => <Divider />}
-        />
+      {isShown && props?.member.dues.map((item: any) => {
+        return <View key={item.paymentId.toString() + item.feeType} style={styles.item}>
+          <Divider />
+          <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />
+        </View>
+      })
       }
     </>
   )
@@ -89,7 +83,7 @@ export default ClubDues
 
 const MemberFeeItem = (props: { paymentId: number; fee: string; feeType: string, feeDesc: string, amount: number; }) => {
   return (
-    <View key={props.paymentId.toString() + props.feeType} style={styles.item}>      
+    <View key={props.paymentId.toString() + props.feeType} style={styles.item}>
       <View style={{ paddingVertical: 5 }}>
         <ThemedText style={styles.label}>{props?.fee} </ThemedText>
         <ThemedText style={styles.subLabel}>{props?.feeDesc} </ThemedText>
@@ -105,7 +99,7 @@ const styles = StyleSheet.create({
   item: {
     width: "95%",
     flexDirection: "row",
-    flexWrap: "wrap", alignSelf:"center",
+    flexWrap: "wrap", alignSelf: "center",
     alignItems: "center",
     justifyContent: "space-between"
   },
@@ -126,7 +120,7 @@ const styles = StyleSheet.create({
   divider: {
     borderBottomColor: 'rgba(136, 136, 136, 0.2)',
     borderBottomWidth: .75,
-    width: "85%", 
+    width: "85%",
     alignSelf: "center"
   }
 });
