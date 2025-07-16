@@ -3,13 +3,14 @@ create table club (
     club_name varchar(50) not null,
     description varchar(100),
     location varchar(50),
+    is_active smallint default 1, -- 1,0
     created_by varchar(100) not null,
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
     updated_ts timestamp  default now()
 );
 CREATE SEQUENCE club_id_seq START 1;
-ALTER TABLE public."member" ADD date_of_birth date NULL;
+
 create table member (
     member_id integer primary key,
     first_name varchar(50) not null,
@@ -24,7 +25,9 @@ create table member (
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
     updated_ts timestamp default now(),
-    last_accessed_on timestamp default now()
+    last_accessed_on timestamp default now(),
+    CONSTRAINT unique_email UNIQUE (email),
+    CONSTRAINT unique_phone UNIQUE (phone)
 );
 CREATE SEQUENCE member_id_seq START 1;
 

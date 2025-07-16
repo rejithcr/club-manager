@@ -8,16 +8,16 @@ GET_CLUB = """
 
 SEARCH_CLUB = """
     select club_id, club_name from club 
-    where upper(club_name) like %s 
+    where upper(club_name) like %s and is_active = 1
     limit 10
 """
 
 GET_CLUBS_BY_MEMBER = """ 
-    select c.club_id, c.club_name , r.role_id ,r.role_name
+    select c.club_id, c.club_name, c.description, c.location, r.role_id ,r.role_name
     from club c
         join membership ms on c.club_id=ms.club_id     
         join role r on ms.role_id = r.role_id      
-    where ms.member_id = %s and ms.is_active = 1
+    where ms.member_id = %s and ms.is_active = 1 and c.is_active = 1
 """
 GET_CLUB_MEMBER = """
     select m.first_name, m.last_name, m.email, m.phone, m.photo, m.is_registered, r.role_name role, m.updated_by, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth
@@ -49,6 +49,18 @@ GET_CLUB_SEQ_NEXT_VAL="select nextval('club_id_seq')"
 SAVE_CLUB = """
    insert into club (club_id, club_name, description, location, created_by, updated_by) values
     (%s, %s, %s, %s, %s, %s)
+"""
+
+UPDATE_CLUB = """
+    update club 
+    set club_name = %s, description=%s, location=%s, updated_by=%s
+    where club_id = %s
+"""
+
+MARK_CLUB_FOR_DELETION = """
+    update club 
+    set is_active=0, updated_by=%s
+    where club_id = %s
 """
 
 GET_TRANSACTIONS = """

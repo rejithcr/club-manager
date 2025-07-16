@@ -9,7 +9,9 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 const MyClubs = (props: { clubs: [] }) => {
   const router = useRouter()
 
-  const showDetails = (clubId: number, clubName: string, role: string) => router.push(`/(main)/(clubs)?clubId=${clubId}&clubName=${clubName}&role=${role}`)
+  const showDetails = (clubId: number, clubName: string, clubDesc: string, clubLocation: string, role: string) => {
+    router.push(`/(main)/(clubs)?clubId=${clubId}&clubName=${clubName}&clubDesc=${clubDesc}&clubLocation=${clubLocation}&role=${role}`)
+  }
 
   return (
     <ThemedView>
@@ -22,7 +24,7 @@ const MyClubs = (props: { clubs: [] }) => {
         </ThemedView>}
       {props.clubs?.map((item: any) =>
       <View key={item.clubId}>
-        <TouchableCard onPress={() => showDetails(item.clubId, item.clubName, item.roleName)} id={item.clubId}>          
+        <TouchableCard onPress={() => showDetails(item.clubId, item.clubName, item.description, item.location, item.roleName)} id={item.clubId}>          
             <ThemedText>{item.clubName}</ThemedText>
         </TouchableCard>
         <Spacer space={4}/>

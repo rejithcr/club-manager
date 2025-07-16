@@ -1,7 +1,7 @@
 import { View, GestureResponderEvent, TouchableOpacity, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'expo-router/build/hooks'
-import { getClubCounts, getFundBalance, getTotalDue } from '@/src/helpers/club_helper'
+import { deleteClub, getClubCounts, getTotalDue, updateClub } from '@/src/helpers/club_helper'
 import { FlatList, GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
 import { router } from 'expo-router'
@@ -21,6 +21,10 @@ import { useHttpGet } from '@/src/hooks/use-http'
 import Card from '@/src/components/Card'
 import CircularProgress from '@/src/components/charts/CircularProgress'
 import FloatingMenu from '@/src/components/FloatingMenu'
+import Modal from 'react-native-modal'
+import InputText from '@/src/components/InputText'
+import ThemedButton from '@/src/components/ThemedButton'
+import { UserContext } from '@/src/context/UserContext'
 
 const ClubHome = () => {
     const router = useRouter()
@@ -104,18 +108,9 @@ const ClubHome = () => {
         })
     }
 
-    const handleDeleteClub = () => {
-        setAlertConfig({
-            visible: true,
-            title: 'Delete Club',
-            message: 'Are you sure you want to delete this club? This action cannot be undone.',
-            buttons: [{
-                text: 'OK', onPress: () => {
-                    setAlertConfig({ visible: false });
-                    router.dismissTo('/(main)');
-                }
-            }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
-        });
+    const [isEditClubVisible, setIsEditClubVisible] = useState(false);
+    const handleEditClub = () => {
+        setIsEditClubVisible(true);
     }
     return (
         <ThemedView style={{ flex: 1 }}>
@@ -229,19 +224,29 @@ const ClubHome = () => {
                     }
                     <Spacer space={20} />
                 </ScrollView>
+
+                {isEditClubVisible && <EditClubModal
+                    clubId={params.get("clubId")}
+                    clubName={params.get("clubName")}
+                    clubDesc={params.get("clubDesc")}
+                    clubLocation={params.get("clubLocation")}
+                    isVisible={isEditClubVisible}
+                    onCancel={() => setIsEditClubVisible(false)} />}
+
                 {alertConfig?.visible && <Alert {...alertConfig} />}
-                {/*<FloatingMenu actions={actions} position={"left"} color='black'
+                <FloatingMenu actions={actions} position={"left"} color='black'
                     icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-                    onPressItem={(name: string | undefined) => handleMenuPress(name, handleDeleteClub)}
-                />*/}
+                    onPressItem={(name: string | undefined) => handleMenuPress(name, handleEditClub)}
+                />
+
             </GestureHandlerRootView>
         </ThemedView>
     )
 }
 
-const handleMenuPress = (name: string | undefined, handleDeleteClub: any) => {
-    if (name == "delete") {
-        handleDeleteClub();
+const handleMenuPress = (name: string | undefined, handleEditClub: any) => {
+    if (name == "edit") {
+        handleEditClub();
     } else if (name == "members") {
         router.push(`/(main)/(members)`)
     } else if (name == "transactions") {
@@ -261,11 +266,85 @@ const actions = [
     // },
     {
         color: "black",
-        text: "Delete Club",
-        icon: <MaterialCommunityIcons name={"delete"} size={15} color={"red"} />,
-        name: "delete",
+        text: "Edit Club",
+        icon: <MaterialCommunityIcons name={"square-edit-outline"} size={15} color={"white"} />,
+        name: "edit",
         position: 4
     }
 ];
 
-export default ClubHome
+export default ClubHome;
+
+
+const EditClubModal = ({ isVisible, onCancel, clubId, clubName, clubDesc, clubLocation }: {
+    isVisible: boolean, onCancel: (value: boolean) => void,
+    clubId: string | null, clubName: string | null, clubDesc: string | null, clubLocation: string | null
+}) => {
+    const [name, setClubName] = useState<string | null>(clubName);
+    const [desc, setClubDesc] = useState<string | null>(clubDesc);
+    const [location, setClubLocation] = useState<string | null>(clubLocation);
+    const { colors } = useTheme();
+    const { userInfo } = useContext(UserContext);
+    const [alertConfig, setAlertConfig] = useState<AlertProps>();
+    const [isUpdating, setIsUpdating] = useState(false);
+
+    const handleUpdate = () => {
+        setIsUpdating(true);
+        updateClub(clubId, name, desc, location, userInfo.email)
+            .then((response) => {
+                setAlertConfig({ visible: true, title: 'Success', message: response.data.message, buttons: [{ text: 'OK', onPress: () => { onCancel(false); setAlertConfig({ visible: false }) } }] });
+            })
+            .catch(error => {
+                setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] });
+            })
+            .finally(() => {
+                setIsUpdating(false);
+            });
+    }
+    const handleDelete = () => {
+
+        setAlertConfig({
+            visible: true,
+            title: 'Are you sure!',
+            message: 'This will delete the club. This cannot be recovered.',
+            buttons: [{
+                text: 'OK', onPress: () => {
+                    setAlertConfig({ visible: false });
+                    setIsUpdating(true);
+                    deleteClub(Number(clubId), userInfo.email)
+                        .then((response) => {
+                            router.dismissTo(`/(main)`);
+                            setAlertConfig({ visible: true, title: 'Success', message: response.data.message, buttons: [{ text: 'OK', onPress: () => { onCancel(false); setAlertConfig({ visible: false }) } }] });
+                        })
+                        .catch(error => {
+                            setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] });
+                        })
+                        .finally(() => {
+                            setIsUpdating(false);
+                        });
+                }
+            }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+        });
+
+
+    }
+    return (
+        <Modal isVisible={isVisible}>
+            {isUpdating && <LoadingSpinner />}
+            {!isUpdating &&
+                <ThemedView style={{ padding: 20, borderRadius: 5 }}>
+                    <ThemedHeading>Edit Club</ThemedHeading>
+                    <InputText label="Club Name" value={name} onChangeText={setClubName} />
+                    <InputText label="Description" value={desc} onChangeText={setClubDesc} />
+                    <InputText label="Location" value={location} onChangeText={setClubLocation} />
+                    <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
+                        <ThemedButton title="Save" onPress={() => handleUpdate()} />
+                        <ThemedButton title="Cancel" onPress={() => onCancel(false)} />
+                        <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => handleDelete()} color={colors.error} />
+                    </View>
+                </ThemedView>
+            }
+            {alertConfig?.visible && <Alert {...alertConfig} />}
+        </Modal>
+    )
+}

@@ -90,3 +90,11 @@ export const saveClubMemberAttributeValues = (clubId: any, memberId: number, upd
 export const getClubMemberAttributesReport = (clubId: number, clubMemberAttributeIds: number[]) => {
     return get("/club/report/memberattribute", { clubId, clubMemberAttributeIds:  clubMemberAttributeIds.join(',') })
 }
+
+export const updateClub = (clubId: string | null, clubName: string | null, clubDescription: string | null, location: string | null, email: string) => {
+    return put("/club", null, {clubId, clubName, clubDescription, location, email})
+}
+
+export const deleteClub = async (clubId: number | null, email: string) => {
+    return del("/club", {clubId, email}, null)
+}

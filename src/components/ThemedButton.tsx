@@ -16,6 +16,7 @@ export default ThemedButton;
 
 const styles = StyleSheet.create({
     button: {
+        minWidth:80,
         height: 40,
         alignSelf: "center",
         justifyContent: "center",

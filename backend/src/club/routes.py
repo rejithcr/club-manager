@@ -41,3 +41,14 @@ def put_club():
         return service.put(conn, params), 200
     finally:
         db.close_connection(conn)
+
+@club_bp.route('/', methods=['DELETE'], strict_slashes=False)
+@role_required([constants.ROLE_ADMIN])
+def delete_club():
+    service = ClubService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.delete(conn, params), 200
+    finally:
+        db.close_connection(conn)

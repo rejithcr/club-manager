@@ -61,6 +61,14 @@ class ClubService():
         comments = params.get('comments')
         status = params.get('status')
 
+        club_name = params.get('clubName')
+        club_description = params.get('clubDescription')
+        location = params.get('location')
+        if club_name:
+            db.execute(conn, queries_club.UPDATE_CLUB, (club_name, club_description, location, email,clubId))
+            conn.commit()
+            return {"message": "Club details updated"}
+
         if status == "APPROVED":
             db.execute(conn, queries_club.UPDATE_MEMBERSHIP_REQUEST_STATUS, (status, comments, email, clubId, memberId))
             db.execute(conn, queries_member.SAVE_MEMBERSHIP, (clubId, memberId, constants.ROLE_MEMBER, email, email))
@@ -73,3 +81,13 @@ class ClubService():
             return {"message": "Membership " + status}
 
         return {"message": "Nothing done"}
+
+
+    def delete(self, conn, params):
+        clubId = params.get('clubId')
+        email = params.get('email')
+
+        db.execute(conn, queries_club.MARK_CLUB_FOR_DELETION, (clubId, email))
+        conn.commit()
+
+        return {"message": "Club marked for deletion. Please contact support to restore within 7 days."}
