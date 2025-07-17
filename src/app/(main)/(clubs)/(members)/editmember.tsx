@@ -16,11 +16,10 @@ import { ClubContext } from '@/src/context/ClubContext'
 import { getClubMember, saveClubMember } from '@/src/helpers/club_helper'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import { Picker } from '@react-native-picker/picker'
-
+import EditClubLevelAttributes from './editclublevelattributes'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { appStyles } from '@/src/utils/styles'
 import DatePicker from '@/src/components/DatePicker'
-import EditClubLevelAttributes from '../(clubs)/(members)/editclublevelattributes'
 
 const Editmember = () => {
     const params = useSearchParams()

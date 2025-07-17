@@ -61,7 +61,7 @@ const Profile = () => {
                         </TouchableOpacity>
                     </View>
                     <View>
-                        {isLoadingMyRequests && <LoadingSpinner />}
+                        {isLoadingMyRequests && isMembershipRequestShown && <LoadingSpinner />}
                         {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length > 0 &&
                             <FlatList
                                 data={myRequests}

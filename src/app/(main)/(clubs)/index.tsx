@@ -1,10 +1,9 @@
 import { View, GestureResponderEvent, TouchableOpacity, RefreshControl } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
-import { useRouter, useSearchParams } from 'expo-router/build/hooks'
+import { useSearchParams, useRouter} from 'expo-router/build/hooks'
 import { deleteClub, getClubCounts, getTotalDue, updateClub } from '@/src/helpers/club_helper'
 import { FlatList, GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
-import { router } from 'expo-router'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { ClubContext } from '@/src/context/ClubContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
@@ -141,7 +140,7 @@ const ClubHome = () => {
                         <ThemedText>Transactions</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
-                    <TouchableCard onPress={() => router.push(`/(main)/(members)`)}>
+                    <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(members)`)}>
                         <ThemedText>Members</ThemedText>
                     </TouchableCard>
                     <Spacer space={4} />
@@ -248,9 +247,9 @@ const handleMenuPress = (name: string | undefined, handleEditClub: any) => {
     if (name == "edit") {
         handleEditClub();
     } else if (name == "members") {
-        router.push(`/(main)/(members)`)
+        //router.push(`/(main)/(members)`)
     } else if (name == "transactions") {
-        router.push(`/(main)/(clubs)/(transactions)`)
+       // router.push(`/(main)/(clubs)/(transactions)`)
     } else {
         throw ("Error")
     }
@@ -287,7 +286,7 @@ const EditClubModal = ({ isVisible, onCancel, clubId, clubName, clubDesc, clubLo
     const { userInfo } = useContext(UserContext);
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const [isUpdating, setIsUpdating] = useState(false);
-
+    const router = useRouter();
     const handleUpdate = () => {
         setIsUpdating(true);
         updateClub(clubId, name, desc, location, userInfo.email)

@@ -72,11 +72,9 @@ export default function Home() {
 
 const handleMenuPress = (name: string | undefined) => {
   if (name == "attributes") {
-    router.push(`/(main)/(clubs)/(reports)/memberattributesexport`)
+    router.push(`/(main)/(clubs)/(members)/memberattributes`)
   } else if (name == "add") {
-    router.push(`/(main)/(members)/addmember`)
-  } else if (name == "editAttributes") {
-    router.push(`/(main)/(members)/memberattributes`)
+    router.push(`/(main)/(clubs)/(members)/addmember`)
   } else if (name == "requests") {
     router.push(`/(main)/(clubs)/membershiprequests`)
   } else {
@@ -90,12 +88,6 @@ const actions = [
     text: "Member Attributes",
     icon: <MaterialCommunityIcons name={"account-details"} size={15} color={"white"} />,
     name: "attributes",
-    position: 1
-  },{
-    color: "black",
-    text: "Edit Attributes",
-    icon: <MaterialIcons name={"edit-note"} size={15} color={"white"} />,
-    name: "editAttributes",
     position: 1
   },{
     color: "black",

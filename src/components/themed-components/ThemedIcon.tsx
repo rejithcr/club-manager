@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleProp, ViewStyle } from 'react-native';
-import { MaterialIcons, MaterialCommunityIcons, Ionicons, FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons, MaterialCommunityIcons, Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import { useTheme } from '@/src/hooks/use-theme';
 
 type IconProps = {
@@ -16,6 +16,7 @@ const iconMap: Record<string, any> = {
   MaterialCommunityIcons,
   Ionicons,
   FontAwesome,
+  AntDesign
 };
 
 function getIconComponent(name: string) {  

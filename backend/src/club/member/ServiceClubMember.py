@@ -63,7 +63,7 @@ class ClubMemberService():
             createdBy = params.get('createdBy')
             phone = params.get('phone')
             db.execute(conn, queries_member.SAVE_MEMBER,
-                       (first_name, last_name, email, phone, None, 0, createdBy, createdBy))
+                       (first_name, last_name, email, phone, None, None, 0, createdBy, createdBy))
             member_id = db.fetch_one(conn, queries_member.GET_MEMBER_BY_EMAIL, (email,))["member_id"]
             db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id,
                                                               constants.ROLE_MEMBER, email, email))
