@@ -1,75 +1,104 @@
-import { View, Text } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import { appStyles } from '@/src/utils/styles';
-import { MaterialIcons } from '@expo/vector-icons';
-import { getEvents, Event } from '@/src/helpers/events_helper';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import LoadingSpinner from '@/src/components/LoadingSpinner';
+import { View } from "react-native";
+import React, { useEffect, useState } from "react";
+import { appStyles } from "@/src/utils/styles";
+import { Event } from "@/src/helpers/events_helper";
+import Card from "@/src/components/Card";
+import ThemedText from "@/src/components/themed-components/ThemedText";
+import Spacer from "@/src/components/Spacer";
+import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 
-
-const UpcomingEvents = (props: { memberEmail: string }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [events, setEvents] = useState<Event[]>([]);
-
-  useEffect(() => {
-    getEvents(props.memberEmail)
-      .then(data => { setEvents(data) })
-      .catch(error => { console.error(error) })
-      .finally(() => setIsLoading(false))
-  }, [])
-
+const UpcomingEvents = (props: { events: Event[] }) => {
   return (
     <View>
-      <Text style={appStyles.title}>Upcoming Events</Text>
-      {isLoading && <LoadingSpinner />}
-      {!isLoading && events?.length == 0 && <Text style={{ textAlign: "center" }}>No upcoming events!</Text>}
-      {!isLoading && events.map((event) => {
-        return (
-          <View key={event.id} style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15 }}>
-            <View style={{ width: "15%", paddingRight: 10, alignItems: "center" }}>
-              {getEventIcon(event)}
-            </View>
-            <View style={{ width: "80%", flexDirection: "row", flexWrap: "wrap" }}>
-              <View style={{
-                flexDirection: "row", width: "100%", margin: 5,
-                justifyContent: "space-between", alignItems: "center"
-              }}>
-                <Text style={{ fontWeight: "bold", fontSize: 15 }}> {event.name} </Text>
-                <Text style={{ fontSize: 10, paddingRight: 10 }}> {event.type} </Text>
-              </View>
-              <View style={{ flexDirection: "row", margin: 5, alignItems: "center" }}>
-                <MaterialIcons name={"calendar-today"} size={20} />
-                <Text> {event.date} </Text>
-              </View>
-              {event?.time && <View style={{ flexDirection: "row", margin: 5, alignItems: "center" }}>
-                <MaterialIcons name={"access-time"} size={20} />
-                <Text> {event?.time} </Text>
-              </View>
-              }
-              {event?.location &&
-                <View style={{ flexDirection: "row", margin: 5, alignItems: "center" }}>
-                  <MaterialIcons name={"location-pin"} size={20} />
-                  <Text> {event?.location} </Text>
-                </View>
-              }
-            </View>
-          </View>
-        )
+      <ThemedText style={appStyles.title}>Upcoming Events</ThemedText>
+      events?.length == 0 && (<ThemedText style={{ ThemedTextAlign: "center" }}>No upcoming events!</ThemedText>)
+      {props.events.map((event) => {
+        return <EventCard event={event} />;
       })}
     </View>
-  )
-}
+  );
+};
 
-const getEventIcon = (event: Event) => {
-  if (event.type.toLowerCase() == "birthday") {
-    return <FontAwesome name={"birthday-cake"} size={30} />
-  } else if (event.type.toLowerCase() == "meeting") {
-    return <MaterialIcons name={"event"} size={30} />
-  } else if (event.type.toLowerCase() == "anniversary") {
-    return <MaterialIcons name={"celebration"} size={30} />
+const getEventIcon = (event: Event | undefined) => {
+  if (event?.name?.toLowerCase() == "birthday") {
+    return <ThemedIcon name={"FontAwesome:birthday-cake"} size={30} />;
+  } else if (event?.name?.toLowerCase() == "meeting") {
+    return <ThemedIcon name={"MaterialIcons:event"} size={30} />;
+  } else if (event?.name?.toLowerCase() == "anniversary") {
+    return <ThemedIcon name={"MaterialIcons:celebration"} size={30} />;
+  } else if (event?.name?.toLowerCase() == "practice session") {
+    return <ThemedIcon name={"MaterialIcons:sports-cricket"} size={30} />;
+  } else if (event?.name?.toLowerCase() == "match") {
+    return <ThemedIcon name={"MaterialIcons:sports-cricket"} size={30} />;
   } else {
-    return <MaterialIcons name={"event"} size={30} />
+    return <ThemedIcon name={"MaterialIcons:event"} size={30} />;
   }
-}
+};
 
-export default UpcomingEvents
+export default UpcomingEvents;
+
+export const EventCard = ({ event, cardSize }: { event: Event | undefined; cardSize?: string }) => {
+  return (
+    <Card>
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+        }}
+      >
+        <View style={{ flexDirection: "row" }}>
+          <View>
+            <ThemedText style={{ fontWeight: "bold", fontSize: 15 }}>{event?.title}</ThemedText>
+            <ThemedText style={{ fontSize: 10 }}>{event?.description}</ThemedText>
+          </View>
+        </View>
+        <Spacer hspace={10} />
+        {getEventIcon(event)}
+      </View>
+      <View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            marginTop: 5,
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ flexDirection: "row" }}>
+            <ThemedIcon name={"MaterialIcons:calendar-today"} size={15} />
+            <Spacer hspace={2} />
+            <ThemedText style={{ fontSize: 12 }}>{event?.eventDate}</ThemedText>
+            <Spacer hspace={10} />
+            {cardSize === "long" && event?.startTime && (
+              <>
+                <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
+                <Spacer hspace={2} />
+                <ThemedText style={{ fontSize: 12 }}>
+                  {event?.startTime}
+                  {event?.endTime && " - "}
+                  {event?.endTime}
+                </ThemedText>
+              </>
+            )}
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            {event?.location ? <ThemedIcon name={"MaterialIcons:location-pin"} size={15} /> : <></>}
+            <ThemedText style={{ fontSize: 12 }}>{event?.location}</ThemedText>
+          </View>
+        </View>
+        {cardSize !== "long" && event?.startTime && (
+          <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
+            <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
+            <Spacer hspace={2} />
+            <ThemedText style={{ fontSize: 12 }}>
+              {event?.startTime}
+              {event?.endTime && " - "}
+              {event?.endTime}
+            </ThemedText>
+          </View>
+        )}
+      </View>
+    </Card>
+  );
+};

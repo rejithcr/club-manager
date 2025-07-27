@@ -1,6 +1,7 @@
 from src.club import queries_club
 
 from src import db
+from src.club.event import queries_events
 from src.member import queries_member
 from src import  helper
 from src import  constants
@@ -50,6 +51,7 @@ class ClubService():
         club_id = db.fetch_one(conn, queries_club.GET_CLUB_SEQ_NEXT_VAL, None)['nextval']
         db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, club_description, location, email, email))
         db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id, '1', email, email))
+        db.execute(conn, queries_events.INSERT_EVET_TYPES, (club_id, club_id, club_id, club_id))
         conn.commit()
 
         return {"clubId": club_id}

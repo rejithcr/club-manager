@@ -10,6 +10,7 @@ from flask_compress import Compress
 
 from src import constants
 from src.auth.routes import auth_bp
+from src.club.event.routes import club_event_bp
 from src.club.member.routes import club_member_bp
 from src.club.report.routes import club_report_bp
 from src.club.routes import club_bp
@@ -27,10 +28,10 @@ def create_app():
     cm_app = Flask(__name__)
     # Auth
     cm_app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY')
-    cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(minutes=15)
+    cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(days=1)
     cm_app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=365)
     JWTManager(cm_app)
-    #CORS(cm_app, origins=constants.CORS_ORIGINS)
+    CORS(cm_app, origins=constants.CORS_ORIGINS)
     Compress(cm_app)
     # Register the blueprint with an optional URL prefix
     cm_app.register_blueprint(member_bp)
@@ -44,6 +45,7 @@ def create_app():
     cm_app.register_blueprint(fee_adhoc_bp)
     cm_app.register_blueprint(fee_exception_bp)
     cm_app.register_blueprint(fee_collection_bp)
+    cm_app.register_blueprint(club_event_bp)
 
     #Error handlers
     cm_app.register_error_handler(500, generic_error_handler)

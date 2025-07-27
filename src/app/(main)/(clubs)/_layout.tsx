@@ -69,6 +69,13 @@ export default function ClubLayout() {
             headerShown: true
           }}
         />
+        <Stack.Screen
+          name="(events)" // This is the name of the page and must match the url from root
+          options={{
+            headerTitle: () => <StackHeader header={"Events"} rightText={clubInfo?.clubName} />,
+            headerShown: false
+          }}
+        />
     </Stack>
   )
 }

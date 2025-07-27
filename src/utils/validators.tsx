@@ -27,3 +27,7 @@ export const isValidYear = (year: string) => {
 export const isAplhaNumeric = (value: string) => {
   return /^[a-zA-Z0-9 -_]{2,}$/.test(value)
 }
+
+export const isValidDate = (date: any) => {
+  return date instanceof Date && !isNaN(date.getTime());
+}
