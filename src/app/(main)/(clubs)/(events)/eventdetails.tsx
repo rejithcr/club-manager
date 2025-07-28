@@ -17,6 +17,9 @@ import { Picker } from "@react-native-picker/picker";
 import InputText from "@/src/components/InputText";
 import { View } from "react-native";
 import { arrayDifference } from "@/src/utils/array";
+import { EventItem } from ".";
+import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
+import { router } from "expo-router";
 
 const EventDetails = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
@@ -29,7 +32,7 @@ const EventDetails = () => {
   const [attendanceDiff, setAttendanceDiff] = useState<{ added: any[]; removed: any[] }>({ added: [], removed: [] });
   const [attendanceChanged, setAttendanceChanged] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
-  const [isSaving, setIsSaving] = useState(false)
+  const [isSaving, setIsSaving] = useState(false);
   const [event, setEvent] = useState<Event>();
   const params = useSearchParams();
   const { clubInfo } = useContext(ClubContext);
@@ -38,21 +41,22 @@ const EventDetails = () => {
     setIsLoadingAttendedMembers(true);
     getAtendedMembers(eventId)
       .then((response) => {
-        console.log('attended',response.data);
-        const attendedMembersLocal = response.data.filter((m: { present: any; })=> m.present);
-        console.log('present',attendedMembersLocal);
-        setAttendedMembersBackup(structuredClone(attendedMembersLocal));
+        const attendedMembersLocal = response.data.filter((m: { present: any }) => m.present);
+        setAttendedMembersBackup([...attendedMembersLocal]);
         setAttendedMembers(attendedMembersLocal);
         setIsLoadingMembers(true);
         getClubMembers(clubInfo.clubId)
           .then((response) => {
             const members = response.data;
-            const difference = members.filter((m: any) => !attendedMembersLocal.some((e: any) => e.membershipId == m.membershipId));
-            console.log('remaining',difference);
+            const difference = members.filter(
+              (m: any) => !attendedMembersLocal.some((e: any) => e.membershipId == m.membershipId)
+            );
             setRemainingMembers(difference);
           })
+          .catch(() => alert("Error! please retry"))
           .finally(() => setIsLoadingMembers(false));
       })
+      .catch(() => alert("Error! please retry"))
       .finally(() => setIsLoadingAttendedMembers(false));
   };
   useEffect(() => {
@@ -63,48 +67,64 @@ const EventDetails = () => {
 
   const addToAttended = (member: Member) => {
     setAttendedMembers((prev) => {
-      return [...prev, member].toSorted((m1, m2) => m1.firstName.localeCompare(m2.firstName));
+      return [...prev, member].sort((m1, m2) => m1.firstName.localeCompare(m2.firstName));
     });
     setRemainingMembers((prev) => {
       return prev
         .filter((m) => m.memberId !== member.memberId)
-        .toSorted((m1, m2) => m1.firstName.localeCompare(m2.firstName));
+        .sort((m1, m2) => m1.firstName.localeCompare(m2.firstName));
     });
   };
   const removeFromAttended = (member: Member) => {
     setRemainingMembers((prev) => {
-      return [...prev, member].toSorted((m1, m2) => m1.firstName.localeCompare(m2.firstName));
+      return [...prev, member].sort((m1, m2) => m1.firstName.localeCompare(m2.firstName));
     });
     setAttendedMembers((prev) => {
       return prev
         .filter((m) => m.memberId !== member.memberId)
-        .toSorted((m1, m2) => m1.firstName.localeCompare(m2.firstName));
+        .sort((m1, m2) => m1.firstName.localeCompare(m2.firstName));
     });
   };
 
   useEffect(() => {
-    const diff = arrayDifference(attendedMembersBackup, attendedMembers, 'membershipId');
+    const diff = arrayDifference(attendedMembersBackup, attendedMembers, "membershipId");
     setAttendanceDiff(diff);
     setAttendanceChanged(diff.added.length > 0 || diff.removed.length > 0);
   }, [attendedMembers]);
 
   const handleSaveChanges = () => {
-    console.log(attendanceDiff)
+    console.log(attendanceDiff);
     const added = attendanceDiff.added.map((m) => ({ membershipId: m.membershipId, present: true }));
-    const removed = attendanceDiff.removed.map((m) => ({ membershipId: m.membershipId, present: false }))
-    setIsSaving(true)
+    const removed = attendanceDiff.removed.map((m) => ({ membershipId: m.membershipId, present: false }));
+    setIsSaving(true);
     saveEventChanges(event?.eventId, [...added, ...removed], eventStatus)
       .then((response) => {
         alert(response.data.message);
       })
-      .finally(() => {setIsSaving(false); setIsConfirmVisible(false) });
+      .finally(() => {
+        setIsSaving(false);
+        setIsConfirmVisible(false);
+      });
   };
   return (
     <ThemedView style={{ flex: 1 }}>
-      <EventCard event={event} cardSize={"long"} />
+      <ThemedView
+        style={{
+          width: "90%",
+          alignSelf: "center",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <ThemedHeading style={{ width: 200 }}>Mark Attendance</ThemedHeading>
+        <ThemedIcon name="MaterialCommunityIcons:square-edit-outline" size={25} 
+            onPress={() => router.push(`/(main)/(clubs)/(events)/editevent?event=${JSON.stringify(event)}`)} />
+      </ThemedView>
 
-      <ThemedHeading>Mark Attendance</ThemedHeading>
-      <ThemedText style={{ width: "85%", alignSelf: "center" }}>
+      {event && <EventItem event={event} />}
+      <Spacer space={8} />
+      <ThemedText style={{ width: "85%", textAlign: "center" }}>
         Please select from the below list to mark attendance
       </ThemedText>
       <Spacer space={8} />

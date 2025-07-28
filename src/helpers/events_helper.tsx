@@ -9,12 +9,17 @@ export interface Event {
   location?: string;
   eventTypeId: Number;
   createdBy: string;
+  clubName?: string;
 }
 
 import { get, post, put } from "../utils/http/api";
 
 export const getEvents = async (clubId: number, limit: number, offset: number) => {
   return get("/club/event", { clubId, limit, offset });
+};
+
+export const getEventsByMember = async (clubIds: string, limit: number, offset: number) => {
+  return get("/club/event", { clubIds, limit, offset });
 };
 
 export const getEventsByStatus = async (clubId: number, status: string, limit: number, offset: number) => {

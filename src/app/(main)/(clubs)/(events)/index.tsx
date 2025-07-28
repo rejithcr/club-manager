@@ -1,4 +1,4 @@
-import { FlatList, RefreshControl, TouchableOpacity } from "react-native";
+import { FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Spacer from "@/src/components/Spacer";
 import ThemedView from "@/src/components/themed-components/ThemedView";
@@ -8,13 +8,16 @@ import { getEvents } from "@/src/helpers/events_helper";
 import { ClubContext } from "@/src/context/ClubContext";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
-import { EventCard } from "../../upcoming_events";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
+import ThemedText from "@/src/components/themed-components/ThemedText";
+import { useTheme } from "@/src/hooks/use-theme";
+import ShadowBox from "@/src/components/ShadowBox";
+import { appStyles } from "@/src/utils/styles";
+import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 
 const EventsHome = () => {
   const [events, setEvents] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
   const { clubInfo } = useContext(ClubContext);
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
@@ -36,9 +39,7 @@ const EventsHome = () => {
           visible: true,
           title: "Error",
           message: error.response.data.error,
-          buttons: [
-            { text: "OK", onPress: () => setAlertConfig({ visible: false }) },
-          ],
+          buttons: [{ text: "OK", onPress: () => setAlertConfig({ visible: false }) }],
         })
       )
       .finally(() => setIsLoading(false));
@@ -58,9 +59,7 @@ const EventsHome = () => {
             visible: true,
             title: "Error",
             message: error.response.data.error,
-            buttons: [
-              { text: "OK", onPress: () => setAlertConfig({ visible: false }) },
-            ],
+            buttons: [{ text: "OK", onPress: () => setAlertConfig({ visible: false }) }],
           })
         )
         .finally(() => setIsFetching(false));
@@ -73,40 +72,38 @@ const EventsHome = () => {
 
   return (
     <>
-    <ThemedView style={{ flex: 1, width: "90%", alignSelf: "center" }}>
-      <Spacer space={5} />
-      {isLoading ? (
-        <LoadingSpinner />
-      ) : (
-        <FlatList
-          data={events}
-          keyExtractor={(item) => item.eventId.toString()}
-          initialNumToRender={20}
-          onEndReached={fetchNextPage}
-          onEndReachedThreshold={0.2}
-          refreshControl={
-            <RefreshControl refreshing={false} onRefresh={onRefresh} />
-          }
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onPress={() => router.push(`/(main)/(clubs)/(events)/eventdetails?event=${JSON.stringify(item)}`)}
-            >
-              <EventCard event={item} cardSize={"long"} />
-              <Spacer hspace={0} />
-            </TouchableOpacity>
-          )}
-          ListFooterComponent={() =>
-            (isFectching && (
-              <>
-                <Spacer space={10} />
-                <LoadingSpinner />
-              </>
-            )) || <Spacer space={4} />
-          }
-        />
-      )}
-      {alertConfig?.visible && <Alert {...alertConfig} />}
-    </ThemedView>
+      <ThemedView style={{ flex: 1 }}>
+        <Spacer space={5} />
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <FlatList
+            data={events}
+            keyExtractor={(item) => item.eventId.toString()}
+            initialNumToRender={20}
+            onEndReached={fetchNextPage}
+            onEndReachedThreshold={0.2}
+            refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => router.push(`/(main)/(clubs)/(events)/eventdetails?event=${JSON.stringify(item)}`)}
+              >
+                <EventItem event={item} />
+                <Spacer hspace={0} />
+              </TouchableOpacity>
+            )}
+            ListFooterComponent={() =>
+              (isFectching && (
+                <>
+                  <Spacer space={10} />
+                  <LoadingSpinner />
+                </>
+              )) || <Spacer space={4} />
+            }
+          />
+        )}
+        {alertConfig?.visible && <Alert {...alertConfig} />}
+      </ThemedView>
       <FloatingMenu
         actions={actions}
         position={"left"}
@@ -114,7 +111,7 @@ const EventsHome = () => {
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
         onPressItem={(name: string | undefined) => handleMenuPress(name)}
       />
-      </>
+    </>
   );
 };
 
@@ -132,14 +129,63 @@ const actions = [
   {
     color: "black",
     text: "Add Event",
-    icon: (
-      <MaterialCommunityIcons
-        name={"calendar-plus"}
-        size={15}
-        color={"white"}
-      />
-    ),
+    icon: <MaterialCommunityIcons name={"calendar-plus"} size={15} color={"white"} />,
     name: "addEvent",
     position: 5,
   },
 ];
+
+export const EventItem = ({ event }: { event: any }) => {
+  const { colors } = useTheme();
+  return (
+    <ThemedView style={{ ...appStyles.shadowBox, width: "85%" }}>
+      <ThemedView style={{ flexDirection: "row", width: "100%", justifyContent: "space-between"}}>
+        <ThemedView style={{rowGap: 3 }}>
+          <ThemedText style={{ fontWeight: "bold" }}>{event.title}</ThemedText>
+          <ThemedText style={{ fontSize: 10 }}>{event.description}</ThemedText>
+          <ThemedView style={{ flexDirection: "row" }}>
+            <ThemedText style={{ fontSize: 12, fontWeight: "bold", color: colors.button }}>{event.name}</ThemedText>
+            <Spacer hspace={2} />
+            <ThemedText
+              style={{
+                fontSize: 12,
+                fontWeight: "bold",
+                color:
+                  event.status === "Completed"
+                    ? colors.success
+                    : event.status === "Scheduled"
+                    ? colors.warning
+                    : colors.error,
+              }}
+            >
+              {event.status}
+            </ThemedText>
+          </ThemedView>
+        </ThemedView>
+        <ThemedView style={{rowGap: 3 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+            <ThemedIcon name={"MaterialIcons:calendar-today"} size={15} />
+            <Spacer hspace={2} />
+            <ThemedText style={{ textAlign: "right", fontSize: 12, fontWeight: "bold" }}>{event.eventDate}</ThemedText>
+          </View>
+          {event.startTime && (
+            <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+              <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
+              <Spacer hspace={2} />
+              <ThemedText style={{ fontSize: 12}}>
+                {event.startTime} {event.endTime && " - " + event.endTime}
+              </ThemedText>
+            </View>
+          )}
+          {event.location && (
+            <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+              <ThemedIcon name={"MaterialIcons:location-pin"} size={15} />
+              <Spacer hspace={2} />
+              <ThemedText style={{ textAlign: "right", fontSize: 12}}>{event.location}</ThemedText>
+            </View>
+          )}
+        </ThemedView>
+      </ThemedView>
+    </ThemedView>
+  );
+};

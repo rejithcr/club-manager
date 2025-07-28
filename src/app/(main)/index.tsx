@@ -1,45 +1,59 @@
-import { RefreshControl, ScrollView } from 'react-native'
-import { useRouter } from 'expo-router/build/hooks';
-import FloatingMenu from '@/src/components/FloatingMenu';
-import FeeSummary from './dues';
-import { useContext } from 'react';
-import { UserContext } from '../../context/UserContext';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import MyClubs from './myclubs';
-import { router } from 'expo-router';
-import LoadingSpinner from '@/src/components/LoadingSpinner';
-import { useHttpGet } from '@/src/hooks/use-http';
-import ThemedView from '@/src/components/themed-components/ThemedView';
-import Spacer from '@/src/components/Spacer';
-import ThemedHeading from '@/src/components/themed-components/ThemedHeading';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-
+import { RefreshControl, ScrollView } from "react-native";
+import { useRouter } from "expo-router/build/hooks";
+import FloatingMenu from "@/src/components/FloatingMenu";
+import FeeSummary from "./dues";
+import { useContext, useEffect, useState } from "react";
+import { UserContext } from "../../context/UserContext";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import MyClubs from "./myclubs";
+import { router } from "expo-router";
+import LoadingSpinner from "@/src/components/LoadingSpinner";
+import { useHttpGet } from "@/src/hooks/use-http";
+import ThemedView from "@/src/components/themed-components/ThemedView";
+import Spacer from "@/src/components/Spacer";
+import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { getEventsByMember, Event } from "@/src/helpers/events_helper";
+import UpcomingEvents from "./upcoming_events";
 
 const Main = () => {
-  const router = useRouter()
-  const { userInfo } = useContext(UserContext)
+  const router = useRouter();
+  const { userInfo } = useContext(UserContext);
   const {
     data: duesByMember,
     isLoading: isLoadingMemberDues,
-    refetch: refetchMemberDues
-  } = useHttpGet("/club/member", { memberId: userInfo?.memberId, duesByMember: "true" })
+    refetch: refetchMemberDues,
+  } = useHttpGet("/club/member", { memberId: userInfo?.memberId, duesByMember: "true" });
   const {
     data: clubs,
     isLoading: isLoadingMyClubs,
     refetch: refetchClubs,
-  } = useHttpGet("/club", { memberId: userInfo?.memberId })
+  } = useHttpGet("/club", { memberId: userInfo?.memberId });
 
   const onRefresh = () => {
-    refetchMemberDues()
-    refetchClubs()
+    refetchMemberDues();
+    refetchClubs();
   };
   const handleLogout = async () => {
-    await AsyncStorage.removeItem("userInfo")
-    await AsyncStorage.removeItem('accessToken')
-    await AsyncStorage.removeItem('refreshToken')
-    router.replace("/(auth)")
-  }
+    await AsyncStorage.removeItem("userInfo");
+    await AsyncStorage.removeItem("accessToken");
+    await AsyncStorage.removeItem("refreshToken");
+    router.replace("/(auth)");
+  };
+
+  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    if (clubs) {
+      const clubIds = clubs.map((c: { clubId: any }) => c.clubId);
+      setIsLoadingEvents(true);
+      getEventsByMember(clubIds.join(","), 10, 0)
+        .then((response) => setEvents(response.data))
+        .finally(() => setIsLoadingEvents(false));
+    }
+  }, [clubs]);
 
   return (
     <ThemedView style={{ flex: 1 }}>
@@ -53,34 +67,38 @@ const Main = () => {
           {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
           {isLoadingMemberDues && <LoadingSpinner />}
           {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
-
-          {/*<UpcomingMatches memberEmail={userInfo?.email} />
-        <UpcomingEvents memberEmail={userInfo?.email} /> */}
+          
+          {isLoadingEvents && <><Spacer space={10}/><LoadingSpinner /></> }
+          {events?.length > 0 && <><ThemedHeading>Upcoming Events</ThemedHeading>
+          <UpcomingEvents events={events} /></>}
+          {/*<UpcomingMatches memberEmail={userInfo?.email} />*/}
           <Spacer space={50} />
-        </ScrollView >
+        </ScrollView>
       </GestureHandlerRootView>
-      <FloatingMenu actions={actions} position={"left"} color='black'
+      <FloatingMenu
+        actions={actions}
+        position={"left"}
+        color="black"
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
         onPressItem={(name: string | undefined) => handleMenuPress(name, handleLogout)}
       />
     </ThemedView>
-  )
-}
+  );
+};
 
-export default Main
-
+export default Main;
 
 const handleMenuPress = (name: string | undefined, handleLogout: { (): void }) => {
   if (name == "createclub") {
-    router.push(`/(main)/(clubs)/createclub`)
+    router.push(`/(main)/(clubs)/createclub`);
   } else if (name == "logout") {
-    handleLogout()
+    handleLogout();
   } else if (name == "profile") {
-    router.push(`/(main)/(profile)`)
+    router.push(`/(main)/(profile)`);
   } else {
-    throw ("Error")
+    throw "Error";
   }
-}
+};
 
 const actions = [
   {
@@ -88,20 +106,20 @@ const actions = [
     text: "Logout",
     icon: <MaterialIcons name={"logout"} size={15} color={"white"} />,
     name: "logout",
-    position: 1
+    position: 1,
   },
   {
     color: "black",
     text: "Create Club",
     icon: <MaterialIcons name={"add"} size={15} color={"white"} />,
     name: "createclub",
-    position: 1
+    position: 1,
   },
   {
     color: "black",
     text: "Profile",
     icon: <MaterialCommunityIcons name={"face-man-profile"} size={15} color={"white"} />,
     name: "profile",
-    position: 1
+    position: 1,
   },
 ];

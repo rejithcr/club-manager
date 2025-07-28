@@ -17,6 +17,7 @@ class ClubEventService():
         offset = params.get('offset')
         status = params.get('status')
         club_id = params.get('clubId')
+        club_ids = params.get('clubIds')
 
         if event_id:
             event = db.fetch_one(conn, queries_events.GET_EVENT_BY_ID, (event_id,))
@@ -24,6 +25,11 @@ class ClubEventService():
         elif status:
             events = db.fetch(conn, queries_events.GET_EVENTS_BY_STATUS, (status, club_id, limit,offset))
             return helper.convert_to_camel_case(events if events else [])
+        elif club_ids:
+            club_id_list = list(map(int, club_ids.split(',')))
+            events = db.fetch(conn, queries_events.GET_EVENTS_BY_MEMBER, (club_id_list, limit,offset))
+            return helper.convert_to_camel_case(events if events else [])
+
         else:
             events = db.fetch(conn, queries_events.GET_EVENTS, (club_id, limit,offset))
             return helper.convert_to_camel_case(events if events else [])

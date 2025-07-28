@@ -348,7 +348,7 @@ UPDATE_FEE_ADHOC = """
     update club_adhoc_fee
     set club_adhoc_fee_name = %s, club_adhoc_fee_desc = %s, 
         club_adhoc_fee_date = %s, updated_by = %s
-    where club_adhoc_fee_id = $s
+    where club_adhoc_fee_id = %s
 """
 
 ADD_FEE_ADHOC_PAYMENT = """

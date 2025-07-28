@@ -9,11 +9,15 @@ import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 
 const UpcomingEvents = (props: { events: Event[] }) => {
   return (
-    <View>
-      <ThemedText style={appStyles.title}>Upcoming Events</ThemedText>
-      events?.length == 0 && (<ThemedText style={{ ThemedTextAlign: "center" }}>No upcoming events!</ThemedText>)
+    <View style={{ width: "85%", alignSelf: "center" }}>
+      {props.events?.length == 0 && <ThemedText style={{ ThemedTextAlign: "center" }}>No upcoming events!</ThemedText>}
       {props.events.map((event) => {
-        return <EventCard event={event} />;
+        return (
+          <>
+            <EventCard event={event} />
+            <Spacer space={4} />
+          </>
+        );
       })}
     </View>
   );
@@ -87,17 +91,23 @@ export const EventCard = ({ event, cardSize }: { event: Event | undefined; cardS
             <ThemedText style={{ fontSize: 12 }}>{event?.location}</ThemedText>
           </View>
         </View>
-        {cardSize !== "long" && event?.startTime && (
-          <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5 }}>
-            <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
-            <Spacer hspace={2} />
-            <ThemedText style={{ fontSize: 12 }}>
-              {event?.startTime}
-              {event?.endTime && " - "}
-              {event?.endTime}
-            </ThemedText>
+
+        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5, justifyContent: "space-between" }}>
+          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+            {cardSize !== "long" && event?.startTime && (
+              <>
+                <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
+                <Spacer hspace={2} />
+                <ThemedText style={{ fontSize: 12 }}>
+                  {event?.startTime}
+                  {event?.endTime && " - "}
+                  {event?.endTime}
+                </ThemedText>
+              </>
+            )}
           </View>
-        )}
+          <ThemedText style={{ textAlign: "right", fontSize: 10 }}>{event?.clubName}</ThemedText>
+        </View>
       </View>
     </Card>
   );
