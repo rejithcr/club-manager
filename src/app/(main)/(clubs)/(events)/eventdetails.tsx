@@ -229,14 +229,14 @@ const EventDetails = () => {
                 }}
               >
                 {attendanceDiff.added.map((item: any) => (
-                  <Chip selected={true} key={item.memberId} onPress={() => addToAttended(item)}>
+                  <Chip selected={true} key={item.memberId}>
                     <ThemedText>
                       {item?.firstName} {item?.lastName}
                     </ThemedText>
                   </Chip>
                 ))}
                 {attendanceDiff.removed.map((item: any) => (
-                  <Chip selected={false} key={item.memberId} onPress={() => addToAttended(item)}>
+                  <Chip selected={false} key={item.memberId}>
                     <ThemedText>
                       {item?.firstName} {item?.lastName}
                     </ThemedText>
