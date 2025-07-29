@@ -90,7 +90,7 @@ const Editmember = () => {
     const { setClubInfo } = useContext(ClubContext)
     const showDetails = (club: any) => {
         setClubInfo({ clubId: club.clubId, clubName: club.clubName, role: club.role });
-        router.push(`/(main)/(club)/(members)/editclublevelattributes?memberId=${params.get("memberId")}`);
+        router.push(`/(main)/(clubs)/(members)/editclublevelattributes?memberId=${params.get("memberId")}`);
     }
 
     return (
