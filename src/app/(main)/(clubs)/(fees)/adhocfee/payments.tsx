@@ -201,7 +201,7 @@ const Payments = () => {
 export default Payments
 
 const MemberFeeItem = (props: {
-    clubAdhocFeePaymentId: number; firstName: string | undefined; paymentDate: Date
+    clubAdhocFeePaymentId: number; firstName: string | undefined; lastName: string | undefined; paymentDate: Date
     paid: number; clubAdhocFeePaymentAmount: number; setPaymentStatusUpdates: any;
     feeByMembers: any | undefined
 }) => {
@@ -210,14 +210,14 @@ const MemberFeeItem = (props: {
     const selectItem = () => {
         setIsSelected(prev => !prev)
 
-        props.setPaymentStatusUpdates((prev: ({ clubAdhocFeePaymentId: number; paid: Boolean; firstName?: string | undefined; clubAdhocFeePaymentAmount: number; paymentDate: Date })[]) => {
+        props.setPaymentStatusUpdates((prev: ({ clubAdhocFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName: string | undefined; clubAdhocFeePaymentAmount: number; paymentDate: Date })[]) => {
 
             let item = prev.find(item => item.clubAdhocFeePaymentId == props.clubAdhocFeePaymentId)
             const initialPaymentStatus = props.feeByMembers?.find((item: { clubAdhocFeePaymentId: number; }) => item.clubAdhocFeePaymentId == props.clubAdhocFeePaymentId)
             if (item) {
                 item.paid = !isSelected
             } else {
-                item = { clubAdhocFeePaymentId: props.clubAdhocFeePaymentId, paid: !isSelected, firstName: props.firstName, clubAdhocFeePaymentAmount: props.clubAdhocFeePaymentAmount, paymentDate: new Date() }
+                item = { clubAdhocFeePaymentId: props.clubAdhocFeePaymentId, paid: !isSelected, firstName: props.firstName, lastName: props.lastName, clubAdhocFeePaymentAmount: props.clubAdhocFeePaymentAmount, paymentDate: new Date() }
                 prev.push(item)
             }
             if (initialPaymentStatus?.paid == !isSelected) {
@@ -229,10 +229,11 @@ const MemberFeeItem = (props: {
 
     return (
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "85%" }}>
-                <ThemedText style={{ width: "70%", fontSize: 15 }}>{props?.firstName}</ThemedText>
-                <ThemedText style={{ width: "20%", fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
-                <View style={{ width: "10%", flexDirection: "row", justifyContent: "center" }}>
+            <ShadowBox style={{ ...appStyles.shadowBox, width: "85%", justifyContent:"space-between" }}>
+                <ThemedText style={{ fontSize: 15 }}>{props?.firstName} {props?.lastName}</ThemedText>                
+                <View style={{ flexDirection: "row", alignItems: "center" }}>
+                    <ThemedText style={{ fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
+                    <Spacer hspace={3}/>
                     <ThemedCheckBox checked={isSelected} />
                 </View>
             </ShadowBox>
@@ -241,10 +242,10 @@ const MemberFeeItem = (props: {
 }
 
 
-const PaymentUpdates = (props: { clubFeePaymentId: number | undefined; firstName?: string | null | undefined; paid: boolean | undefined; }) => {
+const PaymentUpdates = (props: { clubFeePaymentId: number | undefined; firstName?: string | null | undefined; lastName?: string | null | undefined; paid: boolean | undefined; }) => {
     return (
-        <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", marginBottom: 15, flexWrap: "wrap" }}>
-            <ThemedText numberOfLines={1} style={{ width: "80%", fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName}</ThemedText>
+         <ShadowBox style={{ ...appStyles.shadowBox, width: "85%", marginBottom: 15, flexWrap: "wrap", justifyContent: "space-between" }}>
+            <ThemedText numberOfLines={1} style={{ fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName} {props?.lastName}</ThemedText>
             <ThemedCheckBox checked={props?.paid} />
         </ShadowBox>
     )
