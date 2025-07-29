@@ -1,4 +1,4 @@
-import { FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
+import { Button, FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import Spacer from "@/src/components/Spacer";
 import ThemedView from "@/src/components/themed-components/ThemedView";
@@ -7,11 +7,10 @@ import Alert, { AlertProps } from "@/src/components/Alert";
 import { getEvents } from "@/src/helpers/events_helper";
 import { ClubContext } from "@/src/context/ClubContext";
 import FloatingMenu from "@/src/components/FloatingMenu";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import { useTheme } from "@/src/hooks/use-theme";
-import ShadowBox from "@/src/components/ShadowBox";
 import { appStyles } from "@/src/utils/styles";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 
@@ -70,6 +69,10 @@ const EventsHome = () => {
     onRefresh();
   }, []);
 
+  const gotoPage =(url: any) => {
+    router.push(url)
+  }
+
   return (
     <>
       <ThemedView style={{ flex: 1 }}>
@@ -104,12 +107,13 @@ const EventsHome = () => {
         )}
         {alertConfig?.visible && <Alert {...alertConfig} />}
       </ThemedView>
+      
       <FloatingMenu
         actions={actions}
         position={"left"}
         color="black"
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-        onPressItem={(name: string | undefined) => handleMenuPress(name)}
+        onPressItem={(name: string | undefined) => handleMenuPress(name, gotoPage)}
       />
     </>
   );
@@ -117,11 +121,11 @@ const EventsHome = () => {
 
 export default EventsHome;
 
-const handleMenuPress = (name: string | undefined) => {
+const handleMenuPress = (name: string | undefined, gotoPage: any) => {
   if (name == "addEvent") {
-    router.push("/(main)/(clubs)/(events)/addevent");
-  } if (name == "attendance") {
-    router.push("/(main)/(clubs)/(events)/attendance");
+    gotoPage("/(main)/(clubs)/(events)/addevent");
+  } else if (name == "attendance") {
+    gotoPage("/(main)/(clubs)/(events)/attendance");
   } else {
     throw "Error";
   }
@@ -137,7 +141,7 @@ const actions = [
   },{
     color: "black",
     text: "Attendance Report",
-    icon: <MaterialCommunityIcons name={"calendar-plus"} size={15} color={"white"} />,
+    icon: <AntDesign name={"barschart"} size={15} color={"white"} />,
     name: "attendance",
     position: 5,
   },

@@ -1,4 +1,3 @@
-import { AlertProps } from "@/src/components/Alert";
 import DatePicker from "@/src/components/DatePicker";
 import InputText from "@/src/components/InputText";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
@@ -14,7 +13,7 @@ import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import Alert from '@/src/components/Alert'
+import Alert, { AlertProps }from '@/src/components/Alert'
 
 const AddEvent = () => {
   const [title, setTitle] = useState("");

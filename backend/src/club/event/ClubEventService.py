@@ -162,8 +162,8 @@ class ClubEventService():
         records = params.get('records', [])
         status = params.get('status')
 
-        if not event_id or not records:
-            raise Exception('Missing event_id or records')
+        if not event_id and not records:
+            raise Exception('Either eventId or records required!')
 
         for r in records:
             db.execute(conn, """
@@ -179,7 +179,7 @@ class ClubEventService():
                             """, (status, event_id))
 
         conn.commit()
-        return jsonify({'message': 'Attendance recorded'})
+        return jsonify({'message': 'Status updated.'})
 
     def get_attendance(self, conn, params):
         event_id = params.get('eventId')

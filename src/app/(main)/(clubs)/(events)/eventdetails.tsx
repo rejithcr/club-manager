@@ -94,7 +94,6 @@ const EventDetails = () => {
   }, [attendedMembers]);
 
   const handleSaveChanges = () => {
-    console.log(attendanceDiff);
     const added = attendanceDiff.added.map((m) => ({ membershipId: m.membershipId, present: true }));
     const removed = attendanceDiff.removed.map((m) => ({ membershipId: m.membershipId, present: false }));
     setIsSaving(true);
@@ -169,11 +168,14 @@ const EventDetails = () => {
           <Modal isVisible={isConfirmVisible}>
             <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
               <ThemedHeading>{attendanceChanged ? "Update Attendance" : "Update Status"}</ThemedHeading>
-              {attendanceChanged && (
+              {attendanceChanged ? 
                 <ThemedText style={{ textAlign: "center" }}>
                   Review the attendance changes and update event status?
-                </ThemedText>
-              )}
+                </ThemedText> :
+                <ThemedText style={{ textAlign: "center" }}>
+                  Update event status?
+                </ThemedText> 
+              }
               <Spacer space={10} />
               <ThemedView
                 style={{
@@ -232,8 +234,7 @@ const EventDetails = () => {
           width: "100%",
         }}
       >
-        {attendanceChanged && <ThemedButton title="Save Changes" onPress={() => setIsConfirmVisible(true)} />}
-        {!attendanceChanged && <ThemedButton title="Update Event Status" onPress={() => setIsConfirmVisible(true)} />}
+        <ThemedButton title="Update Status" onPress={() => setIsConfirmVisible(true)} />
       </View>
     </ThemedView>
   );

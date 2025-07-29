@@ -286,11 +286,9 @@ const ClubHome = () => {
                 )}
                 ListFooterComponent={() => (
                   <View style={{ width: 100, height: 100, alignItems: "center", justifyContent: "center" }}>
-                    {params.get("role") == ROLE_ADMIN && (
-                      <TouchableOpacity onPress={() => router.push("/(main)/(clubs)/(events)")}>
+                    <TouchableOpacity onPress={() => router.push("/(main)/(clubs)/(events)")}>
                         <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
-                      </TouchableOpacity>
-                    )}
+                    </TouchableOpacity>
                   </View>
                 )}
                 horizontal
