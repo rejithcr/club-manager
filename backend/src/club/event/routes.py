@@ -121,14 +121,3 @@ def get_attendance():
     finally:
         db.close_connection(conn)
 
-
-@club_event_bp.route('/attendance', methods=['GET'])
-@role_required([constants.ROLE_MEMBER])
-def report_user_attendance_by_event_type():
-    service = ClubEventService()
-    params = util.get_params(request)
-    conn = db.get_connection()
-    try:
-        return service.report_user_attendance_by_event_type(conn, params), 200
-    finally:
-        db.close_connection(conn)

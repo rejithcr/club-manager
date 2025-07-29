@@ -14,8 +14,8 @@ export default function EventsLayout() {
       <Stack.Screen name="addevent" options={{ headerTitle: () => <StackHeader header={"Add Event"} rightText={clubInfo?.clubName} />, headerShown: true }} />
       <Stack.Screen name="editevent" options={{ headerTitle: () => <StackHeader header={"Edit Event"} rightText={clubInfo?.clubName} />, headerShown: true }} />
       <Stack.Screen name="eventdetails" options={{ headerTitle: () => <StackHeader header={"Event Details"} rightText={clubInfo?.clubName} />, headerShown: true }} />
-      {/* <Stack.Screen name="Attendance" options={{ headerTitle: () => <StackHeader header={"Attendance"} rightText={clubInfo?.clubName} />, headerShown: true }} />
-      <Stack.Screen name="Report"options={{ headerTitle: () => <StackHeader header={"Report"} rightText={clubInfo?.clubName} />, headerShown: true }} /> */}
+      <Stack.Screen name="attendance" options={{ headerTitle: () => <StackHeader header={"Attendance Report"} rightText={clubInfo?.clubName} />, headerShown: true }} />
+      {/* <Stack.Screen name="Report"options={{ headerTitle: () => <StackHeader header={"Report"} rightText={clubInfo?.clubName} />, headerShown: true }} /> */}
     </Stack>
   )
 }

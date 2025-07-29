@@ -26,6 +26,9 @@ export const getEventsByStatus = async (clubId: number, status: string, limit: n
   return get("/club/event", { clubId, status, limit, offset });
 };
 
+export const getAttendanceReport = async (eventTypeId: number | undefined, startDate: Date, endDate: Date) => {
+  return get("/club/event/attendance", { eventTypeId, startDate, endDate });
+};
 
 export const addEvent = async (event: Event) => {
   return post("/club/event", null, { ...event });

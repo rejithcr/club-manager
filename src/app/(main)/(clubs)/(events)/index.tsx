@@ -120,6 +120,8 @@ export default EventsHome;
 const handleMenuPress = (name: string | undefined) => {
   if (name == "addEvent") {
     router.push("/(main)/(clubs)/(events)/addevent");
+  } if (name == "attendance") {
+    router.push("/(main)/(clubs)/(events)/attendance");
   } else {
     throw "Error";
   }
@@ -131,6 +133,12 @@ const actions = [
     text: "Add Event",
     icon: <MaterialCommunityIcons name={"calendar-plus"} size={15} color={"white"} />,
     name: "addEvent",
+    position: 5,
+  },{
+    color: "black",
+    text: "Attendance Report",
+    icon: <MaterialCommunityIcons name={"calendar-plus"} size={15} color={"white"} />,
+    name: "attendance",
     position: 5,
   },
 ];

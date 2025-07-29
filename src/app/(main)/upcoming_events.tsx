@@ -13,10 +13,10 @@ const UpcomingEvents = (props: { events: Event[] }) => {
       {props.events?.length == 0 && <ThemedText style={{ ThemedTextAlign: "center" }}>No upcoming events!</ThemedText>}
       {props.events.map((event) => {
         return (
-          <>
+          <View key={event.eventId}>
             <EventCard event={event} />
             <Spacer space={4} />
-          </>
+          </View>
         );
       })}
     </View>

@@ -24,5 +24,9 @@ Check the content of firebase.json. igore section should contain only firebase.j
    firebase deploy   
 ```
 
+
 ## How to deploy to Playstore
-1. 
+1. EAS BUILD to build artifact in expo server
+```
+eas build --platform android
+```

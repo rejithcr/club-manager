@@ -84,8 +84,8 @@ class ClubEventService():
         status = params.get('status')
         event_type_id = params.get('event_type_id')
         date = params.get('date')
-        limit = params.get('limit', type=int, default=10)
-        offset = params.get('offset', type=int, default=0)
+        limit = params.get('limit')
+        offset = params.get('offset')
 
         filters = []
         values = []
@@ -183,21 +183,20 @@ class ClubEventService():
 
     def get_attendance(self, conn, params):
         event_id = params.get('eventId')
-        attendance = db.fetch(conn, """
-                                        SELECT ms.membership_id, m.member_id, m.first_name, m.last_name, a.present
-                                        FROM attendance a
-                                            join membership ms on ms.membership_id = a.membership_id
-                                            join member m on m.member_id = ms.member_id
-                                        WHERE event_id = %s
-                                    """, (event_id,))
-        return helper.convert_to_camel_case(attendance)
+        start_date = params.get('startDate')
+        end_date = params.get('endDate')
+        event_type_id = params.get('eventTypeId')
 
-    def report_user_attendance_by_event_type(self, conn, params):
-        start_date = params.get('start_date')
-        end_date = params.get('end_date')
-        event_type_id = params.get('event_type_id', type=int)
-        limit = params.get('limit', type=int, default=10)
-        offset = params.get('offset', type=int, default=0)
+        if event_id:
+            attendance = db.fetch(conn, """
+                                            SELECT ms.membership_id, m.member_id, m.first_name, m.last_name, a.present
+                                            FROM attendance a
+                                                join membership ms on ms.membership_id = a.membership_id
+                                                join member m on m.member_id = ms.member_id
+                                            WHERE event_id = %s
+                                        """, (event_id,))
+            return helper.convert_to_camel_case(attendance)
+
 
         filters = []
         values = []
@@ -215,25 +214,24 @@ class ClubEventService():
         where_clause = "WHERE " + " AND ".join(filters) if filters else ""
 
         query = f"""
-                SELECT
-                    mem.first_name,
-                    mem.last_name,
-                    COUNT(a.event_id) AS total_events,
-                    COUNT(a.event_id) FILTER (WHERE a.present IS TRUE) AS attended_events,
-                    ROUND(
-                        COUNT(a.event_id) FILTER (WHERE a.present IS TRUE)::DECIMAL /
-                        NULLIF(COUNT(a.event_id), 0) * 100, 2
-                    ) AS attendance_percentage
-                FROM membership m
-                join member mem on m.membership_id = mem.membership_id
-                JOIN attendance a ON m.membership_id = a.user_id
-                JOIN events e ON a.event_id = e.event_id
-                {where_clause}
-                GROUP BY mem.first_name, mem.last_name
-                ORDER BY attendance_percentage DESC
-                LIMIT %s OFFSET %s
-            """
+                        SELECT
+                            mem.member_id,
+                            mem.first_name,
+                            mem.last_name,
+                            COUNT(a.event_id) AS total_events,
+                            COUNT(a.event_id) FILTER (WHERE a.present IS TRUE) AS attended_events,
+                            ROUND(
+                                COUNT(a.event_id) FILTER (WHERE a.present IS TRUE)::DECIMAL /
+                                NULLIF(COUNT(a.event_id), 0) * 100, 2
+                            ) AS attendance_percentage
+                        FROM membership m
+                        join member mem on m.member_id = mem.member_id
+                        JOIN attendance a ON m.membership_id = a.membership_id
+                        JOIN events e ON a.event_id = e.event_id
+                        {where_clause}
+                        GROUP BY mem.member_id, mem.first_name, mem.last_name
+                        ORDER BY attendance_percentage DESC
+                    """
+        results = db.fetch(conn, query, tuple(values))
+        return helper.convert_to_camel_case(results if results else [])
 
-        values.extend([limit, offset])
-        results = db.execute(conn, query, values)
-        return helper.convert_to_camel_case(results)
