@@ -51,7 +51,7 @@ create table membership (
     club_id integer not null,
     member_id integer not null,
     role_id integer not null,
-    is_active smallint default 1;
+    is_active smallint default 1,
     start_date date not null,
     end_date date,
     created_by varchar(100) not null,
@@ -161,7 +161,7 @@ create table club_adhoc_fee (
     updated_by varchar(100) not null,
     updated_ts timestamp  default now(),
     FOREIGN KEY (club_id) REFERENCES club(club_id),
-    CONSTRAINT unique_adhoc_fee_name UNIQUE (club_id,club_adhoc_fee_name, club_adhoc_fee_is_active)
+    CONSTRAINT unique_adhoc_fee_name UNIQUE (club_id,club_adhoc_fee_name, club_adhoc_fee_date, club_adhoc_fee_is_active)
 );
 CREATE SEQUENCE club_adhoc_fee_id_seq START 1;
 
@@ -211,8 +211,7 @@ create table membership_requests (
     created_ts timestamp  default now(),
     updated_by varchar(100) not null,
     updated_ts timestamp  default now(),
-    CONSTRAINT membership_status_check CHECK (status in ('REQUESTED','APPROVED','REJECTED')),
-    CONSTRAINT unique_membership_request UNIQUE (club_id,member_id)
+    CONSTRAINT membership_status_check CHECK (status in ('REQUESTED','APPROVED','REJECTED'))
 );
 
 create table club_member_attributes (
