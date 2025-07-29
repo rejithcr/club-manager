@@ -25,7 +25,7 @@ CREATE TABLE events (
     location VARCHAR(100),
     event_type_id INT NOT NULL,
     created_by varchar(100) not null,
-    status VARCHAR(20) CHECK (status IN ('Scheduled', 'Completed', 'Canceled')) DEFAULT 'Scheduled',
+    status VARCHAR(20) CHECK (status IN ('Scheduled', 'Completed', 'Cancelled')) DEFAULT 'Scheduled',
     cancellation_reason TEXT,
     FOREIGN KEY (event_type_id) REFERENCES event_types(event_type_id)
 );

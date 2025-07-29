@@ -47,7 +47,7 @@ const EventDetails = () => {
       .then((response) => {
         const attendedMembersLocal = response.data.filter((m: { present: any }) => m.present);
         setAttendedMembersBackup([...attendedMembersLocal]);
-        setAttendedMembers(attendedMembersLocal);
+        setAttendedMembers(attendedMembersLocal.sort((m1: { firstName: string; }, m2: { firstName: any; }) => m1.firstName.localeCompare(m2.firstName)));
         setIsLoadingMembers(true);
         getClubMembers(clubInfo.clubId)
           .then((response) => {
@@ -55,7 +55,7 @@ const EventDetails = () => {
             const difference = members.filter(
               (m: any) => !attendedMembersLocal.some((e: any) => e.membershipId == m.membershipId)
             );
-            setRemainingMembers(difference);
+            setRemainingMembers(difference.sort((m1: { firstName: string; }, m2: { firstName: any; }) => m1.firstName.localeCompare(m2.firstName)));
           })
           .catch(() => alert("Error! please retry"))
           .finally(() => setIsLoadingMembers(false));
