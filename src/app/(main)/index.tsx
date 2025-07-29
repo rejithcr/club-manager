@@ -70,7 +70,7 @@ const Main = () => {
           
           {isLoadingEvents && <><Spacer space={10}/><LoadingSpinner /></> }
           {events?.length > 0 && <><ThemedHeading>Upcoming Events</ThemedHeading>
-          <UpcomingEvents events={events} /></>}
+          <UpcomingEvents events={events} clubs={clubs} /></>}
           {/*<UpcomingMatches memberEmail={userInfo?.email} />*/}
           <Spacer space={50} />
         </ScrollView>

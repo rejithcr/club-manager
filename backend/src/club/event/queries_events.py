@@ -26,7 +26,7 @@ GET_EVENTS = """
 
 
 GET_EVENTS_BY_MEMBER = """
-    SELECT e.event_id, et.name, e.title, e.description, to_char(start_time, 'HH12:MI am') start_time, to_char(end_time, 'HH12:MI am') end_time, e.location, 
+    SELECT c.club_id, e.event_id, et.name, e.title, e.description, to_char(start_time, 'HH12:MI am') start_time, to_char(end_time, 'HH12:MI am') end_time, e.location, 
         e.event_type_id, e.created_by, e.status, to_char(event_date, 'YYYY-mm-dd') event_date , c.club_name
     FROM events e
         join event_types et on et.event_type_id = e.event_type_id

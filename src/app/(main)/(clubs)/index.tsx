@@ -44,7 +44,7 @@ const ClubHome = () => {
   const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
 
   /* events */
-  const { data: events, isLoading: isLoadingEvents } = useHttpGet("/club/event", {
+  const { data: events, isLoading: isLoadingEvents, refetch: fetchEvents } = useHttpGet("/club/event", {
     clubId: params.get("clubId"),
     limit: 5,
     offset: 0,
@@ -130,6 +130,8 @@ const ClubHome = () => {
     fetchFundBalance();
     fetchTotalDue();
     fetchFees();
+    fetchSplits();
+    fetchEvents();
   };
 
   const showAdhocFeeDetails = (adhocFee: any) => {

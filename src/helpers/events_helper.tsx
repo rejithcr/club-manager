@@ -10,6 +10,7 @@ export interface Event {
   eventTypeId: Number;
   createdBy: string;
   clubName?: string;
+  clubId?: number;
 }
 
 import { get, post, put, del } from "../utils/http/api";

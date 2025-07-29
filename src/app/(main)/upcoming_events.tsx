@@ -1,20 +1,30 @@
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { Event } from "@/src/helpers/events_helper";
 import Card from "@/src/components/Card";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import Spacer from "@/src/components/Spacer";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
+import { router } from "expo-router";
+import { useContext } from "react";
+import { ClubContext } from "@/src/context/ClubContext";
 
-const UpcomingEvents = (props: { events: Event[] }) => {
+const UpcomingEvents = (props: { events: Event[]; clubs: any[] }) => {
+  const { setClubInfo } = useContext(ClubContext);
+
+  const gotoEventDetails = async (event: Event) => {
+    const roleName = props.clubs.find(c=> c.clubId == event.clubId).roleName;
+    await setClubInfo({ clubId: event.clubId, clubName: event.clubName, role: roleName });
+    router.push(`/(main)/(clubs)/(events)/eventdetails?event=${JSON.stringify(event)}`)
+  }
   return (
     <View style={{ width: "85%", alignSelf: "center" }}>
       {props.events?.length == 0 && <ThemedText style={{ ThemedTextAlign: "center" }}>No upcoming events!</ThemedText>}
       {props.events.map((event) => {
         return (
-          <View key={event.eventId}>
+          <TouchableOpacity key={event.eventId} onPress={()=> gotoEventDetails(event)}>
             <EventCard event={event} />
             <Spacer space={4} />
-          </View>
+          </TouchableOpacity>
         );
       })}
     </View>
