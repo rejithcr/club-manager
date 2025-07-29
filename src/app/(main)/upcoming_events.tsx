@@ -1,6 +1,4 @@
 import { View } from "react-native";
-import React, { useEffect, useState } from "react";
-import { appStyles } from "@/src/utils/styles";
 import { Event } from "@/src/helpers/events_helper";
 import Card from "@/src/components/Card";
 import ThemedText from "@/src/components/themed-components/ThemedText";

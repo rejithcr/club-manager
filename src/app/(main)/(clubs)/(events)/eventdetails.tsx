@@ -197,7 +197,7 @@ const EventDetails = () => {
           <Spacer space={40} />
           <Modal isVisible={isConfirmVisible}>
             <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
-              <ThemedHeading>{attendanceChanged ? "Update Attendance" : "Update Status"}</ThemedHeading>
+              <ThemedHeading>Update Status</ThemedHeading>
               {attendanceChanged ? (
                 <ThemedText style={{ textAlign: "center" }}>
                   Review the attendance changes and update event status?
