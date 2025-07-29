@@ -10,7 +10,8 @@ import DatePicker from "@/src/components/DatePicker";
 import ThemedButton from "@/src/components/ThemedButton";
 import { getAttendanceReport } from "@/src/helpers/events_helper";
 import ProgressBar from "@/src/components/charts/ProgressBar";
-import { appStyles } from "@/src/utils/styles";
+import ShadowBox from "@/src/components/ShadowBox";
+import ThemedText from "@/src/components/themed-components/ThemedText";
 
 const AttendanceReport = () => {
   const { clubInfo } = useContext(ClubContext);
@@ -62,13 +63,14 @@ const AttendanceReport = () => {
         data={report}
         keyExtractor={(r: any) => r.memberId}
         ItemSeparatorComponent={() => <Spacer space={4} />}
+        ListFooterComponent={() => <Spacer space={10} />}
         renderItem={({ item }) => (
-          <View style={{ ...appStyles.shadowBox, width: "85%", flexDirection: "row", alignItems: "center", justifyContent:"space-between" }}>
-            <Text style={{ width: "60%"}}>{item.firstName} {item.lastName}</Text>
+          <ShadowBox style={{ width: "85%", flexDirection: "row", alignItems: "center", justifyContent:"space-between" }}>
+            <ThemedText style={{ width: "60%"}}>{item.firstName} {item.lastName}</ThemedText>
             <View style={{ width: "40%"}}>
              <ProgressBar height={12} value={Math.round(item.attendancePercentage)} />
              </View>
-          </View>
+          </ShadowBox>
         )}
       />}
     </ThemedView>

@@ -20,6 +20,7 @@ import { arrayDifference } from "@/src/utils/array";
 import { EventItem } from ".";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { router } from "expo-router";
+import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 
 const EventDetails = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
@@ -118,8 +119,11 @@ const EventDetails = () => {
         }}
       >
         <ThemedHeading style={{ width: 200 }}>Mark Attendance</ThemedHeading>
-        <ThemedIcon name="MaterialCommunityIcons:square-edit-outline" size={25} 
-            onPress={() => router.push(`/(main)/(clubs)/(events)/editevent?event=${JSON.stringify(event)}`)} />
+        <ThemedIcon
+          name="MaterialCommunityIcons:square-edit-outline"
+          size={25}
+          onPress={() => router.push(`/(main)/(clubs)/(events)/editevent?event=${JSON.stringify(event)}`)}
+        />
       </ThemedView>
 
       {event && <EventItem event={event} />}
@@ -128,46 +132,8 @@ const EventDetails = () => {
         Please select from the below list to mark attendance
       </ThemedText>
       <Spacer space={8} />
-      <ThemedView
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
-          gap: 10,
-          alignSelf: "center",
-          width: "85%",
-        }}
-      >
-        {isLoadingAttendedMembers && <LoadingSpinner />}
-        {!isLoadingAttendedMembers &&
-          attendedMembers.map((item: any) => (
-            <Chip selected={true} key={item.memberId} onPress={() => removeFromAttended(item)}>
-              <ThemedText>
-                {item?.firstName} {item?.lastName}
-              </ThemedText>
-            </Chip>
-          ))}
-        {isLoadingMembers && <LoadingSpinner />}
-        {!isLoadingMembers && !isLoadingAttendedMembers && remainingMembers.length == 0 && (
-          <ThemedText style={{ textAlign: "center" }}>Yay!! All members attended 👏</ThemedText>
-        )}
-        {!isLoadingMembers &&
-          remainingMembers.map((item: any) => (
-            <Chip selected={false} key={item.memberId} onPress={() => addToAttended(item)}>
-              <ThemedText>
-                {item?.firstName} {item?.lastName}
-              </ThemedText>
-            </Chip>
-          ))}
-      </ThemedView>
-      <Modal isVisible={isConfirmVisible}>
-        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
-          <ThemedHeading>{attendanceChanged ? "Update Attendance" : "Update Status"}</ThemedHeading>
-          {attendanceChanged && (
-            <ThemedText style={{ textAlign: "center" }}>
-              Review the attendance changes and update event status?
-            </ThemedText>
-          )}
-          <Spacer space={10} />
+      <GestureHandlerRootView>
+        <ScrollView>
           <ThemedView
             style={{
               flexDirection: "row",
@@ -177,42 +143,85 @@ const EventDetails = () => {
               width: "85%",
             }}
           >
-            {attendanceDiff.added.map((item: any) => (
-              <Chip selected={true} key={item.memberId} onPress={() => addToAttended(item)}>
-                <ThemedText>
-                  {item?.firstName} {item?.lastName}
-                </ThemedText>
-              </Chip>
-            ))}
-            {attendanceDiff.removed.map((item: any) => (
-              <Chip selected={false} key={item.memberId} onPress={() => addToAttended(item)}>
-                <ThemedText>
-                  {item?.firstName} {item?.lastName}
-                </ThemedText>
-              </Chip>
-            ))}
+            {isLoadingAttendedMembers && <LoadingSpinner />}
+            {!isLoadingAttendedMembers &&
+              attendedMembers.map((item: any) => (
+                <Chip selected={true} key={item.memberId} onPress={() => removeFromAttended(item)}>
+                  <ThemedText>
+                    {item?.firstName} {item?.lastName}
+                  </ThemedText>
+                </Chip>
+              ))}
+            {isLoadingMembers && <LoadingSpinner />}
+            {!isLoadingMembers && !isLoadingAttendedMembers && remainingMembers.length == 0 && (
+              <ThemedText style={{ textAlign: "center" }}>Yay!! All members attended 👏</ThemedText>
+            )}
+            {!isLoadingMembers &&
+              remainingMembers.map((item: any) => (
+                <Chip selected={false} key={item.memberId} onPress={() => addToAttended(item)}>
+                  <ThemedText>
+                    {item?.firstName} {item?.lastName}
+                  </ThemedText>
+                </Chip>
+              ))}
           </ThemedView>
-          <Spacer space={10} />
-          <Picker
-            style={{ width: "80%", alignSelf: "center" }}
-            onValueChange={setEventStatus}
-            selectedValue={eventStatus}
-          >
-            <Picker.Item value={"Scheduled"} label="Scheduled" />
-            <Picker.Item value={"Completed"} label="Completed" />
-            <Picker.Item value={"Cancelled"} label="Cancelled" />
-          </Picker>
-          <Spacer space={10} />
-          {eventStatus === "Cancelled" && (
-            <InputText placeholder="Cancellation Reason" onChangeText={setCancellationReason} />
-          )}
-          <Spacer space={10} />
-          <ThemedView style={{ flexDirection: "row", justifyContent: "space-around" }}>
-            <ThemedButton title="Save" onPress={handleSaveChanges} />
-            <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
-          </ThemedView>
-        </ThemedView>
-      </Modal>
+          <Spacer space={40} />
+          <Modal isVisible={isConfirmVisible}>
+            <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+              <ThemedHeading>{attendanceChanged ? "Update Attendance" : "Update Status"}</ThemedHeading>
+              {attendanceChanged && (
+                <ThemedText style={{ textAlign: "center" }}>
+                  Review the attendance changes and update event status?
+                </ThemedText>
+              )}
+              <Spacer space={10} />
+              <ThemedView
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 10,
+                  alignSelf: "center",
+                  width: "85%",
+                }}
+              >
+                {attendanceDiff.added.map((item: any) => (
+                  <Chip selected={true} key={item.memberId} onPress={() => addToAttended(item)}>
+                    <ThemedText>
+                      {item?.firstName} {item?.lastName}
+                    </ThemedText>
+                  </Chip>
+                ))}
+                {attendanceDiff.removed.map((item: any) => (
+                  <Chip selected={false} key={item.memberId} onPress={() => addToAttended(item)}>
+                    <ThemedText>
+                      {item?.firstName} {item?.lastName}
+                    </ThemedText>
+                  </Chip>
+                ))}
+              </ThemedView>
+              <Spacer space={10} />
+              <Picker
+                style={{ width: "80%", alignSelf: "center" }}
+                onValueChange={setEventStatus}
+                selectedValue={eventStatus}
+              >
+                <Picker.Item value={"Scheduled"} label="Scheduled" />
+                <Picker.Item value={"Completed"} label="Completed" />
+                <Picker.Item value={"Cancelled"} label="Cancelled" />
+              </Picker>
+              <Spacer space={10} />
+              {eventStatus === "Cancelled" && (
+                <InputText placeholder="Cancellation Reason" onChangeText={setCancellationReason} />
+              )}
+              <Spacer space={10} />
+              <ThemedView style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                <ThemedButton title="Save" onPress={handleSaveChanges} />
+                <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
+              </ThemedView>
+            </ThemedView>
+          </Modal>
+        </ScrollView>
+      </GestureHandlerRootView>
       <View
         style={{
           position: "absolute",

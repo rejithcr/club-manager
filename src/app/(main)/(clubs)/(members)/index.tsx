@@ -47,7 +47,7 @@ export default function Home() {
           <FlatList
             data={members}
             initialNumToRender={8}
-            ListFooterComponent={<Spacer space={10} />}
+            ListFooterComponent={<Spacer space={60} />}
             ItemSeparatorComponent={() => <Spacer space={4} />}
             refreshControl={<RefreshControl refreshing={false} onRefresh={loadMembers} />}
             renderItem={({ item }) => (

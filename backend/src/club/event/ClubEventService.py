@@ -215,22 +215,24 @@ class ClubEventService():
 
         query = f"""
                         SELECT
-                            mem.member_id,
-                            mem.first_name,
-                            mem.last_name,
-                            COUNT(a.event_id) AS total_events,
+                            m.member_id,
+                            m.first_name,
+                            m.last_name,
+                            COUNT(e.event_id) AS total_events,
                             COUNT(a.event_id) FILTER (WHERE a.present IS TRUE) AS attended_events,
                             ROUND(
-                                COUNT(a.event_id) FILTER (WHERE a.present IS TRUE)::DECIMAL /
-                                NULLIF(COUNT(a.event_id), 0) * 100, 2
+                                COUNT(e.event_id) FILTER (WHERE a.present IS TRUE)::DECIMAL /
+                                NULLIF(COUNT(e.event_id), 0) * 100, 2
                             ) AS attendance_percentage
-                        FROM membership m
-                        join member mem on m.member_id = mem.member_id
-                        JOIN attendance a ON m.membership_id = a.membership_id
-                        JOIN events e ON a.event_id = e.event_id
+                         FROM events e                        
+                        	join event_types et on et.event_type_id = e.event_type_id 
+                        	join club c on c.club_id = et.club_id
+                        	join membership ms ON ms.club_id=c.club_id 
+                        	join "member" m on m.member_id = ms.member_id
+                        	left join attendance a ON a.event_id = e.event_id and a.membership_id = ms.membership_id
                         {where_clause}
-                        GROUP BY mem.member_id, mem.first_name, mem.last_name
-                        ORDER BY attendance_percentage DESC
+                        GROUP BY m.member_id, m.first_name, m.last_name
+                        ORDER BY attendance_percentage DESC, m.first_name
                     """
         results = db.fetch(conn, query, tuple(values))
         return helper.convert_to_camel_case(results if results else [])

@@ -185,13 +185,13 @@ export const EventItem = ({ event }: { event: any }) => {
               </ThemedText>
             </View>
           )}
-          {event.location && (
+          {event.location ? 
             <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
               <ThemedIcon name={"MaterialIcons:location-pin"} size={15} />
               <Spacer hspace={2} />
               <ThemedText style={{ textAlign: "right", fontSize: 12}}>{event.location}</ThemedText>
-            </View>
-          )}
+            </View> : null // i dont know why erro txt  inside view. this worked though
+          }
         </ThemedView>
       </ThemedView>
     </ThemedView>

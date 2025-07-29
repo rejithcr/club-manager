@@ -47,7 +47,6 @@ const ClubHome = () => {
     clubId: params.get("clubId"),
     limit: 5,
     offset: 0,
-    status: "Scheduled",
   });
 
   const {
@@ -369,7 +368,7 @@ const ClubHome = () => {
               />
             </View>
           )}
-          <Spacer space={20} />
+          <Spacer space={50} />
         </ScrollView>
 
         {isEditClubVisible && (
@@ -382,16 +381,15 @@ const ClubHome = () => {
             onCancel={() => setIsEditClubVisible(false)}
           />
         )}
-
         {alertConfig?.visible && <Alert {...alertConfig} />}
-        <FloatingMenu
-          actions={actions}
-          position={"left"}
-          color="black"
-          icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-          onPressItem={(name: string | undefined) => handleMenuPress(name, handleEditClub)}
-        />
       </GestureHandlerRootView>
+      <FloatingMenu
+        actions={actions}
+        position={"left"}
+        color="black"
+        icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
+        onPressItem={(name: string | undefined) => handleMenuPress(name, handleEditClub)}
+      />
     </ThemedView>
   );
 };
