@@ -13,6 +13,7 @@ import ThemedText from "@/src/components/themed-components/ThemedText";
 import { useTheme } from "@/src/hooks/use-theme";
 import { appStyles } from "@/src/utils/styles";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
+import { ROLE_ADMIN } from "@/src/utils/constants";
 
 const EventsHome = () => {
   const [events, setEvents] = useState<any[]>([]);
@@ -69,9 +70,9 @@ const EventsHome = () => {
     onRefresh();
   }, []);
 
-  const gotoPage =(url: any) => {
-    router.push(url)
-  }
+  const gotoPage = (url: any) => {
+    router.push(url);
+  };
 
   return (
     <>
@@ -107,14 +108,15 @@ const EventsHome = () => {
         )}
         {alertConfig?.visible && <Alert {...alertConfig} />}
       </ThemedView>
-      
-      <FloatingMenu
-        actions={actions}
-        position={"left"}
-        color="black"
-        icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-        onPressItem={(name: string | undefined) => handleMenuPress(name, gotoPage)}
-      />
+      {clubInfo.role === ROLE_ADMIN && (
+        <FloatingMenu
+          actions={actions}
+          position={"left"}
+          color="black"
+          icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
+          onPressItem={(name: string | undefined) => handleMenuPress(name, gotoPage)}
+        />
+      )}
     </>
   );
 };
@@ -138,7 +140,8 @@ const actions = [
     icon: <MaterialCommunityIcons name={"calendar-plus"} size={15} color={"white"} />,
     name: "addEvent",
     position: 5,
-  },{
+  },
+  {
     color: "black",
     text: "Attendance Report",
     icon: <AntDesign name={"barschart"} size={15} color={"white"} />,
@@ -151,8 +154,8 @@ export const EventItem = ({ event }: { event: any }) => {
   const { colors } = useTheme();
   return (
     <ThemedView style={{ ...appStyles.shadowBox, width: "85%" }}>
-      <ThemedView style={{ flexDirection: "row", width: "100%", justifyContent: "space-between"}}>
-        <ThemedView style={{rowGap: 3 }}>
+      <ThemedView style={{ flexDirection: "row", width: "100%", justifyContent: "space-between" }}>
+        <ThemedView style={{ rowGap: 3 }}>
           <ThemedText style={{ fontWeight: "bold" }}>{event.title}</ThemedText>
           <ThemedText style={{ fontSize: 10 }}>{event.description}</ThemedText>
           <ThemedView style={{ flexDirection: "row" }}>
@@ -174,7 +177,7 @@ export const EventItem = ({ event }: { event: any }) => {
             </ThemedText>
           </ThemedView>
         </ThemedView>
-        <ThemedView style={{rowGap: 3 }}>
+        <ThemedView style={{ rowGap: 3 }}>
           <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
             <ThemedIcon name={"MaterialIcons:calendar-today"} size={15} />
             <Spacer hspace={2} />
@@ -184,17 +187,19 @@ export const EventItem = ({ event }: { event: any }) => {
             <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
               <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
               <Spacer hspace={2} />
-              <ThemedText style={{ fontSize: 12}}>
+              <ThemedText style={{ fontSize: 12 }}>
                 {event.startTime} {event.endTime && " - " + event.endTime}
               </ThemedText>
             </View>
           )}
-          {event.location ? 
-            <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
-              <ThemedIcon name={"MaterialIcons:location-pin"} size={15} />
-              <Spacer hspace={2} />
-              <ThemedText style={{ textAlign: "right", fontSize: 12}}>{event.location}</ThemedText>
-            </View> : null // i dont know why erro txt  inside view. this worked though
+          {
+            event.location ? (
+              <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+                <ThemedIcon name={"MaterialIcons:location-pin"} size={15} />
+                <Spacer hspace={2} />
+                <ThemedText style={{ textAlign: "right", fontSize: 12 }}>{event.location}</ThemedText>
+              </View>
+            ) : null // i dont know why erro txt  inside view. this worked though
           }
         </ThemedView>
       </ThemedView>

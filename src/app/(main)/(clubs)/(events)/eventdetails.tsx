@@ -23,6 +23,7 @@ import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "@/src/hooks/use-theme";
 import Alert, { AlertProps } from "@/src/components/Alert";
+import { ROLE_ADMIN } from "@/src/utils/constants";
 
 const EventDetails = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
@@ -47,7 +48,11 @@ const EventDetails = () => {
       .then((response) => {
         const attendedMembersLocal = response.data.filter((m: { present: any }) => m.present);
         setAttendedMembersBackup([...attendedMembersLocal]);
-        setAttendedMembers(attendedMembersLocal.sort((m1: { firstName: string; }, m2: { firstName: any; }) => m1.firstName.localeCompare(m2.firstName)));
+        setAttendedMembers(
+          attendedMembersLocal.sort((m1: { firstName: string }, m2: { firstName: any }) =>
+            m1.firstName.localeCompare(m2.firstName)
+          )
+        );
         setIsLoadingMembers(true);
         getClubMembers(clubInfo.clubId)
           .then((response) => {
@@ -55,7 +60,11 @@ const EventDetails = () => {
             const difference = members.filter(
               (m: any) => !attendedMembersLocal.some((e: any) => e.membershipId == m.membershipId)
             );
-            setRemainingMembers(difference.sort((m1: { firstName: string; }, m2: { firstName: any; }) => m1.firstName.localeCompare(m2.firstName)));
+            setRemainingMembers(
+              difference.sort((m1: { firstName: string }, m2: { firstName: any }) =>
+                m1.firstName.localeCompare(m2.firstName)
+              )
+            );
           })
           .catch(() => alert("Error! please retry"))
           .finally(() => setIsLoadingMembers(false));
@@ -148,11 +157,15 @@ const EventDetails = () => {
         }}
       >
         <ThemedHeading style={{ width: 200 }}>Mark Attendance</ThemedHeading>
-        <ThemedIcon
-          name="MaterialCommunityIcons:square-edit-outline"
-          size={25}
-          onPress={() => router.push(`/(main)/(clubs)/(events)/editevent?event=${JSON.stringify(event)}`)}
-        />
+        {clubInfo.role === ROLE_ADMIN ? (
+          <ThemedIcon
+            name="MaterialCommunityIcons:square-edit-outline"
+            size={25}
+            onPress={() => router.push(`/(main)/(clubs)/(events)/editevent?event=${JSON.stringify(event)}`)}
+          />
+        ) : (
+          <ThemedText></ThemedText>
+        )}
       </ThemedView>
 
       {event && <EventItem event={event} />}
@@ -253,37 +266,35 @@ const EventDetails = () => {
           </Modal>
         </ScrollView>
       </GestureHandlerRootView>
-
-      <View
-        style={{
-          position: "absolute",
-          flexDirection: "row",
-          bottom: 30,
-          justifyContent: "space-around",
-          alignSelf: "center",
-          width: "100%",
-        }}
-      >
-        {isDeleting ? (
-          <LoadingSpinner />
-        ) : (
-          <>
-            <ThemedButton title="Update Status" onPress={() => setIsConfirmVisible(true)} />
-            <MaterialCommunityIcons name="delete" size={30} onPress={() => handleDeleteEvent()} color={colors.error} />
-          </>
-        )}
-      </View>
+      {clubInfo.role === ROLE_ADMIN && (
+        <View
+          style={{
+            position: "absolute",
+            flexDirection: "row",
+            bottom: 30,
+            justifyContent: "space-around",
+            alignSelf: "center",
+            width: "100%",
+          }}
+        >
+          {isDeleting ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <ThemedButton title="Update Status" onPress={() => setIsConfirmVisible(true)} />
+              <MaterialCommunityIcons
+                name="delete"
+                size={30}
+                onPress={() => handleDeleteEvent()}
+                color={colors.error}
+              />
+            </>
+          )}
+        </View>
+      )}
       {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
   );
 };
 
 export default EventDetails;
-function setAlertConfig(arg0: {
-  visible: boolean;
-  title: string;
-  message: string;
-  buttons: { text: string; onPress: () => void }[];
-}) {
-  throw new Error("Function not implemented.");
-}
