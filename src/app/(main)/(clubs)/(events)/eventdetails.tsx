@@ -209,60 +209,62 @@ const EventDetails = () => {
           </ThemedView>
           <Spacer space={40} />
           <Modal isVisible={isConfirmVisible}>
-            <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
-              <ThemedHeading>Update Status</ThemedHeading>
-              {attendanceChanged ? (
-                <ThemedText style={{ textAlign: "center" }}>
-                  Review the attendance changes and update event status?
-                </ThemedText>
-              ) : (
-                <ThemedText style={{ textAlign: "center" }}>Update event status?</ThemedText>
-              )}
-              <Spacer space={10} />
-              <ThemedView
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: 10,
-                  alignSelf: "center",
-                  width: "85%",
-                }}
-              >
-                {attendanceDiff.added.map((item: any) => (
-                  <Chip selected={true} key={item.memberId}>
-                    <ThemedText>
-                      {item?.firstName} {item?.lastName}
-                    </ThemedText>
-                  </Chip>
-                ))}
-                {attendanceDiff.removed.map((item: any) => (
-                  <Chip selected={false} key={item.memberId}>
-                    <ThemedText>
-                      {item?.firstName} {item?.lastName}
-                    </ThemedText>
-                  </Chip>
-                ))}
+            <ScrollView>
+              <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+                <ThemedHeading>Update Status</ThemedHeading>
+                {attendanceChanged ? (
+                  <ThemedText style={{ textAlign: "center" }}>
+                    Review the attendance changes and update event status?
+                  </ThemedText>
+                ) : (
+                  <ThemedText style={{ textAlign: "center" }}>Update event status?</ThemedText>
+                )}
+                <Spacer space={10} />
+                <ThemedView
+                  style={{
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: 10,
+                    alignSelf: "center",
+                    width: "85%",
+                  }}
+                >
+                  {attendanceDiff.added.map((item: any) => (
+                    <Chip selected={true} key={item.memberId}>
+                      <ThemedText>
+                        {item?.firstName} {item?.lastName}
+                      </ThemedText>
+                    </Chip>
+                  ))}
+                  {attendanceDiff.removed.map((item: any) => (
+                    <Chip selected={false} key={item.memberId}>
+                      <ThemedText>
+                        {item?.firstName} {item?.lastName}
+                      </ThemedText>
+                    </Chip>
+                  ))}
+                </ThemedView>
+                <Spacer space={10} />
+                <Picker
+                  style={{ width: "80%", alignSelf: "center" }}
+                  onValueChange={setEventStatus}
+                  selectedValue={eventStatus}
+                >
+                  <Picker.Item value={"Scheduled"} label="Scheduled" />
+                  <Picker.Item value={"Completed"} label="Completed" />
+                  <Picker.Item value={"Cancelled"} label="Cancelled" />
+                </Picker>
+                <Spacer space={10} />
+                {eventStatus === "Cancelled" && (
+                  <InputText placeholder="Cancellation Reason" onChangeText={setCancellationReason} />
+                )}
+                <Spacer space={10} />
+                <ThemedView style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                  {isSaving ? <LoadingSpinner /> : <ThemedButton title="Save" onPress={handleSaveChanges} />}
+                  <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
+                </ThemedView>
               </ThemedView>
-              <Spacer space={10} />
-              <Picker
-                style={{ width: "80%", alignSelf: "center" }}
-                onValueChange={setEventStatus}
-                selectedValue={eventStatus}
-              >
-                <Picker.Item value={"Scheduled"} label="Scheduled" />
-                <Picker.Item value={"Completed"} label="Completed" />
-                <Picker.Item value={"Cancelled"} label="Cancelled" />
-              </Picker>
-              <Spacer space={10} />
-              {eventStatus === "Cancelled" && (
-                <InputText placeholder="Cancellation Reason" onChangeText={setCancellationReason} />
-              )}
-              <Spacer space={10} />
-              <ThemedView style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                {isSaving ? <LoadingSpinner /> : <ThemedButton title="Save" onPress={handleSaveChanges} />}
-                <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
-              </ThemedView>
-            </ThemedView>
+            </ScrollView>
           </Modal>
         </ScrollView>
       </GestureHandlerRootView>

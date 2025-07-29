@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { router } from "expo-router";
 
-const BASE_URL = process.env.EXPO_PUBLIC_BASE_URL;
+const BASE_URL = 'https://n24tjyszxraupd5cuogxf377i40xiltl.lambda-url.ap-south-1.on.aws';
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,

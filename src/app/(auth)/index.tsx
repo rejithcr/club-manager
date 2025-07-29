@@ -28,7 +28,8 @@ const AuthHome = () => {
     //scopes: ['https://www.googleapis.com/auth/user.phonenumbers.read'],
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
     iosClientId: "",
-    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+    webClientId:
+      "586660286227-4p4t4g48ank7v2uud44t5dqsfqfra541.apps.googleusercontent.com",
     redirectUri: redirectUri,
   });
 
