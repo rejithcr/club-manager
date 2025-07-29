@@ -16,7 +16,9 @@ import ThemedText from "@/src/components/themed-components/ThemedText";
 const AttendanceReport = () => {
   const { clubInfo } = useContext(ClubContext);
   const [eventTypeId, setEventTypeId] = useState<number>();
-  const [startDate, setStartDate] = useState(new Date());
+  const defaultDate = new Date();
+  defaultDate.setMonth(defaultDate.getMonth() - 1);
+  const [startDate, setStartDate] = useState(defaultDate);
   const [endDate, setEndDate] = useState(new Date());
   const [report, setReport] = useState([]);
   const [isLoadingReport, setIsLoadingReport] = useState(false);
@@ -58,21 +60,28 @@ const AttendanceReport = () => {
       {!isLoadingEventTypes && <ThemedButton title="Show Report" onPress={handleShowReport} />}
 
       <Spacer space={5} />
-      {isLoadingReport ? <LoadingSpinner/> :
-      <FlatList
-        data={report}
-        keyExtractor={(r: any) => r.memberId}
-        ItemSeparatorComponent={() => <Spacer space={4} />}
-        ListFooterComponent={() => <Spacer space={10} />}
-        renderItem={({ item }) => (
-          <ShadowBox style={{ width: "85%", flexDirection: "row", alignItems: "center", justifyContent:"space-between" }}>
-            <ThemedText style={{ width: "60%"}}>{item.firstName} {item.lastName}</ThemedText>
-            <View style={{ width: "40%"}}>
-             <ProgressBar height={12} value={Math.round(item.attendancePercentage)} />
-             </View>
-          </ShadowBox>
-        )}
-      />}
+      {isLoadingReport ? (
+        <LoadingSpinner />
+      ) : (
+        <FlatList
+          data={report}
+          keyExtractor={(r: any) => r.memberId}
+          ItemSeparatorComponent={() => <Spacer space={4} />}
+          ListFooterComponent={() => <Spacer space={10} />}
+          renderItem={({ item }) => (
+            <ShadowBox
+              style={{ width: "85%", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}
+            >
+              <ThemedText style={{ width: "60%" }}>
+                {item.firstName} {item.lastName}
+              </ThemedText>
+              <View style={{ width: "40%" }}>
+                <ProgressBar height={12} value={Math.round(item.attendancePercentage)} />
+              </View>
+            </ShadowBox>
+          )}
+        />
+      )}
     </ThemedView>
   );
 };
