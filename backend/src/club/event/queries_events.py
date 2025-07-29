@@ -54,7 +54,11 @@ GET_EVENT_TYPES = """
     where club_id = %s
 """
 
-DELETE_EVENT = "DELETE FROM events WHERE event_id = %s"
+DELETE_EVENT = """
+    DELETE FROM rsvps WHERE event_id = %s;
+    DELETE FROM attendance WHERE event_id = %s;
+    DELETE FROM events WHERE event_id = %s;
+"""
 
 INSERT_EVET_TYPES = """
     INSERT INTO event_types (club_id, name) VALUES 

@@ -19,8 +19,8 @@ const AddEvent = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState(new Date());
-  const [startTime, setStartTime] = useState();
-  const [endTime, setEndTime] = useState();
+  const [startTime, setStartTime] = useState<string>("");
+  const [endTime, setEndTime] = useState<string>("");
   const [location, setLocation] = useState("");
   const [eventTypeId, setEventTypeId] = useState("");
   const [isAdding, setIAdding] = useState(false);
@@ -74,6 +74,17 @@ const AddEvent = () => {
       .finally(() => setIAdding(false));
   };
 
+  const handleTimeChange = (text: string, setState: React.Dispatch<React.SetStateAction<string>>) => {
+    const raw = text.replace(/[^0-9]/g, '');
+    let formatted = '';
+    if (raw.length <= 2) {
+      formatted = raw;
+    } else {
+      formatted = raw.slice(0, 2) + ':' + raw.slice(2, 4);
+    }
+    setState(formatted);
+  };
+
   return (
     <ThemedView style={styles.container}>
       <InputText
@@ -93,14 +104,16 @@ const AddEvent = () => {
       <InputText
         value={startTime}
         label="Start Time"
-        onChangeText={setStartTime}
+        onChangeText={(text: string) => handleTimeChange(text, setStartTime)}
         placeholder="00:00"
+        keyboardType="numeric"
       />
       <InputText
         value={endTime}
         label="End Time"
-        onChangeText={setEndTime}
+        onChangeText={(text: string) => handleTimeChange(text, setEndTime)}
         placeholder="00:00"
+        keyboardType="numeric"
       />
       <InputText
         label={"Location"}

@@ -12,10 +12,14 @@ export interface Event {
   clubName?: string;
 }
 
-import { get, post, put } from "../utils/http/api";
+import { get, post, put, del } from "../utils/http/api";
 
 export const getEvents = async (clubId: number, limit: number, offset: number) => {
   return get("/club/event", { clubId, limit, offset });
+};
+
+export const deleteEvent = async (eventId: number|undefined) => {
+  return del("/club/event", { eventId }, null);
 };
 
 export const getEventsByMember = async (clubIds: string, limit: number, offset: number) => {

@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import ThemedView from "@/src/components/themed-components/ThemedView";
-import { EventCard } from "../../upcoming_events";
 import { useSearchParams } from "expo-router/build/hooks";
-import { Event, getAtendedMembers, saveEventChanges } from "@/src/helpers/events_helper";
+import { deleteEvent, Event, getAtendedMembers, saveEventChanges } from "@/src/helpers/events_helper";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import Spacer from "@/src/components/Spacer";
 import ThemedText from "@/src/components/themed-components/ThemedText";
@@ -21,6 +20,9 @@ import { EventItem } from ".";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { router } from "expo-router";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useTheme } from "@/src/hooks/use-theme";
+import Alert, { AlertProps } from "@/src/components/Alert";
 
 const EventDetails = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
@@ -37,6 +39,7 @@ const EventDetails = () => {
   const [event, setEvent] = useState<Event>();
   const params = useSearchParams();
   const { clubInfo } = useContext(ClubContext);
+  const { colors } = useTheme();
 
   const loadClubMembers = (eventId: string) => {
     setIsLoadingAttendedMembers(true);
@@ -106,6 +109,33 @@ const EventDetails = () => {
         setIsConfirmVisible(false);
       });
   };
+
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<AlertProps>();
+  const handleDeleteEvent = () => {
+    setAlertConfig({
+      visible: true,
+      title: "Are you sure!",
+      message: "This will delete the event and its attendance records. This cannot be recovered.",
+      buttons: [
+        {
+          text: "OK",
+          onPress: () => {
+            setAlertConfig({ visible: false });
+            setIsDeleting(true);
+            deleteEvent(event?.eventId)
+              .then((response) => {
+                alert(response.data.message);
+                router.dismissTo("/(main)/(clubs)/(events)");
+              })
+              .catch((error) => alert(error.response.data.error))
+              .finally(() => setIsDeleting(false));
+          },
+        },
+        { text: "Cancel", onPress: () => setAlertConfig({ visible: false }) },
+      ],
+    });
+  };
   return (
     <ThemedView style={{ flex: 1 }}>
       <ThemedView
@@ -168,14 +198,13 @@ const EventDetails = () => {
           <Modal isVisible={isConfirmVisible}>
             <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
               <ThemedHeading>{attendanceChanged ? "Update Attendance" : "Update Status"}</ThemedHeading>
-              {attendanceChanged ? 
+              {attendanceChanged ? (
                 <ThemedText style={{ textAlign: "center" }}>
                   Review the attendance changes and update event status?
-                </ThemedText> :
-                <ThemedText style={{ textAlign: "center" }}>
-                  Update event status?
-                </ThemedText> 
-              }
+                </ThemedText>
+              ) : (
+                <ThemedText style={{ textAlign: "center" }}>Update event status?</ThemedText>
+              )}
               <Spacer space={10} />
               <ThemedView
                 style={{
@@ -217,13 +246,14 @@ const EventDetails = () => {
               )}
               <Spacer space={10} />
               <ThemedView style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                <ThemedButton title="Save" onPress={handleSaveChanges} />
+                {isSaving ? <LoadingSpinner /> : <ThemedButton title="Save" onPress={handleSaveChanges} />}
                 <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
               </ThemedView>
             </ThemedView>
           </Modal>
         </ScrollView>
       </GestureHandlerRootView>
+
       <View
         style={{
           position: "absolute",
@@ -234,10 +264,26 @@ const EventDetails = () => {
           width: "100%",
         }}
       >
-        <ThemedButton title="Update Status" onPress={() => setIsConfirmVisible(true)} />
+        {isDeleting ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <ThemedButton title="Update Status" onPress={() => setIsConfirmVisible(true)} />
+            <MaterialCommunityIcons name="delete" size={30} onPress={() => handleDeleteEvent()} color={colors.error} />
+          </>
+        )}
       </View>
+      {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
   );
 };
 
 export default EventDetails;
+function setAlertConfig(arg0: {
+  visible: boolean;
+  title: string;
+  message: string;
+  buttons: { text: string; onPress: () => void }[];
+}) {
+  throw new Error("Function not implemented.");
+}

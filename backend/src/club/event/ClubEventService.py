@@ -74,8 +74,8 @@ class ClubEventService():
 
 
     def delete(self, conn, params):
-        event_id = params['event_id']
-        db.execute(conn, queries_events.DELETE_EVENT, (event_id,))
+        event_id = params['eventId']
+        db.execute(conn, queries_events.DELETE_EVENT, (event_id,event_id,event_id))
         conn.commit()
         return jsonify({'message': 'Event deleted'})
 
