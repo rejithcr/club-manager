@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "expo-router/build/hooks";
 import { deleteClub, getClubCounts, getTotalDue, updateClub } from "@/src/helpers/club_helper";
 import { FlatList, GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
@@ -25,6 +25,7 @@ import InputText from "@/src/components/InputText";
 import ThemedButton from "@/src/components/ThemedButton";
 import { UserContext } from "@/src/context/UserContext";
 import { EventCard } from "../upcoming_events";
+import { router } from "expo-router";
 
 const ClubHome = () => {
   const router = useRouter();
@@ -395,24 +396,29 @@ const ClubHome = () => {
 const handleMenuPress = (name: string | undefined, handleEditClub: any) => {
   if (name == "edit") {
     handleEditClub();
-  } else if (name == "members") {
-    //router.push(`/(main)/(members)`)
-  } else if (name == "transactions") {
-    // router.push(`/(main)/(clubs)/(transactions)`)
+  } else if (name == "events") {
+    router.push(`/(main)/(clubs)/(events)`)
+  } else if (name == "expensesplits") {
+    router.push(`/(main)/(clubs)/(fees)/adhocfee`)
   } else {
     throw "Error";
   }
 };
 
 const actions = [
-  // {
-  //     color: "black",
-  //     text: "Attendance",
-  //     icon: <MaterialCommunityIcons name={"human-greeting-variant"} size={15} color={"white"} />,
-  //     name: "attendance",
-  //     position: 3
-  // },
   {
+      color: "black",
+      text: "Events",
+      icon: <SimpleLineIcons name={"event"} size={15} color={"white"} />,
+      name: "events",
+      position: 3
+  },{
+      color: "black",
+      text: "Expense Splits",
+      icon: <MaterialIcons name={"attach-money"} size={15} color={"white"} />,
+      name: "expensesplits",
+      position: 3
+  },{
     color: "black",
     text: "Edit Club",
     icon: <MaterialCommunityIcons name={"square-edit-outline"} size={15} color={"white"} />,
