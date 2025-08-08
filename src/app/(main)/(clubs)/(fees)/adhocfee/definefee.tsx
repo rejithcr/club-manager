@@ -4,7 +4,6 @@ import InputText from '@/src/components/InputText'
 import { MaterialIcons } from '@expo/vector-icons'
 import ThemedButton from '@/src/components/ThemedButton'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import { addAdhocFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { router } from 'expo-router'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
@@ -18,9 +17,10 @@ import ShadowBox from '@/src/components/ShadowBox'
 import { useTheme } from '@/src/hooks/use-theme'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import DatePicker from '@/src/components/DatePicker'
+import { useAddFeesAdhocMutation } from '@/src/services/feeApi'
+import { snackbarRef } from '@/src/components/snackbar/SnackbarRef'
 
 const DefineFee = () => {
-    const [isLoading, setIsLoading] = useState(false);
     const [isLoadingMembers, setIsLoadingMembers] = useState(false);
     const [members, setMembers] = useState<any[]>([])
     const [addedMembers, setAddedMembers] = useState<any[]>([])
@@ -44,25 +44,34 @@ const DefineFee = () => {
         setIsLoadingMembers(true)
         getClubMembers(clubInfo.clubId)
             .then((response) => setMembers(response.data))
-            .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
-                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
+            .catch(error => snackbarRef.current?.show((error.response.data.error, 'error')))
             .finally(() => setIsLoadingMembers(false))
     }, [])
-    const addFee = () => {
-        if (validate(feeName, feeAmount, addedMembers)) {
-            setIsLoading(true)
-            const feeAddedMembers = addedMembers.map( m=> {return {...m, clubAdocFeePaymentAmount: amountPerMember}})            
-            addAdhocFee(clubInfo.clubId, feeName, feeDescription, feeAmount, date, feeAddedMembers,userInfo.email)
-                .then((response) => {
-                    console.log(response.data)
-                    alert("Fee added successfully")
-                    router.dismissTo(`/(main)/(clubs)/(fees)/adhocfee`)
-                })
-                .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
-                                                buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
-                .finally(() => setIsLoading(false))
+    
+    const [addFee, { isLoading}] = useAddFeesAdhocMutation();
+
+    const handleAddFeeAdhoc = async () => {
+      if (validate(feeName, feeAmount, addedMembers)) {
+        try {
+          const feeAddedMembers = addedMembers.map((m) => {
+            return { ...m, clubAdocFeePaymentAmount: amountPerMember };
+          });
+          await addFee({
+            clubId: clubInfo.clubId,
+            adhocFeeName: feeName,
+            adhocFeeDesc: feeDescription,
+            adhocFeeAmount: feeAmount,
+            adhocFeeDate: date,
+            addedMembers: feeAddedMembers,
+            email: userInfo.email,
+          }).unwrap(); // unwrap to catch errors
+          alert("Fee added successfully");
+          router.dismissTo(`/(main)/(clubs)/(fees)/adhocfee`);
+        } catch (err) {
+            console.log("Error", err)
         }
-    }
+      }
+    };
 
     const addMember = (member: any) => {
         setAddedMembers((prev_a: any) => {
@@ -126,7 +135,7 @@ const DefineFee = () => {
                     }
                 </View>
             </ScrollView>
-            <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 30 }} title='Start Collection' onPress={addFee} />
+            <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 30 }} title='Start Collection' onPress={handleAddFeeAdhoc} />
             {alertConfig?.visible && <Alert {...alertConfig}/>}
         </GestureHandlerRootView>
         </ThemedView>

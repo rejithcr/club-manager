@@ -1,5 +1,5 @@
 import { View, TouchableOpacity, FlatList, RefreshControl } from 'react-native'
-import React, { useCallback, useContext, useRef, useState } from 'react'
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { getAdhocFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
@@ -12,61 +12,47 @@ import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
-import Alert, { AlertProps } from '@/src/components/Alert'
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 import ProgressBar from '@/src/components/charts/ProgressBar'
+import { useGetFeesAdhocQuery } from '@/src/services/feeApi'
+
+const limit = 20;
 
 const AdocFeesHome = () => {
-  const [isLoadingAdhoc, setIsLoadingAdhoc] = useState(false);
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
-  const [adhocFees, setAdhocFees] = useState<any[]>([])
   const { clubInfo } = useContext(ClubContext)
   const { colors } = useTheme();
+  
+  const [offset, setOffset] = useState(0);
+  const [items, setItems] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useFocusEffect(
-    useCallback(() => {
-      onRefresh()
-      return () => { console.log('Screen is unfocused'); };
-    }, [])
-  );
+  const {
+    data: expenseSplits,
+    isLoading: isFetching,
+    refetch,
+  } = useGetFeesAdhocQuery({ clubId: Number(clubInfo.clubId), limit, offset }, { skip: !hasMore });
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setOffset(0);
+    refetch(); // Optional: triggers revalidation
+  }, [refetch]);
 
-  const offset = useRef(0)
-  const limit = 20
-  const [hasMoreData, setHasMoreData] = useState(false)
-  const [isFectching, setIsFetching] = useState(false)
-
-  const onRefresh = () => {
-    setIsLoadingAdhoc(true)
-    offset.current = 0
-    getAdhocFee(clubInfo.clubId, limit, offset.current)
-      .then(response => {
-        setHasMoreData(response.data?.length > 0);
-        setAdhocFees(response.data)
-      })
-      .catch(error => setAlertConfig({
-        visible: true, title: 'Error', message: error.response.data.error,
-        buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-      }))
-      .finally(() => setIsLoadingAdhoc(false))
-  }
-
-  const fetchNextPage = () => {
-    if (hasMoreData && !isFectching) {
-      setIsFetching(true)
-      offset.current = offset.current + limit
-      getAdhocFee(clubInfo.clubId, limit, offset.current)
-        .then(response => {
-          setHasMoreData(response.data?.length > 0);
-          setAdhocFees((prev: any) => [...prev, ...response.data])
-        })
-        .catch(error => setAlertConfig({
-          visible: true, title: 'Error', message: error.response.data.error,
-          buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-        }))
-        .finally(() => setIsFetching(false))
+  useEffect(() => {
+    if (expenseSplits) {
+      setItems((prev) => [...prev, ...expenseSplits]);
+      if (expenseSplits.length < limit) {
+        setHasMore(false);
+      }
     }
-  }
+  }, [expenseSplits]);
+
+  const loadMore = () => {
+    if (!isFetching && hasMore) {
+      setOffset((prev) => prev + limit);
+    }
+  };
 
   const showAdhocFeeDetails = (adhocFee: any) => {
     router.push({
@@ -88,20 +74,20 @@ const AdocFeesHome = () => {
               <ThemedIcon size={25} name={'MaterialCommunityIcons:plus-circle'} color={colors.add} />
             </TouchableOpacity>}</View>
         </View>
-        {isLoadingAdhoc && <LoadingSpinner />}
-        {!isLoadingAdhoc && adhocFees?.length == 0 &&
+        {isFetching && <LoadingSpinner />}
+        {!isFetching && items?.length == 0 &&
           <ThemedText style={{ alignSelf: "center", width: "80%" }}>No splits defined.
             This will be a one time collection from selected members.
             For eg. splitting expense among members who participated in an event. Press the + icon to define collection</ThemedText>}
-        {!isLoadingAdhoc && adhocFees?.length > 0 &&
+        {!isFetching && items?.length > 0 &&
           <FlatList style={{ flex: 1 }}
             ItemSeparatorComponent={() => <Spacer space={4} />}
-            ListFooterComponent={() => isFectching && <><Spacer space={10} /><LoadingSpinner /></> || <Spacer space={4} />}
-            data={adhocFees}
+            ListFooterComponent={() => isFetching && !refreshing  && <><Spacer space={10} /><LoadingSpinner /></> || <Spacer space={4} />}
+            data={items}
             initialNumToRender={20}
-            onEndReached={fetchNextPage}
+            onEndReached={loadMore}
             onEndReachedThreshold={0.2}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             renderItem={({ item }) => (
               <TouchableCard onPress={showAdhocFeeDetails} id={item}>
                 <View style={{
@@ -122,7 +108,6 @@ const AdocFeesHome = () => {
             )}
           />
         }
-        {alertConfig?.visible && <Alert {...alertConfig} />}
       </GestureHandlerRootView>
     </ThemedView>
   )

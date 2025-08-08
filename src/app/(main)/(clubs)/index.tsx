@@ -26,6 +26,8 @@ import ThemedButton from "@/src/components/ThemedButton";
 import { UserContext } from "@/src/context/UserContext";
 import { EventCard } from "../upcoming_events";
 import { router } from "expo-router";
+import { useGetClubEventsQuery, useGetClubQuery } from "@/src/services/clubApi";
+import { useGetFeesAdhocQuery, useGetFeesQuery } from "@/src/services/feeApi";
 
 const ClubHome = () => {
   const router = useRouter();
@@ -35,63 +37,36 @@ const ClubHome = () => {
 
   const { colors } = useTheme();
 
-  const [isTotalDueLoading, setIsTotalDueLoading] = useState(false);
-  const [isClubCountsLoading, setIsClubCountsLoading] = useState(false);
-  const [totalDue, setTotalDue] = useState<number | undefined>(0);
-  const [clubCounts, setClubCounts] = useState<any[]>([]);
-
-  const [currentFeeStructure, setCurrentFeeStructure] = useState<any>([]);
-  const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
-
-  /* events */
-  const { data: events, isLoading: isLoadingEvents, refetch: fetchEvents } = useHttpGet("/club/event", {
-    clubId: params.get("clubId"),
-    limit: 5,
-    offset: 0,
-  });
+  const {
+    data: events,
+    isLoading: isLoadingEvents,
+    refetch: fetchEvents,
+  } = useGetClubEventsQuery({ clubId: params.get("clubId"), limit: 5, offset: 0 });
 
   const {
     data: fbr,
     isLoading: isFundBalanceLoading,
     refetch: fetchFundBalance,
-  } = useHttpGet("/club", { clubId: params.get("clubId"), fundBalance: "true" });
+  } = useGetClubQuery({ clubId: params.get("clubId"), fundBalance: "true" });
 
   const {
     data: expenseSplits,
     isLoading: isLoadingSplits,
     refetch: fetchSplits,
-  } = useHttpGet("/fee/adhoc", { clubId: Number(params.get("clubId")), limit: 5, offset: 0 });
+  } = useGetFeesAdhocQuery({ clubId: Number(params.get("clubId")), limit: 5, offset: 0 });
 
-  const fetchTotalDue = () => {
-    setIsTotalDueLoading(true);
-    getTotalDue(params.get("clubId"))
-      .then((response) => setTotalDue(response.data.totalDue))
-      .catch((error) =>
-        setAlertConfig({
-          visible: true,
-          title: "Error",
-          message: error.response.data.error,
-          buttons: [{ text: "OK", onPress: () => setAlertConfig({ visible: false }) }],
-        })
-      )
-      .finally(() => setIsTotalDueLoading(false));
-  };
-  const fetchClubCounts = () => {
-    setIsClubCountsLoading(true);
-    getClubCounts(params.get("clubId"))
-      .then((response) => {
-        setClubCounts(response.data);
-      })
-      .catch((error) =>
-        setAlertConfig({
-          visible: true,
-          title: "Error",
-          message: error.response.data.error,
-          buttons: [{ text: "OK", onPress: () => setAlertConfig({ visible: false }) }],
-        })
-      )
-      .finally(() => setIsClubCountsLoading(false));
-  };
+  const {
+    data: clubDue,
+    isLoading: isTotalDueLoading,
+    refetch: fetchTotalDue,
+  } = useGetClubQuery({ clubId: params.get("clubId"), totalDue: "true" });
+
+  const {
+    data: currentFeeStructure,
+    isLoading: isLoadingCurrent,
+    refetch: fetchFees,
+  } = useGetFeesQuery({ clubId: params.get("clubId") });
+
   const showFeeTypeDetails = (fee: any) => {
     router.push({
       pathname: "/(main)/(clubs)/(fees)/feetypedetails",
@@ -99,27 +74,8 @@ const ClubHome = () => {
     });
   };
 
-  const fetchFees = () => {
-    setIsLoadingCurrent(true);
-    getFeeStructure(Number(params.get("clubId")))
-      .then((response) => setCurrentFeeStructure(response.data))
-      .catch((error) =>
-        setAlertConfig({
-          visible: true,
-          title: "Error",
-          message: error.response.data.error,
-          buttons: [{ text: "OK", onPress: () => setAlertConfig({ visible: false }) }],
-        })
-      )
-      .finally(() => setIsLoadingCurrent(false));
-  };
-
   useEffect(() => {
-    setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") });
-    fetchFundBalance();
-    fetchTotalDue();
-    fetchFees();
-    fetchClubCounts();
+    setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") });    
   }, []);
 
   const showClubDues = (_: GestureResponderEvent): void => {
@@ -170,7 +126,7 @@ const ClubHome = () => {
         </View>
         <Spacer space={5} />
         <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
-          <TouchableCard onPress={Number(totalDue) > 0 ? showClubDues : null}>
+          <TouchableCard onPress={Number(clubDue?.totalDue) > 0 ? showClubDues : null}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
               <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
               {isTotalDueLoading && <LoadingSpinner />}
@@ -180,11 +136,11 @@ const ClubHome = () => {
                     fontWeight: "bold",
                     fontSize: 15,
                     position: "absolute",
-                    right: Number(totalDue) > 0 ? 30 : 5,
+                    right: Number(clubDue?.totalDue) > 0 ? 30 : 5,
                   }}
                 >
                   {" "}
-                  Rs. {totalDue}
+                  Rs. {clubDue?.totalDue}
                 </ThemedText>
               )}
             </View>
@@ -290,7 +246,7 @@ const ClubHome = () => {
                 ListFooterComponent={() => (
                   <View style={{ width: 100, height: 100, alignItems: "center", justifyContent: "center" }}>
                     <TouchableOpacity onPress={() => router.push("/(main)/(clubs)/(events)")}>
-                        <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
+                      <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
                     </TouchableOpacity>
                   </View>
                 )}
@@ -399,9 +355,9 @@ const handleMenuPress = (name: string | undefined, handleEditClub: any) => {
   if (name == "edit") {
     handleEditClub();
   } else if (name == "events") {
-    router.push(`/(main)/(clubs)/(events)`)
+    router.push(`/(main)/(clubs)/(events)`);
   } else if (name == "expensesplits") {
-    router.push(`/(main)/(clubs)/(fees)/adhocfee`)
+    router.push(`/(main)/(clubs)/(fees)/adhocfee`);
   } else {
     throw "Error";
   }
@@ -409,18 +365,20 @@ const handleMenuPress = (name: string | undefined, handleEditClub: any) => {
 
 const actions = [
   {
-      color: "black",
-      text: "Events",
-      icon: <SimpleLineIcons name={"event"} size={15} color={"white"} />,
-      name: "events",
-      position: 3
-  },{
-      color: "black",
-      text: "Expense Splits",
-      icon: <MaterialIcons name={"attach-money"} size={15} color={"white"} />,
-      name: "expensesplits",
-      position: 3
-  },{
+    color: "black",
+    text: "Events",
+    icon: <SimpleLineIcons name={"event"} size={15} color={"white"} />,
+    name: "events",
+    position: 3,
+  },
+  {
+    color: "black",
+    text: "Expense Splits",
+    icon: <MaterialIcons name={"attach-money"} size={15} color={"white"} />,
+    name: "expensesplits",
+    position: 3,
+  },
+  {
     color: "black",
     text: "Edit Club",
     icon: <MaterialCommunityIcons name={"square-edit-outline"} size={15} color={"white"} />,

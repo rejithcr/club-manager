@@ -64,10 +64,6 @@ export const updateExceptionType = (feeTypeExceptionId: string | null, exception
     return put("/fee/exception", null, { feeTypeExceptionId, exceptionType, exceptionAmount, exceptionMembers, email })
 }
 
-export const addAdhocFee = (clubId: string | null, adhocFeeName: any, adhocFeeDesc: any, adhocFeeAmount: any, adhocFeeDate: Date, addedMembers: any, email: string) => {
-    return post("/fee/adhoc", null, { clubId, adhocFeeName, adhocFeeDesc, adhocFeeAmount, adhocFeeDate, addedMembers, email })
-}
-
 export const getAdhocFee = (clubId: number, limit: number, offset: number) => {
     return get("/fee/adhoc", { clubId, limit, offset})
 }

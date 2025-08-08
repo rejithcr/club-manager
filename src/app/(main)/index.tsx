@@ -9,27 +9,31 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyClubs from "./myclubs";
 import { router } from "expo-router";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
-import { useHttpGet } from "@/src/hooks/use-http";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
 import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { getEventsByMember, Event } from "@/src/helpers/events_helper";
 import UpcomingEvents from "./upcoming_events";
+import { clearTokens } from "@/src/helpers/auth_helper";
+import { useGetClubMembersQuery, useGetClubQuery } from "@/src/services/clubApi";
+import ThemedText from "@/src/components/themed-components/ThemedText";
 
 const Main = () => {
   const router = useRouter();
   const { userInfo } = useContext(UserContext);
   const {
-    data: duesByMember,
-    isLoading: isLoadingMemberDues,
-    refetch: refetchMemberDues,
-  } = useHttpGet("/club/member", { memberId: userInfo?.memberId, duesByMember: "true" });
-  const {
     data: clubs,
     isLoading: isLoadingMyClubs,
     refetch: refetchClubs,
-  } = useHttpGet("/club", { memberId: userInfo?.memberId });
+    error: clubsError
+  } = useGetClubQuery({ memberId: userInfo?.memberId });
+
+   const {
+    data: duesByMember,
+    isLoading: isLoadingMemberDues,
+    refetch: refetchMemberDues,
+  } = useGetClubMembersQuery({ memberId: userInfo?.memberId, duesByMember: "true" });
 
   const onRefresh = () => {
     refetchMemberDues();
@@ -37,8 +41,7 @@ const Main = () => {
   };
   const handleLogout = async () => {
     await AsyncStorage.removeItem("userInfo");
-    await AsyncStorage.removeItem("accessToken");
-    await AsyncStorage.removeItem("refreshToken");
+    await clearTokens();
     router.replace("/(auth)");
   };
 
@@ -54,11 +57,12 @@ const Main = () => {
         .finally(() => setIsLoadingEvents(false));
     }
   }, [clubs]);
-
+  
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
         <Spacer space={5} />
+        <ThemedText>{JSON.stringify(clubsError)}</ThemedText>
         <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
           <ThemedHeading>My Clubs</ThemedHeading>
           {isLoadingMyClubs && <LoadingSpinner />}
@@ -67,10 +71,19 @@ const Main = () => {
           {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
           {isLoadingMemberDues && <LoadingSpinner />}
           {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
-          
-          {isLoadingEvents && <><Spacer space={10}/><LoadingSpinner /></> }
-          {events?.length > 0 && <><ThemedHeading>Upcoming Events</ThemedHeading>
-          <UpcomingEvents events={events} clubs={clubs} /></>}
+
+          {isLoadingEvents && (
+            <>
+              <Spacer space={10} />
+              <LoadingSpinner />
+            </>
+          )}
+          {events?.length > 0 && (
+            <>
+              <ThemedHeading>Upcoming Events</ThemedHeading>
+              <UpcomingEvents events={events} clubs={clubs} />
+            </>
+          )}
           {/*<UpcomingMatches memberEmail={userInfo?.email} />*/}
           <Spacer space={50} />
         </ScrollView>

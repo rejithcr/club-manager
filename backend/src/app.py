@@ -31,7 +31,7 @@ def create_app():
     cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(days=1)
     cm_app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=365)
     JWTManager(cm_app)
-    #CORS(cm_app, origins=constants.CORS_ORIGINS) #cors not required in aws lambda but required in local
+    CORS(cm_app, origins=constants.CORS_ORIGINS) #cors not required in aws lambda but required in local
     Compress(cm_app)
     # Register the blueprint with an optional URL prefix
     cm_app.register_blueprint(member_bp)
