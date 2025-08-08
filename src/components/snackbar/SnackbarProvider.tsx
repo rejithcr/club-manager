@@ -1,8 +1,7 @@
-// src/components/SnackbarProvider.tsx
 import React, { useEffect, useCallback, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { setSnackbarHandle, showSnackbar, SnackbarType } from "./snackbarService";
-import SnackbarItem from "./SnackBarItem";
+import { setSnackbarHandle, SnackbarType } from "./snackbarService";
+import SnackbarItem from "./SnackbarItem";
 
 type Message = { id: string; text: string; type: SnackbarType };
 
@@ -10,11 +9,9 @@ export const SnackbarProvider: React.FC<{ children?: React.ReactNode }> = ({ chi
   const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
-    // Register handle so showSnackbar will call addMessage
     setSnackbarHandle({
       show: (text: string, type: SnackbarType = "info") => {
         const id = `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-        // functional update to avoid race conditions
         setMessages((prev) => [...prev, { id, text, type }]);
       },
     });
@@ -39,7 +36,6 @@ export const SnackbarProvider: React.FC<{ children?: React.ReactNode }> = ({ chi
             text={m.text}
             type={m.type}
             onHide={() => remove(m.id)}
-            // optional: pass index for staggered offset if you prefer
             index={idx}
           />
         ))}

@@ -2,7 +2,6 @@ import React, { useContext } from 'react'
 import { UserContext } from '@/src/context/UserContext'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { appStyles } from '@/src/utils/styles'
-import { useHttpGet } from '@/src/hooks/use-http'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
@@ -15,13 +14,16 @@ import { useTheme } from '@/src/hooks/use-theme'
 import { router } from 'expo-router'
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 import Chip from '@/src/components/Chip'
+import { useGetMembersQuery } from '@/src/services/memberApi'
 
 const Profile = () => {
     const { userInfo } = useContext(UserContext)
-    const { data: myRequests, isLoading: isLoadingMyRequests } = useHttpGet("/member", { memberId: userInfo?.memberId, requests: "true" })
     const { theme, setTheme } = useContext(ThemeContext);
     const { colors } = useTheme()
     const [isMembershipRequestShown, setIsMembershipRequestShown] = React.useState(false)
+    
+    const { data: myRequests, isLoading: isLoadingMyRequests } = useGetMembersQuery({ memberId: userInfo?.memberId, requests: "true" });
+
     const handleToggleMembershipRequests = () => {
         setIsMembershipRequestShown(prev => !prev)
     }

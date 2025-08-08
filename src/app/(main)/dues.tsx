@@ -1,4 +1,4 @@
-import { View, StyleSheet, TouchableOpacity, Button } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import ShadowBox from "@/src/components/ShadowBox";
 import ThemedText from "@/src/components/themed-components/ThemedText";
@@ -8,7 +8,6 @@ import { useTheme } from "@/src/hooks/use-theme";
 import Spacer from "@/src/components/Spacer";
 import Divider from "@/src/components/Divider";
 import * as Linking from "expo-linking";
-import { showSnackbar } from "@/src/components/snackbar/snackbarService";
 
 type ClubDueType = {
   clubId: string;

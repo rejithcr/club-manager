@@ -1,9 +1,7 @@
-// services/customBaseQuery.ts
 import { fetchBaseQuery, BaseQueryFn } from '@reduxjs/toolkit/query/react';
 import { getAccessToken, getRefreshToken, clearTokens, saveAccessToken } from '../helpers/auth_helper';
 import { showSnackbar } from "../components/snackbar/snackbarService";
-
-const BASE_URL = 'https://n24tjyszxraupd5cuogxf377i40xiltl.lambda-url.ap-south-1.on.aws'; //"http://127.0.0.1:5000";//
+import { BASE_URL } from '../utils/constants'
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,

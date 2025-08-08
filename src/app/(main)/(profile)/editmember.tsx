@@ -1,133 +1,136 @@
-import { ScrollView, View } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
-import InputText from '@/src/components/InputText'
-import Spacer from '@/src/components/Spacer'
-import ThemedButton from '@/src/components/ThemedButton'
-import { Member, getMemberDetails, saveMemberDetails } from '@/src/helpers/member_helper'
-import { useSearchParams } from 'expo-router/build/hooks'
-import LoadingSpinner from '@/src/components/LoadingSpinner'
-import ThemedView from '@/src/components/themed-components/ThemedView'
-import { router } from 'expo-router'
-import ThemedText from '@/src/components/themed-components/ThemedText'
-import { useTheme } from '@/src/hooks/use-theme'
-import { isValidPhoneNumber } from '@/src/utils/validators'
-import Alert, { AlertProps } from '@/src/components/Alert'
-import { appStyles } from '@/src/utils/styles'
-import TouchableCard from '@/src/components/TouchableCard'
-import { useHttpGet } from '@/src/hooks/use-http'
-import { ClubContext } from '@/src/context/ClubContext'
-import DatePicker from '@/src/components/DatePicker'
+import { ScrollView, View } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import InputText from "@/src/components/InputText";
+import Spacer from "@/src/components/Spacer";
+import ThemedButton from "@/src/components/ThemedButton";
+import { Member } from "@/src/helpers/member_helper";
+import { useSearchParams } from "expo-router/build/hooks";
+import LoadingSpinner from "@/src/components/LoadingSpinner";
+import ThemedView from "@/src/components/themed-components/ThemedView";
+import { router } from "expo-router";
+import ThemedText from "@/src/components/themed-components/ThemedText";
+import { useTheme } from "@/src/hooks/use-theme";
+import { isValidPhoneNumber } from "@/src/utils/validators";
+import { appStyles } from "@/src/utils/styles";
+import TouchableCard from "@/src/components/TouchableCard";
+import { useHttpGet } from "@/src/hooks/use-http";
+import { ClubContext } from "@/src/context/ClubContext";
+import DatePicker from "@/src/components/DatePicker";
+import { useGetMembersQuery, useUpdateMemberMutation } from "@/src/services/memberApi";
 
 const Editmember = () => {
-    const params = useSearchParams()
-    const [isMemberLoading, setIsMemberLoading] = useState(false)
-    const [firstName, setFirstName] = useState<string | undefined>();
-    const [lastName, setLastName] = useState<string | undefined>();
-    const [updatedBy, setUpdatedBy] = useState<string | undefined>();
-    const [phone, setPhone] = useState<number | undefined>();
-    const [email, setEmail] = useState<string | undefined>();
-    const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
-    const [alertConfig, setAlertConfig] = useState<AlertProps>();
-    const { colors } = useTheme();
+  const params = useSearchParams();
+  const [firstName, setFirstName] = useState<string | undefined>();
+  const [lastName, setLastName] = useState<string | undefined>();
+  const [updatedBy, setUpdatedBy] = useState<string | undefined>();
+  const [phone, setPhone] = useState<number | undefined>();
+  const [email, setEmail] = useState<string | undefined>();
+  const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
+  const { colors } = useTheme();
 
-    const setDetails = (memberDetails: Member) => {
-        setFirstName(memberDetails?.firstName)
-        setLastName(memberDetails?.lastName)
-        setPhone(memberDetails?.phone)
-        setEmail(memberDetails?.email)
-        setDateOfBirth(memberDetails?.dateOfBirth)
-        setUpdatedBy(memberDetails?.updatedBy)
+  const setDetails = (memberDetails: Member) => {
+    setFirstName(memberDetails?.firstName);
+    setLastName(memberDetails?.lastName);
+    setPhone(memberDetails?.phone);
+    setEmail(memberDetails?.email);
+    setDateOfBirth(memberDetails?.dateOfBirth);
+    setUpdatedBy(memberDetails?.updatedBy);
+  };
+
+  const { data: member, isLoading: isMemberLoading } = useGetMembersQuery({
+    memberId: Number(params.get("memberId")),
+  });
+  const [updateMember, { isLoading: isMemberUpdating }] = useUpdateMemberMutation();
+
+  useEffect(() => {
+    if (member) {
+      setDetails(member);
     }
-    useEffect(() => {
-        setIsMemberLoading(true);
-        getMemberDetails(Number(params.get("memberId")))
-            .then(response => { console.log(response.data); setDetails(response.data) })
-            .catch(error => alert(error?.response?.data?.error || "Error fetching member details"))
-            .finally(() => setIsMemberLoading(false));
-    }, [])
+  }, [member]);
 
-    const handleSave = () => {
-        setIsMemberLoading(true)
-        if (validate()) {
-            saveMemberDetails(Number(params.get("memberId")), firstName, lastName, phone, dateOfBirth, email, email)
-                .then(response => setAlertConfig({
-                    visible: true, title: 'Success', message: response.data.message,
-                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-                }))
-                .catch(error => setAlertConfig({
-                    visible: true, title: 'Error', message: error?.response?.data?.error || "Error fetching member details",
-                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-                }))
-                .finally(() => setIsMemberLoading(false));
-        } else {
-            setIsMemberLoading(false)
-        }
+  const handleSave = () => {
+    if (validate()) {
+      updateMember({
+        memberId: Number(params.get("memberId")),
+        firstName,
+        lastName,
+        phone,
+        dateOfBirth,
+        email,
+        updatedBy: email,
+      });
     }
+  };
 
-    const validate = () => {
-        console.log(phone)
-        if (!isValidPhoneNumber(phone?.toString())) {
-            alert("Invalid Phone number")
-            return false
-        }
-        if (!firstName || (firstName && firstName?.length < 2)) {
-            alert("Please enter name with atleast 2 characters")
-            return false
-        }
-        if (!lastName || (lastName && lastName?.length < 1)) {
-            alert("Please enter last name")
-            return false
-        }
-        return true
+  const validate = () => {
+    console.log(phone);
+    if (!isValidPhoneNumber(phone?.toString())) {
+      alert("Invalid Phone number");
+      return false;
     }
-
-    const {
-        data: clubs,
-        isLoading: isLoadingMyClubs,
-    } = useHttpGet("/club", { memberId: Number(params.get("memberId")) })
-
-    
-    const { setClubInfo } = useContext(ClubContext)
-    const showDetails = (club: any) => {
-        setClubInfo({ clubId: club.clubId, clubName: club.clubName, role: club.role });
-        router.push(`/(main)/(clubs)/(members)/editclublevelattributes?memberId=${params.get("memberId")}`);
+    if (!firstName || (firstName && firstName?.length < 2)) {
+      alert("Please enter name with atleast 2 characters");
+      return false;
     }
+    if (!lastName || (lastName && lastName?.length < 1)) {
+      alert("Please enter last name");
+      return false;
+    }
+    return true;
+  };
 
-    return (
-        <ThemedView style={{ flex: 1 }}>
-            {isMemberLoading && <LoadingSpinner />}
-            {!isMemberLoading &&
-                <ScrollView>
-                    <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
-                    <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
-                    <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
-                    <InputText label="Email" defaultValue={email} keyboardType={"email-address"} editable={false} />
-                    <DatePicker label={"Date of Birth"} date={dateOfBirth ? new Date(dateOfBirth) : null} setDate={setDateOfBirth} />
-                    {updatedBy !== email &&
-                        <ThemedText style={{ alignSelf: "center", color: colors.warning }}>Last updated by: {updatedBy} </ThemedText>}
-                    <Spacer space={10} />
-                    <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                        <ThemedButton title="Save" onPress={handleSave} />
-                        <Spacer space={10} />
-                        <ThemedButton title="Cancel" onPress={() => router.dismissTo('/(main)/(profile)')} />
-                    </View>
-                    <Spacer space={10} />
-                    <ThemedText style={appStyles.heading}>Club level attributes</ThemedText>
-                    {isLoadingMyClubs && <LoadingSpinner />}
-                    {!isLoadingMyClubs && clubs?.map((item: any) =>
-                        <View key={item.clubId}>
-                            <TouchableCard onPress={() => showDetails(item)} id={item.clubId}>
-                                <ThemedText>{item.clubName}</ThemedText>
-                            </TouchableCard>
-                            <Spacer space={4} />
-                        </View>
-                    )}                    
-                    <Spacer space={10} />
-                </ScrollView>}
-            {alertConfig?.visible && <Alert {...alertConfig} />}
-        </ThemedView>
-    )
-}
+  const { data: clubs, isLoading: isLoadingMyClubs } = useHttpGet("/club", {
+    memberId: Number(params.get("memberId")),
+  });
 
-export default Editmember
+  const { setClubInfo } = useContext(ClubContext);
+  const showDetails = (club: any) => {
+    setClubInfo({ clubId: club.clubId, clubName: club.clubName, role: club.role });
+    router.push(`/(main)/(clubs)/(members)/editclublevelattributes?memberId=${params.get("memberId")}`);
+  };
 
+  return (
+    <ThemedView style={{ flex: 1 }}>
+      {(isMemberLoading || isMemberUpdating)&& <LoadingSpinner />}
+      {!(isMemberLoading || isMemberUpdating) && (
+        <ScrollView>
+          <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
+          <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
+          <InputText label="Phone" onChangeText={setPhone} defaultValue={phone} keyboardType={"numeric"} />
+          <InputText label="Email" defaultValue={email} keyboardType={"email-address"} editable={false} />
+          <DatePicker
+            label={"Date of Birth"}
+            date={dateOfBirth ? new Date(dateOfBirth) : null}
+            setDate={setDateOfBirth}
+          />
+          {updatedBy !== email && (
+            <ThemedText style={{ alignSelf: "center", color: colors.warning }}>
+              Last updated by: {updatedBy}{" "}
+            </ThemedText>
+          )}
+          <Spacer space={10} />
+          <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+            <ThemedButton title="Save" onPress={handleSave} />
+            <Spacer space={10} />
+            <ThemedButton title="Cancel" onPress={() => router.dismissTo("/(main)/(profile)")} />
+          </View>
+          <Spacer space={10} />
+          <ThemedText style={appStyles.heading}>Club level attributes</ThemedText>
+          {isLoadingMyClubs && <LoadingSpinner />}
+          {!isLoadingMyClubs &&
+            clubs?.map((item: any) => (
+              <View key={item.clubId}>
+                <TouchableCard onPress={() => showDetails(item)} id={item.clubId}>
+                  <ThemedText>{item.clubName}</ThemedText>
+                </TouchableCard>
+                <Spacer space={4} />
+              </View>
+            ))}
+          <Spacer space={10} />
+        </ScrollView>
+      )}
+    </ThemedView>
+  );
+};
+
+export default Editmember;

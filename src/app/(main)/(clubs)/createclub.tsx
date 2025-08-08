@@ -1,37 +1,37 @@
 import React, { useContext, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
-import { createClub } from '@/src/helpers/club_helper'
 import { UserContext } from '@/src/context/UserContext'
 import { router } from 'expo-router'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { View } from 'react-native'
 import { isValidLength } from '@/src/utils/validators'
 import ThemedView from '@/src/components/themed-components/ThemedView'
-import Alert, { AlertProps } from '@/src/components/Alert'
+import { useAddClubMutation } from '@/src/services/clubApi'
+import { showSnackbar } from '@/src/components/snackbar/snackbarService'
 
 const CreateClub = () => {
-  const [isLoading, setIsLoading] = useState(false)
   const [clubName, setClubName] = useState("")
   const [clubDescription, setClubDescription] = useState("")
   const [location, setLocation] = useState("")
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const { userInfo } = useContext(UserContext)
 
-  const submitCreateClub = () => {
+  const [addClub, {isLoading}] = useAddClubMutation();
+  
+  const submitCreateClub = async () => {
     if (validate(clubName.trim())) {
-      setIsLoading(true)
-      createClub(clubName.trim(), clubDescription, location, userInfo.memberId, userInfo.email)
-        .then(response => router.replace(`/(main)/(clubs)?clubId=${response.data.clubId}&clubName=${clubName.trim()}&role=ADMIN`))
-        .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, 
-                                        buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
-        .finally(() => setIsLoading(false))
+      try{
+        const response = await addClub({clubName: clubName.trim(), clubDescription, location, memberId: userInfo.memberId, email: userInfo.email});
+        router.replace(`/(main)/(clubs)?clubId=${response.data.clubId}&clubName=${clubName.trim()}&role=ADMIN`)
+      } catch(error){
+        console.log(error);
+      }
     }
   }
   
   const validate = (clubName: string | null | undefined) => {
     if (!isValidLength(clubName?.trim(), 2)) {
-      setAlertConfig({visible: true, title: 'Error', message: "Enter atleast 2 characters for club name", buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]})
+      showSnackbar("Enter atleast 2 characters for club name", 'error');
       return false
     }
     return true
@@ -47,7 +47,6 @@ const CreateClub = () => {
           <ThemedButton title="Create" onPress={submitCreateClub} />
         </View>
       }
-      {alertConfig?.visible && <Alert {...alertConfig}/>}
     </ThemedView>
   )
 }

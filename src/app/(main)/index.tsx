@@ -13,10 +13,13 @@ import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
 import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { getEventsByMember, Event } from "@/src/helpers/events_helper";
 import UpcomingEvents from "./upcoming_events";
 import { clearTokens } from "@/src/helpers/auth_helper";
-import { useGetClubMembersQuery, useGetClubQuery } from "@/src/services/clubApi";
+import {
+  useGetClubMembersQuery,
+  useGetClubQuery,
+  useLazyGetClubEventsQuery,
+} from "@/src/services/clubApi";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 
 const Main = () => {
@@ -26,10 +29,10 @@ const Main = () => {
     data: clubs,
     isLoading: isLoadingMyClubs,
     refetch: refetchClubs,
-    error: clubsError
+    error: clubsError,
   } = useGetClubQuery({ memberId: userInfo?.memberId });
 
-   const {
+  const {
     data: duesByMember,
     isLoading: isLoadingMemberDues,
     refetch: refetchMemberDues,
@@ -45,19 +48,15 @@ const Main = () => {
     router.replace("/(auth)");
   };
 
-  const [isLoadingEvents, setIsLoadingEvents] = useState(false);
-  const [events, setEvents] = useState<Event[]>([]);
+  const [triggerGetEvents, { data: events, isLoading: isLoadingEvents }] = useLazyGetClubEventsQuery();
 
   useEffect(() => {
     if (clubs) {
       const clubIds = clubs.map((c: { clubId: any }) => c.clubId);
-      setIsLoadingEvents(true);
-      getEventsByMember(clubIds.join(","), 10, 0)
-        .then((response) => setEvents(response.data))
-        .finally(() => setIsLoadingEvents(false));
+      triggerGetEvents({clubIds, limit: 10, offset:0});
     }
   }, [clubs]);
-  
+
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
