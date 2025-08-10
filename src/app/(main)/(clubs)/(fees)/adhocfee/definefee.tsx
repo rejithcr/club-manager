@@ -65,7 +65,6 @@ const DefineFee = () => {
             addedMembers: feeAddedMembers,
             email: userInfo.email,
           }).unwrap(); // unwrap to catch errors
-          alert("Fee added successfully");
           router.dismissTo(`/(main)/(clubs)/(fees)/adhocfee`);
         } catch (err) {
             console.log("Error", err)
