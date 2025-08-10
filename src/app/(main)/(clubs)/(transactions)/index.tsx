@@ -32,7 +32,6 @@ const Transactions = () => {
   const [resfresh, setRefresh] = useState(false)
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnDate: new Date(), txnCategory: "", txnComment: "", txnAmount: "" })
-  const [date, setDate] = useState(new Date())
   const { clubInfo } = useContext(ClubContext)
   const { userInfo } = useContext(UserContext)
   const { colors } = useTheme()
@@ -80,7 +79,7 @@ const Transactions = () => {
     setIsAddTxnVisible(false)
     if (validate(txnValues?.txnCategory, txnValues?.txnComment, txnValues?.txnAmount)) {
       if (txnValues?.txnId) {
-        updateTransaction(txnValues.txnId, txnValues.txnType, date, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
+        updateTransaction(txnValues.txnId, txnValues.txnType, txnValues.txnDate, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
           .then(() => {
             offset.current = 0;
             setRefresh(prev => !prev)
@@ -91,7 +90,7 @@ const Transactions = () => {
           }))
           .finally(() => setIsAddTxnVisible(false))
       } else {
-        saveTransaction(clubInfo.clubId, date, txnValues.txnType, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
+        saveTransaction(clubInfo.clubId, txnValues.txnDate, txnValues.txnType, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
           .then(() => {
             offset.current = 0;
             setRefresh(prev => !prev)
@@ -181,14 +180,14 @@ const Transactions = () => {
         }
       </ThemedView>
       <Modal isVisible={isAddTxnVisible}>
-        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}> 
           <ThemedText style={appStyles.heading}>{txnValues?.txnId ? "Edit" : "Add"} Tansaction</ThemedText>
           <Picker style={{ width: "80%", alignSelf: "center" }}
             onValueChange={handleTxnTypeChange} selectedValue={txnValues?.txnType}>
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
           </Picker>
-          <DatePicker date={txnValues?.txnDate} setDate={setDate} label='Date'/>
+          <DatePicker date={txnValues?.txnDate || new Date()} setDate={(value: Date) => setTxnValues((prev: any) => ({ ...prev, txnDate: value }))} label='Date'/>
           <InputText label="Category" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnCategory: value }))} defaultValue={txnValues?.txnCategory} />
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />
