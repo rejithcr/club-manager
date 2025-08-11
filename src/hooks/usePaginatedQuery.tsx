@@ -9,7 +9,11 @@ const usePaginatedQuery = (useGetQuery: any, params: {}, limit: number) => {
 
   useEffect(() => {
     if (currentPageData) {
-      setItems((prev) => [...prev, ...currentPageData]);
+      if (offset === 0) {
+        setItems(currentPageData);
+      } else {
+        setItems((prev) => [...prev, ...currentPageData]);
+      }
     }
   }, [currentPageData]);
 
@@ -21,9 +25,9 @@ const usePaginatedQuery = (useGetQuery: any, params: {}, limit: number) => {
 
   const onRefresh = (): void => {
     setRefreshing(true);
-    setItems([]);
     setOffset(0);
     refetch();
+    setRefreshing(false);
   };
 
   return {
@@ -32,7 +36,7 @@ const usePaginatedQuery = (useGetQuery: any, params: {}, limit: number) => {
     isFetching,
     refreshing,
     onRefresh,
-    loadMore,
+    loadMore
   };
 };
 

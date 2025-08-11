@@ -63,14 +63,14 @@ const AdocFeesHome = () => {
         ) : (
           <FlatList
             style={{ flex: 1 }}
-            ItemSeparatorComponent={() => <Spacer space={10} />}
+            ItemSeparatorComponent={() => <Spacer space={4} />}
             ListFooterComponent={() =>
               (isFetching && (
                 <>
                   <Spacer space={10} />
                   <LoadingSpinner />
                 </>
-              )) || <Spacer space={4} />
+              )) || <ThemedText style={{ alignSelf: "center", paddingVertical: 10 }}>No more items</ThemedText>
             }
             data={items}
             initialNumToRender={limit}

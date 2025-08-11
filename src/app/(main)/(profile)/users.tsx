@@ -43,7 +43,8 @@ const users = () => {
             initialNumToRender={limit}
             onEndReached={loadMore}
             onEndReachedThreshold={0.5}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
             renderItem={({ item }) => <UserInfoView {...item} />}
           />
         )}

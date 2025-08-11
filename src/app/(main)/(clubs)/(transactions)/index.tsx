@@ -1,7 +1,6 @@
 import { View, FlatList, Switch, TouchableOpacity, RefreshControl, Platform } from 'react-native'
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { ClubContext } from '@/src/context/ClubContext'
-import { deleteTransaction, getTransactions, saveTransaction, updateTransaction } from '@/src/helpers/transaction_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import FloatingMenu from '@/src/components/FloatingMenu'
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons'
@@ -20,106 +19,78 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import DatePicker from '@/src/components/DatePicker'
 import Alert, { AlertProps } from '@/src/components/Alert'
+import { useAddTransactionMutation, useDeleteTransactionMutation, useGetTransactionsQuery, useUpdateTransactionMutation } from '@/src/services/feeApi'
+import usePaginatedQuery from '@/src/hooks/usePaginatedQuery'
+
+const limit = 20;
 
 const Transactions = () => {
-  const [isLoading, setIsLoading] = useState(false)
   const [isAddTxnVisible, setIsAddTxnVisible] = useState(false)
   const [txnTypeFilter, setTxnTypeFilter] = useState("ALL")
-  const [isFectching, setIsFetching] = useState(false)
-  const [hasMoreData, setHasMoreData] = useState(false)
-  const [transactions, setTransactions] = useState<any>([])
   const [showFees, setShowFees] = useState(false)
-  const [resfresh, setRefresh] = useState(false)
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnDate: new Date(), txnCategory: "", txnComment: "", txnAmount: "" })
   const { clubInfo } = useContext(ClubContext)
   const { userInfo } = useContext(UserContext)
   const { colors } = useTheme()
+ console.log(txnTypeFilter, showFees, clubInfo);
+  const {
+    items,
+    isLoading: isTxnsLoading,
+    loadMore,
+    isFetching: isTxnsFetching,
+    refreshing,
+    onRefresh,
+  } = usePaginatedQuery(useGetTransactionsQuery, { clubId: clubInfo.clubId, txnType: txnTypeFilter, showFees }, limit);
 
-  const offset = useRef(0)
-  const limit = 20
+  const [addTransaction, {isLoading: isAddingTxn}] = useAddTransactionMutation();
+  const [updateTransaction, {isLoading: isUpdatingTxn}] = useUpdateTransactionMutation();
+  const [deleteTransaction] = useDeleteTransactionMutation();
 
-  const onRefresh = () => {
-    setIsLoading(true)
-    offset.current = 0
-    getTransactions(clubInfo.clubId, txnTypeFilter, showFees, limit, offset.current)
-      .then(response => {
-        setHasMoreData(response.data?.length > 0);
-        console.log(response.data)
-        setTransactions(response.data)
-      })
-      .catch(error => setAlertConfig({
-        visible: true, title: 'Error', message: error.response.data.error,
-        buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-      }))
-      .finally(() => setIsLoading(false))
-  }
-  useEffect(() => {
-    onRefresh()
-  }, [resfresh, txnTypeFilter, showFees])
-
-  const fetchNextPage = () => {
-    if (hasMoreData && !isFectching) {
-      setIsFetching(true)
-      offset.current = offset.current + limit
-      getTransactions(clubInfo.clubId, txnTypeFilter, showFees, limit, offset.current)
-        .then(response => {
-          setHasMoreData(response.data?.length > 0);
-          setTransactions((prev: any) => [...prev, ...response.data])
-        })
-        .catch(error => setAlertConfig({
-          visible: true, title: 'Error', message: error.response.data.error,
-          buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-        }))
-        .finally(() => setIsFetching(false))
-    }
-  }
-
-  const handleSave = () => {
-    setIsAddTxnVisible(false)
+  const handleSave = async () => {
     if (validate(txnValues?.txnCategory, txnValues?.txnComment, txnValues?.txnAmount)) {
       if (txnValues?.txnId) {
-        updateTransaction(txnValues.txnId, txnValues.txnType, txnValues.txnDate, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
-          .then(() => {
-            offset.current = 0;
-            setRefresh(prev => !prev)
-          })
-          .catch(error => setAlertConfig({
-            visible: true, title: 'Error', message: error.response.data.error,
-            buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-          }))
-          .finally(() => setIsAddTxnVisible(false))
+        await updateTransaction({
+          txnId: txnValues.txnId,
+          txnType: txnValues.txnType,
+          txnDate: txnValues.txnDate,
+          txnCategory: txnValues.txnCategory,
+          txnComment: txnValues.txnComment,
+          txnAmount: Number(txnValues.txnAmount),
+          email: userInfo.email
+        });
       } else {
-        saveTransaction(clubInfo.clubId, txnValues.txnDate, txnValues.txnType, txnValues.txnCategory, txnValues.txnComment, Number(txnValues.txnAmount), userInfo.email)
-          .then(() => {
-            offset.current = 0;
-            setRefresh(prev => !prev)
-          })
-          .catch(error => setAlertConfig({
-            visible: true, title: 'Error', message: error.response.data.error,
-            buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-          }))
-          .finally(() => setIsAddTxnVisible(false))
+        await addTransaction({
+          clubId: clubInfo.clubId,
+          txnDate: txnValues.txnDate || new Date(),
+          txnType: txnValues.txnType,
+          txnCategory: txnValues.txnCategory,
+          txnComment: txnValues.txnComment,
+          txnAmount: Number(txnValues.txnAmount),
+          email: userInfo.email,
+        });
       }
+      setIsAddTxnVisible(false);
     }
   }
   const handleDelete = () => {
     setAlertConfig({
       visible: true,
-      title: 'Are you sure!',
-      message: 'This will delete the transcation. This cannot be recovered.',
-      buttons: [{
-        text: 'OK', onPress: () => {
-          setAlertConfig({ visible: false });
-          setIsLoading(true);
-          deleteTransaction(txnValues.txnId)
-            .then(() => {offset.current = 0; setRefresh(prev => !prev)})
-            .catch((error: { response: { data: { error: string | undefined } } }) => alert(error.response.data.error))
-            .finally(() => { setIsLoading(false); setIsAddTxnVisible(false) })
-        }
-      }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
+      title: "Are you sure!",
+      message: "This will delete the transcation. This cannot be recovered.",
+      buttons: [
+        {
+          text: "OK",
+          onPress: async () => {
+            setAlertConfig({ visible: false });
+            setIsAddTxnVisible(false);
+            await deleteTransaction({ txnId: txnValues.txnId });
+          },
+        },
+        { text: "Cancel", onPress: () => setAlertConfig({ visible: false }) },
+      ],
     });
-  }
+  };
 
   const handleEdit = (item: any) => {
     setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnDate: new Date(item.clubTransactionDate), 
@@ -129,6 +100,7 @@ const Transactions = () => {
   const handleTxnTypeChange = (value: string) => {
     setTxnValues((prev: any) => ({ ...prev, txnType: value }))
   }
+
   return (
     <GestureHandlerRootView>
       <ThemedView style={{ flex: 1 }}>
@@ -146,17 +118,17 @@ const Transactions = () => {
             <Switch onValueChange={() => setShowFees(prev => !prev)} value={showFees} />
           </View>
         </View>
-        {isLoading && <LoadingSpinner />}
-        {!isLoading && transactions?.length == 0 && <ThemedText style={{ textAlign: "center" }}>No transactions found!</ThemedText>}
-        {!isLoading && transactions &&
+        {isTxnsLoading ? <LoadingSpinner /> :
           <FlatList style={{ width: "100%" }}
             ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .3, borderBottomColor: "grey", width: "80%", alignSelf: "center" }} />}
-            ListFooterComponent={() => isFectching && <LoadingSpinner /> || <View style={{ marginVertical: 30 }} />}
-            data={transactions}
-            initialNumToRender={8}
-            onEndReached={fetchNextPage}
-            onEndReachedThreshold={0.2}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
+            ListFooterComponent={() => isTxnsFetching && <LoadingSpinner /> || <View style={{ marginVertical: 30 }} />}
+            data={items}
+            initialNumToRender={limit}
+            onEndReached={loadMore}
+            ListEmptyComponent={() => <ThemedText style={{ textAlign: "center" }}>No transactions found!</ThemedText>}
+            onEndReachedThreshold={0.5}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
             renderItem={({ item }) => (
               <View style={{
                 width: "85%", alignSelf: "center", alignItems: "center",
@@ -192,7 +164,8 @@ const Transactions = () => {
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>
-            <ThemedButton title={"   Save   "} onPress={() => handleSave()} />
+            {isAddingTxn || isUpdatingTxn ? <LoadingSpinner />
+            : <ThemedButton title={"   Save   "} onPress={() => handleSave()} />}
             <ThemedButton title="Cancel" onPress={() => setIsAddTxnVisible(false)} />
             {txnValues?.txnId && <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => handleDelete()} color={colors.error} />}
           </View>

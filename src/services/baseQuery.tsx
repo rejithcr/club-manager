@@ -79,7 +79,7 @@ export const baseQueryWithReauth: BaseQueryFn<any, unknown, unknown> = async (
     showSnackbar(message, "error");
   }
 
-  console.log(result)
+  console.log(result.meta?.request?.url, result.meta?.request?.method, result.meta?.response?.status, result.error);
 
   if (!result.error && api.type === "mutation") {
     const data = result.data as any;
