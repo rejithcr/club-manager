@@ -40,7 +40,7 @@ class FeeAdhocService():
     def put(self, conn, params):
         clubId = params.get("clubId")
         email = params.get("email")
-        paymentStatusUpadtes = params.get("paymentStatusUpadtes")
+        paymentStatusUpdates = params.get("paymentStatusUpdates")
         updateFee = params.get("updateFee")
         clubAdhocFeeId = params.get("clubAdhocFeeId")
         adhocFeeDate = params.get("adhocFeeDate")
@@ -53,7 +53,7 @@ class FeeAdhocService():
             conn.commit()
             return {"message": "Fee updated."}
 
-        for item in paymentStatusUpadtes:
+        for item in paymentStatusUpdates:
             if item["paid"]:
                 # club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_SEQ_NEXT_VAL, None)['nextval']
                 db.execute(conn, queries_fee.ADD_ADHOC_FEE_TRANSACTION,
@@ -67,7 +67,7 @@ class FeeAdhocService():
                 db.execute(conn, queries_fee.UPDATE_ADHOC_FEE_PAYMENT_STATUS, (0, email, item["clubAdhocFeePaymentId"]))
                 db.execute(conn, queries_fee.DELETE_ADHOC_FEE_TRANSACTION, (item["clubAdhocFeePaymentId"],))
         conn.commit()
-        return {"message": f"Updated payment status for {str(paymentStatusUpadtes)}"}
+        return {"message": f"Updated payment status for {str(paymentStatusUpdates)}"}
 
     def delete(self, conn, params):
         clubAdhocFeeId = params.get("clubAdhocFeeId")

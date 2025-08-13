@@ -1,7 +1,6 @@
 import { View, FlatList, TouchableOpacity } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
-import { deleteAdhocFeeCollection, editeAdhocFee, getAdhocFeePayments, saveAdhocFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles, colors } from '@/src/utils/styles';
@@ -23,12 +22,11 @@ import Alert, { AlertProps } from '@/src/components/Alert';
 import CircularProgress from '@/src/components/charts/CircularProgress';
 import InputText from '@/src/components/InputText';
 import DatePicker from '@/src/components/DatePicker';
+import { useDeleteFeesAdhocMutation, useGetFeesAdhocQuery, useSaveFeesAdhocMutation } from '@/src/services/feeApi';
 
 const Payments = () => {
-    const [isLoading, setIsLoading] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
-    const [feeByMembers, setFeeByMembers] = useState<any | undefined>(undefined);
-    const [paymentStatusUpdates, setPaymentStatusUpdates] = useState<{
+    const [paymentStatusUpdates, setpaymentStatusUpdates] = useState<{
         clubFeePaymentId: number;
         paid: boolean;
         firstName?: string;
@@ -42,20 +40,9 @@ const Payments = () => {
     const params = useSearchParams()
     const feeObj = JSON.parse(params.get('adhocFee') || "")
 
-    useEffect(() => {
-        setIsLoading(true)
-        setPaymentStatusUpdates([]);
-        getAdhocFeePayments(feeObj?.clubAdhocFeeId)
-            .then(response => { console.log(response.data.memberAdhocFees); setFeeByMembers(response.data.memberAdhocFees) })
-            .catch(error => setAlertConfig({
-                visible: true, title: 'Error', message: error.response.data.error,
-                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-            }))
-            .finally(() => setIsLoading(false));
-    }, [])
+    const { data, isLoading } = useGetFeesAdhocQuery({ adhocFeeId: feeObj?.clubAdhocFeeId });
 
     const updatePaymentStatus = () => {
-        console.log(paymentStatusUpdates)
         if (paymentStatusUpdates.length == 0) {
             alert("No updates selected")
         } else {
@@ -63,17 +50,24 @@ const Payments = () => {
         }
     }
 
-    const savePaymentUpdates = () => {
-        setIsLoading(true)
-        setIsConfirmVisible(false)
-        saveAdhocFeePayments(paymentStatusUpdates, clubInfo.clubId, "true", userInfo.email)
-            .then(() => router.back())
-            .catch(error => setAlertConfig({
-                visible: true, title: 'Error', message: error.response.data.error,
-                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-            }))
-            .finally(() => setIsLoading(false));
-    }
+    const [saveAdhocFee, { isLoading: isSaving }] = useSaveFeesAdhocMutation();
+
+    const savePaymentUpdates = async () => {
+      try {
+        setIsConfirmVisible(false);
+        await saveAdhocFee({
+          paymentStatusUpdates,
+          clubId: clubInfo.clubId,
+          updatePaymentStatus: "true",
+          email: userInfo.email,
+        }).unwrap();
+        router.back();
+      } catch (error) {
+        console.log("Error", error);
+      } 
+    };
+
+    const [deleteAdhocFeeCollection, {isLoading: isDeleting}] = useDeleteFeesAdhocMutation();
 
     const deleteCollection = () => {
         setAlertConfig({
@@ -83,35 +77,38 @@ const Payments = () => {
             buttons: [{
                 text: 'OK', onPress: () => {
                     setAlertConfig({ visible: false });
-                    setIsLoading(true);
-                    deleteAdhocFeeCollection(feeObj?.clubAdhocFeeId, userInfo.email)
-                        .then((response) => { alert(response.data.message); router.dismissTo('/(main)/(clubs)/(fees)/adhocfee') })
-                        .catch(error => alert(error.response.data.error))
-                        .finally(() => setIsLoading(false));
+                    try {
+                        deleteAdhocFeeCollection({ clubAdhocFeeId: feeObj?.clubAdhocFeeId, email: userInfo.email }).unwrap();
+                        router.dismissTo('/(main)/(clubs)/(fees)/adhocfee');
+                    } catch (error) {
+                        console.log("Error", error);
+                    }
                 }
             }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
         });
     }
+    const getIsLoading = () => isLoading || isSaving || isDeleting;
 
     const [isEditVisible, setIsEditVisible] = useState(false)
     const [feeName, setFeeName] = useState(feeObj?.clubAdhocFeeName)
     const [feeDescription, setFeeDescription] = useState(feeObj?.clubAdhocFeeDesc)
     const [feeDate, setFeeDate] = useState(new Date(feeObj?.clubAdhocFeeDate))
 
-    const handleEdit = () => {
-        setIsEditVisible(false)
-        setIsLoading(true)
-        editeAdhocFee(feeObj?.clubAdhocFeeId, feeName, feeDescription, feeDate, userInfo.email)
-            .then(response => setAlertConfig({
-                visible: true, title: 'Success', message: response.data.message,
-                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-            }))
-            .catch(error => setAlertConfig({
-                visible: true, title: 'Error', message: error.response.data.error,
-                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-            }))
-            .finally(() => setIsLoading(false));
-    }
+    const handleEdit = async () => {
+      try {
+        setIsEditVisible(false);
+        await saveAdhocFee({
+          clubAdhocFeeId: feeObj?.clubAdhocFeeId,
+          updateFee: "true",
+          adhocFeeName: feeName,
+          adhocFeeDesc: feeDescription,
+          adhocFeeDate: feeDate,
+          email: userInfo.email,
+        }).unwrap();
+      } catch (error) {
+        console.log("Error", error);
+      }
+    };
 
     return (
         <ThemedView style={{ flex: 1 }}>
@@ -142,15 +139,15 @@ const Payments = () => {
                 </View>
                 <Spacer space={5} />
                 <View style={{ height: "90%" }}>
-                    {isLoading && <LoadingSpinner />}
-                    {!isLoading &&
+                    {getIsLoading() && <LoadingSpinner />}
+                    {!getIsLoading() &&
                         <FlatList style={{ width: "100%" }}
-                            data={feeByMembers}
+                            data={data?.memberAdhocFees}
                             ListFooterComponent={() => <Spacer space={60} />}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             initialNumToRender={8}
                             renderItem={({ item }) => (
-                                <MemberFeeItem {...item} key={item.clubAdhocFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
+                                <MemberFeeItem {...item} key={item.clubAdhocFeePaymentId} feeByMembers={data?.memberAdhocFees} setpaymentStatusUpdates={setpaymentStatusUpdates} />
                             )}
                         />}
                 </View>
@@ -202,7 +199,7 @@ export default Payments
 
 const MemberFeeItem = (props: {
     clubAdhocFeePaymentId: number; firstName: string | undefined; lastName: string | undefined; paymentDate: Date
-    paid: number; clubAdhocFeePaymentAmount: number; setPaymentStatusUpdates: any;
+    paid: number; clubAdhocFeePaymentAmount: number; setpaymentStatusUpdates: any;
     feeByMembers: any | undefined
 }) => {
     const [isSelected, setIsSelected] = useState(props?.paid != 0)
@@ -210,7 +207,7 @@ const MemberFeeItem = (props: {
     const selectItem = () => {
         setIsSelected(prev => !prev)
 
-        props.setPaymentStatusUpdates((prev: ({ clubAdhocFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName: string | undefined; clubAdhocFeePaymentAmount: number; paymentDate: Date })[]) => {
+        props.setpaymentStatusUpdates((prev: ({ clubAdhocFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName: string | undefined; clubAdhocFeePaymentAmount: number; paymentDate: Date })[]) => {
 
             let item = prev.find(item => item.clubAdhocFeePaymentId == props.clubAdhocFeePaymentId)
             const initialPaymentStatus = props.feeByMembers?.find((item: { clubAdhocFeePaymentId: number; }) => item.clubAdhocFeePaymentId == props.clubAdhocFeePaymentId)

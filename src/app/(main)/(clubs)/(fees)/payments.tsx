@@ -27,7 +27,7 @@ const Payments = () => {
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const [feeByMembers, setFeeByMembers] = useState<any | undefined>(undefined);
-    const [paymentStatusUpdates, setPaymentStatusUpdates] = useState<{
+    const [paymentStatusUpdates, setpaymentStatusUpdates] = useState<{
         clubFeePaymentId: number;
         paid: boolean;
         firstName?: string;
@@ -41,7 +41,7 @@ const Payments = () => {
 
     useEffect(() => {
         setIsLoading(true)
-        setPaymentStatusUpdates([]);
+        setpaymentStatusUpdates([]);
         getFeePayments(params.get("clubFeeCollectionId"), "true")
             .then(response => { console.log(response.data); setFeeByMembers(response.data) })
             .catch(error => console.error(error))
@@ -110,7 +110,7 @@ const Payments = () => {
                             ListFooterComponent={() => <Spacer space={40} />}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
-                                <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setPaymentStatusUpdates={setPaymentStatusUpdates} />
+                                <MemberFeeItem {...item} key={item.clubFeePaymentId} feeByMembers={feeByMembers} setpaymentStatusUpdates={setpaymentStatusUpdates} />
                             )}
                         />}
                 </View>
@@ -142,7 +142,7 @@ export default Payments
 
 const MemberFeeItem = (props: {
     clubFeePaymentId: number; firstName: string | undefined; lastName: string | undefined;
-    paid: number; amount: number; setPaymentStatusUpdates: any;
+    paid: number; amount: number; setpaymentStatusUpdates: any;
     feeByMembers: any | undefined
 }) => {
     const [isSelected, setIsSelected] = useState(props?.paid != 0)
@@ -150,7 +150,7 @@ const MemberFeeItem = (props: {
     const selectItem = () => {
         setIsSelected(prev => !prev)
 
-        props.setPaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName?: string | undefined; amount: number; paymentDate: Date })[]) => {
+        props.setpaymentStatusUpdates((prev: ({ clubFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName?: string | undefined; amount: number; paymentDate: Date })[]) => {
 
             let item = prev.find(item => item.clubFeePaymentId == props.clubFeePaymentId)
             const initialPaymentStatus = props.feeByMembers?.find((item: { clubFeePaymentId: number; }) => item.clubFeePaymentId == props.clubFeePaymentId)

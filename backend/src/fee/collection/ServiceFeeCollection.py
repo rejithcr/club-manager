@@ -51,9 +51,9 @@ class FeeCollectionService():
 
         updatePaymentStatus = params.get("updatePaymentStatus")
         if updatePaymentStatus and updatePaymentStatus == "true":
-            paymentStatusUpadtes = params.get("paymentStatusUpadtes")
+            paymentStatusUpdates = params.get("paymentStatusUpdates")
             club_transaction_id = None
-            for item in paymentStatusUpadtes:
+            for item in paymentStatusUpdates:
                 if item["paid"]:
                     # club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_SEQ_NEXT_VAL, None)['nextval']
                     db.execute(conn, queries_fee.ADD_FEE_TRANSACTION,
@@ -66,7 +66,7 @@ class FeeCollectionService():
                     db.execute(conn, queries_fee.UPDATE_FEE_PAYMENT_STATUS, (0, email, item["clubFeePaymentId"]))
                     db.execute(conn, queries_fee.DELETE_FEE_TRANSACTION, (item["clubFeePaymentId"],))
             conn.commit()
-            return {"message": f"Updated payment status for {str(paymentStatusUpadtes)}"}
+            return {"message": f"Updated payment status for {str(paymentStatusUpdates)}"}
 
         else:
             club_fee_collection_id = db.fetch_one(conn, queries_fee.GET_FEE_TYPE_COLLECTION_SEQ_NEXT_VAL, None)[

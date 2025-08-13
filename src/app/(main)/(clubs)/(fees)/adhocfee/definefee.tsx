@@ -19,34 +19,31 @@ import Alert, { AlertProps } from '@/src/components/Alert'
 import DatePicker from '@/src/components/DatePicker'
 import { useAddFeesAdhocMutation } from '@/src/services/feeApi'
 import { snackbarRef } from '@/src/components/snackbar/SnackbarRef'
+import { useGetClubMembersQuery } from '@/src/services/clubApi'
 
 const DefineFee = () => {
-    const [isLoadingMembers, setIsLoadingMembers] = useState(false);
-    const [members, setMembers] = useState<any[]>([])
     const [addedMembers, setAddedMembers] = useState<any[]>([])
+    const [remainingMembers, setRemainingMembers] = useState<any[]>([])
     const [feeName, setFeeName] = useState("");
     const [amountPerMember, setAmountPerMember] = useState(0);
     const [feeAmount, setFeeAmount] = useState("");
     const [feeDescription, setFeeDescription] = useState("")
-    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
     const { colors } = useTheme()
     const [ date, setDate] = useState(new Date())
+    
+    const { data: members, isLoading: isLoadingMembers } = useGetClubMembersQuery({ clubId: clubInfo.clubId });
+    
+    useEffect(() => {
+        setRemainingMembers(members || []);
+    },[members]);
 
     useEffect(()=>{
         if (feeAmount && addedMembers?.length > 0) {
             setAmountPerMember(Number((Number(feeAmount)/addedMembers?.length).toFixed(2)))
         } 
     },[addedMembers,feeAmount])
-
-    useEffect(() => {
-        setIsLoadingMembers(true)
-        getClubMembers(clubInfo.clubId)
-            .then((response) => setMembers(response.data))
-            .catch(error => snackbarRef.current?.show((error.response.data.error, 'error')))
-            .finally(() => setIsLoadingMembers(false))
-    }, [])
     
     const [addFee, { isLoading}] = useAddFeesAdhocMutation();
 
@@ -74,12 +71,12 @@ const DefineFee = () => {
 
     const addMember = (member: any) => {
         setAddedMembers((prev_a: any) => {
-            setMembers((prev_m) => prev_m.filter(pm => pm.memberId != member.memberId))
+            setRemainingMembers((prev_m) => prev_m.filter(pm => pm.memberId != member.memberId))
             return [...prev_a, member]
         })
     }
     const removeMember = (member: any) => {
-        setMembers((prev_m: any) => {
+        setRemainingMembers((prev_m: any) => {
             setAddedMembers((prev_a) => prev_a.filter(pa => pa.memberId != member.memberId))
             return [...prev_m, member]
         })
@@ -123,7 +120,7 @@ const DefineFee = () => {
                 <ThemedText style={appStyles.heading}>Select Members</ThemedText>
                 <View style={{ marginBottom: 80 }}>
                     {isLoadingMembers && <LoadingSpinner/>}
-                    {!isLoading && !isLoadingMembers && members.map((item: any) => (
+                    {!isLoading && !isLoadingMembers && remainingMembers.map((item: any) => (
                         <TouchableOpacity key={item.memberId} onPress={() => addMember(item)}>
                             <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 5, width: "80%", flexWrap: "wrap" }}>
                                 <MaterialIcons name="add-circle" size={20} color={colors.add}/>
@@ -135,7 +132,6 @@ const DefineFee = () => {
                 </View>
             </ScrollView>
             <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 30 }} title='Start Collection' onPress={handleAddFeeAdhoc} />
-            {alertConfig?.visible && <Alert {...alertConfig}/>}
         </GestureHandlerRootView>
         </ThemedView>
     )

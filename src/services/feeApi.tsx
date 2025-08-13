@@ -7,6 +7,14 @@ export const feeApi = createApi({
   baseQuery: baseQueryWithReauth,
   tagTypes: ["adhoc", "fee", "transaction"],
   endpoints: (builder) => ({
+    getFundBalance: builder.query({
+      query: (params) => `/club?${new URLSearchParams(params).toString()}`,
+      providesTags: ["transaction", "fee", "adhoc"],
+    }),
+    getTotalDue: builder.query({
+      query: (params) => `/club?${new URLSearchParams(params).toString()}`,
+      providesTags: ["fee", "adhoc"],
+    }),
     getFees: builder.query({
       query: (params) => `/fee?${new URLSearchParams(params).toString()}`,
     }),
@@ -18,6 +26,22 @@ export const feeApi = createApi({
       query: (body) => ({
         url: "/fee/adhoc",
         method: "POST",
+        body,
+      }),
+      invalidatesTags: ["adhoc"],
+    }),
+    saveFeesAdhoc: builder.mutation({
+      query: (body) => ({
+        url: "/fee/adhoc",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["adhoc"],
+    }),
+    deleteFeesAdhoc: builder.mutation({
+      query: (body) => ({
+        url: "/fee/adhoc",
+        method: "DELETE",
         body,
       }),
       invalidatesTags: ["adhoc"],
@@ -54,8 +78,12 @@ export const feeApi = createApi({
 
 export const {
   useGetFeesQuery,
+  useGetFundBalanceQuery,
+  useGetTotalDueQuery,
   useGetFeesAdhocQuery,
   useAddFeesAdhocMutation,
+  useSaveFeesAdhocMutation,
+  useDeleteFeesAdhocMutation,
   useGetTransactionsQuery,
   useAddTransactionMutation,
   useUpdateTransactionMutation,

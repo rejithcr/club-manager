@@ -26,13 +26,13 @@ import ThemedButton from "@/src/components/ThemedButton";
 import { UserContext } from "@/src/context/UserContext";
 import { EventCard } from "../upcoming_events";
 import { router } from "expo-router";
-import { useGetClubEventsQuery, useGetClubQuery } from "@/src/services/clubApi";
-import { useGetFeesAdhocQuery, useGetFeesQuery } from "@/src/services/feeApi";
+import { useGetClubEventsQuery } from "@/src/services/clubApi";
+import { useGetFeesAdhocQuery, useGetFeesQuery, useGetFundBalanceQuery, useGetTotalDueQuery } from "@/src/services/feeApi";
 
 const ClubHome = () => {
   const router = useRouter();
   const params = useSearchParams();
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
+  const [refreshing, setRefreshing] = useState(false);
   const { setClubInfo } = useContext(ClubContext);
 
   const { colors } = useTheme();
@@ -47,7 +47,7 @@ const ClubHome = () => {
     data: fbr,
     isLoading: isFundBalanceLoading,
     refetch: fetchFundBalance,
-  } = useGetClubQuery({ clubId: params.get("clubId"), fundBalance: "true" });
+  } = useGetFundBalanceQuery({ clubId: params.get("clubId"), fundBalance: "true" });
 
   const {
     data: expenseSplits,
@@ -59,7 +59,7 @@ const ClubHome = () => {
     data: clubDue,
     isLoading: isTotalDueLoading,
     refetch: fetchTotalDue,
-  } = useGetClubQuery({ clubId: params.get("clubId"), totalDue: "true" });
+  } = useGetTotalDueQuery({ clubId: params.get("clubId"), totalDue: "true" });
 
   const {
     data: currentFeeStructure,
@@ -83,11 +83,13 @@ const ClubHome = () => {
   };
 
   const onRefresh = () => {
+    setRefreshing(true);
     fetchFundBalance();
     fetchTotalDue();
     fetchFees();
     fetchSplits();
     fetchEvents();
+    setRefreshing(false);
   };
 
   const showAdhocFeeDetails = (adhocFee: any) => {
@@ -125,7 +127,7 @@ const ClubHome = () => {
           )}
         </View>
         <Spacer space={5} />
-        <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
+        <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <TouchableCard onPress={Number(clubDue?.totalDue) > 0 ? showClubDues : null}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
               <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
@@ -338,7 +340,6 @@ const ClubHome = () => {
             onCancel={() => setIsEditClubVisible(false)}
           />
         )}
-        {alertConfig?.visible && <Alert {...alertConfig} />}
       </GestureHandlerRootView>
       <FloatingMenu
         actions={actions}
