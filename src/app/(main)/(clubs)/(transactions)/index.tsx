@@ -1,5 +1,5 @@
 import { View, FlatList, Switch, TouchableOpacity, RefreshControl, Platform } from 'react-native'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { ClubContext } from '@/src/context/ClubContext'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import FloatingMenu from '@/src/components/FloatingMenu'
@@ -33,7 +33,7 @@ const Transactions = () => {
   const { clubInfo } = useContext(ClubContext)
   const { userInfo } = useContext(UserContext)
   const { colors } = useTheme()
- console.log(txnTypeFilter, showFees, clubInfo);
+
   const {
     items,
     isLoading: isTxnsLoading,
@@ -42,6 +42,12 @@ const Transactions = () => {
     refreshing,
     onRefresh,
   } = usePaginatedQuery(useGetTransactionsQuery, { clubId: clubInfo.clubId, txnType: txnTypeFilter, showFees }, limit);
+
+  
+  useEffect(() => {
+    onRefresh();
+  }, [txnTypeFilter, showFees]);
+  
 
   const [addTransaction, {isLoading: isAddingTxn}] = useAddTransactionMutation();
   const [updateTransaction, {isLoading: isUpdatingTxn}] = useUpdateTransactionMutation();
