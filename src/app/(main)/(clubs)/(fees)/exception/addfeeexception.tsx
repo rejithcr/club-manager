@@ -16,9 +16,10 @@ import ThemedText from '@/src/components/themed-components/ThemedText'
 import ShadowBox from '@/src/components/ShadowBox'
 import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox'
 import Spacer from '@/src/components/Spacer'
+import { useGetClubMembersQuery } from '@/src/services/clubApi'
+import { useAddFeesExceptionMutation } from '@/src/services/feeApi'
 
 const AddFeeException = () => {
-    const [isLoading, setIsLoading] = useState(false)
     const [exceptionType, setExceptionType] = useState<string>("")
     const [exceptionAmount, setExceptionAmount] = useState<string>("")
     const { userInfo } = useContext(UserContext)
@@ -27,16 +28,18 @@ const AddFeeException = () => {
     const params = useSearchParams()
 
     const clubFeeTypeId = params.get("clubFeeTypeId")
-
-    const saveException = () => {
+    const [addFeesException, {isLoading: isSaving}] = useAddFeesExceptionMutation();
+    
+    const saveException = async () => {
         const exceptionMembers = getChanges()
         console.log(exceptionMembers)
         if (validate(exceptionType, exceptionAmount)) {
-            setIsLoading(true)
-            addExceptionType(clubFeeTypeId, exceptionType, exceptionAmount, exceptionMembers, userInfo.email)
-                .then(() => router.back())
-                .catch((error) => alert(error?.message))
-                .finally(() => setIsLoading(false))
+            try {
+                await addFeesException({feeTypeId: clubFeeTypeId, exceptionType, exceptionAmount, exceptionMembers, email: userInfo.email});
+                router.back()
+            } catch (error) {
+                console.log(error);
+            } 
         }
     }
 
@@ -46,19 +49,18 @@ const AddFeeException = () => {
 
     const [members, setMembers] = useState<any>([]);
 
+    const { data: membersData, isLoading: isLoadingMembers } = useGetClubMembersQuery({ clubId: clubInfo.clubId });
+
     useEffect(() => {
-        setIsLoading(true)
-        getClubMembers(clubInfo.clubId)
-            .then(response => {
-                const memberItems = response.data.map((item: any) => ({
-                    ...item,
-                    selected: false
-                }));
-                setMembers(memberItems)
-                setInitialState(memberItems)
-            })
-            .finally(() => setIsLoading(false))
-    }, []);
+      if (membersData) {
+        const memberItems = membersData.map((item: any) => ({
+          ...item,
+          selected: false,
+        }));
+        setMembers(memberItems);
+        setInitialState(memberItems);
+      }
+    }, [membersData]);
 
     // Function to toggle item selection
     const toggleSelection = (memberId: any) => {
@@ -89,8 +91,8 @@ const AddFeeException = () => {
             <ThemedText style={{width: "80%",  alignSelf: "center", fontSize: 20, fontWeight: "bold" }}>Select Members</ThemedText>
             <ThemedText style={{width: "80%", alignSelf: "center", fontSize: 10}}>Select the members eligible for this fee exception</ThemedText>
             <Spacer space={5} />
-            {isLoading && <LoadingSpinner />}
-            {!isLoading && <View style={{ height: "65%" }}>
+            {isLoadingMembers && <LoadingSpinner />}
+            {!isLoadingMembers && <View style={{ height: "65%" }}>
                 <FlatList 
                     data={members}
                     ListFooterComponent={() => <View style={{ height: 50 }} />}
@@ -109,7 +111,7 @@ const AddFeeException = () => {
             }
         </View>
         <View style={{ position: "absolute", bottom: 30, alignSelf:"center" }} >
-            <ThemedButton title='Add Exception' onPress={saveException} />
+           { isSaving ? <LoadingSpinner /> :  <ThemedButton title='Add Exception' onPress={saveException} /> }
         </View>
         </ThemedView>
     )

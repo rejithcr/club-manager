@@ -1,7 +1,6 @@
-import { TouchableOpacity, View, FlatList, StyleSheet, ScrollView } from 'react-native';
-import React, { useContext, useEffect, useState } from 'react'
+import { TouchableOpacity, View, StyleSheet, ScrollView } from 'react-native';
+import React, { useContext, useState } from 'react'
 import LoadingSpinner from '@/src/components/LoadingSpinner';
-import { getClubDues } from '@/src/helpers/club_helper';
 import { ClubContext } from '@/src/context/ClubContext';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedText from '@/src/components/themed-components/ThemedText';
@@ -9,26 +8,12 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import { useTheme } from '@/src/hooks/use-theme';
 import Spacer from '@/src/components/Spacer';
 import ShadowBox from '@/src/components/ShadowBox';
-import Alert, { AlertProps } from '@/src/components/Alert';
 import Divider from '@/src/components/Divider';
+import { useGetClubDuesQuery } from '@/src/services/feeApi';
 
 const ClubDues = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [duesByMembers, setDuesByMembers] = useState<any[] | undefined>(undefined);
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
-
-  const { clubInfo } = useContext(ClubContext)
-
-  const fetchClubDues = () => {
-    setIsLoading(true);
-    getClubDues(clubInfo.clubId)
-      .then(response => { setDuesByMembers(response.data) })
-      .catch(error => setAlertConfig({ visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }] }))
-      .finally(() => setIsLoading(false));
-  }
-  useEffect(() => {
-    fetchClubDues();
-  }, [])
+  const { clubInfo } = useContext(ClubContext);
+  const { data: duesByMembers, isLoading } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true" });
 
   return (
     <ThemedView style={{ flex: 1 }}>
@@ -41,7 +26,6 @@ const ClubDues = () => {
           })}
         </View>
       </ScrollView>
-      {alertConfig?.visible && <Alert {...alertConfig} />}
       {/* <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => null} /> */}
     </ThemedView>
   )

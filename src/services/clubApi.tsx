@@ -42,5 +42,5 @@ export const {
   useGetClubEventsQuery,
   useLazyGetClubEventsQuery,
   useAddMemberMutation,
-  useAddClubMutation
+  useAddClubMutation,
 } = clubApi;

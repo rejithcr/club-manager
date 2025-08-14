@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native'
+import { View, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
@@ -18,6 +18,7 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import { useTheme } from '@/src/hooks/use-theme'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import Spacer from '@/src/components/Spacer'
+import { useUpdateFeesExceptionMutation } from '@/src/services/feeApi'
 
 const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
@@ -32,18 +33,29 @@ const EditFeeException = () => {
 
     const params = useSearchParams()
 
-    const handleSaveException = () => {
-        const changes = exceptionMembers.filter((item: { endDateAdded: any; clubFeeTypeExceptionMemberId: any }) => item.endDateAdded || !item.clubFeeTypeExceptionMemberId)
-        if (validate(exceptionType, exceptionAmount)) {
-            setIsLoadingMembers(true)
-            updateExceptionType(params.get("clubFeeTypeExceptionId"), exceptionType, exceptionAmount, changes, userInfo.email)
-                .then(() => router.back())
-                .catch((error) => alert(error?.response?.data?.error))
-                .finally(() => setIsLoadingMembers(false))
+    const [updateExceptionType, { isLoading: isSaving }] = useUpdateFeesExceptionMutation();
+
+    const handleSaveException = async () => {
+      const changes = exceptionMembers.filter(
+        (item: { endDateAdded: any; clubFeeTypeExceptionMemberId: any }) =>
+          item.endDateAdded || !item.clubFeeTypeExceptionMemberId
+      );
+      if (validate(exceptionType, exceptionAmount)) {
+        setIsLoadingMembers(true);
+        try {
+          await updateExceptionType({
+            feeTypeExceptionId: params.get("clubFeeTypeExceptionId"),
+            exceptionType,
+            exceptionAmount,
+            exceptionMembers: changes,
+            email: userInfo.email,
+          });
+          router.back();
+        } catch (error) {
+          console.log(error);
         }
-    }
-
-
+      }
+    };
 
     useEffect(() => {
         setIsLoadingException(true)
@@ -144,7 +156,7 @@ const EditFeeException = () => {
             </ScrollView>
             
             {clubInfo.role === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 30, alignSelf: "center" }} >
-                <ThemedButton title='Update Exception' onPress={handleSaveException} />
+                {isSaving ? <LoadingSpinner /> : <ThemedButton title='Update Exception' onPress={handleSaveException} />}
             </View>}
         </ThemedView>
     )

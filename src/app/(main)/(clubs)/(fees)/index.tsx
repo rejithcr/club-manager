@@ -13,40 +13,22 @@ import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
-import Alert, { AlertProps } from '@/src/components/Alert'
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
+import { useGetFeesQuery } from '@/src/services/feeApi'
 
 const Fees = () => {
-  const [isLoadingCurrent, setIsLoadingCurrent] = useState(false);
-  const [currentFeeStructure, setCurrentFeeStructure] = useState<any>([])
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const { clubInfo } = useContext(ClubContext)
   const { colors } = useTheme();
 
-  useFocusEffect(
-    useCallback(() => {
-      showFees()
-      return () => { console.log('Screen is unfocused'); };
-    }, [])
-  );
-
-  const showFees = () => {
-    setIsLoadingCurrent(true)
-    getFeeStructure(Number(clubInfo.clubId))
-      .then(response => setCurrentFeeStructure(response.data))
-      .catch(error => setAlertConfig({
-                    visible: true, title: 'Error', message: error.response.data.error,
-                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-                }))
-      .finally(() => setIsLoadingCurrent(false));
-  }
-
+  const {data: currentFeeStructure, isLoading: isLoadingCurrent} = useGetFeesQuery({ clubId: clubInfo.clubId });
+ 
   const showFeeTypeDetails = (fee: any) => {
     router.push({
       pathname: "/(main)/(clubs)/(fees)/feetypedetails",
       params: { fee: JSON.stringify(fee) }
     })
   }
+  
   return (
     <ThemedView style={{flex: 1}}>
     <GestureHandlerRootView>
@@ -80,7 +62,6 @@ const Fees = () => {
           </View>
         })}
       </ScrollView>
-      {alertConfig?.visible && <Alert {...alertConfig}/>}
     </GestureHandlerRootView>
     </ThemedView>
   )

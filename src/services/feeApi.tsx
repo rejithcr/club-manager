@@ -5,7 +5,7 @@ import { baseQueryWithReauth } from "./baseQuery";
 export const feeApi = createApi({
   reducerPath: "feeApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["adhoc", "fee", "transaction"],
+  tagTypes: ["adhoc", "fee", "transaction", "exception"],
   endpoints: (builder) => ({
     getFundBalance: builder.query({
       query: (params) => `/club?${new URLSearchParams(params).toString()}`,
@@ -17,10 +17,23 @@ export const feeApi = createApi({
     }),
     getFees: builder.query({
       query: (params) => `/fee?${new URLSearchParams(params).toString()}`,
+      providesTags: ["fee"],
     }),
     getFeesAdhoc: builder.query({
       query: (params) => `/fee/adhoc?${new URLSearchParams(params).toString()}`,
       providesTags: ["adhoc"],
+    }),
+    getClubDues: builder.query({
+      query: (params) => `/club/member?${new URLSearchParams(params).toString()}`,
+      providesTags: ["fee", "adhoc"],
+    }), 
+    addFee: builder.mutation({
+      query: (body) => ({
+        url: "/fee",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["fee"],
     }),
     addFeesAdhoc: builder.mutation({
       query: (body) => ({
@@ -45,6 +58,22 @@ export const feeApi = createApi({
         body,
       }),
       invalidatesTags: ["adhoc"],
+    }),    
+    addFeesException: builder.mutation({
+      query: (body) => ({
+        url: "/fee/exception",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["exception"],
+    }),
+    updateFeesException: builder.mutation({
+      query: (body) => ({
+        url: "/fee/exception",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["exception"],
     }),
     getTransactions: builder.query({
       query: (params) => `/club/transaction?${new URLSearchParams(params).toString()}`,
@@ -87,5 +116,9 @@ export const {
   useGetTransactionsQuery,
   useAddTransactionMutation,
   useUpdateTransactionMutation,
-  useDeleteTransactionMutation
+  useDeleteTransactionMutation,
+  useAddFeesExceptionMutation,
+  useGetClubDuesQuery,
+  useAddFeeMutation,
+  useUpdateFeesExceptionMutation,
 } = feeApi;
