@@ -1,6 +1,7 @@
 // src/services/api.js
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
+import { saveNextPeriodFeeCollection } from "../helpers/fee_helper";
 
 export const feeApi = createApi({
   reducerPath: "feeApi",
@@ -35,6 +36,22 @@ export const feeApi = createApi({
       }),
       invalidatesTags: ["fee"],
     }),
+    editFee: builder.mutation({
+      query: (body) => ({
+        url: "/fee",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["fee"],
+    }),
+    deleteFee: builder.mutation({
+      query: (body) => ({
+        url: "/fee",
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: ["fee"],
+    }),
     addFeesAdhoc: builder.mutation({
       query: (body) => ({
         url: "/fee/adhoc",
@@ -58,7 +75,11 @@ export const feeApi = createApi({
         body,
       }),
       invalidatesTags: ["adhoc"],
-    }),    
+    }),        
+    getExceptionTypes: builder.query({
+      query: (params) => `/fee/exception?${new URLSearchParams(params).toString()}`,
+      providesTags: ["exception"],
+    }), 
     addFeesException: builder.mutation({
       query: (body) => ({
         url: "/fee/exception",
@@ -78,6 +99,26 @@ export const feeApi = createApi({
     getTransactions: builder.query({
       query: (params) => `/club/transaction?${new URLSearchParams(params).toString()}`,
       providesTags: ["adhoc", "transaction", "fee"],
+    }),
+    getCollectionsOfFeeType: builder.query({
+      query: (params) => `/fee/collection?${new URLSearchParams(params).toString()}`,
+      providesTags: ["fee"],
+    }),
+    saveFeeCollection: builder.mutation({
+      query: (body) => ({
+        url: "/fee/collection",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["fee"],
+    }),
+    deleteFeeCollection: builder.mutation({
+      query: (body) => ({
+        url: "/fee/collection",
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: ["fee"],
     }),
     addTransaction: builder.mutation({
       query: (body) => ({
@@ -121,4 +162,11 @@ export const {
   useGetClubDuesQuery,
   useAddFeeMutation,
   useUpdateFeesExceptionMutation,
+  useEditFeeMutation,
+  useDeleteFeeMutation,
+  useGetExceptionTypesQuery,
+  useGetCollectionsOfFeeTypeQuery,
+  useLazyGetCollectionsOfFeeTypeQuery,
+  useSaveFeeCollectionMutation,
+  useDeleteFeeCollectionMutation
 } = feeApi;

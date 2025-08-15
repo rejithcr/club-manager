@@ -25,7 +25,7 @@ const DefineFee = () => {
   const handleAddFee = async () => {
     if (validate(feeType, feeAmount)) {
       try {
-        await addFee({ clubId: clubInfo.clubId, feeType, feeTypeInterval, feeAmount, email: userInfo.email });
+        await addFee({ clubId: clubInfo.clubId, feeType, feeTypeInterval, feeAmount, email: userInfo.email }).unwrap(); 
         router.dismissTo(`/(main)/(clubs)`);
       } catch (error) {
         console.error("Error adding fee:", error);

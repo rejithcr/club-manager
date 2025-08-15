@@ -1,7 +1,6 @@
 import { View, Text, FlatList, Button, TextInput, Platform } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
-import { getNextPeriodFeeMemberList, getNextPeriods, saveNextPeriodFeeCollection } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import ThemedButton from '@/src/components/ThemedButton';
@@ -16,21 +15,21 @@ import Spacer from '@/src/components/Spacer';
 import { useTheme } from '@/src/hooks/use-theme';
 import { isValidYear } from '@/src/utils/validators';
 import { getCurrentMonthItem, getCurrentQuarterItem, getMonths, getQuarters } from '@/src/utils/common';
+import { useGetCollectionsOfFeeTypeQuery, useLazyGetCollectionsOfFeeTypeQuery, useSaveFeeCollectionMutation } from '@/src/services/feeApi';
 
 const StartNextPeriod = () => {
     const [year, setYear] = useState(new Date().getFullYear().toString());
     const [periods, setPeriods] = useState<{ period: string, startDate: string }[] | undefined>();
     const [isStartCollectionEnabled, setIsStartCollectionEnabled] = useState(true)
 
-    const [isLoadingPeriods, setIsLoadingPeriods] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
     const [nextPeriodDate, setNextPeriodDate] = useState<string>();
-    const [nextPeriodFee, setNextPeriodFee] = useState<any>(undefined);
     const { userInfo } = useContext(UserContext)
     const { colors } = useTheme()
     const params = useSearchParams()
     const interval = JSON.parse(params.get('fee') || '').clubFeeTypeInterval;
 
+    const [getNextPeriodFeeMemberList, { data: nextPeriodFee, isLoading: isLoadingPeriods }] = useLazyGetCollectionsOfFeeTypeQuery();
     useEffect(() => {
         if (validate(year)) {
             if (interval != 'YEARLY') {
@@ -38,12 +37,11 @@ const StartNextPeriod = () => {
                 setPeriods(periodList)
                 setNextPeriodDate(interval === 'MONTHLY' ? getCurrentMonthItem(periodList)?.startDate : getCurrentQuarterItem(periodList)?.startDate)
             } else {
-                setIsLoadingPeriods(true)
                 setNextPeriodDate(year + '-01-01')
-                getNextPeriodFeeMemberList(params.get("clubFeeTypeId"), "true")
-                    .then(response => { setNextPeriodFee(response.data) })
-                    .catch(error => console.error(error))
-                    .finally(() => setIsLoadingPeriods(false));
+                getNextPeriodFeeMemberList({
+                    feeTypeId: params.get("clubFeeTypeId"),
+                    listNextPaymentCollectionList: "true"
+                });
             }
             setIsStartCollectionEnabled(true)
         } else {
@@ -56,34 +54,38 @@ const StartNextPeriod = () => {
 
     useEffect(() => {
         if (periods && periods.length > 0) {
-            setIsLoadingPeriods(true)
-            getNextPeriodFeeMemberList(params.get("clubFeeTypeId"), "true")
-                .then(response => { setNextPeriodFee(response.data) })
-                .catch(error => console.error(error))
-                .finally(() => setIsLoadingPeriods(false));
+            getNextPeriodFeeMemberList({
+                feeTypeId: params.get("clubFeeTypeId"),
+                listNextPaymentCollectionList: "true"
+            });
         }
     }, [periods]);
 
-
-    const handleStartCollection = () => {
-        setIsLoadingPeriods(true)
-        let nextPeriodLabel;
-        if (interval !== 'YEARLY') {
-            const nextP = periods?.find((p: any) => p.startDate == nextPeriodDate)
-            nextPeriodLabel = nextP?.period + '-' + nextPeriodDate?.substring(0, 4)
-        } else {
-            nextPeriodLabel = nextPeriodDate?.substring(0, 4)
-        }
-        saveNextPeriodFeeCollection(params.get("clubFeeTypeId"), nextPeriodFee, nextPeriodDate, nextPeriodLabel, userInfo.email)
-            .then(() =>
-                router.dismissTo({
-                    pathname: "/(main)/(clubs)/(fees)/feetypedetails",
-                    params: { fee: params.get('fee') }
-                })
-            )
-            .catch((error: any) => alert(error.response.data.error))
-            .finally(() => setIsLoadingPeriods(false));
-    }
+    const [saveNextPeriodFeeCollection, { isLoading: isSaving }] = useSaveFeeCollectionMutation();
+    const handleStartCollection = async () => {
+      let nextPeriodLabel;
+      if (interval !== "YEARLY") {
+        const nextP = periods?.find((p: any) => p.startDate == nextPeriodDate);
+        nextPeriodLabel = nextP?.period + "-" + nextPeriodDate?.substring(0, 4);
+      } else {
+        nextPeriodLabel = nextPeriodDate?.substring(0, 4);
+      }
+      try {
+        await saveNextPeriodFeeCollection({
+          feeTypeId: params.get("clubFeeTypeId"),
+          nextPeriodFees: nextPeriodFee,
+          nextPeriodDate,
+          nextPeriodLabel,
+          email: userInfo.email,
+        }).unwrap(); 
+        router.dismissTo({
+          pathname: "/(main)/(clubs)/(fees)/feetypedetails",
+          params: { fee: params.get("fee") },
+        });
+      } catch (error) {
+        console.error("Error saving next period fee collection:", error);
+      }
+    };
 
     return (
         <ThemedView style={{ flex: 1 }}>
@@ -130,7 +132,7 @@ const StartNextPeriod = () => {
                         <Button title="Hide modal" onPress={() => setIsConfirmVisible(false)} />
                     </View>
                 </Modal>
-                {!isLoadingPeriods && <ThemedButton style={{ position: "absolute", bottom: 20, alignSelf: "center" }} title='Start Collection' onPress={handleStartCollection} disabled={!isStartCollectionEnabled} />}
+                {!isSaving && <ThemedButton style={{ position: "absolute", bottom: 20, alignSelf: "center" }} title='Start Collection' onPress={handleStartCollection} disabled={!isStartCollectionEnabled} />}
             </GestureHandlerRootView>
         </ThemedView>
     )

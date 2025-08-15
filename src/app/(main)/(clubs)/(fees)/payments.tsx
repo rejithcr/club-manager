@@ -1,7 +1,7 @@
 import { View, FlatList, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
-import { deleteFeeCollection, getFeePayments, saveFeePayments } from '@/src/helpers/fee_helper';
+import { getFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
@@ -21,6 +21,7 @@ import { ROLE_ADMIN } from '@/src/utils/constants';
 import Alert, { AlertProps } from '@/src/components/Alert';
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading';
 import CircularProgress from '@/src/components/charts/CircularProgress';
+import { useDeleteFeeCollectionMutation, useSaveFeeCollectionMutation } from '@/src/services/feeApi';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -55,32 +56,43 @@ const Payments = () => {
             setIsConfirmVisible(true)
         }
     }
-
-    const savePaymentUpdates = () => {
-        setIsLoading(true)
-        setIsConfirmVisible(false)
-        saveFeePayments(paymentStatusUpdates, clubInfo.clubId, "true", userInfo.email)
-            .then(() => router.back())
-            .catch(error => setAlertConfig({
-                visible: true, title: 'Error', message: error.response.data.error,
-                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-            }))
-            .finally(() => setIsLoading(false));
-    }
-
+    const [saveFeePayments] = useSaveFeeCollectionMutation();
+    const savePaymentUpdates = async () => {
+      setIsLoading(true);
+      setIsConfirmVisible(false);
+      try {
+        await saveFeePayments({
+          paymentStatusUpdates,
+          clubId: clubInfo.clubId,
+          updatePaymentStatus: "true",
+          email: userInfo.email,
+        }).unwrap();
+        router.back();
+      } catch (error) {
+        console.error("Error saving payment updates:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    const [deleteFeeCollection] = useDeleteFeeCollectionMutation();
     const deleteCollection = () => {
         setAlertConfig({
             visible: true,
             title: 'Are you sure!',
             message: 'This will delete the transcations of this collecton. This cannot be recovered.',
             buttons: [{
-                text: 'OK', onPress: () => {
+                text: 'OK', onPress: async () => {
                     setAlertConfig({ visible: false });
                     setIsLoading(true);
-                    deleteFeeCollection(params.get("clubFeeCollectionId"), userInfo.email)
-                        .then(() => router.back())
-                        .catch(error => alert(error.response.data.error))
-                        .finally(() => setIsLoading(false));
+                    try {
+                        await deleteFeeCollection({ clubFeeCollectionId: params.get("clubFeeCollectionId"), email: userInfo.email }).unwrap();
+                        router.back();
+                    } catch (error) {
+                        console.error("Error deleting fee collection:", error);
+                    } finally {
+                        setIsLoading(false);
+                    }
+
                 }
             }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
         });

@@ -1,12 +1,11 @@
 import { View, TouchableOpacity, FlatList, RefreshControl } from 'react-native'
-import React, { useCallback, useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks'
 import ThemedButton from '@/src/components/ThemedButton'
-import { appStyles } from '@/src/utils/styles'
-import { getExceptionTypes, getCollectionsOfFeeType } from '@/src/helpers/fee_helper'
+import { appStyles } from '@/src/utils/styles';
 import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { router, useFocusEffect } from 'expo-router'
+import { router } from 'expo-router'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import TouchableCard from '@/src/components/TouchableCard'
 import ThemedView from '@/src/components/themed-components/ThemedView'
@@ -17,36 +16,22 @@ import { useTheme } from '@/src/hooks/use-theme'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import { ClubContext } from '@/src/context/ClubContext'
 import ProgressBar from '@/src/components/charts/ProgressBar'
-import Alert, { AlertProps } from '@/src/components/Alert'
+import { useGetCollectionsOfFeeTypeQuery, useGetExceptionTypesQuery } from '@/src/services/feeApi'
+import usePaginatedQuery from '@/src/hooks/usePaginatedQuery'
 
 const FeeTypeDetails = () => {
-    const [isExceptionTypesLoading, setIsExceptionTypesLoading] = useState(false)
     const [showAddException, setShowAddException] = useState(false)
     const [fee, setFee] = useState<any>()
-    const [exceptionTypes, setExceptionTypes] = useState<[{}]>()
-    const [feeCollections, setFeeCollections] = useState<any>([])
-    const [isFeeCollectionsLoading, setIsFeeCollectionsLoading] = useState(false)
     const { colors } = useTheme();
     const { clubInfo } = useContext(ClubContext)
-    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const params = useSearchParams()
 
     const feeObj = JSON.parse(params.get('fee') || "")
 
-    const setExceptionTypesValue = () => {
-        setIsExceptionTypesLoading(true)
-        getExceptionTypes(feeObj.clubFeeTypeId)
-            .then(response => {
-                console.log(response.data)
-                setExceptionTypes(response.data)
-            })
-            .catch((error) => alert(error?.message))
-            .finally(() => setIsExceptionTypesLoading(false))
-    }
-
+    const {data: exceptionTypes, isLoading: isExceptionTypesLoading} = useGetExceptionTypesQuery({ feeTypeId: feeObj.clubFeeTypeId });
+   
     useEffect(() => {
         setFee(feeObj)
-        console.log(feeObj)
     }, [])
 
     const showStartCollectionPage = () => {
@@ -79,56 +64,19 @@ const FeeTypeDetails = () => {
             params: {
                 clubFeeTypeId: fee.clubFeeTypeId, clubFeeAmount: fee.clubFeeAmount,
                 clubFeeType: fee.clubFeeType, clubFeeTypeInterval: fee.clubFeeTypeInterval,
-                isEditable: feeCollections.length > 0 ? "false" : "true"
+                isEditable: items.length > 0 ? "false" : "true"
             }
         })
     }
 
-
-    const offset = useRef(0)
-    const limit = 12
-    const [hasMoreData, setHasMoreData] = useState(false)
-    const [isFectching, setIsFetching] = useState(false)
     
-    useFocusEffect(
-        useCallback(() => {
-            onRefresh()
-            setExceptionTypesValue()
-            return () => { console.log('Screen is unfocused'); };
-        }, [])
+    const limit = 12;
+    const { items, isLoading, isFetching, refreshing, onRefresh, loadMore } = usePaginatedQuery(
+      useGetCollectionsOfFeeTypeQuery,
+      { feeTypeId: feeObj.clubFeeTypeId, listCollectionsOfFeetType: "true" },
+      limit
     );
 
-    const fetchNextPage = () => {
-        if (hasMoreData && !isFectching) {
-            setIsFetching(true)
-            offset.current = offset.current + limit
-            getCollectionsOfFeeType(feeObj.clubFeeTypeId, "true", limit, offset.current)
-                .then(response => {
-                    setHasMoreData(response.data?.length > 0);
-                    setFeeCollections((prev: any) => [...prev, ...response.data])
-                })
-                .catch(error => setAlertConfig({
-                    visible: true, title: 'Error', message: error.response.data.error,
-                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-                }))
-                .finally(() => setIsFetching(false))
-        }
-    }
-    const onRefresh = () => {
-        setIsFeeCollectionsLoading(true)
-        offset.current = 0
-        getCollectionsOfFeeType(feeObj.clubFeeTypeId, "true", limit, offset.current)
-            .then(response => {
-                setHasMoreData(response.data?.length > 0);
-                setFeeCollections(response.data);
-            })
-            .catch(error => setAlertConfig({
-                visible: true, title: 'Error', message: error.response.data.error,
-                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-            }))
-            .finally(() => setIsFeeCollectionsLoading(false))
-    }
-    
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
@@ -172,17 +120,15 @@ const FeeTypeDetails = () => {
                 </View>
                 <View style={{ flex: 1 }}>
                     <ThemedText style={appStyles.heading}>Collections</ThemedText>
-                    {isFeeCollectionsLoading && <LoadingSpinner />}
-                    {!isFeeCollectionsLoading && feeCollections.length == 0 &&
-                        <ThemedText style={{ alignSelf: "center", width: "85%" }}>No collections present. To start collecting fee for a period, press the below button.</ThemedText>}
-                    {!isFeeCollectionsLoading && feeCollections &&
+                    {!isLoading &&
                         <FlatList style={{ width: "100%" }}
-                            data={feeCollections}
+                            data={items}
+                            ListEmptyComponent={() => <ThemedText style={{ alignSelf: "center", width: "85%" }}>No collections present. To start collecting fee for a period, press the below button.</ThemedText>}
                             initialNumToRender={20}
-                            onEndReached={fetchNextPage}
+                            onEndReached={loadMore}
                             onEndReachedThreshold={0.2}
-                            refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
-                            ListFooterComponent={() => isFectching && <><Spacer space={10} /><LoadingSpinner /></> || <Spacer space={40} />}
+                            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+                            ListFooterComponent={() => isFetching && <><Spacer space={10} /><LoadingSpinner /></> || <Spacer space={40} />}
                             ItemSeparatorComponent={() => <Spacer space={4} />}
                             renderItem={({ item }) => (
                                 <TouchableCard onPress={() => gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod, item.collected, item.total)} id={item}>
@@ -206,24 +152,6 @@ const FeeTypeDetails = () => {
                 {clubInfo.role === ROLE_ADMIN &&
                     <ThemedButton style={{ position: "absolute", bottom: 20, alignSelf: "center" }} title='Start new collection' onPress={showStartCollectionPage} />
                 }
-                {/*  <Modal isVisible={isSelectPeriodVisible}>
-                <View style={{ backgroundColor: "white", borderRadius: 5, paddingBottom: 20 }}>
-                    <Text style={appStyles.heading}>Select Period</Text>
-                    <Picker style={{ width: "60%" , alignSelf:"center"}}
-                        selectedValue={"MONTHLY"}
-                        onValueChange={(itemValue, _itemIndex) => undefined}>
-                        <Picker.Item label="MONTHLY" value="MONTHLY" />
-                        <Picker.Item label="QUATERLY" value="QUATERLY" />
-                        <Picker.Item label="YEARLY" value="YEARLY" />
-                        <Picker.Item label="ADHOC" value="ADHOC" />
-                    </Picker>
-                    <View style={{flexDirection:"row", justifyContent:"space-around"}}>
-                    <ThemedButton title='Start' onPress={showStartCollectionPage}/>
-                    <ThemedButton title='Cancel' onPress={() => setIsSelectPeriodVisible(false)}/>
-                    </View>
-                </View>
-            </Modal> */}
-                {alertConfig?.visible && <Alert {...alertConfig} />}
             </GestureHandlerRootView>
         </ThemedView>
     )
