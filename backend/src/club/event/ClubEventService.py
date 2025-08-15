@@ -170,7 +170,7 @@ class ClubEventService():
                     INSERT INTO attendance (event_id, membership_id, present)
                     VALUES (%s, %s, %s)
                     ON CONFLICT (event_id, membership_id)
-                    DO UPDATE SET present = EXCLUDED.present, timestamp = CURRENT_TIMESTAMP
+                    DO UPDATE SET present = EXCLUDED.present
                 """, (event_id, r['membershipId'], r['present']))
 
         if status:
