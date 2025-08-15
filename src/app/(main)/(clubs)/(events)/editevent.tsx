@@ -1,4 +1,3 @@
-import { AlertProps } from "@/src/components/Alert";
 import DatePicker from "@/src/components/DatePicker";
 import InputText from "@/src/components/InputText";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
@@ -7,8 +6,6 @@ import ThemedView from "@/src/components/themed-components/ThemedView";
 import ThemedButton from "@/src/components/ThemedButton";
 import { ClubContext } from "@/src/context/ClubContext";
 import { UserContext } from "@/src/context/UserContext";
-import { addEvent, updateEvent } from "@/src/helpers/events_helper";
-import { useHttpGet } from "@/src/hooks/use-http";
 import { isValidDate, isValidLength } from "@/src/utils/validators";
 import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
@@ -16,6 +13,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import Alert from '@/src/components/Alert'
 import { useSearchParams } from "expo-router/build/hooks";
+import { useGetClubEventTypesQuery, useUpdateEventMutation } from "@/src/services/clubApi";
 
 const AddEvent = () => {
   const [title, setTitle] = useState("");
@@ -26,18 +24,13 @@ const AddEvent = () => {
   const [location, setLocation] = useState("");
   const [eventTypeId, setEventTypeId] = useState("");
   const [eventId, setEventId] = useState();
-  const [isAdding, setIAdding] = useState(false);
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
   const params = useSearchParams()
 
-  const { data: eventTypes, isLoading: isLoadingEventTypes } = useHttpGet(
-    "/club/event/types",
-    { clubId: clubInfo.clubId }
-  );
-
+  const { data: eventTypes, isLoading: isLoadingEventTypes } = useGetClubEventTypesQuery({ clubId: clubInfo.clubId });
+  
   useEffect(()=>{    
     const eventObj = JSON.parse(params.get('event')||'')
     setTitle(eventObj.title)
@@ -50,13 +43,12 @@ const AddEvent = () => {
     eventTypes && setEventTypeId(eventObj.eventTypeId)
   },[eventTypes])
 
+  const [updateEvent, { isLoading: isUpdating }] = useUpdateEventMutation();
   const handleSubmit = async () => {
-    console.log(eventDate);
     if (!isValidLength(title, 2) || !isValidDate(eventDate)) {
       alert("Please enter title and date");
       return;
     }
-    setIAdding(true);
     const payload = {
       title,
       description,
@@ -68,23 +60,12 @@ const AddEvent = () => {
       createdBy: userInfo.email,
       eventId
     };
-    updateEvent(payload)
-      .then((response) => {
-        console.log(response.data);
-        alert("Event Updated!");
-        router.dismissTo(`/(main)/(clubs)/(events)`);
-      })
-      .catch((error) =>
-        setAlertConfig({
-          visible: true,
-          title: "Error",
-          message: error.response.data.error,
-          buttons: [
-            { text: "OK", onPress: () => setAlertConfig({ visible: false }) },
-          ],
-        })
-      )
-      .finally(() => setIAdding(false));
+    try {
+      await updateEvent(payload).unwrap();
+      router.dismissTo(`/(main)/(clubs)/(events)`);
+    } catch (error) {
+      console.error("Error updating event:", error);
+    }
   };
 
   return (
@@ -140,9 +121,8 @@ const AddEvent = () => {
         </Picker>
       )}
       <Spacer space={5} />
-      {isAdding ? <LoadingSpinner/> :
+      {isUpdating ? <LoadingSpinner/> :
       <ThemedButton title="Save Event" onPress={handleSubmit} />}
-    {alertConfig?.visible && <Alert {...alertConfig}/>}
     </ThemedView>
   );
 };

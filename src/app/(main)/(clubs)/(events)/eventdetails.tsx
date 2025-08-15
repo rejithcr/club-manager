@@ -24,6 +24,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "@/src/hooks/use-theme";
 import Alert, { AlertProps } from "@/src/components/Alert";
 import { ROLE_ADMIN } from "@/src/utils/constants";
+import { useDeleteEventMutation, useUpdateEventAttendanceMutation } from "@/src/services/clubApi";
 
 const EventDetails = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
@@ -36,7 +37,6 @@ const EventDetails = () => {
   const [attendanceDiff, setAttendanceDiff] = useState<{ added: any[]; removed: any[] }>({ added: [], removed: [] });
   const [attendanceChanged, setAttendanceChanged] = useState(false);
   const [cancellationReason, setCancellationReason] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
   const [event, setEvent] = useState<Event>();
   const params = useSearchParams();
   const { clubInfo } = useContext(ClubContext);
@@ -105,22 +105,21 @@ const EventDetails = () => {
     setAttendanceChanged(diff.added.length > 0 || diff.removed.length > 0);
   }, [attendedMembers]);
 
-  const handleSaveChanges = () => {
+  const [updateEventAttendance, {isLoading: isSaving}] = useUpdateEventAttendanceMutation();
+  const handleSaveChanges = async () => {
     const added = attendanceDiff.added.map((m) => ({ membershipId: m.membershipId, present: true }));
     const removed = attendanceDiff.removed.map((m) => ({ membershipId: m.membershipId, present: false }));
-    setIsSaving(true);
-    saveEventChanges(event?.eventId, [...added, ...removed], eventStatus)
-      .then((response) => {
-        alert(response.data.message);
-      })
-      .finally(() => {
-        setIsSaving(false);
-        setIsConfirmVisible(false);
-      });
+    try {
+      await updateEventAttendance({ eventId: event?.eventId, records: [...added, ...removed], status: eventStatus }).unwrap();
+    } catch (error) {
+      console.error("Error updating attendance:", error);
+    } finally {
+      setIsConfirmVisible(false);
+    }
   };
 
-  const [isDeleting, setIsDeleting] = useState(false);
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
+  const [deleteEvent, { isLoading: isDeleting }] = useDeleteEventMutation();
   const handleDeleteEvent = () => {
     setAlertConfig({
       visible: true,
@@ -129,16 +128,14 @@ const EventDetails = () => {
       buttons: [
         {
           text: "OK",
-          onPress: () => {
+          onPress: async () => {
             setAlertConfig({ visible: false });
-            setIsDeleting(true);
-            deleteEvent(event?.eventId)
-              .then((response) => {
-                alert(response.data.message);
-                router.dismissTo("/(main)/(clubs)/(events)");
-              })
-              .catch((error) => alert(error.response.data.error))
-              .finally(() => setIsDeleting(false));
+            try{
+              await deleteEvent({ eventId: event?.eventId }).unwrap();
+              router.dismissTo("/(main)/(clubs)/(events)");
+            }catch (error) {
+              console.error("Error deleting event:", error);
+            }
           },
         },
         { text: "Cancel", onPress: () => setAlertConfig({ visible: false }) },

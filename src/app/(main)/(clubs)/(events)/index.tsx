@@ -1,10 +1,8 @@
-import { Button, FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
+import React, { useContext } from "react";
 import Spacer from "@/src/components/Spacer";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import { router } from "expo-router";
-import Alert, { AlertProps } from "@/src/components/Alert";
-import { getEvents } from "@/src/helpers/events_helper";
 import { ClubContext } from "@/src/context/ClubContext";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import { AntDesign, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
@@ -14,61 +12,19 @@ import { useTheme } from "@/src/hooks/use-theme";
 import { appStyles } from "@/src/utils/styles";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { ROLE_ADMIN } from "@/src/utils/constants";
+import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
+import { useGetClubEventsQuery } from "@/src/services/clubApi";
+
+const limit = 20;
 
 const EventsHome = () => {
-  const [events, setEvents] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const { clubInfo } = useContext(ClubContext);
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
-  const offset = useRef(0);
-  const limit = 20;
-  const [hasMoreData, setHasMoreData] = useState(false);
-  const [isFectching, setIsFetching] = useState(false);
-
-  const onRefresh = () => {
-    setIsLoading(true);
-    offset.current = 0;
-    getEvents(clubInfo.clubId, limit, offset.current)
-      .then((response) => {
-        setHasMoreData(response.data?.length > 0);
-        setEvents(response.data);
-      })
-      .catch((error) =>
-        setAlertConfig({
-          visible: true,
-          title: "Error",
-          message: error.response.data.error,
-          buttons: [{ text: "OK", onPress: () => setAlertConfig({ visible: false }) }],
-        })
-      )
-      .finally(() => setIsLoading(false));
-  };
-
-  const fetchNextPage = () => {
-    if (hasMoreData && !isFectching) {
-      setIsFetching(true);
-      offset.current = offset.current + limit;
-      getEvents(clubInfo.clubId, limit, offset.current)
-        .then((response) => {
-          setHasMoreData(response.data?.length > 0);
-          setEvents((prev: any) => [...prev, ...response.data]);
-        })
-        .catch((error) =>
-          setAlertConfig({
-            visible: true,
-            title: "Error",
-            message: error.response.data.error,
-            buttons: [{ text: "OK", onPress: () => setAlertConfig({ visible: false }) }],
-          })
-        )
-        .finally(() => setIsFetching(false));
-    }
-  };
-
-  useEffect(() => {
-    onRefresh();
-  }, []);
+  const { items, isLoading, isFetching, refreshing, onRefresh, loadMore } = usePaginatedQuery(
+    useGetClubEventsQuery,
+    { clubId: clubInfo.clubId },
+    limit
+  );
 
   const gotoPage = (url: any) => {
     router.push(url);
@@ -82,12 +38,12 @@ const EventsHome = () => {
           <LoadingSpinner />
         ) : (
           <FlatList
-            data={events}
+            data={items}
             keyExtractor={(item) => item.eventId.toString()}
             initialNumToRender={20}
-            onEndReached={fetchNextPage}
+            onEndReached={loadMore}
             onEndReachedThreshold={0.2}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => router.push(`/(main)/(clubs)/(events)/eventdetails?event=${JSON.stringify(item)}`)}
@@ -97,16 +53,15 @@ const EventsHome = () => {
               </TouchableOpacity>
             )}
             ListFooterComponent={() =>
-              (isFectching && (
+              (isFetching && (
                 <>
                   <Spacer space={10} />
                   <LoadingSpinner />
                 </>
-              )) || <Spacer space={4} />
+              )) || <ThemedText style={{ alignSelf: "center", paddingVertical: 10 }}>No more items</ThemedText>
             }
           />
         )}
-        {alertConfig?.visible && <Alert {...alertConfig} />}
       </ThemedView>
       {clubInfo.role === ROLE_ADMIN && (
         <FloatingMenu

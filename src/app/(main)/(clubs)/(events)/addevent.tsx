@@ -6,14 +6,13 @@ import ThemedView from "@/src/components/themed-components/ThemedView";
 import ThemedButton from "@/src/components/ThemedButton";
 import { ClubContext } from "@/src/context/ClubContext";
 import { UserContext } from "@/src/context/UserContext";
-import { addEvent } from "@/src/helpers/events_helper";
-import { useHttpGet } from "@/src/hooks/use-http";
 import { isValidDate, isValidLength } from "@/src/utils/validators";
 import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import Alert, { AlertProps }from '@/src/components/Alert'
+import { useAddEventMutation, useGetClubEventTypesQuery } from "@/src/services/clubApi";
 
 const AddEvent = () => {
   const [title, setTitle] = useState("");
@@ -23,28 +22,24 @@ const AddEvent = () => {
   const [endTime, setEndTime] = useState<string>("");
   const [location, setLocation] = useState("");
   const [eventTypeId, setEventTypeId] = useState("");
-  const [isAdding, setIAdding] = useState(false);
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
 
-  const { data: eventTypes, isLoading: isLoadingEventTypes } = useHttpGet(
-    "/club/event/types",
-    { clubId: clubInfo.clubId }
-  );
+  const { data: eventTypes, isLoading: isLoadingEventTypes } = useGetClubEventTypesQuery({ clubId: clubInfo.clubId });
 
   useEffect(()=>{    
     eventTypes && setEventTypeId(eventTypes[0].eventTypeId)
   },[eventTypes])
 
+  const [addEvent, { isLoading: isAdding }] = useAddEventMutation();
   const handleSubmit = async () => {
     console.log(eventDate);
     if (!isValidLength(title, 2) || !isValidDate(eventDate)) {
       alert("Please enter title and date");
       return;
     }
-    setIAdding(true);
     const payload = {
       title,
       description,
@@ -55,23 +50,12 @@ const AddEvent = () => {
       eventTypeId: Number(eventTypeId),
       createdBy: userInfo.email,
     };
-    addEvent(payload)
-      .then((response) => {
-        console.log(response.data);
-        alert("Event added");
-        router.dismissTo(`/(main)/(clubs)/(events)`);
-      })
-      .catch((error) =>
-        setAlertConfig({
-          visible: true,
-          title: "Error",
-          message: error.response.data.error,
-          buttons: [
-            { text: "OK", onPress: () => setAlertConfig({ visible: false }) },
-          ],
-        })
-      )
-      .finally(() => setIAdding(false));
+    try {
+      await addEvent(payload).unwrap();
+      router.dismissTo(`/(main)/(clubs)/(events)`);
+    } catch (error) {
+      console.error("Error adding event:", error);
+    }
   };
 
   const handleTimeChange = (text: string, setState: React.Dispatch<React.SetStateAction<string>>) => {
