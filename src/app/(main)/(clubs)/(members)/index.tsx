@@ -18,7 +18,7 @@ export default function Home() {
 
   const { data: members, isLoading, refetch } = useGetClubMembersQuery({ clubId: clubInfo.clubId });
 
-  const showDetails = (memberId: number) => router.push(`/(main)/(members)/memberdetails?memberId=${memberId}`)
+  const showDetails = (memberId: number) => router.push(`/(main)/(clubs)/(members)/memberdetails?memberId=${memberId}`)
 
   return (    
     <ThemedView style={{ flex: 1 }}>
