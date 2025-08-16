@@ -312,12 +312,10 @@ const ClubHome = () => {
                   </TouchableOpacity>
                 )}
                 ListFooterComponent={() => (
-                  <View style={{ width: 100, height: 100, alignItems: "center", justifyContent: "center" }}>
-                    {params.get("role") == ROLE_ADMIN && (
-                      <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
-                        <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
-                      </TouchableOpacity>
-                    )}
+                  <View style={{ width: 100, height: 100, alignItems: "center", justifyContent: "center" }}>                    
+                    <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
+                      <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
+                    </TouchableOpacity>
                   </View>
                 )}
                 horizontal
@@ -340,7 +338,7 @@ const ClubHome = () => {
         )}
       </GestureHandlerRootView>
       <FloatingMenu
-        actions={actions}
+        actions={actions.filter((action) => params.get("role") != ROLE_ADMIN ? action.role != ROLE_ADMIN : true)}
         position={"left"}
         color="black"
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
@@ -383,6 +381,7 @@ const actions = [
     icon: <MaterialCommunityIcons name={"square-edit-outline"} size={15} color={"white"} />,
     name: "edit",
     position: 4,
+    role: ROLE_ADMIN
   },
 ];
 
