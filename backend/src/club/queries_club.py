@@ -13,7 +13,7 @@ SEARCH_CLUB = """
 """
 
 GET_CLUBS_BY_MEMBER = """ 
-    select c.club_id, c.club_name, c.description, c.location, r.role_id ,r.role_name
+    select c.club_id, c.club_name, c.description, c.location, c.upi_id, r.role_id, c.upi_id, r.role_name
     from club c
         join membership ms on c.club_id=ms.club_id     
         join role r on ms.role_id = r.role_id      
@@ -47,13 +47,13 @@ UPDATE_CLUB_MEMBER_ROLE = """
 GET_CLUB_SEQ_NEXT_VAL="select nextval('club_id_seq')"
 
 SAVE_CLUB = """
-   insert into club (club_id, club_name, description, location, created_by, updated_by) values
-    (%s, %s, %s, %s, %s, %s)
+   insert into club (club_id, club_name, description, location, upi_id, created_by, updated_by) values
+    (%s, %s, %s, %s, %s, %s, %s)
 """
 
 UPDATE_CLUB = """
     update club 
-    set club_name = %s, description=%s, location=%s, updated_by=%s
+    set club_name = %s, description=%s, location=%s, upi_id=%s, updated_by=%s
     where club_id = %s
 """
 

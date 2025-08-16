@@ -33,7 +33,7 @@ const ClubHome = () => {
   const { setClubInfo } = useContext(ClubContext);
 
   const { colors } = useTheme();
-
+  console.log(...params);
   const {
     data: events,
     isLoading: isLoadingEvents,
@@ -333,6 +333,7 @@ const ClubHome = () => {
             clubName={params.get("clubName")}
             clubDesc={params.get("clubDesc")}
             clubLocation={params.get("clubLocation")}
+            paymentUpiId={params.get("UpiId")}
             isVisible={isEditClubVisible}
             close={() => setIsEditClubVisible(false)}
           />
@@ -394,6 +395,7 @@ const EditClubModal = ({
   clubName,
   clubDesc,
   clubLocation,
+  paymentUpiId
 }: {
   isVisible: boolean;
   close: () => void;
@@ -401,10 +403,12 @@ const EditClubModal = ({
   clubName: string | null;
   clubDesc: string | null;
   clubLocation: string | null;
+  paymentUpiId: string | null;
 }) => {
   const [name, setClubName] = useState<string | null>(clubName);
   const [desc, setClubDesc] = useState<string | null>(clubDesc);
   const [location, setClubLocation] = useState<string | null>(clubLocation);
+  const [upiId, setUpiId] = useState<string | null>(paymentUpiId);
   const { colors } = useTheme();
   const { userInfo } = useContext(UserContext);
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
@@ -419,6 +423,7 @@ const EditClubModal = ({
         clubName: name,
         clubDescription: desc,
         location: location,
+        upiId: upiId?.trim(),
         email: userInfo.email,
       }).unwrap();
     } catch (error) {
@@ -460,8 +465,9 @@ const EditClubModal = ({
         <ThemedView style={{ padding: 20, borderRadius: 5 }}>
           <ThemedHeading>Edit Club</ThemedHeading>
           <InputText label="Club Name" value={name} onChangeText={setClubName} />
-          <InputText label="Description" value={desc} onChangeText={setClubDesc} />
-          <InputText label="Location" value={location} onChangeText={setClubLocation} />
+            <InputText label="Description" value={desc} onChangeText={setClubDesc} />
+            <InputText label="Location" value={location} onChangeText={setClubLocation} />
+            <InputText label="Payment UPI ID" value={upiId} onChangeText={setUpiId} />
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
             <ThemedButton title="Save" onPress={() => handleUpdate()} />
             <ThemedButton title="Cancel" onPress={() => close()} />

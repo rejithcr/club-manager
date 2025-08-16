@@ -3,6 +3,7 @@ create table club (
     club_name varchar(50) not null,
     description varchar(100),
     location varchar(50),
+    upi_id varchar(100),
     is_active smallint default 1, -- 1,0
     created_by varchar(100) not null,
     created_ts timestamp  default now(),

@@ -12,6 +12,7 @@ import * as Linking from "expo-linking";
 type ClubDueType = {
   clubId: string;
   clubName: string;
+  upiId: string;
   dueAmount: number;
   dues: {
     paymentId: string | number;
@@ -47,8 +48,8 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
   const [showDues, setShowDues] = useState(false);
   const { colors } = useTheme();
 
-  const makeUpiPayment = async (amount: number, clubName: string) => {
-    const upiUri = `upi://pay?pa=8281478849@ybl&tid=txn1d1&tr=REF123456&tn=${clubName}${" fee payment"}&am=${amount}&cu=INR`;
+  const makeUpiPayment = async (amount: number, clubName: string, upiId: string) => {
+    const upiUri = `upi://pay?pa=${upiId}&tid=txn1d1&tr=REF123456&tn=${clubName}${" fee payment"}&am=${amount}&cu=INR`;
     console.log(upiUri);
     const canOpen = await Linking.canOpenURL(upiUri);
     if (canOpen) {
@@ -95,8 +96,8 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
           </View>
         ))}
 
-      {showDues && (
-        <TouchableOpacity onPress={() => makeUpiPayment(club.dueAmount, club.clubName)}>
+      {showDues && club.upiId && (
+        <TouchableOpacity onPress={() => makeUpiPayment(club.dueAmount, club.clubName, club.upiId)}>
           <ThemedText style={{...styles.button}}>Pay Now</ThemedText>
         </TouchableOpacity>
       )}

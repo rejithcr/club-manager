@@ -47,9 +47,10 @@ class ClubService():
         location = params.get('location')
         email = params.get('email')
         member_id = params.get('memberId')
+        upi_id = params.get('upiId')
 
         club_id = db.fetch_one(conn, queries_club.GET_CLUB_SEQ_NEXT_VAL, None)['nextval']
-        db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, club_description, location, email, email))
+        db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, club_description, location, upi_id, email, email))
         db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id, '1', email, email))
         db.execute(conn, queries_events.INSERT_EVET_TYPES, (club_id, club_id, club_id, club_id))
         conn.commit()
@@ -66,8 +67,9 @@ class ClubService():
         club_name = params.get('clubName')
         club_description = params.get('clubDescription')
         location = params.get('location')
+        upi_id = params.get('upiId')
         if club_name:
-            db.execute(conn, queries_club.UPDATE_CLUB, (club_name, club_description, location, email,clubId))
+            db.execute(conn, queries_club.UPDATE_CLUB, (club_name, club_description, location, upi_id, email,clubId))
             conn.commit()
             return {"message": "Club details updated"}
 
