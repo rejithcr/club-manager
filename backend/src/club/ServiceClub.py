@@ -89,7 +89,7 @@ class ClubService():
         clubId = params.get('clubId')
         email = params.get('email')
 
-        db.execute(conn, queries_club.MARK_CLUB_FOR_DELETION, (clubId, email))
+        db.execute(conn, queries_club.MARK_CLUB_FOR_DELETION, (email, clubId))
         conn.commit()
 
         return {"message": "Club marked for deletion. Please contact support to restore within 7 days."}

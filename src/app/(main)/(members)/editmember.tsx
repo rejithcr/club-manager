@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import Spacer from '@/src/components/Spacer'
 import ThemedButton from '@/src/components/ThemedButton'
-import { Member } from '@/src/helpers/member_helper'
+import { Member } from "@/src/types/member";
 import { useSearchParams } from 'expo-router/build/hooks'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import ThemedView from '@/src/components/themed-components/ThemedView'

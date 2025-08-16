@@ -1,7 +1,6 @@
 import { View, GestureResponderEvent, TouchableOpacity, RefreshControl } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "expo-router/build/hooks";
-import { deleteClub, getClubCounts, getTotalDue, updateClub } from "@/src/helpers/club_helper";
 import { FlatList, GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import { MaterialCommunityIcons, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
@@ -13,10 +12,8 @@ import Spacer from "@/src/components/Spacer";
 import TouchableCard from "@/src/components/TouchableCard";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import { useTheme } from "@/src/hooks/use-theme";
-import { getFeeStructure } from "@/src/helpers/fee_helper";
 import Alert, { AlertProps } from "@/src/components/Alert";
 import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
-import { useHttpGet } from "@/src/hooks/use-http";
 import Card from "@/src/components/Card";
 import CircularProgress from "@/src/components/charts/CircularProgress";
 import FloatingMenu from "@/src/components/FloatingMenu";
@@ -26,7 +23,7 @@ import ThemedButton from "@/src/components/ThemedButton";
 import { UserContext } from "@/src/context/UserContext";
 import { EventCard } from "../upcoming_events";
 import { router } from "expo-router";
-import { useGetClubEventsQuery } from "@/src/services/clubApi";
+import { useDeleteClubMutation, useGetClubEventsQuery, useUpdateClubMutation } from "@/src/services/clubApi";
 import { useGetFeesAdhocQuery, useGetFeesQuery, useGetFundBalanceQuery, useGetTotalDueQuery } from "@/src/services/feeApi";
 
 const ClubHome = () => {
@@ -337,7 +334,7 @@ const ClubHome = () => {
             clubDesc={params.get("clubDesc")}
             clubLocation={params.get("clubLocation")}
             isVisible={isEditClubVisible}
-            onCancel={() => setIsEditClubVisible(false)}
+            close={() => setIsEditClubVisible(false)}
           />
         )}
       </GestureHandlerRootView>
@@ -392,14 +389,14 @@ export default ClubHome;
 
 const EditClubModal = ({
   isVisible,
-  onCancel,
+  close,
   clubId,
   clubName,
   clubDesc,
   clubLocation,
 }: {
   isVisible: boolean;
-  onCancel: (value: boolean) => void;
+  close: () => void;
   clubId: string | null;
   clubName: string | null;
   clubDesc: string | null;
@@ -411,39 +408,27 @@ const EditClubModal = ({
   const { colors } = useTheme();
   const { userInfo } = useContext(UserContext);
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
-  const [isUpdating, setIsUpdating] = useState(false);
   const router = useRouter();
-  const handleUpdate = () => {
-    setIsUpdating(true);
-    updateClub(clubId, name, desc, location, userInfo.email)
-      .then((response) => {
-        setAlertConfig({
-          visible: true,
-          title: "Success",
-          message: response.data.message,
-          buttons: [
-            {
-              text: "OK",
-              onPress: () => {
-                onCancel(false);
-                setAlertConfig({ visible: false });
-              },
-            },
-          ],
-        });
-      })
-      .catch((error) => {
-        setAlertConfig({
-          visible: true,
-          title: "Error",
-          message: error.response.data.error,
-          buttons: [{ text: "OK", onPress: () => setAlertConfig({ visible: false }) }],
-        });
-      })
-      .finally(() => {
-        setIsUpdating(false);
-      });
+
+  const [updateClub,{isLoading: isUpdating}] = useUpdateClubMutation();
+  const handleUpdate = async () => {
+    try {
+      setAlertConfig({ visible: false });
+      await updateClub({
+        clubId,
+        clubName: name,
+        clubDescription: desc,
+        location: location,
+        email: userInfo.email,
+      }).unwrap();
+    } catch (error) {
+      console.log(error);
+    } finally {
+      close();
+    }
   };
+
+  const [deleteClub, { isLoading: isDeleting }] = useDeleteClubMutation();
   const handleDelete = () => {
     setAlertConfig({
       visible: true,
@@ -452,38 +437,16 @@ const EditClubModal = ({
       buttons: [
         {
           text: "OK",
-          onPress: () => {
+          onPress: async () => {
             setAlertConfig({ visible: false });
-            setIsUpdating(true);
-            deleteClub(Number(clubId), userInfo.email)
-              .then((response) => {
-                router.dismissTo(`/(main)`);
-                setAlertConfig({
-                  visible: true,
-                  title: "Success",
-                  message: response.data.message,
-                  buttons: [
-                    {
-                      text: "OK",
-                      onPress: () => {
-                        onCancel(false);
-                        setAlertConfig({ visible: false });
-                      },
-                    },
-                  ],
-                });
-              })
-              .catch((error) => {
-                setAlertConfig({
-                  visible: true,
-                  title: "Error",
-                  message: error.response.data.error,
-                  buttons: [{ text: "OK", onPress: () => setAlertConfig({ visible: false }) }],
-                });
-              })
-              .finally(() => {
-                setIsUpdating(false);
-              });
+            try {
+              await deleteClub({ clubId: Number(clubId), email: userInfo.email }).unwrap();
+              router.dismissTo(`/(main)`);
+            } catch (error) {
+              console.log(error);
+            } finally{              
+              close();
+            }
           },
         },
         { text: "Cancel", onPress: () => setAlertConfig({ visible: false }) },
@@ -492,8 +455,8 @@ const EditClubModal = ({
   };
   return (
     <Modal isVisible={isVisible}>
-      {isUpdating && <LoadingSpinner />}
-      {!isUpdating && (
+      {(isUpdating || isDeleting) && <LoadingSpinner />}
+      {!(isUpdating || isDeleting) && (
         <ThemedView style={{ padding: 20, borderRadius: 5 }}>
           <ThemedHeading>Edit Club</ThemedHeading>
           <InputText label="Club Name" value={name} onChangeText={setClubName} />
@@ -501,7 +464,7 @@ const EditClubModal = ({
           <InputText label="Location" value={location} onChangeText={setClubLocation} />
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
             <ThemedButton title="Save" onPress={() => handleUpdate()} />
-            <ThemedButton title="Cancel" onPress={() => onCancel(false)} />
+            <ThemedButton title="Cancel" onPress={() => close()} />
             <ThemedIcon
               name="MaterialCommunityIcons:delete"
               size={30}

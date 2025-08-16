@@ -1,6 +1,5 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
-import { getAttendanceReport } from "../helpers/events_helper";
 
 export const clubApi = createApi({
   reducerPath: "clubApi",
@@ -132,6 +131,23 @@ export const clubApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["club"],
+    }),
+    updateClub: builder.mutation({
+      query: (body) => ({
+        url: "/club",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["club"],
+    }),
+    deleteClub: builder.mutation({
+      query: (body) => ({
+        url: "/club",
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: ["club"],
     }),
   }),
 });
@@ -158,5 +174,7 @@ export const {
   useLazyGetClubMemberAttributesReportQuery,
   useAddClubMemberAttributeMutation,
   useDeleteClubMemberAttributeMutation,
-  useRemoveMemberMutation
+  useRemoveMemberMutation,
+  useUpdateClubMutation,
+  useDeleteClubMutation
 } = clubApi;

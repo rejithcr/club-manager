@@ -7,7 +7,7 @@ import Spacer from "@/src/components/Spacer";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import { ClubContext } from "@/src/context/ClubContext";
 import { getClubMembers } from "@/src/helpers/club_helper";
-import { Member } from "@/src/helpers/member_helper";
+import { Member } from "@/src/types/member";
 import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import Chip from "@/src/components/Chip";
 import ThemedButton from "@/src/components/ThemedButton";

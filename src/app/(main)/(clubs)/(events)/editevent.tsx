@@ -11,7 +11,6 @@ import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
-import Alert from '@/src/components/Alert'
 import { useSearchParams } from "expo-router/build/hooks";
 import { useGetClubEventTypesQuery, useUpdateEventMutation } from "@/src/services/clubApi";
 

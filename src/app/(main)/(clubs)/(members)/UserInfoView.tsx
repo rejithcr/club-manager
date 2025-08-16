@@ -1,7 +1,7 @@
 import Spacer from "@/src/components/Spacer";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import ThemedText from "@/src/components/themed-components/ThemedText";
-import { Member } from "@/src/helpers/member_helper";
+import { Member } from "@/src/types/member";
 import { useTheme } from "@/src/hooks/use-theme";
 import { View, Image } from 'react-native'
 
