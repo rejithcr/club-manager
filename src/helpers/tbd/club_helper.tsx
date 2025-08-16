@@ -1,5 +1,5 @@
-import { ClubMemberAttribute } from "../types/member";
-import { del, get, post, put } from "../utils/http/api";
+import { ClubMemberAttribute } from "../../types/member";
+import { del, get, post, put } from "../../utils/http/api";
 
 export const getClubs = (memberId: number) => {
     return get("/club", {memberId: memberId})
