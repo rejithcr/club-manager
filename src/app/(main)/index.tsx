@@ -20,7 +20,6 @@ import {
   useGetClubQuery,
   useLazyGetClubEventsQuery,
 } from "@/src/services/clubApi";
-import ThemedText from "@/src/components/themed-components/ThemedText";
 
 const Main = () => {
   const router = useRouter();
