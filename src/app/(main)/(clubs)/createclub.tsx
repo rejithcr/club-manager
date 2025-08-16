@@ -51,7 +51,7 @@ const CreateClub = () => {
       {isLoading && <LoadingSpinner />}
       {!isLoading &&
         <View style={{ alignItems: "center", marginTop:20}}>
-          <InputText placeholder='Enter Club Name' label='Club Name' onChangeText={(text: string) => setClubName(text)} />
+          <InputText placeholder='Enter Club Name' label='Club Name *' onChangeText={(text: string) => setClubName(text)} />
           <InputText placeholder='Enter Club Description' label='Club Description' onChangeText={(text: string) => setClubDescription(text)} />
           <InputText placeholder='Enter Location' label='Location' onChangeText={(text: string) => setLocation(text)} />
           <InputText placeholder='Fee Collection UPI id' label='UPI Id' onChangeText={(text: string) => setUpiId(text)} />

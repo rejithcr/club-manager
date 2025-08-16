@@ -2,7 +2,7 @@ import { RefreshControl, ScrollView } from "react-native";
 import { useRouter } from "expo-router/build/hooks";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import FeeSummary from "./dues";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { UserContext } from "../../context/UserContext";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -61,7 +61,6 @@ const Main = () => {
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
         <Spacer space={5} />
-        <ThemedText>{JSON.stringify(clubsError)}</ThemedText>
         <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
           <ThemedHeading>My Clubs</ThemedHeading>
           {isLoadingMyClubs && <LoadingSpinner />}
