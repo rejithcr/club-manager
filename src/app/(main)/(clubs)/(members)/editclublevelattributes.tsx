@@ -17,6 +17,7 @@ import Alert, { AlertProps } from '@/src/components/Alert'
 import { saveClubMemberAttributeValues } from '@/src/helpers/club_helper'
 import { UserContext } from '@/src/context/UserContext'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
+import { useGetClubMemberAttributesQuery, useSaveClubMemberAttributesMutation } from '@/src/services/clubApi'
 
 const EditClubLevelAttributes = () => {
     const params = useSearchParams()
@@ -30,8 +31,7 @@ const EditClubLevelAttributes = () => {
     const {
         data: cmaList,
         isLoading: isLoadingCMA,
-        refetch: refetchCMA
-    } = useHttpGet("/club/member/attribute", { clubId: clubInfo.clubId, memberId: Number(params.get("memberId")), getClubMemberAttributeValues: true })
+    } = useGetClubMemberAttributesQuery({ clubId: clubInfo.clubId, memberId: Number(params.get("memberId")), getClubMemberAttributeValues: true })
 
     useEffect(() => {
         setUpdatedCMAList(JSON.parse(JSON.stringify(cmaList || [])));
@@ -62,22 +62,20 @@ const EditClubLevelAttributes = () => {
             return true;
         }
     }
-    const handleSave = () => {
+    const [saveClubMemberAttributes] = useSaveClubMemberAttributesMutation();
+    const handleSave = async () => {
         setIsAttributeModalVisible(false)
-        saveClubMemberAttributeValues(clubInfo.clubId, Number(params.get("memberId")), updatedCMAList, userInfo.email)
-            .then(() => {
-                setAlertConfig({
-                    visible: true, title: 'Success', message: "Attributes saved successfully.",
-                    buttons: [{ text: 'OK', onPress: () => { setAlertConfig({ visible: false }); router.back() } }]
-                })
-            })
-            .catch(error => {
-                setAlertConfig({
-                    visible: true, title: 'Error', message: error?.response?.data?.error || "Error saving attributes",
-                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-                })
-            })
-            .finally(() => false);
+        try {
+            await saveClubMemberAttributes({
+                clubId: clubInfo.clubId,
+                memberId: Number(params.get("memberId")),
+                updatedCMAList: updatedCMAList,
+                saveClubMemberAttributeValues: true,
+                email: userInfo.email
+            }).unwrap();
+        } catch(error){
+            console.error("Error saving club member attributes:", error);
+        }
     }
 
     const setAttributeValue = (value: string, clubMemberAttributeId: number) => {

@@ -5,23 +5,25 @@ import ThemedText from '@/src/components/themed-components/ThemedText';
 import ThemedView from '@/src/components/themed-components/ThemedView';
 import TouchableCard from '@/src/components/TouchableCard';
 import { UserContext } from '@/src/context/UserContext';
-import { requestMembership, searchClubsByName } from '@/src/helpers/club_helper';
 import { router } from 'expo-router';
 import React, { useContext, useState } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import Alert, {AlertProps} from '@/src/components/Alert'
+import { useLazyGetClubQuery, useRequestMembershipMutation } from '@/src/services/clubApi';
 
 const JoinClub = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const [filteredClubs, setFilteredClubs] = useState<{ clubId: number, clubName: string }[]>([]);
+    const [queryLength, setQueryLength] = useState(0);
     const [debounceTimeout, setDebounceTimeout] = useState<number | null>(null);
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
     const { userInfo } = useContext(UserContext)
 
+    const [searchClubsByName, {data: filteredClubs, isLoading: isClubsLoading}] = useLazyGetClubQuery();
+
     const handleSearch = (query: string) => {
+        setQueryLength(query.length);
         if (query.length < 2) {
-            setFilteredClubs([]);
             return;
         }
 
@@ -30,16 +32,12 @@ const JoinClub = () => {
         }
 
         const timeout = setTimeout(() => {
-            setIsLoading(true);
-            searchClubsByName(query)
-                .then(response => setFilteredClubs(response.data))
-                .catch(error => alert(error.response.data.message))
-                .finally(() => setIsLoading(false));
-        }, 500); // 500ms delay
+            searchClubsByName({clubName: query, search: true});
+        }, 500); 
 
         setDebounceTimeout(timeout);
     };
-
+    const [requestMembership] = useRequestMembershipMutation();
     const handleSelectClub = (club: { clubId: number; clubName: string }) => {
         setAlertConfig({
             visible: true,
@@ -47,13 +45,17 @@ const JoinClub = () => {
             message: `This will send your membership request for ${club.clubName} to the club admin`,
             buttons: [
                 {
-                    text: 'OK', onPress: () => {
+                    text: 'OK', onPress: async () => {
                         setAlertConfig({visible: false}); 
                         setIsLoading(true);
-                        requestMembership(club.clubId, userInfo.memberId, userInfo.email)
-                            .then((response) => { alert(response.data.message); router.dismissTo('/(main)/(profile)') })
-                            .catch(error => alert(error.response.data.error))
-                            .finally(() =>{ setIsLoading(false)});
+                        try {
+                            await requestMembership({memberId: userInfo.memberId, clubId: club.clubId, membershipRequest: true, email: userInfo.email}).unwrap();
+                            router.dismissTo('/(main)/(profile)');
+                        } catch (error) {
+                            console.log(error);
+                        }finally {
+                            setIsLoading(false);
+                        }
                     }
                 },
                 { text: 'Cancel', style: 'cancel', onPress: () => setAlertConfig({visible: false}) },
@@ -68,11 +70,11 @@ const JoinClub = () => {
                 placeholder="Search clubs by name"
                 onChangeText={handleSearch}
             />
-            {isLoading && <LoadingSpinner />}
-            {!isLoading && filteredClubs.length === 0 && (
+            {(isLoading || isClubsLoading) && <LoadingSpinner />}
+            {!(isLoading || isClubsLoading) && filteredClubs?.length === 0 && (
                 <ThemedText style={styles.emptyText}>No clubs found</ThemedText>
             )}
-            {!isLoading && filteredClubs.length > 0 && <FlatList
+            {!(isLoading || isClubsLoading) && filteredClubs?.length > 0 && queryLength >= 2 && <FlatList
                 data={filteredClubs}
                 keyExtractor={(item) => item.clubId.toString()}
                 renderItem={({ item }) => (

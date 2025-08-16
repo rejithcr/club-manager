@@ -4,9 +4,10 @@ import LoadingSpinner from "@/src/components/LoadingSpinner";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import { View } from "react-native";
 import Spacer from "@/src/components/Spacer";
-import UserInfoView from "../(members)/UserInfoView";
+
 import { useGetMembersQuery } from "@/src/services/memberApi";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
+import UserInfoView from "../(clubs)/(members)/UserInfoView";
 
 const limit = 20;
 

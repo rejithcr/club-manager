@@ -50,23 +50,32 @@ const AddMember = () => {
     const [addMemberToClub, { isLoading: isAddingMemberToClub }] = useAddMemberToClub();
 
     const handleAddMemberToClub = (member: any | undefined) => {
-        setAlertConfig({
-            visible: true,
-            title: 'Are you sure!',
-            message: "Clck 'OK' to add the member to club.",
-            buttons: [{
-                text: 'OK', onPress: () => {
-                    setAlertConfig({ visible: false });
-                    addMemberToClub({
-                        memberId: member.memberId,
-                        clubId: Number(params.get("clubId") || clubInfo.clubId),
-                        addToClub: "true",
-                        email: member.email,
-                    });
-                }
-            }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
-        });
-    }
+      setAlertConfig({
+        visible: true,
+        title: "Are you sure!",
+        message: "Clck 'OK' to add the member to club.",
+        buttons: [
+          {
+            text: "OK",
+            onPress: async () => {
+              setAlertConfig({ visible: false });
+              try {
+                await addMemberToClub({
+                  memberId: member.memberId,
+                  clubId: Number(params.get("clubId") || clubInfo.clubId),
+                  addToClub: "true",
+                  email: member.email,
+                }).unwrap();
+                clearForm();
+              } catch (error) {
+                console.log(error);
+              }
+            },
+          },
+          { text: "Cancel", onPress: () => setAlertConfig({ visible: false }) },
+        ],
+      });
+    };
 
     const createAndAddToClub = async () => {
         if (validate()) {

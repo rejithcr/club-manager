@@ -1,24 +1,22 @@
-import { Platform, TouchableOpacity } from 'react-native'
-import React, { useContext, useState } from 'react'
-import ThemedButton from '@/src/components/ThemedButton'
-import * as Sharing from 'expo-sharing'
-import * as FileSystem from 'expo-file-system'
-import { ClubContext } from '@/src/context/ClubContext'
-import { jsonToCSV } from '@/src/utils/common'
-import ThemedText from '@/src/components/themed-components/ThemedText'
-import { appStyles } from '@/src/utils/styles'
-import ThemedView from '@/src/components/themed-components/ThemedView'
-import { useHttpGet } from '@/src/hooks/use-http'
-import LoadingSpinner from '@/src/components/LoadingSpinner'
-import { ClubMemberAttribute } from '@/src/types/member'
-import Spacer from '@/src/components/Spacer'
-import Chip from '@/src/components/Chip'
-import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
-import { getClubMemberAttributesReport } from '@/src/helpers/club_helper'
-import Alert, { AlertProps } from '@/src/components/Alert'
-import MemberAttributesEdit from './memberattributesedit'
-import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
-import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
+import { Platform, TouchableOpacity } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import ThemedButton from '@/src/components/ThemedButton';
+import * as Sharing from 'expo-sharing';
+import * as FileSystem from 'expo-file-system';
+import { ClubContext } from '@/src/context/ClubContext';
+import { jsonToCSV } from '@/src/utils/common';
+import ThemedText from '@/src/components/themed-components/ThemedText';
+import ThemedView from '@/src/components/themed-components/ThemedView';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
+import { ClubMemberAttribute } from '@/src/types/member';
+import Spacer from '@/src/components/Spacer';
+import Chip from '@/src/components/Chip';
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+import Alert, { AlertProps } from '@/src/components/Alert';
+import MemberAttributesEdit from './memberattributesedit';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
+import ThemedHeading from '@/src/components/themed-components/ThemedHeading';
+import { useGetClubMemberReportableAttributesQuery, useLazyGetClubMemberAttributesReportQuery } from '@/src/services/clubApi';
 
 export default function MemberAttributes() {
   const [isEdit, setIsEdit] = useState(false);
@@ -41,12 +39,17 @@ export default function MemberAttributes() {
 const MemberAttributesExport = () => {
   const { clubInfo } = useContext(ClubContext);
   const [isReportFetching, setIsReportFetching] = React.useState(false)
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
+  const [cmaList, setCmaList] = React.useState<ClubMemberAttribute[]>([]);
   const {
-    data: cmaList,
+    data,
     isLoading: isLoadingCMA,
-    setData: setCmaList
-  } = useHttpGet("/club/report/memberattribute", { clubId: clubInfo.clubId, getClubMemberAttribute: true })
+  } = useGetClubMemberReportableAttributesQuery({ clubId: clubInfo.clubId, getClubMemberAttribute: true })
+
+  useEffect(()=>{
+    if(data){
+      setCmaList(data)
+    }
+  }, [data]);
 
   const exportDataToCSV = async (data: any[], filename: string) => {
     try {
@@ -75,20 +78,21 @@ const MemberAttributesExport = () => {
     }
   }
 
-
-  const handleExport = () => {
+  const [getClubMemberAttributesReport] = useLazyGetClubMemberAttributesReportQuery();
+  const handleExport = async () => {
     setIsReportFetching(true);
-    getClubMemberAttributesReport(clubInfo.clubId, cmaList.filter((cma: ClubMemberAttribute) => cma.selected).map((cma: ClubMemberAttribute) => cma.clubMemberAttributeId))
-      .then(response => {
-        console.log(response.data);
-        exportDataToCSV(response.data, clubInfo.clubName + ' - member attributes.csv')
-      })
-      .catch(error => setAlertConfig({
-        visible: true, title: 'Error', message: error.response.data.error,
-        buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-      }))
-      .finally(() => setIsReportFetching(false));
-  }
+    try {
+      const clubMemberAttributeIds = cmaList.filter((cma) => cma.selected).map((cma) => cma.clubMemberAttributeId);
+      const response = await getClubMemberAttributesReport({
+        clubId: clubInfo.clubId,
+        clubMemberAttributeIds: clubMemberAttributeIds.join(","),
+      }).unwrap();
+      console.log(response)
+      exportDataToCSV(response, clubInfo.clubName + " - member attributes.csv");
+    } finally {
+      setIsReportFetching(false);
+    }
+  };
 
   const handleSelection = (clubMemberAttributeId: number) => {
     setCmaList((prevCMAList: ClubMemberAttribute[]) => {
@@ -120,7 +124,7 @@ const MemberAttributesExport = () => {
       {isReportFetching && <LoadingSpinner />}
       {!(isLoadingCMA || isReportFetching) && <ThemedButton title=' Export ' onPress={() => handleExport()} />}
       <Spacer space={20} />
-      {alertConfig?.visible && <Alert {...alertConfig} />}
     </>
   )
 }
+

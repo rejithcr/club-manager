@@ -18,6 +18,7 @@ import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { isAplhaNumeric } from '@/src/utils/validators';
 import TouchableCard from '@/src/components/TouchableCard';
 import { useTheme } from '@/src/hooks/use-theme';
+import { useAddClubMemberAttributeMutation, useDeleteClubMemberAttributeMutation, useGetClubMemberAttributesQuery, useSaveClubMemberAttributesMutation } from '@/src/services/clubApi';
 
 const MemberAttributesEdit = () => {
     const { userInfo } = useContext(UserContext)
@@ -34,10 +35,12 @@ const MemberAttributesEdit = () => {
     const {
         data: cmaList,
         isLoading: isLoadingCMA,
-        refetch: refetchCMA
-    } = useHttpGet("/club/member/attribute", { clubId: clubInfo.clubId, getClubMemberAttribute: true })
+    } = useGetClubMemberAttributesQuery({ clubId: clubInfo.clubId, getClubMemberAttribute: true })
 
-    const handleSave = () => {
+    const [saveClubMemberAttributes] = useSaveClubMemberAttributesMutation();
+    const [addClubMemberAttribute] = useAddClubMemberAttributeMutation();
+    const [deleteClubMemberAttribute] = useDeleteClubMemberAttributeMutation();
+    const handleSave = async () => {
         if (!isAplhaNumeric(attributeName)) {
             setAlertConfig({
                 visible: true, title: 'Error', message: "Enter only alphanumeric with min 2 characters.",
@@ -47,25 +50,29 @@ const MemberAttributesEdit = () => {
             setIsSaving(true)
             setIsAttributeModalVisible(false)
             if (isEdit) {
-                saveClubMemberAttribute(clubMemberAttributeId, attributeName, required, userInfo.email)
-                    .then(() => refetchCMA())
-                    .catch(error => {
-                        console.log(error.response.data); setAlertConfig({
-                            visible: true, title: 'Error', message: error,
-                            buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-                        })
-                    })
-                    .finally(() => { setIsSaving(false) })
+              try {
+                await saveClubMemberAttributes({
+                  clubMemberAttributeId,
+                  attributeName,
+                  required,
+                  email: userInfo.email,
+                  editClubMemberAttribute: true,
+                }).unwrap();
+              } finally {
+                setIsSaving(false);
+              }
             } else {
-                addClubMemberAttribute(clubInfo.clubId, attributeName, required, userInfo.email)
-                    .then(() => refetchCMA())
-                    .catch(error => {
-                        console.log(error.response.data); setAlertConfig({
-                            visible: true, title: 'Error', message: error.response.data.error,
-                            buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-                        })
-                    })
-                    .finally(() => { setIsSaving(false) })
+                try {
+                  await addClubMemberAttribute({
+                    clubId: clubInfo.clubId,
+                    attributeName,
+                    required,
+                    email: userInfo.email,
+                    addClubMemberAttribute: true,
+                  }).unwrap();
+                } finally {
+                  setIsSaving(false);
+                }
             }
         }
     }
@@ -75,14 +82,15 @@ const MemberAttributesEdit = () => {
             title: 'Are you sure!',
             message: 'This will delete the attribute. This cannot be recovered.',
             buttons: [{
-                text: 'OK', onPress: () => {
+                text: 'OK', onPress: async () => {
                     setAlertConfig({ visible: false });
                     setIsSaving(true);
-                    setIsAttributeModalVisible(false)
-                    deleteClubMemberAttribute(clubMemberAttributeId)
-                        .then(() => refetchCMA())
-                        .catch((error: { response: { data: { error: string | undefined } } }) => alert(error.response.data.error))
-                        .finally(() => setIsSaving(false))
+                    setIsAttributeModalVisible(false);
+                    try {
+                        await deleteClubMemberAttribute({ clubMemberAttributeId, deleteClubMemberAttribute: true}).unwrap();
+                    } finally {
+                        setIsSaving(false);
+                    }
                 }
             }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
         });

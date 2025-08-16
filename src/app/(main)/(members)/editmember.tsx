@@ -13,7 +13,6 @@ import { useTheme } from '@/src/hooks/use-theme'
 import { isValidEmail, isValidPhoneNumber } from '@/src/utils/validators'
 import { UserContext } from '@/src/context/UserContext'
 import { ClubContext } from '@/src/context/ClubContext'
-import { getClubMember, saveClubMember } from '@/src/helpers/club_helper'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import { Picker } from '@react-native-picker/picker'
 
@@ -21,10 +20,10 @@ import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler
 import { appStyles } from '@/src/utils/styles'
 import DatePicker from '@/src/components/DatePicker'
 import EditClubLevelAttributes from '../(clubs)/(members)/editclublevelattributes'
+import { useGetClubMembersQuery, useUpdateMemberMutation } from '@/src/services/clubApi'
 
 const Editmember = () => {
-    const params = useSearchParams()
-    const [isMemberLoading, setIsMemberLoading] = useState(false)
+    const params = useSearchParams();
     const [firstName, setFirstName] = useState<string | undefined>();
     const [lastName, setLastName] = useState<string | undefined>();
     const [updatedBy, setUpdatedBy] = useState<string | undefined>();
@@ -34,8 +33,8 @@ const Editmember = () => {
     const [dateOfBirth, setDateOfBirth] = useState<Date | undefined>();
     const [isRegistered, setIsRegistered] = useState<number | undefined>();
     const { colors } = useTheme();
-    const { userInfo } = useContext(UserContext)
-    const { clubInfo } = useContext(ClubContext)
+    const { userInfo } = useContext(UserContext);
+    const { clubInfo } = useContext(ClubContext);
 
     const setDetails = (memberDetails: Member) => {
         setFirstName(memberDetails?.firstName)
@@ -45,27 +44,38 @@ const Editmember = () => {
         setRole(memberDetails?.role)
         setIsRegistered(memberDetails?.isRegistered)
         setUpdatedBy(memberDetails?.updatedBy)
-    }
+    };
+
+     const {data: member, isLoading: isMemberLoading} = useGetClubMembersQuery({ clubId: clubInfo.clubId, memberId: Number(params.get("memberId"))});
     
     useEffect(() => {
-        setIsMemberLoading(true);
-        getClubMember(clubInfo.clubId, Number(params.get("memberId")))
-            .then(response => { console.log(response.data); setDetails(response.data) })
-            .catch(error => alert(error?.response?.data?.error || "Error fetching member details"))
-            .finally(() => setIsMemberLoading(false));
-    }, [])
-
-    const handleSave = () => {
-        setIsMemberLoading(true)
-        if (validate()) {
-            saveClubMember(clubInfo.clubId, Number(params.get("memberId")), firstName, lastName, phone, email, role, dateOfBirth, userInfo.email)
-                .then(response => {alert(response.data.message); router.back()})
-                .catch(error => alert(error?.response?.data?.error || "Error fetching member details"))
-                .finally(() => setIsMemberLoading(false));
-        } else {
-            setIsMemberLoading(false)
+        if(member){
+            setDetails(member);
         }
-    }
+    }, [member]);
+
+    const [updateMember, { isLoading: isUpdating }] = useUpdateMemberMutation();
+    const handleSave = async () => {
+        if (validate()) {
+        try {
+            await updateMember({
+            clubId: clubInfo.clubId,
+            memberId: Number(params.get("memberId")),
+            firstName,
+            lastName,
+            phone,
+            email,
+            updatedBy: userInfo.email,
+            role,
+            dateOfBirth,
+            }).unwrap();
+            router.back();
+        } catch (error) {
+            console.error("Error saving member details", error);
+        }
+        }
+    };
+
 
     const validate = () => {
         if (!isValidPhoneNumber(phone?.toString())) {
@@ -91,8 +101,8 @@ const Editmember = () => {
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
             <ScrollView>
-            {isMemberLoading && <LoadingSpinner />}
-            {!isMemberLoading && 
+            {(isMemberLoading || isUpdating) && <LoadingSpinner />}
+            {!(isMemberLoading || isUpdating) && 
                 <View>                    
                     {isRegistered === 0 ? <>
                     <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName}/>

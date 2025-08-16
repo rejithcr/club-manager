@@ -17,13 +17,6 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
-          name="memberdetails" // This is the name of the page and must match the url from root
-          options={{
-            headerTitle: () => <StackHeader header={"Member Profile"} rightText={clubInfo?.clubName} />,
-            headerShown: true
-          }}
-        />
-        <Stack.Screen
           name="addmember" // This is the name of the page and must match the url from root
           options={{
             headerTitle: () => <StackHeader header={"Add Member"} rightText={clubInfo?.clubName} />,
@@ -36,21 +29,7 @@ export default function RootLayout() {
             headerTitle: () => <StackHeader header={"Member Attributes"} rightText={clubInfo?.clubName} />,
             headerShown: true
           }}
-        />            
-        <Stack.Screen
-          name="joinclub" // This is the name of the page and must match the url from root
-          options={{
-            headerTitle: () => <StackHeader header={"Join Club"} rightText={clubInfo?.clubName} />,
-            headerShown:true
-          }}
         />         
-        <Stack.Screen
-          name="editmember" // This is the name of the page and must match the url from root
-          options={{
-            headerTitle: () => <StackHeader header={"Edit Member"} rightText={clubInfo?.clubName} />,
-            headerShown:true
-          }}
-        />       
         <Stack.Screen
           name="editclublevelattributes" // This is the name of the page and must match the url from root
           options={{
