@@ -1,7 +1,6 @@
 import { View, FlatList, TouchableOpacity } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
-import { getFeePayments } from '@/src/helpers/fee_helper';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import { appStyles } from '@/src/utils/styles';
@@ -21,13 +20,13 @@ import { ROLE_ADMIN } from '@/src/utils/constants';
 import Alert, { AlertProps } from '@/src/components/Alert';
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading';
 import CircularProgress from '@/src/components/charts/CircularProgress';
-import { useDeleteFeeCollectionMutation, useSaveFeeCollectionMutation } from '@/src/services/feeApi';
+import { useDeleteFeeCollectionMutation, useGetFeeCollectionsQuery, useSaveFeeCollectionMutation } from '@/src/services/feeApi';
+import { showSnackbar } from '@/src/components/snackbar/snackbarService';
 
 const Payments = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
-    const [feeByMembers, setFeeByMembers] = useState<any | undefined>(undefined);
     const [paymentStatusUpdates, setpaymentStatusUpdates] = useState<{
         clubFeePaymentId: number;
         paid: boolean;
@@ -40,18 +39,14 @@ const Payments = () => {
 
     const params = useSearchParams()
 
-    useEffect(() => {
-        setIsLoading(true)
-        setpaymentStatusUpdates([]);
-        getFeePayments(params.get("clubFeeCollectionId"), "true")
-            .then(response => { console.log(response.data); setFeeByMembers(response.data) })
-            .catch(error => console.error(error))
-            .finally(() => setIsLoading(false));
-    }, [])
+    const { data: feeByMembers, isLoading: isLoadingPayments } = useGetFeeCollectionsQuery({
+      feeCollectionId: params.get("clubFeeCollectionId"),
+      listPayments: "true",
+    });
 
     const updatePaymentStatus = () => {
         if (paymentStatusUpdates.length == 0) {
-            alert("No updates selected")
+            showSnackbar("No updates selected", "error");
         } else {
             setIsConfirmVisible(true)
         }
@@ -59,7 +54,6 @@ const Payments = () => {
     const [saveFeePayments] = useSaveFeeCollectionMutation();
     const savePaymentUpdates = async () => {
       setIsLoading(true);
-      setIsConfirmVisible(false);
       try {
         await saveFeePayments({
           paymentStatusUpdates,
@@ -71,6 +65,7 @@ const Payments = () => {
       } catch (error) {
         console.error("Error saving payment updates:", error);
       } finally {
+        setIsConfirmVisible(false);
         setIsLoading(false);
       }
     };
@@ -114,8 +109,8 @@ const Payments = () => {
                 </View>
                 <Spacer space={5} />
                 <View style={{ flex: 1 }}>
-                    {isLoading && <LoadingSpinner />}
-                    {!isLoading &&
+                    {isLoadingPayments && <LoadingSpinner />}
+                    {!isLoadingPayments && 
                         <FlatList style={{ width: "100%" }}
                             data={feeByMembers}
                             initialNumToRender={8}
@@ -133,10 +128,10 @@ const Payments = () => {
                             {paymentStatusUpdates.map((item) => {
                                 return <PaymentUpdates key={item.clubFeePaymentId} {...item} />
                             })}
-                            <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                            {isLoading ? <LoadingSpinner/> : <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
                                 <ThemedButton title="Update" onPress={() => savePaymentUpdates()} />
                                 <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
-                            </View>
+                            </View>}
                         </ThemedView>
                     </ScrollView>
                 </Modal>

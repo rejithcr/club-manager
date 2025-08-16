@@ -1,37 +1,37 @@
-import { View, TouchableOpacity, FlatList, RefreshControl } from 'react-native'
-import React, { useContext, useEffect, useState } from 'react'
-import { useSearchParams } from 'expo-router/build/hooks'
-import ThemedButton from '@/src/components/ThemedButton'
+import { View, TouchableOpacity, FlatList, RefreshControl } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { useSearchParams } from 'expo-router/build/hooks';
+import ThemedButton from '@/src/components/ThemedButton';
 import { appStyles } from '@/src/utils/styles';
-import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { router } from 'expo-router'
-import LoadingSpinner from '@/src/components/LoadingSpinner'
-import TouchableCard from '@/src/components/TouchableCard'
-import ThemedView from '@/src/components/themed-components/ThemedView'
-import ThemedText from '@/src/components/themed-components/ThemedText'
-import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
-import Spacer from '@/src/components/Spacer'
-import { useTheme } from '@/src/hooks/use-theme'
-import { ROLE_ADMIN } from '@/src/utils/constants'
-import { ClubContext } from '@/src/context/ClubContext'
-import ProgressBar from '@/src/components/charts/ProgressBar'
-import { useGetCollectionsOfFeeTypeQuery, useGetExceptionTypesQuery } from '@/src/services/feeApi'
-import usePaginatedQuery from '@/src/hooks/usePaginatedQuery'
+import KeyValueTouchableBox from '@/src/components/KeyValueTouchableBox';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { router } from 'expo-router';
+import LoadingSpinner from '@/src/components/LoadingSpinner';
+import TouchableCard from '@/src/components/TouchableCard';
+import ThemedView from '@/src/components/themed-components/ThemedView';
+import ThemedText from '@/src/components/themed-components/ThemedText';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
+import Spacer from '@/src/components/Spacer';
+import { useTheme } from '@/src/hooks/use-theme';
+import { ROLE_ADMIN } from '@/src/utils/constants';
+import { ClubContext } from '@/src/context/ClubContext';
+import ProgressBar from '@/src/components/charts/ProgressBar';
+import { useGetFeeCollectionsQuery, useGetExceptionQuery } from '@/src/services/feeApi';
+import usePaginatedQuery from '@/src/hooks/usePaginatedQuery';
 
 const FeeTypeDetails = () => {
-    const [showAddException, setShowAddException] = useState(false)
-    const [fee, setFee] = useState<any>()
+    const [showAddException, setShowAddException] = useState(false);
+    const [fee, setFee] = useState<any>();
     const { colors } = useTheme();
-    const { clubInfo } = useContext(ClubContext)
-    const params = useSearchParams()
+    const { clubInfo } = useContext(ClubContext);
+    const params = useSearchParams();
 
-    const feeObj = JSON.parse(params.get('fee') || "")
+    const feeObj = JSON.parse(params.get('fee') || "");
 
-    const {data: exceptionTypes, isLoading: isExceptionTypesLoading} = useGetExceptionTypesQuery({ feeTypeId: feeObj.clubFeeTypeId });
+    const {data: exceptionTypes, isFetching: isExceptionTypesLoading} = useGetExceptionQuery({ feeTypeId: feeObj.clubFeeTypeId });
    
     useEffect(() => {
-        setFee(feeObj)
+        setFee(feeObj);
     }, [])
 
     const showStartCollectionPage = () => {
@@ -72,7 +72,7 @@ const FeeTypeDetails = () => {
     
     const limit = 12;
     const { items, isLoading, isFetching, refreshing, onRefresh, loadMore } = usePaginatedQuery(
-      useGetCollectionsOfFeeTypeQuery,
+      useGetFeeCollectionsQuery,
       { feeTypeId: feeObj.clubFeeTypeId, listCollectionsOfFeetType: "true" },
       limit
     );
@@ -120,7 +120,7 @@ const FeeTypeDetails = () => {
                 </View>
                 <View style={{ flex: 1 }}>
                     <ThemedText style={appStyles.heading}>Collections</ThemedText>
-                    {!isLoading &&
+                    {isLoading ? <LoadingSpinner /> :
                         <FlatList style={{ width: "100%" }}
                             data={items}
                             ListEmptyComponent={() => <ThemedText style={{ alignSelf: "center", width: "85%" }}>No collections present. To start collecting fee for a period, press the below button.</ThemedText>}

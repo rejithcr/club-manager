@@ -2,12 +2,10 @@ import { View, TouchableOpacity, ScrollView } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
-import { getExceptionDetails, updateExceptionType } from '@/src/helpers/fee_helper'
 import { useSearchParams } from 'expo-router/build/hooks'
 import { UserContext } from '@/src/context/UserContext'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { router } from 'expo-router'
-import { getClubMembers } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import ShadowBox from '@/src/components/ShadowBox'
@@ -18,7 +16,8 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import { useTheme } from '@/src/hooks/use-theme'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import Spacer from '@/src/components/Spacer'
-import { useUpdateFeesExceptionMutation } from '@/src/services/feeApi'
+import { useLazyGetExceptionQuery, useUpdateFeesExceptionMutation } from '@/src/services/feeApi'
+import { useLazyGetClubMembersQuery } from '@/src/services/clubApi'
 
 const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
@@ -57,28 +56,30 @@ const EditFeeException = () => {
       }
     };
 
-    useEffect(() => {
-        setIsLoadingException(true)
-        getExceptionDetails(params.get("clubFeeTypeExceptionId"))
-            .then(response => {
-                const exceptionType = response.data
-                setExceptionType(exceptionType.clubFeeTypeExceptionReason)
-                setExceptionAmount(exceptionType.clubFeeExceptionAmount.toString())
-                setExceptionMembers(exceptionType.members)
-                setIsLoadingMembers(true)
-                getClubMembers(clubInfo.clubId)
-                    .then(response => {
-                        const members = response.data
-                        const activeExceptions = exceptionType.members.filter((e: any) => !e.endDate)
-                        const difference = members.filter(
-                            (m: any) => !activeExceptions.some(
-                                (e: any) => e.memberId == m.memberId)
-                        );
-                        setMembers(difference)
-                    })
-                    .finally(() => setIsLoadingMembers(false))
+    const loadExceptionDetails = async () => {
+      setIsLoadingMembers(true);
+      try {
+        const exceptionType = await getExceptionDetails({
+          clubFeeTypeExceptionId: params.get("clubFeeTypeExceptionId"),
+        }).unwrap();
+        setExceptionType(exceptionType.clubFeeTypeExceptionReason);
+        setExceptionAmount(exceptionType.clubFeeExceptionAmount.toString());
+        setExceptionMembers(exceptionType.members);
+        const members = await getClubMembers({ clubId: clubInfo.clubId }).unwrap();
+        const activeExceptions = exceptionType.members.filter((e: any) => !e.endDate);
+        const difference = members.filter((m: any) => !activeExceptions.some((e: any) => e.memberId == m.memberId));
+        setMembers(difference);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoadingMembers(false);
+      }
+    };
 
-            }).finally(() => setIsLoadingException(false))
+    const [getClubMembers] = useLazyGetClubMembersQuery();
+    const [getExceptionDetails] = useLazyGetExceptionQuery();
+    useEffect(() => {
+        loadExceptionDetails();
     }, []);
 
     const addToException = (member: any) => {
@@ -116,8 +117,8 @@ const EditFeeException = () => {
                     <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setExceptionAmount} value={exceptionAmount} />
                 </View>
 
-                {isLoadingException && <LoadingSpinner />}
-                {!isLoadingException && exceptionMembers && exceptionMembers.length > 0 && exceptionMembers[0].memberId &&
+                {isLoadingMembers && <LoadingSpinner />}
+                {!isLoadingMembers && exceptionMembers && exceptionMembers.length > 0 && exceptionMembers[0].memberId &&
                     exceptionMembers?.map((member: {
                         memberId: number, lastName: string, firstName: string | undefined, startDate: string,
                         clubFeeTypeExceptionMemberId: number, endDate: string | undefined, endDateAdded: string | undefined

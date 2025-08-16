@@ -1,12 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import { useSearchParams } from "expo-router/build/hooks";
-import { deleteEvent, Event, getAtendedMembers, saveEventChanges } from "@/src/helpers/events_helper";
+import { Event } from "@/src/types/event";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import Spacer from "@/src/components/Spacer";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import { ClubContext } from "@/src/context/ClubContext";
-import { getClubMembers } from "@/src/helpers/club_helper";
 import { Member } from "@/src/types/member";
 import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import Chip from "@/src/components/Chip";
@@ -24,11 +23,10 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "@/src/hooks/use-theme";
 import Alert, { AlertProps } from "@/src/components/Alert";
 import { ROLE_ADMIN } from "@/src/utils/constants";
-import { useDeleteEventMutation, useUpdateEventAttendanceMutation } from "@/src/services/clubApi";
+import { useDeleteEventMutation, useLazyGetClubMembersQuery, useLazyGetEventMembersQuery, useUpdateEventAttendanceMutation } from "@/src/services/clubApi";
 
 const EventDetails = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
-  const [isLoadingAttendedMembers, setIsLoadingAttendedMembers] = useState(false);
   const [attendedMembers, setAttendedMembers] = useState<Member[]>([]);
   const [attendedMembersBackup, setAttendedMembersBackup] = useState<Member[]>([]);
   const [remainingMembers, setRemainingMembers] = useState<Member[]>([]);
@@ -42,36 +40,37 @@ const EventDetails = () => {
   const { clubInfo } = useContext(ClubContext);
   const { colors } = useTheme();
 
-  const loadClubMembers = (eventId: string) => {
-    setIsLoadingAttendedMembers(true);
-    getAtendedMembers(eventId)
-      .then((response) => {
-        const attendedMembersLocal = response.data.filter((m: { present: any }) => m.present);
-        setAttendedMembersBackup([...attendedMembersLocal]);
-        setAttendedMembers(
-          attendedMembersLocal.sort((m1: { firstName: string }, m2: { firstName: any }) =>
-            m1.firstName.localeCompare(m2.firstName)
-          )
-        );
-        setIsLoadingMembers(true);
-        getClubMembers(clubInfo.clubId)
-          .then((response) => {
-            const members = response.data;
-            const difference = members.filter(
-              (m: any) => !attendedMembersLocal.some((e: any) => e.membershipId == m.membershipId)
-            );
-            setRemainingMembers(
-              difference.sort((m1: { firstName: string }, m2: { firstName: any }) =>
-                m1.firstName.localeCompare(m2.firstName)
-              )
-            );
-          })
-          .catch(() => alert("Error! please retry"))
-          .finally(() => setIsLoadingMembers(false));
-      })
-      .catch(() => alert("Error! please retry"))
-      .finally(() => setIsLoadingAttendedMembers(false));
+  const [getClubMembers] = useLazyGetClubMembersQuery();
+  const [getAtendedMembers] = useLazyGetEventMembersQuery();
+
+
+  const loadClubMembers = async (eventId: string) => {
+    setIsLoadingMembers(true);
+    try {
+      const attendedMembers = await getAtendedMembers({eventId}).unwrap();
+      const attendedMembersLocal = attendedMembers.filter((m: { present: any }) => m.present);
+      setAttendedMembersBackup([...attendedMembersLocal]);
+      setAttendedMembers(
+        attendedMembersLocal.sort((m1: { firstName: string }, m2: { firstName: any }) =>
+          m1.firstName.localeCompare(m2.firstName)
+        )
+      );
+      const members = await getClubMembers({clubId: clubInfo.clubId}).unwrap();
+      const difference = members.filter(
+        (m: any) => !attendedMembersLocal.some((e: any) => e.membershipId == m.membershipId)
+      );
+      setRemainingMembers(
+        difference.sort((m1: { firstName: string }, m2: { firstName: any }) =>
+          m1.firstName.localeCompare(m2.firstName)
+        )
+      );
+    } catch(error){
+      console.log(error);
+    } finally{
+      setIsLoadingMembers(false);
+    }
   };
+
   useEffect(() => {
     const eventObj = JSON.parse(params.get("event") || "");
     setEvent(eventObj);
@@ -182,8 +181,8 @@ const EventDetails = () => {
               width: "85%",
             }}
           >
-            {isLoadingAttendedMembers && <LoadingSpinner />}
-            {!isLoadingAttendedMembers &&
+            {isLoadingMembers && <LoadingSpinner />}
+            {!isLoadingMembers &&
               attendedMembers.map((item: any) => (
                 <Chip selected={true} key={item.memberId} onPress={() => removeFromAttended(item)}>
                   <ThemedText>
@@ -191,8 +190,8 @@ const EventDetails = () => {
                   </ThemedText>
                 </Chip>
               ))}
-            {isLoadingMembers && <LoadingSpinner />}
-            {!isLoadingMembers && !isLoadingAttendedMembers && remainingMembers.length == 0 && (
+            
+            {!isLoadingMembers && remainingMembers.length == 0 && (
               <ThemedText style={{ textAlign: "center" }}>Yay!! All members attended 👏</ThemedText>
             )}
             {!isLoadingMembers &&

@@ -61,6 +61,10 @@ export const clubApi = createApi({
       }),
       invalidatesTags: ["memberAttribute"]
     }),
+    getEventMembers: builder.query({
+      query: (params) => `/club/event/attendance?${new URLSearchParams(params).toString()}`,
+      providesTags: ["attendance"]
+    }),
     updateEventAttendance: builder.mutation({
       query: (body) => ({
         url: "/club/event/attendance",
@@ -176,5 +180,8 @@ export const {
   useDeleteClubMemberAttributeMutation,
   useRemoveMemberMutation,
   useUpdateClubMutation,
-  useDeleteClubMutation
+  useDeleteClubMutation,
+  useGetEventMembersQuery,
+  useLazyGetEventMembersQuery,
+  useLazyGetClubMembersQuery
 } = clubApi;

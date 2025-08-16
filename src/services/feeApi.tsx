@@ -1,7 +1,6 @@
 // src/services/api.js
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
-import { saveNextPeriodFeeCollection } from "../helpers/fee_helper";
 
 export const feeApi = createApi({
   reducerPath: "feeApi",
@@ -76,7 +75,7 @@ export const feeApi = createApi({
       }),
       invalidatesTags: ["adhoc"],
     }),        
-    getExceptionTypes: builder.query({
+    getException: builder.query({
       query: (params) => `/fee/exception?${new URLSearchParams(params).toString()}`,
       providesTags: ["exception"],
     }), 
@@ -100,7 +99,7 @@ export const feeApi = createApi({
       query: (params) => `/club/transaction?${new URLSearchParams(params).toString()}`,
       providesTags: ["adhoc", "transaction", "fee"],
     }),
-    getCollectionsOfFeeType: builder.query({
+    getFeeCollections: builder.query({
       query: (params) => `/fee/collection?${new URLSearchParams(params).toString()}`,
       providesTags: ["fee"],
     }),
@@ -164,9 +163,10 @@ export const {
   useUpdateFeesExceptionMutation,
   useEditFeeMutation,
   useDeleteFeeMutation,
-  useGetExceptionTypesQuery,
-  useGetCollectionsOfFeeTypeQuery,
-  useLazyGetCollectionsOfFeeTypeQuery,
+  useGetExceptionQuery,
+  useLazyGetExceptionQuery,
+  useGetFeeCollectionsQuery,
+  useLazyGetFeeCollectionsQuery,
   useSaveFeeCollectionMutation,
   useDeleteFeeCollectionMutation
 } = feeApi;

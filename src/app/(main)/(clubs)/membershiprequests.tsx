@@ -17,8 +17,8 @@ import { UserContext } from '@/src/context/UserContext'
 import { useTheme } from '@/src/hooks/use-theme'
 import { isValidLength } from '@/src/utils/validators'
 import { ROLE_ADMIN } from '@/src/utils/constants'
-import { membershipRequestPut } from '@/src/helpers/club_helper'
 import Alert, { AlertProps } from '@/src/components/Alert'
+import { useUpdateClubMutation } from '@/src/services/clubApi'
 
 const MembershipRequests = () => {
   const { colors } = useTheme()
@@ -28,19 +28,25 @@ const MembershipRequests = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [comments, setComments] = useState("")
   const [statusChangeRequest, setStatusChangeRequest] = useState({ clubId: 0, memberId: 0 });
-  const { data, isLoading, refetch} = useHttpGet('/club', { clubId: clubInfo.clubId, membershipRequests: "true" })
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
-  const handleStatusChange = (status: string) => {
-    if (validate(comments)) {    
-      setIsModalVisible(false)
+  const { data, isLoading, refetch} = useHttpGet('/club', { clubId: clubInfo.clubId, membershipRequests: "true" })
+  const [upadteMembershipRequest] = useUpdateClubMutation();
+
+  const handleStatusChange = async (status: string) => {
+    if (validate(comments)) {
+      setIsModalVisible(false);
       setIsUpdating(true);
-      membershipRequestPut({ clubId: statusChangeRequest.clubId, memberId: statusChangeRequest.memberId, status, comments, email: userInfo.email })
-          .then(() => refetch())
-          .catch(error => setAlertConfig({visible: true, title: 'Error', message: error.response.data.error, buttons: [{ text: 'OK', onPress: () => setAlertConfig({visible: false}) }]}))
-          .finally(() => setIsUpdating(false))
-    } 
-  }
+      await upadteMembershipRequest({
+        clubId: statusChangeRequest.clubId,
+        memberId: statusChangeRequest.memberId,
+        status,
+        comments,
+        email: userInfo.email,
+      }).unwrap();
+      refetch();
+      setIsUpdating(false);
+    }
+  };
   const showApproveModal = (memberId: any, clubId: any) => {
     setStatusChangeRequest({ clubId, memberId })
     setIsModalVisible(true)
@@ -86,7 +92,6 @@ const MembershipRequests = () => {
           </View>
         </ThemedView>
       </Modal>}
-      {alertConfig?.visible && <Alert {...alertConfig}/>}
     </GestureHandlerRootView>
   )
 }
