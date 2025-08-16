@@ -10,7 +10,9 @@ import { UserContext } from "../../context/UserContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import * as AuthSession from "expo-auth-session";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
-import { authenticateMember, getAccessToken, saveTokens } from "@/src/helpers/auth_helper";
+import { getAccessToken, saveTokens } from "@/src/helpers/auth_helper";
+import { useAuthenticateMemberMutation } from "@/src/services/authApi";
+import { showSnackbar } from "@/src/components/snackbar/snackbarService";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -34,7 +36,7 @@ const AuthHome = () => {
 
   useEffect(() => {
     if (response?.type === "success") {
-      authenticate(response, setLoading, setUserInfo);
+      authenticate();
     } else {
       login();
     }
@@ -49,41 +51,39 @@ const AuthHome = () => {
       router.replace("/(main)");
     }
   };
-
-  const authenticate = async (
-    response: any | undefined,
-    setLoading: (isLoading: boolean) => void,
-    setUserInfo: (gInfo: {}) => void
-  ) => {
+  const [authenticateMember] = useAuthenticateMemberMutation();
+  const authenticate = async () => {
     setLoading(true);
-    const gInfo = await getGoogleProfile(response);
-    authenticateMember(gInfo.email, gInfo.gtoken)
-      .then((authResponse) => {
-        if (authResponse.data?.isRegistered === 1) {
-          setUserInfo({ ...gInfo, ...authResponse.data });
-          router.replace("/(main)");
-        } else if (authResponse.data?.isRegistered === 0) {
-          const memberInfo = { ...authResponse.data, photo: gInfo.photo };
-          router.replace(`/(auth)/verify?memberInfo=${JSON.stringify(memberInfo)}`);
-        } else {
-          setUserInfo(gInfo);
-          router.replace(`/(main)/(members)/addmember?createMember=true&name=${gInfo.name}&email=${gInfo.email}`);
-        }
-        delete gInfo.gtoken; // Remove gtoken from user info before saving
-        AsyncStorage.setItem(
-          "userInfo",
-          JSON.stringify({
-            ...gInfo,
-            memberId: authResponse.data["memberId"],
-            isSuperUser: authResponse.data["isSuperUser"],
-          })
-        );
-        saveTokens(authResponse.data["accessToken"], authResponse.data["refreshToken"]);
-      })
-      .catch((error) => {
-        alert(error.response.data.error);
-      })
-      .finally(() => setLoading(false));
+    try {
+      const gInfo = await getGoogleProfile(response);
+      const authResponse = await authenticateMember({ email: gInfo.email, gToken: gInfo.gtoken }).unwrap();
+      if (authResponse?.isRegistered === 1) {
+        setUserInfo({ ...gInfo, ...authResponse });
+        router.replace("/(main)");
+      } else if (authResponse?.isRegistered === 0) {
+        const memberInfo = { ...authResponse, photo: gInfo.photo };
+        router.replace(`/(auth)/verify?memberInfo=${JSON.stringify(memberInfo)}`);
+      } else {
+        setUserInfo(gInfo);
+        router.replace(`/(main)/(members)/addmember?createMember=true&name=${gInfo.name}&email=${gInfo.email}`);
+      }
+      delete gInfo.gtoken; // Remove gtoken from user info before saving
+      AsyncStorage.setItem(
+        "userInfo",
+        JSON.stringify({
+          ...gInfo,
+          memberId: authResponse["memberId"],
+          isSuperUser: authResponse["isSuperUser"],
+        })
+      );
+      saveTokens(authResponse["accessToken"], authResponse["refreshToken"]);
+    } catch (error: any) {
+      console.log("Authentication error.", error);
+      const message = `${error.data?.message || error.message}.`;
+      showSnackbar(`Authentication error! ${message} Please try again. `, "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const getGoogleProfile = async (response: any | undefined) => {

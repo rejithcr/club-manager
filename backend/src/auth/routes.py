@@ -23,6 +23,8 @@ def get_token():
             member_info = m_service.get(conn, {'email': email})
             member_info['accessToken'] = access_token
             member_info['refreshToken'] = refresh_token
+            name = member_info.get("firstName") if member_info.get("firstName") else ""
+            member_info['message'] = f'Welcome {name}!'
             update_last_access(email)
             return member_info, 200
         finally:

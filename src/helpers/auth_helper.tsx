@@ -1,14 +1,4 @@
-import { post } from "../utils/http/api";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-export const authenticateMember = (
-  email: string,
-  gToken: string | undefined
-) => {
-  return post("/auth", null, { email: email, gToken: gToken });
-};
-
 
 const ACCESS_KEY = 'accessToken';
 const REFRESH_KEY = 'refreshToken';

@@ -46,7 +46,7 @@ const AddMember = () => {
         setShowAddNewMemberForm(false)
     }
 
-    const [addMember] = useAddMember();
+    const [addMember, { isLoading: isAddingMember }] = useAddMember();
     const [addMemberToClub, { isLoading: isAddingMemberToClub }] = useAddMemberToClub();
 
     const handleAddMemberToClub = (member: any | undefined) => {
@@ -133,7 +133,7 @@ const AddMember = () => {
                         const userInfo = JSON.parse(userInfoLocalStorage || '{}');
                         AsyncStorage.setItem("userInfo", JSON.stringify({
                             ...userInfo,
-                            memberId: response.data['memberId']
+                            memberId: response['memberId']
                         })).then(() => router.replace('/(auth)'));
                     })
             } catch(error){
@@ -151,7 +151,7 @@ const AddMember = () => {
         }
     }, [])
 
-    const [saerchTrigger,{ isLoading: isMemberSearchLoading }] = useLazyGetMembersQuery();
+    const [saerchTrigger,{ isFetching: isMemberSearchLoading }] = useLazyGetMembersQuery();
     
     const searchMember = async () => {
         if (!isValidPhoneNumber(searchNumber)) {
@@ -174,10 +174,14 @@ const AddMember = () => {
         }
     }
     const handleCancel = async () => {
-        await AsyncStorage.removeItem("userInfo")
-        await AsyncStorage.removeItem("accessToken")
-        await AsyncStorage.removeItem("resfreshToken")
-        router.dismissTo("/(auth)");
+        if(showRegisterForm){            
+            await AsyncStorage.removeItem("userInfo")
+            await AsyncStorage.removeItem("accessToken")
+            await AsyncStorage.removeItem("resfreshToken")
+            router.dismissTo("/(auth)");
+        } else {
+            router.back();
+        }
     }
     const handleSearchNumberChange = (text: string) => {
         setSearchNumber(text)
@@ -186,7 +190,7 @@ const AddMember = () => {
     return (
         <ThemedView style={{ flex: 1 }}>
             <GestureHandlerRootView>
-                {(isAddingMemberToClub || isMemberSearchLoading) && <LoadingSpinner />}
+                {(isMemberSearchLoading) && <LoadingSpinner />}
                 {!(isAddingMemberToClub && isMemberSearchLoading) && <ScrollView>
                     {showPhoneSearch &&
                         <>
@@ -205,12 +209,13 @@ const AddMember = () => {
                         <InputText label="Phone" onChangeText={setPhone} defaultValue={searchNumber} keyboardType={"numeric"} />
                         {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />}
                         <Spacer space={10} />
+                        {(isAddingMember || isAddingMemberToClub)? <LoadingSpinner /> :
                         <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
                             {showRegisterForm && <ThemedButton title="Register" onPress={createMember} />}
                             {!showRegisterForm && showAddNewMemberForm && <ThemedButton title="Add Member" onPress={createAndAddToClub} />}
                             <Spacer space={10} />
                             <ThemedButton title="Cancel" onPress={handleCancel} />
-                        </View>
+                        </View>}
                     </>}
                 </ScrollView>
                 }

@@ -124,7 +124,7 @@ const AddMember = () => {
                         const userInfo = JSON.parse(userInfoLocalStorage || '{}');
                         AsyncStorage.setItem("userInfo", JSON.stringify({
                             ...userInfo,
-                            memberId: response.data['memberId']
+                            memberId: response['memberId']
                         })).then(() => router.replace('/(auth)'));
                     })
             } catch(error){

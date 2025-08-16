@@ -5,19 +5,17 @@ import ThemedButton from '@/src/components/ThemedButton'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import { useSearchParams } from 'expo-router/build/hooks'
 import ThemedText from '@/src/components/themed-components/ThemedText'
-import { Member, verifyMemberAndUpdate } from '@/src/helpers/member_helper'
-import Alert, { AlertProps } from '@/src/components/Alert'
+import { Member } from '@/src/helpers/member_helper'
 import { isValidPhoneNumber } from '@/src/utils/validators'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import Spacer from '@/src/components/Spacer'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { router } from 'expo-router'
 import DatePicker from '@/src/components/DatePicker'
+import { useUpdateMemberMutation } from '@/src/services/memberApi'
 
 const Register = () => {
     const [memberInfo, setMemberInfo] = useState<Member | null>(null)
-    const [memberSaving, setMemberSaving] = useState(false)
-    const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const params = useSearchParams()
 
     useEffect(() => {
@@ -26,22 +24,16 @@ const Register = () => {
         setMemberInfo(memberInfoFromParams)
     }, [])
 
-    const handleVerify = () => {
-        setMemberSaving(true)
+    const [verifyMemberAndUpdate, {isLoading: memberSaving}] = useUpdateMemberMutation();
+    const handleVerify = async () => {
         if (validate()) {
-            verifyMemberAndUpdate(memberInfo)
-                .then(() => setAlertConfig({
-                    visible: true, title: 'Success', message: "Verified",
-                    buttons: [{ text: 'OK', onPress: () => { setAlertConfig({ visible: false }); router.replace('/(auth)') } }]
-                }))
-                .catch(error => setAlertConfig({
-                    visible: true, title: 'Error', message: error?.response?.data?.error || "Error fetching member details",
-                    buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
-                }))
-                .finally(() => setMemberSaving(false));
-        } else {
-            setMemberSaving(false)
-        }
+            try {
+                await verifyMemberAndUpdate({...memberInfo, isRegistered: 1, updatedBy: memberInfo?.email, verify:true}).unwrap();
+                router.replace('/(auth)') 
+            } catch (error) {
+                console.log(error);
+            }
+        } 
     }
     const handleCancel = () => {
         AsyncStorage.removeItem("userInfo")
@@ -93,7 +85,6 @@ const Register = () => {
                     <ThemedButton title="Cancel" onPress={handleCancel} />
                 </View>
             </>}
-            {alertConfig?.visible && <Alert {...alertConfig} />}
         </ThemedView>
     )
 }

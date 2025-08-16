@@ -4,29 +4,34 @@ import { baseQueryWithReauth } from "./baseQuery";
 export const memberApi = createApi({
   reducerPath: "memberApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ['member'],
+  tagTypes: ["member"],
   endpoints: (builder) => ({
     getMembers: builder.query({
       query: (params) => `/member?${new URLSearchParams(params).toString()}`,
-      providesTags:['member']
+      providesTags: ["member"],
     }),
     updateMember: builder.mutation({
       query: (body) => ({
-        url: '/member',
-        method: 'PUT',
+        url: "/member",
+        method: "PUT",
         body,
       }),
-      invalidatesTags:['member']
+      invalidatesTags: ["member"],
     }),
     addMember: builder.mutation({
       query: (body) => ({
-        url: '/member',
-        method: 'POST',
+        url: "/member",
+        method: "POST",
         body,
       }),
-      invalidatesTags:['member']
+      invalidatesTags: ["member"],
     }),
   }),
 });
 
-export const { useGetMembersQuery, useLazyGetMembersQuery, useUpdateMemberMutation, useAddMemberMutation } = memberApi; 
+export const {
+  useGetMembersQuery,
+  useLazyGetMembersQuery,
+  useUpdateMemberMutation,
+  useAddMemberMutation,
+} = memberApi;
