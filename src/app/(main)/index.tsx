@@ -100,7 +100,7 @@ export default Main;
 
 const handleMenuPress = (name: string | undefined, handleLogout: { (): void }) => {
   if (name == "createclub") {
-    router.push(`/(main)/(clubs)/createclub`);
+    router.push(`/(main)/createclub`);
   } else if (name == "logout") {
     handleLogout();
   } else if (name == "profile") {

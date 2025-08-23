@@ -12,18 +12,13 @@ import Spacer from "@/src/components/Spacer";
 import TouchableCard from "@/src/components/TouchableCard";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import { useTheme } from "@/src/hooks/use-theme";
-import Alert, { AlertProps } from "@/src/components/Alert";
 import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import Card from "@/src/components/Card";
 import CircularProgress from "@/src/components/charts/CircularProgress";
 import FloatingMenu from "@/src/components/FloatingMenu";
-import Modal from "react-native-modal";
-import InputText from "@/src/components/InputText";
-import ThemedButton from "@/src/components/ThemedButton";
-import { UserContext } from "@/src/context/UserContext";
 import { EventCard } from "../upcoming_events";
 import { router } from "expo-router";
-import { useDeleteClubMutation, useGetClubEventsQuery, useUpdateClubMutation } from "@/src/services/clubApi";
+import { useGetClubEventsQuery } from "@/src/services/clubApi";
 import { useGetFeesAdhocQuery, useGetFeesQuery, useGetFundBalanceQuery, useGetTotalDueQuery } from "@/src/services/feeApi";
 
 const ClubHome = () => {
@@ -33,7 +28,7 @@ const ClubHome = () => {
   const { setClubInfo } = useContext(ClubContext);
 
   const { colors } = useTheme();
-  console.log(...params);
+  
   const {
     data: events,
     isLoading: isLoadingEvents,
@@ -96,10 +91,6 @@ const ClubHome = () => {
     });
   };
 
-  const [isEditClubVisible, setIsEditClubVisible] = useState(false);
-  const handleEditClub = () => {
-    setIsEditClubVisible(true);
-  };
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
@@ -324,33 +315,21 @@ const ClubHome = () => {
           )}
           <Spacer space={50} />
         </ScrollView>
-
-        {isEditClubVisible && (
-          <EditClubModal
-            clubId={params.get("clubId")}
-            clubName={params.get("clubName")}
-            clubDesc={params.get("clubDesc")}
-            clubLocation={params.get("clubLocation")}
-            paymentUpiId={params.get("UpiId")}
-            isVisible={isEditClubVisible}
-            close={() => setIsEditClubVisible(false)}
-          />
-        )}
       </GestureHandlerRootView>
       <FloatingMenu
         actions={actions.filter((action) => params.get("role") != ROLE_ADMIN ? action.role != ROLE_ADMIN : true)}
         position={"left"}
         color="black"
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-        onPressItem={(name: string | undefined) => handleMenuPress(name, handleEditClub)}
+        onPressItem={(name: string | undefined) => handleMenuPress(name, params.get("clubId") || "")}
       />
     </ThemedView>
   );
 };
 
-const handleMenuPress = (name: string | undefined, handleEditClub: any) => {
+const handleMenuPress = (name: string | undefined, clubId: string) => {
   if (name == "edit") {
-    handleEditClub();
+    router.push(`/(main)/(clubs)/edit-club?clubId=${clubId}`);
   } else if (name == "events") {
     router.push(`/(main)/(clubs)/(events)`);
   } else if (name == "expensesplits") {
@@ -386,100 +365,3 @@ const actions = [
 ];
 
 export default ClubHome;
-
-const EditClubModal = ({
-  isVisible,
-  close,
-  clubId,
-  clubName,
-  clubDesc,
-  clubLocation,
-  paymentUpiId
-}: {
-  isVisible: boolean;
-  close: () => void;
-  clubId: string | null;
-  clubName: string | null;
-  clubDesc: string | null;
-  clubLocation: string | null;
-  paymentUpiId: string | null;
-}) => {
-  const [name, setClubName] = useState<string | null>(clubName);
-  const [desc, setClubDesc] = useState<string | null>(clubDesc);
-  const [location, setClubLocation] = useState<string | null>(clubLocation);
-  const [upiId, setUpiId] = useState<string | null>(paymentUpiId);
-  const { colors } = useTheme();
-  const { userInfo } = useContext(UserContext);
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
-  const router = useRouter();
-
-  const [updateClub,{isLoading: isUpdating}] = useUpdateClubMutation();
-  const handleUpdate = async () => {
-    try {
-      setAlertConfig({ visible: false });
-      await updateClub({
-        clubId,
-        clubName: name,
-        clubDescription: desc,
-        location: location,
-        upiId: upiId?.trim(),
-        email: userInfo.email,
-      }).unwrap();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      close();
-    }
-  };
-
-  const [deleteClub, { isLoading: isDeleting }] = useDeleteClubMutation();
-  const handleDelete = () => {
-    setAlertConfig({
-      visible: true,
-      title: "Are you sure!",
-      message: "This will delete the club. This cannot be recovered.",
-      buttons: [
-        {
-          text: "OK",
-          onPress: async () => {
-            setAlertConfig({ visible: false });
-            try {
-              await deleteClub({ clubId: Number(clubId), email: userInfo.email }).unwrap();
-              router.dismissTo(`/(main)`);
-            } catch (error) {
-              console.log(error);
-            } finally{              
-              close();
-            }
-          },
-        },
-        { text: "Cancel", onPress: () => setAlertConfig({ visible: false }) },
-      ],
-    });
-  };
-  return (
-    <Modal isVisible={isVisible}>
-      {(isUpdating || isDeleting) && <LoadingSpinner />}
-      {!(isUpdating || isDeleting) && (
-        <ThemedView style={{ padding: 20, borderRadius: 5 }}>
-          <ThemedHeading>Edit Club</ThemedHeading>
-          <InputText label="Club Name" value={name} onChangeText={setClubName} />
-            <InputText label="Description" value={desc} onChangeText={setClubDesc} />
-            <InputText label="Location" value={location} onChangeText={setClubLocation} />
-            <InputText label="Payment UPI ID" value={upiId} onChangeText={setUpiId} />
-          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
-            <ThemedButton title="Save" onPress={() => handleUpdate()} />
-            <ThemedButton title="Cancel" onPress={() => close()} />
-            <ThemedIcon
-              name="MaterialCommunityIcons:delete"
-              size={30}
-              onPress={() => handleDelete()}
-              color={colors.error}
-            />
-          </View>
-        </ThemedView>
-      )}
-      {alertConfig?.visible && <Alert {...alertConfig} />}
-    </Modal>
-  );
-};

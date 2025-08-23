@@ -3,7 +3,7 @@ GET_CLUBS = """
 """
 
 GET_CLUB = """
-    select club_id, club_name from club where club_id = %s
+    select * from club where club_id = %s
 """
 
 SEARCH_CLUB = """
