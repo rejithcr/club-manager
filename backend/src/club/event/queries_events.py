@@ -60,10 +60,6 @@ DELETE_EVENT = """
     DELETE FROM events WHERE event_id = %s;
 """
 
-INSERT_EVET_TYPES = """
-    INSERT INTO event_types (club_id, name) VALUES 
-        (%s, 'Practice Session'), 
-        (%s, 'Match'), 
-        (%s, 'Meeting'), 
-        (%s, 'Fielding Drills');
+INSERT_EVENT_TYPES = """
+    INSERT INTO event_types (club_id, name) VALUES  (%s, %s);
 """

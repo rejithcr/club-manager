@@ -12,7 +12,6 @@ import { ClubMemberAttribute } from '@/src/types/member';
 import Spacer from '@/src/components/Spacer';
 import Chip from '@/src/components/Chip';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
-import Alert, { AlertProps } from '@/src/components/Alert';
 import MemberAttributesEdit from './memberattributesedit';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading';

@@ -1,4 +1,4 @@
-import { View, TouchableOpacity, Switch } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React, { useContext, useState } from 'react'
 import InputText from '@/src/components/InputText';
 import ThemedButton from '@/src/components/ThemedButton';
@@ -6,15 +6,13 @@ import ThemedView from '@/src/components/themed-components/ThemedView';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import { ClubContext } from '@/src/context/ClubContext';
-import { useHttpGet } from '@/src/hooks/use-http';
 import { UserContext } from '@/src/context/UserContext';
 import Modal from 'react-native-modal';
 import { appStyles } from '@/src/utils/styles';
 import Spacer from '@/src/components/Spacer';
-import { addClubMemberAttribute, deleteClubMemberAttribute, saveClubMemberAttribute } from '@/src/helpers/club_helper';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import Alert, { AlertProps } from '@/src/components/Alert';
-import { FlatList, GestureHandlerRootView } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import { isAplhaNumeric } from '@/src/utils/validators';
 import TouchableCard from '@/src/components/TouchableCard';
 import { useTheme } from '@/src/hooks/use-theme';

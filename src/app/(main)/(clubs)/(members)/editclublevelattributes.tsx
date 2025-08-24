@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
 import ThemedView from '@/src/components/themed-components/ThemedView'
-import { useHttpGet } from '@/src/hooks/use-http'
 import { useSearchParams } from 'expo-router/build/hooks'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
@@ -14,7 +13,6 @@ import { ClubMemberAttribute } from '@/src/types/member'
 import Modal from 'react-native-modal'
 import Spacer from '@/src/components/Spacer'
 import Alert, { AlertProps } from '@/src/components/Alert'
-import { saveClubMemberAttributeValues } from '@/src/helpers/club_helper'
 import { UserContext } from '@/src/context/UserContext'
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler'
 import { useGetClubMemberAttributesQuery, useSaveClubMemberAttributesMutation } from '@/src/services/clubApi'
@@ -139,7 +137,7 @@ const EditClubLevelAttributes = () => {
     )
 }
 
-export default EditClubLevelAttributes
+export default EditClubLevelAttributes;
 
 function getChanges(list1: ClubMemberAttribute[], list2: ClubMemberAttribute[]) {
     const map1 = new Map();

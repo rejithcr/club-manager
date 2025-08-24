@@ -48,11 +48,14 @@ class ClubService():
         email = params.get('email')
         member_id = params.get('memberId')
         upi_id = params.get('upiId')
+        event_types = params.get('eventTypes', [])
 
         club_id = db.fetch_one(conn, queries_club.GET_CLUB_SEQ_NEXT_VAL, None)['nextval']
         db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, club_description, location, upi_id, email, email))
         db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id, '1', email, email))
-        db.execute(conn, queries_events.INSERT_EVET_TYPES, (club_id, club_id, club_id, club_id))
+        for event in event_types:
+            if event["isSelected"]:
+                db.execute(conn, queries_events.INSERT_EVENT_TYPES, (club_id, event["name"]))
         conn.commit()
 
         return {"clubId": club_id}
