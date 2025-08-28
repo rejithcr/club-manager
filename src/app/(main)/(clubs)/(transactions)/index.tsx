@@ -21,6 +21,7 @@ import DatePicker from '@/src/components/DatePicker'
 import Alert, { AlertProps } from '@/src/components/Alert'
 import { useAddTransactionMutation, useDeleteTransactionMutation, useGetTransactionsQuery, useUpdateTransactionMutation } from '@/src/services/feeApi'
 import usePaginatedQuery from '@/src/hooks/usePaginatedQuery'
+import Spacer from '@/src/components/Spacer'
 
 const limit = 20;
 
@@ -99,9 +100,11 @@ const Transactions = () => {
   };
 
   const handleEdit = (item: any) => {
-    setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnDate: new Date(item.clubTransactionDate), 
-      txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount })
-    setIsAddTxnVisible(true)
+    if(item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && clubInfo.role === ROLE_ADMIN){
+      setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnDate: new Date(item.clubTransactionDate), 
+        txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount });
+      setIsAddTxnVisible(true);
+    }
   }
   const handleTxnTypeChange = (value: string) => {
     setTxnValues((prev: any) => ({ ...prev, txnType: value }))
@@ -126,7 +129,7 @@ const Transactions = () => {
         </View>
         {isTxnsLoading ? <LoadingSpinner /> :
           <FlatList style={{ width: "100%" }}
-            ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .3, borderBottomColor: "grey", width: "80%", alignSelf: "center" }} />}
+            ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .3, borderBottomColor: "grey", width: "85%", alignSelf: "center" }} />}
             ListFooterComponent={() => isTxnsFetching && <LoadingSpinner /> || <View style={{ marginVertical: 30 }} />}
             data={items}
             initialNumToRender={limit}
@@ -136,23 +139,24 @@ const Transactions = () => {
             onRefresh={onRefresh}
             refreshing={refreshing}
             renderItem={({ item }) => (
-              <View style={{
+              <TouchableOpacity onPress={() => handleEdit(item)} style={{
                 width: "85%", alignSelf: "center", alignItems: "center",
-                flexDirection: "row", justifyContent: "flex-end"
+                flexDirection: "row", justifyContent: "space-between"
               }}>
-                {item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && clubInfo.role === ROLE_ADMIN &&
-                  <TouchableOpacity style={{ width: "10%" }} onPress={() => handleEdit(item)}>
-                    <MaterialCommunityIcons name='square-edit-outline' size={20} color={"#546E7A"} />
-                  </TouchableOpacity>}
-                <View style={{ width: "60%" }}>
-                  <ThemedText style={{ fontWeight: '500' }}>{item.feeName}</ThemedText>
-                  <ThemedText style={{ fontSize: 12 }}>{item.memberName || item.clubTransactionComment}</ThemedText>
-                </View>
-                <View style={{ alignItems: "flex-end", width: "30%" }}>
+                <View style={{ flexDirection: 'row' }}>
+                  <View>
+                    <ThemedText style={{ fontWeight: '500' }}>{item.feeName}</ThemedText>
+                    <ThemedText style={{ fontSize: 12 }}>{item.memberName || item.clubTransactionComment}</ThemedText>
+                  </View>
+                  <Spacer hspace={5} />
+                  {item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && clubInfo.role === ROLE_ADMIN &&                  
+                    <MaterialCommunityIcons name='square-edit-outline' size={10} color={"#546E7A"} />}
+                    </View>
+                <View style={{ alignItems: "flex-end"}}>
                   <ThemedText style={{ fontWeight: 'bold', color: item.clubTranscationType === 'CREDIT' ? colors.success : colors.error }}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} Rs. {item.clubTransactionAmount}</ThemedText>
                   <ThemedText style={{ fontSize: 8 }}>{item.clubTransactionDate}</ThemedText>
                 </View>
-              </View>
+              </TouchableOpacity>
             )}
           />
         }
