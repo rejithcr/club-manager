@@ -1,5 +1,6 @@
 import { TouchableOpacity, View } from "react-native";
-import { Event } from "@/src/helpers/events_helper";
+import Animated, { SlideInLeft } from "react-native-reanimated";
+import { Event } from "@/src/types/event";
 import Card from "@/src/components/Card";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import Spacer from "@/src/components/Spacer";
@@ -12,17 +13,19 @@ const UpcomingEvents = (props: { events: Event[]; clubs: any[] }) => {
   const { setClubInfo } = useContext(ClubContext);
 
   const gotoEventDetails = async (event: Event) => {
-    const roleName = props.clubs.find(c=> c.clubId == event.clubId).roleName;
+    const roleName = props.clubs.find((c) => c.clubId == event.clubId).roleName;
     await setClubInfo({ clubId: event.clubId, clubName: event.clubName, role: roleName });
-    router.push(`/(main)/(clubs)/(events)/eventdetails?event=${JSON.stringify(event)}`)
-  }
+    router.push(`/(main)/(clubs)/(events)/eventdetails?event=${JSON.stringify(event)}`);
+  };
   return (
     <View style={{ width: "85%", alignSelf: "center" }}>
       {props.events?.length == 0 && <ThemedText style={{ ThemedTextAlign: "center" }}>No upcoming events!</ThemedText>}
-      {props.events.map((event) => {
+      {props.events.map((event, idx) => {
         return (
-          <TouchableOpacity key={event.eventId} onPress={()=> gotoEventDetails(event)}>
-            <EventCard event={event} />
+          <TouchableOpacity key={event.eventId} onPress={() => gotoEventDetails(event)}>
+            <Animated.View entering={SlideInLeft.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
+              <EventCard event={event} />
+            </Animated.View>
             <Spacer space={4} />
           </TouchableOpacity>
         );

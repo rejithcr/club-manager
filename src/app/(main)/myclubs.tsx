@@ -1,4 +1,5 @@
 import { View } from "react-native";
+import Animated, { SlideInDown, SlideInLeft, SlideInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router/build/hooks";
 import TouchableCard from "@/src/components/TouchableCard";
 import ThemedText from "@/src/components/themed-components/ThemedText";
@@ -33,24 +34,22 @@ const MyClubs = (props: { clubs: [] }) => {
             onPress={() => router.push(`/(main)/(members)/joinclub`)}
           />
           <ThemedText style={{ marginTop: 20 }}>Create a new club</ThemedText>
-          <ThemedIcon
-            name="MaterialIcons:add-circle"
-            size={50}
-            onPress={() => router.push(`/(main)/(clubs)/createclub`)}
-          />
+          <ThemedIcon name="MaterialIcons:add-circle" size={50} onPress={() => router.push(`/(main)/createclub`)} />
         </ThemedView>
       )}
-      {props.clubs?.map((item: any) => (
+      {props.clubs?.map((item: any, idx: number) => (
         <View key={item.clubId}>
-          <TouchableCard
-            onPress={() =>
-              showDetails(item.clubId, item.clubName, item.description, item.location, item.roleName, item.upiId)
-            }
-            id={item.clubId}
-          >
-            <ThemedText>{item.clubName}</ThemedText>
-          </TouchableCard>
-          <Spacer space={4} />
+          <Animated.View entering={SlideInDown.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
+            <TouchableCard
+              onPress={() =>
+                showDetails(item.clubId, item.clubName, item.description, item.location, item.roleName, item.upiId)
+              }
+              id={item.clubId}
+            >
+              <ThemedText>{item.clubName}</ThemedText>
+            </TouchableCard>
+            <Spacer space={4} />
+          </Animated.View>
         </View>
       ))}
     </ThemedView>
