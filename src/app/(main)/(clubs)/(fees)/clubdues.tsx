@@ -10,10 +10,16 @@ import Spacer from '@/src/components/Spacer';
 import ShadowBox from '@/src/components/ShadowBox';
 import Divider from '@/src/components/Divider';
 import { useGetClubDuesQuery } from '@/src/services/feeApi';
+import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
+import ThemedButton from '@/src/components/ThemedButton';
 
 const ClubDues = () => {
   const { clubInfo } = useContext(ClubContext);
   const { data: duesByMembers, isLoading } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true" });
+
+  const handleMarkAsPaid = () => {
+    alert('Feature coming soon!');
+  }
 
   return (
     <ThemedView style={{ flex: 1 }}>
@@ -25,8 +31,8 @@ const ClubDues = () => {
             return <View key={item.memberId}><MemberDue key={item.memberId} member={item} /><Spacer space={4} /></View>
           })}
         </View>
-      </ScrollView>
-      {/* <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => null} /> */}
+      </ScrollView>      
+      <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => handleMarkAsPaid()} />
     </ThemedView>
   )
 }
@@ -53,7 +59,7 @@ const MemberDue = (props: { member: any }) => {
         </TouchableOpacity>
       </ShadowBox>
       {isShown && props?.member.dues.map((item: any) => {
-        return <View key={item.paymentId.toString() + item.feeType} style={styles.item}>
+        return <View key={item.paymentId.toString() + item.feeType}>
           <Divider />
           <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />
         </View>
@@ -66,12 +72,16 @@ const MemberDue = (props: { member: any }) => {
 export default ClubDues
 
 const MemberFeeItem = (props: { paymentId: number; fee: string; feeType: string, feeDesc: string, amount: number; }) => {
+  const [isChecked, setIsChecked] = useState(false);
   return (
     <View key={props.paymentId.toString() + props.feeType} style={styles.item}>
-      <View style={{ paddingVertical: 5 }}>
-        <ThemedText style={styles.label}>{props?.fee} </ThemedText>
-        <ThemedText style={styles.subLabel}>{props?.feeDesc} </ThemedText>
-      </View>
+      <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }} onPress={() => setIsChecked(!isChecked)}>
+        <ThemedCheckBox checked={isChecked}/>
+        <View style={{ paddingVertical: 5 }}>
+          <ThemedText style={styles.label}>{props?.fee} </ThemedText>
+          <ThemedText style={styles.subLabel}>{props?.feeDesc} </ThemedText>
+        </View>
+      </TouchableOpacity>
       <ThemedText style={styles.amount}>Rs. {props?.amount}</ThemedText>
     </View>
   )
@@ -99,7 +109,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   amount: {
-    padding: 5,
+    textAlign: "right",
   },
   divider: {
     borderBottomColor: 'rgba(136, 136, 136, 0.2)',
