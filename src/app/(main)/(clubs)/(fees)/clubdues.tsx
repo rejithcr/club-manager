@@ -12,6 +12,7 @@ import Divider from '@/src/components/Divider';
 import { useGetClubDuesQuery } from '@/src/services/feeApi';
 import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox';
 import ThemedButton from '@/src/components/ThemedButton';
+import { ROLE_ADMIN } from '@/src/utils/constants';
 
 const ClubDues = () => {
   const { clubInfo } = useContext(ClubContext);
@@ -32,7 +33,7 @@ const ClubDues = () => {
           })}
         </View>
       </ScrollView>      
-      <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => handleMarkAsPaid()} />
+      {clubInfo.role === ROLE_ADMIN && <ThemedButton style={{bottom: 30, position: "absolute", alignSelf: "center"}} title='Mark as paid' onPress={() => handleMarkAsPaid()} />}
     </ThemedView>
   )
 }

@@ -98,7 +98,7 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
 
       {showDues && club.upiId && (
         <TouchableOpacity onPress={() => makeUpiPayment(club.dueAmount, club.clubName, club.upiId)}>
-          <ThemedText style={{...styles.button}}>Pay Now</ThemedText>
+          <ThemedText style={{...styles.button, backgroundColor: colors.primary}}>Pay Now</ThemedText>
         </TouchableOpacity>
       )}
     </View>
@@ -108,12 +108,11 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
 const styles = StyleSheet.create({
   button: {
     borderRadius: 20,
-    borderColor: "gray",
-    borderWidth: 1,
     width: 80,
     textAlign: "center",
     paddingBottom: 2,
-    alignSelf: "center"    
+    alignSelf: "center",
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
   },
   item: {
     width: "80%",

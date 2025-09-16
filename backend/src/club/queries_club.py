@@ -36,6 +36,8 @@ GET_CLUB_MEMBERS = """
         join member m on m.member_id  = ms.member_id  
         join role r on ms.role_id = r.role_id    
     where c.club_id = %s and ms.is_active = 1
+    order by last_accessed_on desc
+    limit %s offset %s
 """
 
 UPDATE_CLUB_MEMBER_ROLE = """

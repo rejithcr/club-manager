@@ -14,6 +14,8 @@ class ClubMemberService():
         memberId = params.get('memberId')
         getClubMemberAttribute = params.get('getClubMemberAttribute')
         getClubMemberAttributeValues = params.get('getClubMemberAttributeValues')
+        limit = params.get("limit")
+        offset = params.get("offset")
 
         if getClubMemberAttribute:
             member_attributes = db.fetch(conn, queries_member.GET_MEMBER_ATTRIBUTES, (club_id,))
@@ -33,7 +35,7 @@ class ClubMemberService():
             member = db.fetch_one(conn, queries_club.GET_CLUB_MEMBER, (memberId, club_id))
             return helper.convert_to_camel_case(member)
 
-        clubs = db.fetch(conn, queries_club.GET_CLUB_MEMBERS, (club_id,))
+        clubs = db.fetch(conn, queries_club.GET_CLUB_MEMBERS, (club_id,limit, offset))
         return [helper.convert_to_camel_case(club) for club in clubs]
 
     def post(self, conn, params):
