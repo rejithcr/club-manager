@@ -18,7 +18,7 @@ const ClubDues = () => {
   const { data: duesByMembers, isLoading } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true" });
 
   const handleMarkAsPaid = () => {
-    alert('Feature coming soon!');
+    alert('Feature coming soon! For now, please go to the fee/splits page and update the status.');
   }
 
   return (

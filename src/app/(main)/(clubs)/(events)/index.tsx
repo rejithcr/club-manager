@@ -109,7 +109,7 @@ const actions = [
 export const EventItem = ({ event }: { event: any }) => {
   const { colors } = useTheme();
   return (
-    <ShadowBox style={{ ...appStyles.shadowBox, width: "85%" }}>
+    <ShadowBox style={{ width: "85%" }}>
       <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between" }}>
         <View style={{ rowGap: 3 }}>
           <ThemedText style={{ fontWeight: "bold" }}>{event.title}</ThemedText>
