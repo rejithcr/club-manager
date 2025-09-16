@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { View, FlatList, RefreshControl } from "react-native";
+import { View, FlatList, RefreshControl, TouchableOpacity } from "react-native";
 import { router, useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import { AntDesign, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
@@ -9,37 +9,61 @@ import { ClubContext } from "@/src/context/ClubContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
 import UserInfoView from "./UserInfoView";
-import TouchableCard from "@/src/components/TouchableCard";
 import { useGetClubMembersQuery } from "@/src/services/clubApi";
+import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
+import ThemedText from "@/src/components/themed-components/ThemedText";
+
+const limit = 20;
 
 export default function Home() {
   const { clubInfo } = useContext(ClubContext)
   const router = useRouter();
 
-  const { data: members, isLoading, refetch } = useGetClubMembersQuery({ clubId: clubInfo.clubId });
+  const { items, isLoading, loadMore, isFetching, refreshing, onRefresh } = usePaginatedQuery(
+      useGetClubMembersQuery,
+      { clubId: clubInfo.clubId },
+      limit
+    );
 
   const showDetails = (memberId: number) => router.push(`/(main)/(clubs)/(members)/memberdetails?memberId=${memberId}`)
 
   return (    
     <ThemedView style={{ flex: 1 }}>
       <Spacer space={10}/>
-      <View style={{ height:"100%", justifyContent: "center", alignContent: "center" }}>
-        {isLoading && <LoadingSpinner />}
-        {!isLoading &&
+      {isLoading ? (
+          <LoadingSpinner />
+        ) : (
           <FlatList
-            data={members}
-            initialNumToRender={8}
-            ListFooterComponent={<Spacer space={60} />}
-            ItemSeparatorComponent={() => <Spacer space={4} />}
-            refreshControl={<RefreshControl refreshing={false} onRefresh={refetch} />}
-            renderItem={({ item }) => (
-              <TouchableCard onPress={() => showDetails(item.memberId)}>
-                <UserInfoView {...item} key={item.memberId} />
-              </TouchableCard>
+            style={{ width: "100%" }}
+            ItemSeparatorComponent={() => (
+              <View
+                style={{
+                  marginVertical: 7,
+                  borderBottomWidth: 0.3,
+                  borderBottomColor: "grey",
+                  width: "85%",
+                  alignSelf: "center",
+                }}
+              />
             )}
+            ListFooterComponent={() =>
+              (isFetching && (
+                <>
+                  <Spacer space={10} />
+                  <LoadingSpinner />
+                </>
+              )) || <ThemedText style={{ alignSelf: "center", paddingBottom: 60, paddingTop: 10 }}>No more members</ThemedText>
+            }
+            data={items}
+            ListEmptyComponent={() => <ThemedText style={{ textAlign: "center" }}>No members found!</ThemedText>}
+            initialNumToRender={limit}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            onRefresh={onRefresh}
+            refreshing={refreshing}
+            renderItem={({ item }) => <TouchableOpacity onPress={() => showDetails(item.memberId)}><UserInfoView {...item} /></TouchableOpacity>}
           />
-        }
-      </View>
+        )}
       {clubInfo.role == ROLE_ADMIN &&
         <FloatingMenu
           actions={actions}
