@@ -14,6 +14,7 @@ import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
 import { useGetClubEventsQuery } from "@/src/services/clubApi";
+import ShadowBox from "@/src/components/ShadowBox";
 
 const limit = 20;
 
@@ -108,12 +109,12 @@ const actions = [
 export const EventItem = ({ event }: { event: any }) => {
   const { colors } = useTheme();
   return (
-    <ThemedView style={{ ...appStyles.shadowBox, width: "85%" }}>
-      <ThemedView style={{ flexDirection: "row", width: "100%", justifyContent: "space-between" }}>
-        <ThemedView style={{ rowGap: 3 }}>
+    <ShadowBox style={{ ...appStyles.shadowBox, width: "85%" }}>
+      <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between" }}>
+        <View style={{ rowGap: 3 }}>
           <ThemedText style={{ fontWeight: "bold" }}>{event.title}</ThemedText>
           <ThemedText style={{ fontSize: 10 }}>{event.description}</ThemedText>
-          <ThemedView style={{ flexDirection: "row" }}>
+          <View style={{ flexDirection: "row" }}>
             <ThemedText style={{ fontSize: 12, fontWeight: "bold", color: colors.button }}>{event.name}</ThemedText>
             <Spacer hspace={2} />
             <ThemedText
@@ -130,9 +131,9 @@ export const EventItem = ({ event }: { event: any }) => {
             >
               {event.status}
             </ThemedText>
-          </ThemedView>
-        </ThemedView>
-        <ThemedView style={{ rowGap: 3 }}>
+          </View>
+        </View>
+        <View style={{ rowGap: 3 }}>
           <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
             <ThemedIcon name={"MaterialIcons:calendar-today"} size={15} />
             <Spacer hspace={2} />
@@ -156,8 +157,8 @@ export const EventItem = ({ event }: { event: any }) => {
               </View>
             ) : null // i dont know why erro txt  inside view. this worked though
           }
-        </ThemedView>
-      </ThemedView>
-    </ThemedView>
+        </View>
+      </View>
+    </ShadowBox>
   );
 };
