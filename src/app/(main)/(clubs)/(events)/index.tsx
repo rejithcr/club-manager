@@ -42,7 +42,7 @@ const EventsHome = () => {
           <LoadingSpinner />
         ) : (
           <Picker
-            style={{ width: "80%", alignSelf: "center" }}
+            style={{ width: "85%", alignSelf: "center" }}
             selectedValue={eventTypeId}
             onValueChange={(value) => setEventTypeId(value)}
           >
