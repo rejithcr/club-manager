@@ -27,7 +27,7 @@ const MembershipRequests = () => {
   const [isUpdating, setIsUpdating] = useState(false)
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [comments, setComments] = useState("")
-  const [statusChangeRequest, setStatusChangeRequest] = useState({ clubId: 0, memberId: 0 });
+  const [statusChangeRequest, setStatusChangeRequest] = useState({ clubId: 0, memberId: 0, phone: '', firstName: '', lastName: '' });
 
   const { data, isLoading, refetch} = useHttpGet('/club', { clubId: clubInfo.clubId, membershipRequests: "true" })
   const [upadteMembershipRequest] = useUpdateClubMutation();
@@ -41,14 +41,14 @@ const MembershipRequests = () => {
         memberId: statusChangeRequest.memberId,
         status,
         comments,
-        email: userInfo.email,
+        email: userInfo.email
       }).unwrap();
       refetch();
       setIsUpdating(false);
     }
   };
-  const showApproveModal = (memberId: any, clubId: any) => {
-    setStatusChangeRequest({ clubId, memberId })
+  const showApproveModal = (memberId: any, clubId: any, phone: any, firstName: any, lastName: any) => {
+    setStatusChangeRequest({ clubId, memberId, phone, firstName, lastName })
     setIsModalVisible(true)
   }
 
@@ -65,7 +65,7 @@ const MembershipRequests = () => {
           keyExtractor={(item) => item.memberId}
           ListEmptyComponent={() => <ThemedText style={{alignSelf: "center"}}>No requests found.</ThemedText>}
           ItemSeparatorComponent={() => <Spacer space={2} />}
-          renderItem={({ item }) => <TouchableCard onPress={() => showApproveModal(item.memberId, item.clubId)}>
+          renderItem={({ item }) => <TouchableCard onPress={() => showApproveModal(item.memberId, item.clubId, item.phone, item.firstName, item.lastName)}>
             <View style={{ flexDirection: "row", alignItems: "center", width: '80%' }}>
               <View style={{ marginRight: 10 }}>
                 <ThemedIcon
@@ -84,6 +84,10 @@ const MembershipRequests = () => {
       {clubInfo.role === ROLE_ADMIN && <Modal isVisible={isModalVisible}>
         <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
           <ThemedText style={{ ...appStyles.heading }}>Approve Request?</ThemedText>
+          <View style={{width:"80%", alignSelf:"center"}}>
+            <ThemedText>{statusChangeRequest.firstName} {statusChangeRequest.lastName}</ThemedText>
+            <ThemedText>Phone: {statusChangeRequest.phone}</ThemedText>
+          </View>
           <InputText label="Comments" onChangeText={(value: string) => setComments(value)} />
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>
             <ThemedButton title="Approve" onPress={() => handleStatusChange("APPROVED")} />

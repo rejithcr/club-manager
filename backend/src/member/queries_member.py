@@ -7,7 +7,7 @@ GET_MEMBER = """
 GET_MEMBER_BY_EMAIL = """
    select member_id, first_name, last_name, email, phone, photo, is_registered, is_super_user, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth
    from member
-   where email = %s
+   where lower(email) = lower(%s)
 """
 
 GET_MEMBER_BY_PHONE = """
