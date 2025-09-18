@@ -2,12 +2,13 @@ import ThemedView from "@/src/components/themed-components/ThemedView";
 import { FlatList, GestureHandlerRootView, RefreshControl } from "react-native-gesture-handler";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import ThemedText from "@/src/components/themed-components/ThemedText";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Spacer from "@/src/components/Spacer";
 
 import { useGetMembersQuery } from "@/src/services/memberApi";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
 import UserInfoView from "../(clubs)/(members)/UserInfoView";
+import { router } from "expo-router";
 
 const limit = 20;
 
@@ -17,6 +18,10 @@ const users = () => {
     {},
     limit
   );
+
+  const handleUserEdit = (user: any) => {
+    router.push(`/(main)/(profile)/superuser-editmember?memberId=${user.memberId}`);
+  }
 
   return (
     <GestureHandlerRootView>
@@ -46,7 +51,7 @@ const users = () => {
             onEndReachedThreshold={0.5}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            renderItem={({ item }) => <UserInfoView {...item} />}
+            renderItem={({ item }) => <TouchableOpacity onPress={() => {handleUserEdit(item)}}><UserInfoView {...item} /></TouchableOpacity>}
           />
         )}
       </ThemedView>

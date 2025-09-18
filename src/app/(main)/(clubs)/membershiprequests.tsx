@@ -17,7 +17,6 @@ import { UserContext } from '@/src/context/UserContext'
 import { useTheme } from '@/src/hooks/use-theme'
 import { isValidLength } from '@/src/utils/validators'
 import { ROLE_ADMIN } from '@/src/utils/constants'
-import Alert, { AlertProps } from '@/src/components/Alert'
 import { useUpdateClubMutation } from '@/src/services/clubApi'
 
 const MembershipRequests = () => {
