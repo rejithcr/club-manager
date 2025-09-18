@@ -10,7 +10,7 @@ import { isValidDate, isValidLength } from "@/src/utils/validators";
 import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet } from "react-native";
+import { Platform, StyleSheet } from "react-native";
 import { useSearchParams } from "expo-router/build/hooks";
 import { useGetClubEventTypesQuery, useUpdateEventMutation } from "@/src/services/clubApi";
 
@@ -69,6 +69,25 @@ const AddEvent = () => {
 
   return (
     <ThemedView style={styles.container}>
+      <Spacer space={ Platform.OS == 'web' ? 10 : 5} />
+      {isLoadingEventTypes ? (
+        <LoadingSpinner />
+      ) : (
+        <Picker
+          style={{ width: "80%", alignSelf: "center" }}
+          selectedValue={eventTypeId}
+          onValueChange={(value) => setEventTypeId(value)}
+        >
+          {eventTypes?.map((type: any) => (
+            <Picker.Item
+              key={type.eventTypeId}
+              label={type.name}
+              value={type.eventTypeId}
+            />
+          ))}
+        </Picker>
+      )}
+      <Spacer space={5} />
       <InputText
         label={"Title"}
         value={title}
@@ -101,24 +120,6 @@ const AddEvent = () => {
         onChangeText={setLocation}
         placeholder=""
       />
-
-      {isLoadingEventTypes ? (
-        <LoadingSpinner />
-      ) : (
-        <Picker
-          style={{ width: "85%", alignSelf: "center" }}
-          selectedValue={eventTypeId}
-          onValueChange={(value) => setEventTypeId(value)}
-        >
-          {eventTypes?.map((type: any) => (
-            <Picker.Item
-              key={type.eventTypeId}
-              label={type.name}
-              value={type.eventTypeId}
-            />
-          ))}
-        </Picker>
-      )}
       <Spacer space={5} />
       {isUpdating ? <LoadingSpinner/> :
       <ThemedButton title="Save Event" onPress={handleSubmit} />}

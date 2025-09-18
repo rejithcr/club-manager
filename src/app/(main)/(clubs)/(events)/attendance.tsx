@@ -1,4 +1,4 @@
-import { View, FlatList } from "react-native";
+import { View, FlatList, Platform } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { ClubContext } from "@/src/context/ClubContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
@@ -36,13 +36,13 @@ const AttendanceReport = () => {
     });
   };
   return (
-    <ThemedView style={{ flex: 1 }}>
-      <Spacer space={5} />
+    <ThemedView style={{ flex: 1 }}>      
+      <Spacer space={ Platform.OS == 'web' ? 10 : 5} />
       {isLoadingEventTypes ? (
         <LoadingSpinner />
       ) : (
         <Picker
-          style={{ width: "85%", alignSelf: "center" }}
+          style={{ width: "80%", alignSelf: "center" }}
           selectedValue={eventTypeId}
           onValueChange={(value) => setEventTypeId(value)}
         >
