@@ -20,6 +20,7 @@ GET_EVENTS = """
         join event_types et on et.event_type_id = e.event_type_id
         join club c on c.club_id = et.club_id
     WHERE c.club_id = %s
+    and (%s = 'ALL' OR e.event_type_id = %s)
     order by event_date desc
     limit %s offset %s
 """

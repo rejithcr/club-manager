@@ -152,7 +152,7 @@ const EventDetails = () => {
           alignItems: "center",
         }}
       >
-        <ThemedHeading style={{ width: 200 }}>Mark Attendance</ThemedHeading>
+        <ThemedHeading style={{ width: 200 }}>{event?.title}</ThemedHeading>
         {clubInfo.role === ROLE_ADMIN ? (
           <ThemedIcon
             name="MaterialCommunityIcons:square-edit-outline"

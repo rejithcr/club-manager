@@ -1,5 +1,5 @@
 import { FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import Spacer from "@/src/components/Spacer";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import { router } from "expo-router";
@@ -9,21 +9,24 @@ import { AntDesign, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-i
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import { useTheme } from "@/src/hooks/use-theme";
-import { appStyles } from "@/src/utils/styles";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
-import { useGetClubEventsQuery } from "@/src/services/clubApi";
+import { useGetClubEventsQuery, useGetClubEventTypesQuery } from "@/src/services/clubApi";
 import ShadowBox from "@/src/components/ShadowBox";
+import { Picker } from "@react-native-picker/picker";
 
 const limit = 20;
 
 const EventsHome = () => {
+  const [eventTypeId, setEventTypeId] = useState("-1");
   const { clubInfo } = useContext(ClubContext);
+
+  const { data: eventTypes, isLoading: isLoadingEventTypes } = useGetClubEventTypesQuery({ clubId: clubInfo.clubId });
 
   const { items, isLoading, isFetching, refreshing, onRefresh, loadMore } = usePaginatedQuery(
     useGetClubEventsQuery,
-    { clubId: clubInfo.clubId },
+    { clubId: clubInfo.clubId, eventTypeId },
     limit
   );
 
@@ -34,7 +37,22 @@ const EventsHome = () => {
   return (
     <>
       <ThemedView style={{ flex: 1 }}>
-        <Spacer space={5} />
+        <Spacer space={10} />
+        {isLoadingEventTypes ? (
+          <LoadingSpinner />
+        ) : (
+          <Picker
+            style={{ width: "80%", alignSelf: "center" }}
+            selectedValue={eventTypeId}
+            onValueChange={(value) => setEventTypeId(value)}
+          >
+            <Picker.Item label="All" value="-1" />
+            {eventTypes?.map((type: any) => (
+              <Picker.Item key={type.eventTypeId} label={type.name} value={type.eventTypeId} />
+            ))}
+          </Picker>
+        )}
+        <Spacer space={10} />
         {isLoading ? (
           <LoadingSpinner />
         ) : (
