@@ -1,4 +1,4 @@
-import { FlatList, RefreshControl, TouchableOpacity, View } from "react-native";
+import { FlatList, Platform, RefreshControl, TouchableOpacity, View } from "react-native";
 import React, { useContext, useState } from "react";
 import Spacer from "@/src/components/Spacer";
 import ThemedView from "@/src/components/themed-components/ThemedView";
@@ -37,7 +37,7 @@ const EventsHome = () => {
   return (
     <>
       <ThemedView style={{ flex: 1 }}>
-        <Spacer space={10} />
+        <Spacer space={ Platform.OS == 'web' ? 10 : 5} />
         {isLoadingEventTypes ? (
           <LoadingSpinner />
         ) : (
@@ -52,7 +52,7 @@ const EventsHome = () => {
             ))}
           </Picker>
         )}
-        <Spacer space={10} />
+        <Spacer space={ Platform.OS == 'web' ? 10 : 0} />
         {isLoading ? (
           <LoadingSpinner />
         ) : (
