@@ -23,9 +23,17 @@ class FeeCollectionService():
         if listNextPaymentCollectionList and listNextPaymentCollectionList == "true":
             nextList = db.fetch(conn, queries_fee.GET_NEXT_PAYTMENT_COLLECTION_LIST, (feeTypeId,))
             for item in nextList:
-                min_fee = min(item['exceptions'], key=lambda obj: obj['club_fee_amount'])
-                item['club_fee_amount'] = min_fee['club_fee_amount']
-                item['club_fee_type_exception_member_id'] = min_fee['club_fee_type_exception_member_id']
+                #min_fee = min(item['exceptions'], key=lambda obj: obj['club_fee_amount'])
+                #item['club_fee_amount'] = min_fee['club_fee_amount']
+                #item['club_fee_type_exception_member_id'] = min_fee['club_fee_type_exception_member_id']
+                match = next((item for item in item['exceptions'] if item["club_fee_type_exception_member_id"]), None)
+                if match:
+                    item['club_fee_amount'] = match['club_fee_amount']
+                    item['club_fee_type_exception_member_id'] = match['club_fee_type_exception_member_id']
+                else:
+                    item['club_fee_amount'] = item['exceptions'][0]['club_fee_amount']
+                    item['club_fee_type_exception_member_id'] = item['exceptions'][0]['club_fee_type_exception_member_id']
+                    
                 del item['exceptions']
 
             return [helper.convert_to_camel_case(item) for item in nextList]
