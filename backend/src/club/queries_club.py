@@ -188,7 +188,7 @@ GET_DUES = """
 """
 
 GET_MEMBERSHIP_REQUESTS = """
-	select club_id, m.member_id, status, m.first_name, m.last_name, m.phone, comments, 
+	select club_id, m.member_id, status, m.first_name, m.last_name, m.phone, m.email, comments, 
         case status when 'REQUESTED' then 1 when 'REJECTED' then 2 else 3 end		
     from membership_requests mr
     	join member m on mr.member_id = m.member_id

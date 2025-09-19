@@ -2,6 +2,8 @@ import React from 'react';
 import { View, StyleProp, ViewStyle } from 'react-native';
 import { MaterialIcons, MaterialCommunityIcons, Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import { useTheme } from '@/src/hooks/use-theme';
+import ThemedText from './ThemedText';
+import Spacer from '../Spacer';
 
 type IconProps = {
   name: string;
@@ -25,13 +27,15 @@ function getIconComponent(name: string) {
   return { IconComponent, iconName: iconName || name };
 }
 
-const ThemedIcon: React.FC<IconProps> = ({ name, size = 20, style, color, onPress }) => {
+const ThemedIcon: React.FC<IconProps & { text?: string, style?: any }> = ({ name, size = 20, style, color, onPress, text }) => {
   const { colors } = useTheme();
   const { IconComponent, iconName } = getIconComponent(name);
 
   return (
-    <View style={style}>
+    <View style={{display:"flex", flexDirection:"row", ...style}}>
       <IconComponent name={iconName} size={size} color={color || colors.text} onPress={onPress} />
+      <Spacer hspace={2} />
+      {text && <ThemedText>{text}</ThemedText>}
     </View>
   );
 };

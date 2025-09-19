@@ -92,7 +92,7 @@ const Profile = () => {
               <ThemedText style={appStyles.heading}>
                 {memberDetails?.firstName} {memberDetails?.lastName}
               </ThemedText>
-              <KeyValueUI data={memberDetails} hideKeys={["photo", "firstName", "lastName"]} />
+              <KeyValueUI data={memberDetails} hideKeys={["photo", "firstName", "lastName", "isRegistered"]} />
             </>
           )}
           <Spacer space={10} />

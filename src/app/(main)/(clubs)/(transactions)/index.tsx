@@ -143,8 +143,8 @@ const Transactions = () => {
                 width: "85%", alignSelf: "center", alignItems: "center",
                 flexDirection: "row", justifyContent: "space-between"
               }}>
-                <View style={{ flexDirection: 'row' }}>
-                  <View>
+                <View style={{ flexDirection: 'row', maxWidth: '70%' }}>
+                  <View style={{maxWidth: '80%' }}>
                     <ThemedText style={{ fontWeight: '500' }}>{item.feeName}</ThemedText>
                     <ThemedText style={{ fontSize: 12 }}>{item.memberName || item.clubTransactionComment}</ThemedText>
                   </View>
