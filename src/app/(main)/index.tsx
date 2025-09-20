@@ -105,6 +105,8 @@ const handleMenuPress = (name: string | undefined, handleLogout: { (): void }) =
     handleLogout();
   } else if (name == "profile") {
     router.push(`/(main)/(profile)`);
+  } else if (name == "joinclub") {
+    router.push(`/(main)/(members)/joinclub`);
   } else {
     throw "Error";
   }
@@ -123,6 +125,13 @@ const actions = [
     text: "Create Club",
     icon: <MaterialIcons name={"add"} size={15} color={"white"} />,
     name: "createclub",
+    position: 1,
+  },
+  {
+    color: "black",
+    text: "Join Club",
+    icon: <MaterialIcons name={"join-inner"} size={15} color={"white"} />,
+    name: "joinclub",
     position: 1,
   },
   {

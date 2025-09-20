@@ -143,15 +143,15 @@ const Transactions = () => {
                 width: "85%", alignSelf: "center", alignItems: "center",
                 flexDirection: "row", justifyContent: "space-between"
               }}>
-                <View style={{ flexDirection: 'row', maxWidth: '70%' }}>
-                  <View style={{maxWidth: '80%' }}>
+                <View style={{ flexDirection: 'row', maxWidth: "70%"  }}>
+                  <View style={{ maxWidth: "90%" }}>
                     <ThemedText style={{ fontWeight: '500' }}>{item.feeName}</ThemedText>
                     <ThemedText style={{ fontSize: 12 }}>{item.memberName || item.clubTransactionComment}</ThemedText>
                   </View>
                   <Spacer hspace={5} />
                   {item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && clubInfo.role === ROLE_ADMIN &&                  
                     <MaterialCommunityIcons name='square-edit-outline' size={12} color={"#546E7A"} />}
-                    </View>
+                </View>
                 <View style={{ alignItems: "flex-end"}}>
                   <ThemedText style={{ fontWeight: 'bold', color: item.clubTranscationType === 'CREDIT' ? colors.success : colors.error }}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} Rs. {item.clubTransactionAmount}</ThemedText>
                   <ThemedText style={{ fontSize: 8 }}>{item.clubTransactionDate}</ThemedText>
