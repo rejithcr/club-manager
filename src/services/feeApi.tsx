@@ -142,6 +142,15 @@ export const feeApi = createApi({
       }),
       invalidatesTags: ["transaction"],
     }),
+    // mark multiple dues as paid
+    markDuesPaid: builder.mutation({
+      query: (body) => ({
+        url: "/fee/markpaid",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["fee", "transaction", "adhoc"],
+    }),
   }),
 });
 
@@ -169,4 +178,5 @@ export const {
   useLazyGetFeeCollectionsQuery,
   useSaveFeeCollectionMutation,
   useDeleteFeeCollectionMutation
+  ,useMarkDuesPaidMutation
 } = feeApi;

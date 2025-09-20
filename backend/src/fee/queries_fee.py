@@ -403,3 +403,15 @@ GET_ADHOC_TRANSACTION_IDS_TO_BE_DELETED = """
                                           from club_adhoc_fee_payment cafp
                                           where cafp.club_adhoc_fee_id = %s \
                                           """
+
+MARK_ADHOC_FEE_AS_PAID = """
+update club_adhoc_fee_payment
+set paid = 1, updated_by = %s
+where club_adhoc_fee_payment_id = %s
+"""
+
+MARK_FEE_AS_PAID = """
+update club_fee_payment
+set paid = 1, updated_by = %s
+where club_fee_payment_id = %s
+"""

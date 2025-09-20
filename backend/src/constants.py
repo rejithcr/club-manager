@@ -2,6 +2,9 @@ ROLE_ADMIN=1
 ROLE_MAINTAINER=2
 ROLE_MEMBER=3
 
+FEE_TYPE_ADHOC_FEE =  "ADHOC-FEE"
+FEE_TYPE_FEE = "FEE"
+
 PII_ATTRIBUTES = [
     { "attribute": 'First Name',  "selected": False , "clubMemberAttributeId": -1, "required": 1 },
     { "attribute": 'Last Name',  "selected": False, "clubMemberAttributeId": -2, "required": 1 },

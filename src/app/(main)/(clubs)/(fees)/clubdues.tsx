@@ -9,30 +9,54 @@ import { useTheme } from "@/src/hooks/use-theme";
 import Spacer from "@/src/components/Spacer";
 import ShadowBox from "@/src/components/ShadowBox";
 import Divider from "@/src/components/Divider";
-import { useGetClubDuesQuery } from "@/src/services/feeApi";
+import { useGetClubDuesQuery, useMarkDuesPaidMutation } from "@/src/services/feeApi";
 import ThemedCheckBox from "@/src/components/themed-components/ThemedCheckBox";
 import ThemedButton from "@/src/components/ThemedButton";
 import { ROLE_ADMIN } from "@/src/utils/constants";
+import { UserContext } from "@/src/context/UserContext";
+import { showSnackbar } from "@/src/components/snackbar/snackbarService";
 
 const ClubDues = () => {
   const { clubInfo } = useContext(ClubContext);
+  const { userInfo } = useContext(UserContext);
   const { data: duesByMembers, isLoading } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true" });
 
-  const handleMarkAsPaid = () => {
-    alert("Feature coming soon! For now, please go to the fee/splits page and update the status.");
+  const [selectedItems, setSelectedItems] = useState<{ paymentId: number; feeType: string; amount?: number }[]>([]);
+  const [markDuesPaid, { isLoading: isMarking }] = useMarkDuesPaidMutation();
+
+  const toggleSelected = (id: number, feeType: string, amount?: number) => {
+    setSelectedItems((prev) => {
+      const exists = prev.find((p) => p.paymentId === id && p.feeType === feeType);
+      if (exists) return prev.filter((p) => !(p.paymentId === id && p.feeType === feeType));
+      return [...prev, { paymentId: id, feeType, amount }];
+    });
+  };
+
+  const handleMarkAsPaid = async () => {   
+    if (selectedItems.length === 0) {
+      showSnackbar("Please select any dues to mark as paid.");
+      return;
+    }
+    try {
+      await markDuesPaid({ clubId: clubInfo.clubId, payments: selectedItems, email: userInfo.email }).unwrap();
+      setSelectedItems([]);
+    } catch (err: any) {
+      console.error(err);
+      showSnackbar("Failed to mark as paid. Try again.", "error");
+    }
   };
 
   return (
     <ThemedView style={{ flex: 1 }}>
       <ScrollView>
         <Spacer space={5} />
-        {isLoading && <LoadingSpinner />}
+    {isLoading && <LoadingSpinner />}
         <View style={{ width: "85%", alignSelf: "center" }}>
           {!isLoading &&
             duesByMembers?.map((item: any) => {
               return (
                 <View key={item.memberId}>
-                  <MemberDue key={item.memberId} member={item} />
+                  <MemberDue key={item.memberId} member={item} selectedItems={selectedItems} toggle={toggleSelected} />
                   <Spacer space={4} />
                 </View>
               );
@@ -41,8 +65,9 @@ const ClubDues = () => {
       </ScrollView>
       {clubInfo.role === ROLE_ADMIN && (
         <ThemedButton
+          disabled={isMarking}
           style={{ bottom: 30, position: "absolute", alignSelf: "center" }}
-          title="Mark as paid"
+          title={isMarking ? "Marking..." : "Mark as paid"}
           onPress={() => handleMarkAsPaid()}
         />
       )}
@@ -50,7 +75,8 @@ const ClubDues = () => {
   );
 };
 
-const MemberDue = (props: { member: any }) => {
+const MemberDue = (props: { member: any; selectedItems: { paymentId: number; feeType: string; amount?: number }[]; toggle: (id: number, feeType: string, amount?: number) => void }) => {
+  const { selectedItems, toggle } = props;
   const [isShown, setIsShown] = useState(false);
   const { colors } = useTheme();
   const showMemberDues = () => {
@@ -88,10 +114,20 @@ const MemberDue = (props: { member: any }) => {
       </ShadowBox>
       {isShown &&
         props?.member.dues.map((item: any) => {
+          const checked = !!selectedItems.find((p) => p.paymentId === item.paymentId && p.feeType === item.feeType);
           return (
             <View key={item.paymentId.toString() + item.feeType}>
               <Divider />
-              <MemberFeeItem {...item} key={item.paymentId.toString() + item.feeType} />
+              <MemberFeeItem
+                paymentId={item.paymentId}
+                fee={item.fee}
+                feeType={item.feeType}
+                feeDesc={item.feeDesc}
+                amount={item.amount}
+                checked={checked}
+                onToggle={() => toggle(item.paymentId, item.feeType, item.amount)}
+                key={item.paymentId.toString() + item.feeType}
+              />
             </View>
           );
         })}
@@ -101,19 +137,27 @@ const MemberDue = (props: { member: any }) => {
 
 export default ClubDues;
 
-const MemberFeeItem = (props: { paymentId: number; fee: string; feeType: string; feeDesc: string; amount: number }) => {
-  const [isChecked, setIsChecked] = useState(false);
+const MemberFeeItem = (props: {
+  paymentId: number;
+  fee: string;
+  feeType: string;
+  feeDesc: string;
+  amount: number;
+  checked?: boolean;
+  onToggle?: () => void;
+}) => {
+  const { paymentId, fee, feeDesc, amount, checked = false, onToggle } = props;
   return (
-    <View key={props.paymentId.toString() + props.feeType} style={styles.item}>
-      <TouchableOpacity style={{ flexDirection: "row", alignItems: "center" }} onPress={() => setIsChecked(!isChecked)}>
-        <ThemedCheckBox checked={isChecked} />
+    <TouchableOpacity key={paymentId.toString() + props.feeType} style={styles.item} onPress={() => onToggle && onToggle()}>
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <ThemedCheckBox checked={checked} />
         <View style={{ paddingVertical: 5 }}>
-          <ThemedText style={styles.label}>{props?.fee} </ThemedText>
-          <ThemedText style={styles.subLabel}>{props?.feeDesc} </ThemedText>
+          <ThemedText style={styles.label}>{fee} </ThemedText>
+          <ThemedText style={styles.subLabel}>{feeDesc} </ThemedText>
         </View>
-      </TouchableOpacity>
-      <ThemedText style={styles.amount}>Rs. {props?.amount}</ThemedText>
-    </View>
+      </View>
+      <ThemedText style={styles.amount}>Rs. {amount}</ThemedText>
+    </TouchableOpacity>
   );
 };
 

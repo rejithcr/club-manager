@@ -50,3 +50,15 @@ def delete_fee():
         return service.delete(conn, params), 200
     finally:
         db.close_connection(conn)
+
+
+@fee_bp.route('/markpaid', methods=['POST'], strict_slashes=False)
+@role_required([constants.ROLE_MAINTAINER])
+def mark_paid():
+    service = FeeService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.mark_paid(conn, params), 200
+    finally:
+        db.close_connection(conn)
