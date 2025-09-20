@@ -1,0 +1,2 @@
+ALTER TABLE public.club_transaction ADD CONSTRAINT club_transaction_unique_fee_payment_id UNIQUE (club_fee_payment_id);
+ALTER TABLE public.club_transaction ADD CONSTRAINT club_transaction_unique_adhoc_fee_payment_id UNIQUE (club_adhoc_fee_payment_id);
