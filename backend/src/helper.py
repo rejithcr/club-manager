@@ -52,36 +52,28 @@ def get_dates_of_period(club_fee_type_interval, latestPeriodDate):
 
 
 def pivot_data(data):
-    from collections import defaultdict
-
-    # Step 1: Normalize and group by (first_name, last_name, phone, email)
-    pivoted = defaultdict(dict)
-
+    pivoted_list = []
     for item in data:
-        fname = item['first_name'].strip() if item['first_name'] else ''
-        lname = item['last_name'].strip() if item['last_name'] else ''
+        first_name = item['first_name'].strip() if item['first_name'] else ''
+        last_name = item['last_name'].strip() if item['last_name'] else ''
         phone = item['phone'].strip() if item['email'] else ''
         email = item['email'].strip() if item['email'] else ''
-        dateOfBirth = item['date_of_birth'].strip() if item['date_of_birth'] else ''
-        attr = item['attribute'].strip()
-        val = item['attribute_value']
+        dob = item['date_of_birth'].strip() if item['date_of_birth'] else ''
 
-        key = (email)
-        pivoted[key]['first_name'] = fname
-        pivoted[key]['last_name'] = lname
-        pivoted[key]['phone'] = phone
-        pivoted[key]['email'] = email
-        pivoted[key]['date_of_birth'] = dateOfBirth
-        pivoted[key][attr] = val
+        pivoted = {
+            att["attribute"]: att["attribute_value"]
+            for att in item['attributes']
+            if att["attribute"] is not None and att["attribute_value"] is not None
+        }
 
-    # Step 2: Get all unique attribute names
-    attribute_set = set()
-    for item in data:
-        attribute_set.add(item['attribute'].strip())
+        pivoted['first_name'] = first_name
+        pivoted['last_name'] = last_name
+        pivoted['phone'] = phone
+        pivoted['email'] = email
+        pivoted['date_of_birth'] = dob
+        pivoted_list.append(pivoted)
 
-    # Define the column order
-    columns = ['first_name', 'last_name'] + sorted(attribute_set)
-    return pivoted.values()
+    return pivoted_list
 
 
 def remove_pii(keys, object_list):

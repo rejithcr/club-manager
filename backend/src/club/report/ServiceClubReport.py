@@ -19,7 +19,7 @@ class ClubReportService():
         if clubMemberAttributeIds:
             int_list = list(map(int, clubMemberAttributeIds.split(',')))
             member_attributes_values = db.fetch(conn, queries_report.GET_CLUB_MEMBER_ATTRIBUTES_VALUES,
-                                                (club_id, int_list))
+                                                (club_id,))
             pivoted = helper.pivot_data(member_attributes_values)
             list_report = [attribute for attribute in pivoted]
             return helper.remove_pii(int_list, list_report)

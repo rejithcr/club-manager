@@ -13,7 +13,7 @@ class ClubEventService():
 
     def get(self, conn, params):
         event_id = params.get('eventId')
-        event_type = params.get('eventType', 'ALL')
+        event_type = params.get('eventType', -1)
         limit = params.get('limit')
         offset = params.get('offset')
         status = params.get('status')
