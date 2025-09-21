@@ -69,7 +69,8 @@ GET_TRANSACTIONS = """
     select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, 
         t.club_transaction_category, t.club_transaction_comment, t.created_by, to_char(t.club_transaction_date, 'YYYY-mm-dd') club_transaction_date,
         coalesce(caf.club_adhoc_fee_name, coalesce(cft.club_fee_type, t.club_transaction_category, concat(cft.club_fee_type, '(', cfc.club_fee_type_period, ')'))) fee_name,
-        coalesce(m.first_name || ' ' || m.last_name, am.first_name || ' ' || am.last_name) member_name
+        coalesce(m.first_name || ' ' || m.last_name, am.first_name || ' ' || am.last_name) member_name,
+        t.updated_by
     from club_transaction t
         left join club_fee_payment cfp on cfp.club_fee_payment_id = t.club_fee_payment_id
         left join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id 
@@ -91,7 +92,8 @@ GET_TRANSACTIONS_ALL = """
     select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, 
         t.club_transaction_category, t.club_transaction_comment, t.created_by, to_char(t.club_transaction_date, 'YYYY-mm-dd') club_transaction_date,
         coalesce(caf.club_adhoc_fee_name, coalesce(cft.club_fee_type, t.club_transaction_category, concat(cft.club_fee_type, '(', cfc.club_fee_type_period, ')'))) fee_name,
-        coalesce(m.first_name || ' ' || m.last_name, am.first_name || ' ' || am.last_name) member_name
+        coalesce(m.first_name || ' ' || m.last_name, am.first_name || ' ' || am.last_name) member_name,
+        t.updated_by
     from club_transaction t
         left join club_fee_payment cfp on cfp.club_fee_payment_id = t.club_fee_payment_id
         left join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id 

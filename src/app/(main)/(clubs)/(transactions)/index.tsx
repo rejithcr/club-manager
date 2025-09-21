@@ -26,14 +26,15 @@ import Spacer from '@/src/components/Spacer'
 const limit = 20;
 
 const Transactions = () => {
-  const [isAddTxnVisible, setIsAddTxnVisible] = useState(false)
-  const [txnTypeFilter, setTxnTypeFilter] = useState("ALL")
-  const [showFees, setShowFees] = useState(false)
+  const [isAddTxnVisible, setIsAddTxnVisible] = useState(false);
+  const [isFeeDetailsVisible, setIsFeeDetailsVisible] = useState(false);
+  const [txnTypeFilter, setTxnTypeFilter] = useState("ALL");
+  const [showFees, setShowFees] = useState(false);
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
-  const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnDate: new Date(), txnCategory: "", txnComment: "", txnAmount: "" })
-  const { clubInfo } = useContext(ClubContext)
-  const { userInfo } = useContext(UserContext)
-  const { colors } = useTheme()
+  const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnDate: new Date(), txnCategory: "", txnComment: "", txnAmount: "", lastUpdatedBy: "" });
+  const { clubInfo } = useContext(ClubContext);
+  const { userInfo } = useContext(UserContext);
+  const { colors } = useTheme();
 
   const {
     items,
@@ -102,8 +103,12 @@ const Transactions = () => {
   const handleEdit = (item: any) => {
     if(item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && clubInfo.role === ROLE_ADMIN){
       setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnDate: new Date(item.clubTransactionDate), 
-        txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount });
+        txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount,
+        lastUpdatedBy: item.updatedBy });
       setIsAddTxnVisible(true);
+    } else {
+      setTxnValues({ lastUpdatedBy: item.updatedBy });
+      setIsFeeDetailsVisible(true);
     }
   }
   const handleTxnTypeChange = (value: string) => {
@@ -173,12 +178,22 @@ const Transactions = () => {
           <InputText label="Category" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnCategory: value }))} defaultValue={txnValues?.txnCategory} />
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />
-          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>
+          <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>
+          <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 30, alignItems: "center" }}>
             {isAddingTxn || isUpdatingTxn ? <LoadingSpinner />
             : <ThemedButton title={"   Save   "} onPress={() => handleSave()} />}
             <ThemedButton title="Cancel" onPress={() => setIsAddTxnVisible(false)} />
             {txnValues?.txnId && <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => handleDelete()} color={colors.error} />}
           </View>
+        </ThemedView>
+      </Modal>
+      <Modal isVisible={isFeeDetailsVisible}>
+        <ThemedView style={{ borderRadius: 5, padding: 20 }}>
+          <ThemedText style={{ width: "80%", alignSelf: "center" }}>Goto Fees/Expense splits to update this transaction</ThemedText>
+          <Spacer space={10} />
+          <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>
+          <Spacer space={10} />
+          <ThemedButton title="Cancel" onPress={() => setIsFeeDetailsVisible(false)} />
         </ThemedView>
       </Modal>
       {alertConfig?.visible && <Alert {...alertConfig} />}
