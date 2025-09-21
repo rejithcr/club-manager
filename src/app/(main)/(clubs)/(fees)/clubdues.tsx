@@ -16,6 +16,7 @@ import ThemedButton from "@/src/components/ThemedButton";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import { UserContext } from "@/src/context/UserContext";
 import { showSnackbar } from "@/src/components/snackbar/snackbarService";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
 const ClubDues = () => {
   const { clubInfo } = useContext(ClubContext);
@@ -76,11 +77,13 @@ const ClubDues = () => {
         {isLoading && <LoadingSpinner />}
         <View style={{ width: "85%", alignSelf: "center" }}>
           {!isLoading &&
-            duesByMembers?.map((item: any) => {
+            duesByMembers?.map((item: any, idx: number) => {
               return (
                 <View key={item.memberId}>
-                  <MemberDue key={item.memberId} member={item} selectedItems={selectedItems} toggle={toggleSelected} />
-                  <Spacer space={4} />
+                  <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
+                    <MemberDue key={item.memberId} member={item} selectedItems={selectedItems} toggle={toggleSelected} />
+                    <Spacer space={4} />
+                  </Animated.View>
                 </View>
               );
             })}
@@ -143,6 +146,7 @@ const MemberDue = (props: {
   const showMemberDues = () => {
     setIsShown(!isShown);
   };
+  
   return (
     <>
       <ShadowBox style={{ width: "100%" }}>
