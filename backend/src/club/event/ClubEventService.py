@@ -13,7 +13,7 @@ class ClubEventService():
 
     def get(self, conn, params):
         event_id = params.get('eventId')
-        event_type = params.get('eventType', -1)
+        event_type_id = params.get('eventTypeId', -1)
         limit = params.get('limit')
         offset = params.get('offset')
         status = params.get('status')
@@ -31,7 +31,7 @@ class ClubEventService():
             events = db.fetch(conn, queries_events.GET_EVENTS_BY_MEMBER, (club_id_list, limit,offset))
             return helper.convert_to_camel_case(events if events else [])
         else:
-            events = db.fetch(conn, queries_events.GET_EVENTS, (club_id, event_type, event_type, limit,offset))
+            events = db.fetch(conn, queries_events.GET_EVENTS, (club_id, event_type_id, event_type_id, limit,offset))
             return helper.convert_to_camel_case(events if events else [])
 
     def post(self, conn, params):
