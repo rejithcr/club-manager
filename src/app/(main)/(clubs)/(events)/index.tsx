@@ -118,7 +118,7 @@ const actions = [
   {
     color: "black",
     text: "Attendance Report",
-    icon: <AntDesign name={"barschart"} size={15} color={"white"} />,
+    icon: <AntDesign name={"bar-chart"} size={15} color={"white"} />,
     name: "attendance",
     position: 5,
   },

@@ -2,7 +2,7 @@ import { Platform, TouchableOpacity } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import ThemedButton from '@/src/components/ThemedButton';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import { ClubContext } from '@/src/context/ClubContext';
 import { jsonToCSV } from '@/src/utils/common';
 import ThemedText from '@/src/components/themed-components/ThemedText';
@@ -16,6 +16,7 @@ import MemberAttributesEdit from './memberattributesedit';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading';
 import { useGetClubMemberReportableAttributesQuery, useLazyGetClubMemberAttributesReportQuery } from '@/src/services/clubApi';
+import { showSnackbar } from '@/src/components/snackbar/snackbarService';
 
 export default function MemberAttributes() {
   const [isEdit, setIsEdit] = useState(false);
@@ -79,9 +80,13 @@ const MemberAttributesExport = () => {
 
   const [getClubMemberAttributesReport] = useLazyGetClubMemberAttributesReportQuery();
   const handleExport = async () => {
-    setIsReportFetching(true);
     try {
       const clubMemberAttributeIds = cmaList.filter((cma) => cma.selected).map((cma) => cma.clubMemberAttributeId);
+      if(clubMemberAttributeIds.length === 0){
+        showSnackbar("Please select at least one attribute to export");
+        return;
+      }
+      setIsReportFetching(true);
       const response = await getClubMemberAttributesReport({
         clubId: clubInfo.clubId,
         clubMemberAttributeIds: clubMemberAttributeIds.join(","),
