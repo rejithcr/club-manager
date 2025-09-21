@@ -10,6 +10,7 @@ import Spacer from "@/src/components/Spacer";
 import ShadowBox from "@/src/components/ShadowBox";
 import Divider from "@/src/components/Divider";
 import { useGetClubDuesQuery, useMarkDuesPaidMutation } from "@/src/services/feeApi";
+import Modal from "react-native-modal";
 import ThemedCheckBox from "@/src/components/themed-components/ThemedCheckBox";
 import ThemedButton from "@/src/components/ThemedButton";
 import { ROLE_ADMIN } from "@/src/utils/constants";
@@ -23,6 +24,8 @@ const ClubDues = () => {
 
   const [selectedItems, setSelectedItems] = useState<{ paymentId: number; feeType: string; amount?: number }[]>([]);
   const [markDuesPaid, { isLoading: isMarking }] = useMarkDuesPaidMutation();
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const [paymentsPreview, setPaymentsPreview] = useState<{ paymentId: number; feeType: string; amount?: number }[]>([]);
 
   const toggleSelected = (id: number, feeType: string, amount?: number) => {
     setSelectedItems((prev) => {
@@ -32,25 +35,45 @@ const ClubDues = () => {
     });
   };
 
-  const handleMarkAsPaid = async () => {   
-    if (selectedItems.length === 0) {
+  const handleMarkAsPaid = async () => {
+    const paymentsToMark =
+      selectedItems.length > 0
+        ? selectedItems
+        : (duesByMembers || []).flatMap((m: any) =>
+            (m.dues || []).map((d: any) => ({ paymentId: d.paymentId, feeType: d.feeType, amount: d.amount }))
+          );
+
+    if (paymentsToMark.length === 0) {
       showSnackbar("Please select any dues to mark as paid.");
       return;
     }
+
+    // show confirmation modal with preview
+    setPaymentsPreview(paymentsToMark);
+    setIsConfirmVisible(true);
+  };
+
+  const confirmMarkAsPaid = async () => {    
+    setIsConfirmVisible(false);
+    if (paymentsPreview.length === 0) {
+      showSnackbar("No dues to mark.");
+      setIsConfirmVisible(false);
+      return;
+    }
     try {
-      await markDuesPaid({ clubId: clubInfo.clubId, payments: selectedItems, email: userInfo.email }).unwrap();
+      await markDuesPaid({ clubId: clubInfo.clubId, payments: paymentsPreview, email: userInfo.email }).unwrap();
       setSelectedItems([]);
     } catch (err: any) {
       console.error(err);
       showSnackbar("Failed to mark as paid. Try again.", "error");
-    }
+    } 
   };
 
   return (
     <ThemedView style={{ flex: 1 }}>
       <ScrollView>
         <Spacer space={5} />
-    {isLoading && <LoadingSpinner />}
+        {isLoading && <LoadingSpinner />}
         <View style={{ width: "85%", alignSelf: "center" }}>
           {!isLoading &&
             duesByMembers?.map((item: any) => {
@@ -64,18 +87,56 @@ const ClubDues = () => {
         </View>
       </ScrollView>
       {clubInfo.role === ROLE_ADMIN && (
-        <ThemedButton
-          disabled={isMarking}
-          style={{ bottom: 30, position: "absolute", alignSelf: "center" }}
-          title={isMarking ? "Marking..." : "Mark as paid"}
-          onPress={() => handleMarkAsPaid()}
-        />
+        <>
+          <ThemedButton
+            disabled={isMarking || selectedItems.length === 0}
+            style={{ bottom: 30, position: "absolute", alignSelf: "center" }}
+            title={isMarking ? "Marking..." : "Mark as paid"}
+            onPress={() => handleMarkAsPaid()}
+          />
+          <ConfirmModal
+            visible={isConfirmVisible}
+            payments={paymentsPreview}
+            onConfirm={confirmMarkAsPaid}
+            onCancel={() => setIsConfirmVisible(false)}
+          />
+        </>
       )}
     </ThemedView>
   );
 };
 
-const MemberDue = (props: { member: any; selectedItems: { paymentId: number; feeType: string; amount?: number }[]; toggle: (id: number, feeType: string, amount?: number) => void }) => {
+const ConfirmModal = (props: {
+  visible: boolean;
+  payments: { paymentId: number; feeType: string; amount?: number }[];
+  onConfirm: () => void;
+  onCancel: () => void;
+}) => {
+  const { visible, payments, onConfirm, onCancel } = props;
+  const total = payments.reduce((s, p) => s + (p.amount || 0), 0);
+  return (
+    <Modal isVisible={visible} onBackdropPress={onCancel} onBackButtonPress={onCancel}>
+      <ThemedView style={{ padding: 16, borderRadius: 6 }}>
+        <ThemedText style={{ fontWeight: "bold", marginBottom: 8, fontSize: 20 }}>Confirm updates</ThemedText>
+        <ThemedText>Items: {payments.length}</ThemedText>
+        <ThemedText>Total: Rs. {total}</ThemedText>
+        <ThemedText style={{ marginTop: 8, fontSize: 12, color: "gray" }}>
+          You are about to mark the listed dues as paid.
+        </ThemedText>
+        <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 12 }}>
+          <ThemedButton title="Confirm" onPress={onConfirm} />
+          <ThemedButton title="Cancel" onPress={onCancel} />
+        </View>
+      </ThemedView>
+    </Modal>
+  );
+};
+
+const MemberDue = (props: {
+  member: any;
+  selectedItems: { paymentId: number; feeType: string; amount?: number }[];
+  toggle: (id: number, feeType: string, amount?: number) => void;
+}) => {
   const { selectedItems, toggle } = props;
   const [isShown, setIsShown] = useState(false);
   const { colors } = useTheme();
@@ -148,7 +209,11 @@ const MemberFeeItem = (props: {
 }) => {
   const { paymentId, fee, feeDesc, amount, checked = false, onToggle } = props;
   return (
-    <TouchableOpacity key={paymentId.toString() + props.feeType} style={styles.item} onPress={() => onToggle && onToggle()}>
+    <TouchableOpacity
+      key={paymentId.toString() + props.feeType}
+      style={styles.item}
+      onPress={() => onToggle && onToggle()}
+    >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <ThemedCheckBox checked={checked} />
         <View style={{ paddingVertical: 5 }}>
