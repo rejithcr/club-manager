@@ -107,7 +107,7 @@ const Transactions = () => {
         lastUpdatedBy: item.updatedBy });
       setIsAddTxnVisible(true);
     } else {
-      setTxnValues({ lastUpdatedBy: item.updatedBy });
+      setTxnValues({ lastUpdatedBy: item.updatedBy, feeType: item.clubTransactionCategory });
       setIsFeeDetailsVisible(true);
     }
   }
@@ -189,7 +189,7 @@ const Transactions = () => {
       </Modal>
       <Modal isVisible={isFeeDetailsVisible}>
         <ThemedView style={{ borderRadius: 5, padding: 20 }}>
-          <ThemedText style={{ width: "80%", alignSelf: "center" }}>Goto Fees/Expense splits to update this transaction</ThemedText>
+          <ThemedText style={{ width: "80%", alignSelf: "center" }}>Go to {txnValues?.feeType == 'FEE' ? 'fees' : 'expense splits'} page to update this transaction.</ThemedText>
           <Spacer space={10} />
           <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>
           <Spacer space={10} />
