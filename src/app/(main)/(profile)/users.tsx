@@ -9,6 +9,7 @@ import { useGetMembersQuery } from "@/src/services/memberApi";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
 import UserInfoView from "../(clubs)/(members)/UserInfoView";
 import { router } from "expo-router";
+import Animated, { FadeInUp } from "react-native-reanimated";
 
 const limit = 20;
 
@@ -21,7 +22,7 @@ const users = () => {
 
   const handleUserEdit = (user: any) => {
     router.push(`/(main)/(profile)/superuser-editmember?memberId=${user.memberId}`);
-  }
+  };
 
   return (
     <GestureHandlerRootView>
@@ -51,7 +52,13 @@ const users = () => {
             onEndReachedThreshold={0.5}
             onRefresh={onRefresh}
             refreshing={refreshing}
-            renderItem={({ item }) => <TouchableOpacity onPress={() => {handleUserEdit(item)}}><UserInfoView {...item} /></TouchableOpacity>}
+            renderItem={({ item, index }) => (
+              <TouchableOpacity onPress={() => handleUserEdit(item)}>
+                <Animated.View entering={FadeInUp.duration(380).delay(index * 40)} style={{ overflow: "hidden", margin: 0 }}>
+                  <UserInfoView {...item} />
+                </Animated.View>
+              </TouchableOpacity>
+            )}
           />
         )}
       </ThemedView>

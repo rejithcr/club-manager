@@ -10,27 +10,25 @@ const MainStack = () => {
   const [clubInfo, setClubInfo] = useState<any | undefined>(undefined)
   return (
     <ClubContext.Provider value={{ clubInfo, setClubInfo }}>
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <Stack>
-          <Stack.Screen name="index" options={{
-            title: "Club Manager", headerShown: true,
+      <Stack>
+        <Stack.Screen name="index" options={{
+          title: "Club Manager", headerShown: true,
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text
+        }} />
+        <Stack.Screen name="(members)" options={{ title: "Member", headerShown: false }} />
+        <Stack.Screen name="(clubs)" options={{ title: "Club", headerShown: false }} />
+        <Stack.Screen name="(profile)" options={{ title: "Profile", headerShown: false }} />          
+        <Stack.Screen
+          name="createclub" // This is the name of the page and must match the url from root
+          options={{
+            title: 'Create Club',
+            headerShown: true,headerTintColor: colors.text,
             headerStyle: { backgroundColor: colors.background },
-            headerTintColor: colors.text
-          }} />
-          <Stack.Screen name="(members)" options={{ title: "Member", headerShown: false }} />
-          <Stack.Screen name="(clubs)" options={{ title: "Club", headerShown: false }} />
-          <Stack.Screen name="(profile)" options={{ title: "Profile", headerShown: false }} />          
-          <Stack.Screen
-            name="createclub" // This is the name of the page and must match the url from root
-            options={{
-              title: 'Create Club',
-              headerShown: true,headerTintColor: colors.text,
-              headerStyle: { backgroundColor: colors.background },
-            }}
-          />
-        </Stack>
-        <StatusBar style={colors.statusbar == "light" ? "light" : "dark"} />
-      </SafeAreaView>
+          }}
+        />
+      </Stack>
+      <StatusBar style={colors.statusbar == "light" ? "light" : "dark"} />
     </ClubContext.Provider>
   )
 }
