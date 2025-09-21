@@ -13,6 +13,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import Alert, { AlertProps } from "@/src/components/Alert";
 import { useAddEventMutation, useGetClubEventTypesQuery } from "@/src/services/clubApi";
+import { handleTimeChange } from "@/src/utils/common";
 
 const AddEvent = () => {
   const [title, setTitle] = useState("");
@@ -35,7 +36,6 @@ const AddEvent = () => {
 
   const [addEvent, { isLoading: isAdding }] = useAddEventMutation();
   const handleSubmit = async () => {
-    console.log(eventDate);
     if (!isValidLength(title, 2) || !isValidDate(eventDate)) {
       alert("Please enter title and date");
       return;
@@ -56,17 +56,6 @@ const AddEvent = () => {
     } catch (error) {
       console.error("Error adding event:", error);
     }
-  };
-
-  const handleTimeChange = (text: string, setState: React.Dispatch<React.SetStateAction<string>>) => {
-    const raw = text.replace(/[^0-9]/g, "");
-    let formatted = "";
-    if (raw.length <= 2) {
-      formatted = raw;
-    } else {
-      formatted = raw.slice(0, 2) + ":" + raw.slice(2, 4);
-    }
-    setState(formatted);
   };
 
   return (
@@ -92,14 +81,14 @@ const AddEvent = () => {
       <DatePicker date={eventDate} setDate={setEventDate} label="Event Date" />
       <InputText
         value={startTime}
-        label="Start Time"
+        label="Start Time (24-hr HH:MM)"
         onChangeText={(text: string) => handleTimeChange(text, setStartTime)}
         placeholder="00:00"
         keyboardType="numeric"
       />
       <InputText
         value={endTime}
-        label="End Time"
+        label="End Time (24-hr HH:MM)"
         onChangeText={(text: string) => handleTimeChange(text, setEndTime)}
         placeholder="00:00"
         keyboardType="numeric"

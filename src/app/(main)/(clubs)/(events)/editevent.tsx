@@ -13,13 +13,14 @@ import React, { useContext, useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { useSearchParams } from "expo-router/build/hooks";
 import { useGetClubEventTypesQuery, useUpdateEventMutation } from "@/src/services/clubApi";
+import { handleTimeChange, to24HourFormat } from "@/src/utils/common";
 
 const AddEvent = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState(new Date());
-  const [startTime, setStartTime] = useState();
-  const [endTime, setEndTime] = useState();
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [location, setLocation] = useState("");
   const [eventTypeId, setEventTypeId] = useState("");
   const [eventId, setEventId] = useState();
@@ -35,8 +36,8 @@ const AddEvent = () => {
     setTitle(eventObj.title)
     setDescription(eventObj.description)
     setEventDate(new Date(eventObj.eventDate))
-    setStartTime(eventObj.startTime)
-    setEndTime(eventObj.endTime)
+    setStartTime(to24HourFormat(eventObj.startTime))
+    setEndTime(to24HourFormat(eventObj.endTime))
     setLocation(eventObj.location)
     setEventId(eventObj.eventId)
     eventTypes && setEventTypeId(eventObj.eventTypeId)
@@ -104,14 +105,14 @@ const AddEvent = () => {
       <DatePicker date={eventDate} setDate={setEventDate} label="Event Date" />
       <InputText
         value={startTime}
-        label="Start Time"
-        onChangeText={setStartTime}
+        label="Start Time (24-hr HH:MM)"
+        onChangeText={(text: string) => handleTimeChange(text, setStartTime)}
         placeholder="00:00"
       />
       <InputText
         value={endTime}
-        label="End Time"
-        onChangeText={setEndTime}
+        label="End Time (24-hr HH:MM)"
+        onChangeText={(text: string) => handleTimeChange(text, setEndTime)}
         placeholder="00:00"
       />
       <InputText
