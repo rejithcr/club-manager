@@ -11,7 +11,6 @@ import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
-import Alert, { AlertProps } from "@/src/components/Alert";
 import { useAddEventMutation, useGetClubEventTypesQuery } from "@/src/services/clubApi";
 import { handleTimeChange } from "@/src/utils/common";
 
@@ -23,7 +22,6 @@ const AddEvent = () => {
   const [endTime, setEndTime] = useState<string>("");
   const [location, setLocation] = useState("");
   const [eventTypeId, setEventTypeId] = useState("");
-  const [alertConfig, setAlertConfig] = useState<AlertProps>();
 
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
@@ -96,7 +94,6 @@ const AddEvent = () => {
       <InputText label={"Location"} value={location} onChangeText={setLocation} placeholder="" />
       <Spacer space={5} />
       {isAdding ? <LoadingSpinner /> : <ThemedButton title="Create Event" onPress={handleSubmit} />}
-      {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
   );
 };

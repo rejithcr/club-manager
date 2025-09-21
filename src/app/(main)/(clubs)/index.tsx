@@ -19,43 +19,52 @@ import FloatingMenu from "@/src/components/FloatingMenu";
 import { EventCard } from "../upcoming_events";
 import { router } from "expo-router";
 import { useGetClubEventsQuery } from "@/src/services/clubApi";
-import { useGetFeesAdhocQuery, useGetFeesQuery, useGetFundBalanceQuery, useGetTotalDueQuery } from "@/src/services/feeApi";
+import {
+  useGetFeesAdhocQuery,
+  useGetFeesQuery,
+  useGetFundBalanceQuery,
+  useGetTotalDueQuery,
+} from "@/src/services/feeApi";
 
 const ClubHome = () => {
   const router = useRouter();
   const params = useSearchParams();
-  const [refreshing, setRefreshing] = useState(false);
   const { setClubInfo } = useContext(ClubContext);
 
   const { colors } = useTheme();
-  
+
   const {
     data: events,
     isLoading: isLoadingEvents,
+    isFetching: isFetchingEvents,
     refetch: fetchEvents,
   } = useGetClubEventsQuery({ clubId: params.get("clubId"), limit: 5, offset: 0 });
 
   const {
     data: fbr,
     isLoading: isFundBalanceLoading,
+    isFetching: isFetchingFundBalance,
     refetch: fetchFundBalance,
   } = useGetFundBalanceQuery({ clubId: params.get("clubId"), fundBalance: "true" });
 
   const {
     data: expenseSplits,
     isLoading: isLoadingSplits,
+    isFetching: isFetchingSplits,
     refetch: fetchSplits,
   } = useGetFeesAdhocQuery({ clubId: Number(params.get("clubId")), limit: 5, offset: 0 });
 
   const {
     data: clubDue,
     isLoading: isTotalDueLoading,
+    isFetching: isFetchingTotalDue,
     refetch: fetchTotalDue,
   } = useGetTotalDueQuery({ clubId: params.get("clubId"), totalDue: "true" });
 
   const {
     data: currentFeeStructure,
     isLoading: isLoadingCurrent,
+    isFetching: isFetchingCurrent,
     refetch: fetchFees,
   } = useGetFeesQuery({ clubId: params.get("clubId") });
 
@@ -67,7 +76,7 @@ const ClubHome = () => {
   };
 
   useEffect(() => {
-    setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") });    
+    setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") });
   }, []);
 
   const showClubDues = (_: GestureResponderEvent): void => {
@@ -75,13 +84,11 @@ const ClubHome = () => {
   };
 
   const onRefresh = () => {
-    setRefreshing(true);
     fetchFundBalance();
     fetchTotalDue();
     fetchFees();
     fetchSplits();
     fetchEvents();
-    setRefreshing(false);
   };
 
   const showAdhocFeeDetails = (adhocFee: any) => {
@@ -115,7 +122,17 @@ const ClubHome = () => {
           )}
         </View>
         <Spacer space={5} />
-        <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={
+                isFetchingCurrent || isFetchingFundBalance || isFetchingTotalDue || isFetchingEvents || isFetchingSplits
+              }
+              onRefresh={onRefresh}
+            />
+          }
+        >
           <TouchableCard onPress={Number(clubDue?.totalDue) > 0 ? showClubDues : null}>
             <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
               <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
@@ -129,7 +146,6 @@ const ClubHome = () => {
                     right: Number(clubDue?.totalDue) > 0 ? 30 : 5,
                   }}
                 >
-                  {" "}
                   Rs. {clubDue?.totalDue}
                 </ThemedText>
               )}
@@ -303,7 +319,7 @@ const ClubHome = () => {
                   </TouchableOpacity>
                 )}
                 ListFooterComponent={() => (
-                  <View style={{ width: 100, height: 100, alignItems: "center", justifyContent: "center" }}>                    
+                  <View style={{ width: 100, height: 100, alignItems: "center", justifyContent: "center" }}>
                     <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
                       <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
                     </TouchableOpacity>
@@ -317,7 +333,7 @@ const ClubHome = () => {
         </ScrollView>
       </GestureHandlerRootView>
       <FloatingMenu
-        actions={actions.filter((action) => params.get("role") != ROLE_ADMIN ? action.role != ROLE_ADMIN : true)}
+        actions={actions.filter((action) => (params.get("role") != ROLE_ADMIN ? action.role != ROLE_ADMIN : true))}
         position={"left"}
         color="black"
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
@@ -360,7 +376,7 @@ const actions = [
     icon: <MaterialCommunityIcons name={"square-edit-outline"} size={15} color={"white"} />,
     name: "edit",
     position: 4,
-    role: ROLE_ADMIN
+    role: ROLE_ADMIN,
   },
 ];
 

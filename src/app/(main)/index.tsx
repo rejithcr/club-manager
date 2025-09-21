@@ -2,7 +2,7 @@ import { RefreshControl, ScrollView } from "react-native";
 import { useRouter } from "expo-router/build/hooks";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import FeeSummary from "./dues";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../context/UserContext";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,12 +28,14 @@ const Main = () => {
     data: clubs,
     isLoading: isLoadingMyClubs,
     refetch: refetchClubs,
+    isFetching: isFetchingClubs,
     error: clubsError,
   } = useGetClubQuery({ memberId: userInfo?.memberId });
 
   const {
     data: duesByMember,
     isLoading: isLoadingMemberDues,
+    isFetching: isFetchingMemberDues,
     refetch: refetchMemberDues,
   } = useGetClubMembersQuery({ memberId: userInfo?.memberId, duesByMember: "true" });
 
@@ -55,12 +57,12 @@ const Main = () => {
       triggerGetEvents({clubIds, limit: 10, offset:0});
     }
   }, [clubs]);
-
+    
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
         <Spacer space={5} />
-        <ScrollView refreshControl={<RefreshControl refreshing={false} onRefresh={onRefresh} />}>
+        <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues} onRefresh={onRefresh} />}>
           <ThemedHeading>My Clubs</ThemedHeading>
           {isLoadingMyClubs && <LoadingSpinner />}
           {!isLoadingMemberDues && <MyClubs clubs={clubs} />}

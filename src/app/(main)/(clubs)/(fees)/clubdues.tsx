@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, StyleSheet, ScrollView } from "react-native";
+import { TouchableOpacity, View, StyleSheet, ScrollView, RefreshControl } from "react-native";
 import React, { useContext, useState } from "react";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
@@ -20,7 +20,7 @@ import { showSnackbar } from "@/src/components/snackbar/snackbarService";
 const ClubDues = () => {
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
-  const { data: duesByMembers, isLoading } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true" });
+  const { data: duesByMembers, isLoading, isFetching, refetch } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true" });
 
   const [selectedItems, setSelectedItems] = useState<{ paymentId: number; feeType: string; amount?: number }[]>([]);
   const [markDuesPaid, { isLoading: isMarking }] = useMarkDuesPaidMutation();
@@ -71,7 +71,7 @@ const ClubDues = () => {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <ScrollView>
+      <ScrollView refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}>
         <Spacer space={5} />
         {isLoading && <LoadingSpinner />}
         <View style={{ width: "85%", alignSelf: "center" }}>
