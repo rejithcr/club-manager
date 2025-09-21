@@ -2,7 +2,7 @@ import { Platform, TouchableOpacity } from 'react-native';
 import React, { useContext, useEffect, useState } from 'react';
 import ThemedButton from '@/src/components/ThemedButton';
 import * as Sharing from 'expo-sharing';
-import * as FileSystem from 'expo-file-system/legacy';
+import { File, Paths } from 'expo-file-system';
 import { ClubContext } from '@/src/context/ClubContext';
 import { jsonToCSV } from '@/src/utils/common';
 import ThemedText from '@/src/components/themed-components/ThemedText';
@@ -65,10 +65,10 @@ const MemberAttributesExport = () => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       } else {
-        const fileUri = FileSystem.documentDirectory + filename;
-        await FileSystem.writeAsStringAsync(fileUri, csvString, { encoding: FileSystem.EncodingType.UTF8 });
+        const file = new File(Paths.document, filename);
+        file.write(csvString);
         if (await Sharing.isAvailableAsync()) {
-          await Sharing.shareAsync(fileUri);
+          await Sharing.shareAsync(file.uri);
         } else {
           console.log("Sharing is not available on this device");
         }

@@ -25,6 +25,7 @@ import {
   useGetFundBalanceQuery,
   useGetTotalDueQuery,
 } from "@/src/services/feeApi";
+import Animated, { FadeInLeft, FadeInRight, FadeInUp } from "react-native-reanimated";
 
 const ClubHome = () => {
   const router = useRouter();
@@ -185,28 +186,30 @@ const ClubHome = () => {
             </ThemedText>
           )}
           {!isLoadingCurrent &&
-            currentFeeStructure?.map((fee: any) => {
+            currentFeeStructure?.map((fee: any, idx: number) => {
               return (
                 <View key={fee.clubFeeTypeId}>
-                  <TouchableCard onPress={showFeeTypeDetails} id={fee}>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        width: "100%",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <View>
-                        <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
-                        <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
+                  <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
+                    <TouchableCard onPress={showFeeTypeDetails} id={fee}>
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          width: "100%",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                        }}
+                      >
+                        <View>
+                          <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
+                          <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
+                        </View>
+                        <ThemedText style={{ fontWeight: "bold", fontSize: 15, position: "absolute", right: 30 }}>
+                          Rs. {fee.clubFeeAmount}
+                        </ThemedText>
                       </View>
-                      <ThemedText style={{ fontWeight: "bold", fontSize: 15, position: "absolute", right: 30 }}>
-                        Rs. {fee.clubFeeAmount}
-                      </ThemedText>
-                    </View>
-                  </TouchableCard>
-                  <Spacer space={4} />
+                    </TouchableCard>
+                    <Spacer space={4} />
+                  </Animated.View>
                 </View>
               );
             })}
@@ -241,12 +244,17 @@ const ClubHome = () => {
                 data={events}
                 onEndReachedThreshold={0.2}
                 ItemSeparatorComponent={() => <Spacer hspace={4} />}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
                   <TouchableOpacity
                     onPress={() => router.push(`/(main)/(clubs)/(events)/eventdetails?event=${JSON.stringify(item)}`)}
                   >
-                    <EventCard event={item} />
-                    <Spacer hspace={0} />
+                    <Animated.View
+                      entering={FadeInRight.duration(380).delay(index * 80)}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <EventCard event={item} />
+                      <Spacer hspace={0} />
+                    </Animated.View>
                   </TouchableOpacity>
                 )}
                 ListFooterComponent={() => (
@@ -292,30 +300,37 @@ const ClubHome = () => {
                 data={expenseSplits}
                 onEndReachedThreshold={0.2}
                 ItemSeparatorComponent={() => <Spacer hspace={4} />}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
                   <TouchableOpacity onPress={() => showAdhocFeeDetails(item)}>
-                    <Card style={{ minHeight: 100 }}>
-                      <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
-                      <ThemedText style={{ fontSize: 10 }}>{item.clubAdhocFeeDesc}</ThemedText>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                          marginTop: 10,
-                          alignItems: "center",
-                          minWidth: 100,
-                        }}
-                      >
-                        <CircularProgress value={Math.round(item.completionPercentage)} strokeWidth={6} size={35} />
-                        <View>
-                          <ThemedText style={{ fontSize: 12, textAlign: "right", fontWeight: "bold" }}>
-                            Rs. {item.clubAdhocFeePaymentAmount}
-                          </ThemedText>
-                          <ThemedText style={{ fontSize: 10, textAlign: "right" }}>{item.clubAdhocFeeDate}</ThemedText>
+                    <Animated.View
+                      entering={FadeInRight.duration(380).delay(index * 80)}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <Card style={{ minHeight: 100 }}>
+                        <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
+                        <ThemedText style={{ fontSize: 10 }}>{item.clubAdhocFeeDesc}</ThemedText>
+                        <View
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            marginTop: 10,
+                            alignItems: "center",
+                            minWidth: 100,
+                          }}
+                        >
+                          <CircularProgress value={Math.round(item.completionPercentage)} strokeWidth={6} size={35} />
+                          <View>
+                            <ThemedText style={{ fontSize: 12, textAlign: "right", fontWeight: "bold" }}>
+                              Rs. {item.clubAdhocFeePaymentAmount}
+                            </ThemedText>
+                            <ThemedText style={{ fontSize: 10, textAlign: "right" }}>
+                              {item.clubAdhocFeeDate}
+                            </ThemedText>
+                          </View>
                         </View>
-                      </View>
-                    </Card>
-                    <Spacer hspace={0} />
+                      </Card>
+                      <Spacer hspace={0} />
+                    </Animated.View>
                   </TouchableOpacity>
                 )}
                 ListFooterComponent={() => (

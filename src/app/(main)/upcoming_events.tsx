@@ -1,5 +1,5 @@
 import { TouchableOpacity, View } from "react-native";
-import Animated, { SlideInLeft } from "react-native-reanimated";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import { Event } from "@/src/types/event";
 import Card from "@/src/components/Card";
 import ThemedText from "@/src/components/themed-components/ThemedText";
@@ -23,7 +23,7 @@ const UpcomingEvents = (props: { events: Event[]; clubs: any[] }) => {
       {props.events.map((event, idx) => {
         return (
           <TouchableOpacity key={event.eventId} onPress={() => gotoEventDetails(event)}>
-            <Animated.View entering={SlideInLeft.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
+            <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
               <EventCard event={event} />
               <Spacer space={4} />
             </Animated.View>

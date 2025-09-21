@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import Animated, { SlideInLeft } from "react-native-reanimated";
+import Animated, { FadeInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router/build/hooks";
 import TouchableCard from "@/src/components/TouchableCard";
 import ThemedText from "@/src/components/themed-components/ThemedText";
@@ -39,7 +39,7 @@ const MyClubs = (props: { clubs: [] }) => {
       )}
       {props.clubs?.map((item: any, idx: number) => (
         <View key={item.clubId}>
-          <Animated.View entering={SlideInLeft.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
+          <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
             <TouchableCard
               onPress={() =>
                 showDetails(item.clubId, item.clubName, item.description, item.location, item.roleName, item.upiId)
