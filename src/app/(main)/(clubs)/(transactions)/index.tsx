@@ -135,7 +135,7 @@ const Transactions = () => {
         {isTxnsLoading ? <LoadingSpinner /> :
           <FlatList style={{ width: "100%" }}
             ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .3, borderBottomColor: "grey", width: "85%", alignSelf: "center" }} />}
-            ListFooterComponent={() => isTxnsFetching && <LoadingSpinner /> || <View style={{ marginVertical: 30 }} />}
+            ListFooterComponent={() => isTxnsFetching && <LoadingSpinner /> || <Spacer space={50} />}
             data={items}
             initialNumToRender={limit}
             onEndReached={loadMore}

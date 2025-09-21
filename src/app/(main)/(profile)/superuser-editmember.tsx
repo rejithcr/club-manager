@@ -11,10 +11,6 @@ import { router } from "expo-router";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import { useTheme } from "@/src/hooks/use-theme";
 import { isValidPhoneNumber } from "@/src/utils/validators";
-import { appStyles } from "@/src/utils/styles";
-import TouchableCard from "@/src/components/TouchableCard";
-import { useHttpGet } from "@/src/hooks/use-http";
-import { ClubContext } from "@/src/context/ClubContext";
 import DatePicker from "@/src/components/DatePicker";
 import { useGetMembersQuery, useUpdateMemberMutation } from "@/src/services/memberApi";
 

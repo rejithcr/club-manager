@@ -13,10 +13,10 @@ import { useTheme } from "@/src/hooks/use-theme";
 import { isValidPhoneNumber } from "@/src/utils/validators";
 import { appStyles } from "@/src/utils/styles";
 import TouchableCard from "@/src/components/TouchableCard";
-import { useHttpGet } from "@/src/hooks/use-http";
 import { ClubContext } from "@/src/context/ClubContext";
 import DatePicker from "@/src/components/DatePicker";
 import { useGetMembersQuery, useUpdateMemberMutation } from "@/src/services/memberApi";
+import { useGetClubQuery } from "@/src/services/clubApi";
 
 const Editmember = () => {
   const params = useSearchParams();
@@ -79,7 +79,7 @@ const Editmember = () => {
     return true;
   };
 
-  const { data: clubs, isLoading: isLoadingMyClubs } = useHttpGet("/club", {
+  const { data: clubs, isLoading: isLoadingMyClubs } = useGetClubQuery({
     memberId: Number(params.get("memberId")),
   });
 

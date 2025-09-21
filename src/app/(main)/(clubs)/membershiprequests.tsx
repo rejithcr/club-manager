@@ -1,6 +1,5 @@
 import { FlatList, View } from "react-native";
 import React, { useContext, useState } from "react";
-import { useHttpGet } from "@/src/hooks/use-http";
 import { ClubContext } from "@/src/context/ClubContext";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedView from "@/src/components/themed-components/ThemedView";
@@ -17,7 +16,7 @@ import { UserContext } from "@/src/context/UserContext";
 import { useTheme } from "@/src/hooks/use-theme";
 import { isValidLength } from "@/src/utils/validators";
 import { ROLE_ADMIN } from "@/src/utils/constants";
-import { useUpdateClubMutation } from "@/src/services/clubApi";
+import { useGetClubQuery, useUpdateClubMutation } from "@/src/services/clubApi";
 
 const MembershipRequests = () => {
   const { colors } = useTheme();
@@ -35,14 +34,14 @@ const MembershipRequests = () => {
     lastName: "",
   });
 
-  const { data, isLoading, refetch } = useHttpGet("/club", { clubId: clubInfo.clubId, membershipRequests: "true" });
-  const [upadteMembershipRequest] = useUpdateClubMutation();
+  const { data, isLoading, refetch } = useGetClubQuery({ clubId: clubInfo.clubId, membershipRequests: "true" });
+  const [updateMembershipRequest] = useUpdateClubMutation();
 
   const handleStatusChange = async (status: string) => {
     if (validate(comments)) {
       setIsModalVisible(false);
       setIsUpdating(true);
-      await upadteMembershipRequest({
+      await updateMembershipRequest({
         clubId: statusChangeRequest.clubId,
         memberId: statusChangeRequest.memberId,
         status,
@@ -74,6 +73,7 @@ const MembershipRequests = () => {
             keyExtractor={(item) => item.memberId}
             ListEmptyComponent={() => <ThemedText style={{ alignSelf: "center" }}>No requests found.</ThemedText>}
             ItemSeparatorComponent={() => <Spacer space={2} />}
+            ListFooterComponent={() => <Spacer space={20} />}
             renderItem={({ item }) => (
               <TouchableCard
                 onPress={() => showApproveModal(item.memberId, item.clubId, item.phone, item.email, item.firstName, item.lastName)}
