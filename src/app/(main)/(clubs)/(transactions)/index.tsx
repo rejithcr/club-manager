@@ -31,7 +31,7 @@ const Transactions = () => {
   const [txnTypeFilter, setTxnTypeFilter] = useState("ALL");
   const [showFees, setShowFees] = useState(false);
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
-  const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnDate: new Date(), txnCategory: "", txnComment: "", txnAmount: "", lastUpdatedBy: "" });
+  const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnDate: new Date(), txnCategory: "", txnComment: "", txnAmount: "" });
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
   const { colors } = useTheme();
@@ -106,7 +106,7 @@ const Transactions = () => {
         txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount,
         lastUpdatedBy: item.updatedBy });
       setIsAddTxnVisible(true);
-    } else {
+    } else if (clubInfo.role === ROLE_ADMIN){
       setTxnValues({ lastUpdatedBy: item.updatedBy, feeType: item.clubTransactionCategory });
       setIsFeeDetailsVisible(true);
     }
@@ -178,7 +178,7 @@ const Transactions = () => {
           <InputText label="Category" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnCategory: value }))} defaultValue={txnValues?.txnCategory} />
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />
-          <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>
+          {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 30, alignItems: "center" }}>
             {isAddingTxn || isUpdatingTxn ? <LoadingSpinner />
             : <ThemedButton title={"   Save   "} onPress={() => handleSave()} />}
@@ -191,7 +191,7 @@ const Transactions = () => {
         <ThemedView style={{ borderRadius: 5, padding: 20 }}>
           <ThemedText style={{ width: "80%", alignSelf: "center" }}>Go to {txnValues?.feeType == 'FEE' ? 'fees' : 'expense splits'} page to update this transaction.</ThemedText>
           <Spacer space={10} />
-          <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>
+          {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
           <Spacer space={10} />
           <ThemedButton title="Cancel" onPress={() => setIsFeeDetailsVisible(false)} />
         </ThemedView>
