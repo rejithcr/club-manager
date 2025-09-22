@@ -13,7 +13,7 @@ import ThemedButton from "@/src/components/ThemedButton";
 import Modal from "react-native-modal";
 import { Picker } from "@react-native-picker/picker";
 import InputText from "@/src/components/InputText";
-import { View, Animated } from "react-native";
+import { View } from "react-native";
 import { arrayDifference } from "@/src/utils/array";
 import { EventItem } from ".";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
@@ -42,30 +42,6 @@ const EventDetails = () => {
 
   const [getClubMembers] = useLazyGetClubMembersQuery();
   const [getAtendedMembers] = useLazyGetEventMembersQuery();
-
-  // Local animated chip: fades in and translates from a small random offset
-  const AnimatedChip = ({ children, onPress, selected, delay = 0 }: any) => {
-    const translateX = React.useRef(new Animated.Value((Math.random() * 40) - 20)).current;
-    const translateY = React.useRef(new Animated.Value((Math.random() * 40) - 20)).current;
-    const opacity = React.useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-      const anims = [
-        Animated.timing(opacity, { toValue: 1, duration: 300, useNativeDriver: true, delay }),
-        Animated.timing(translateX, { toValue: 0, duration: 300, useNativeDriver: true, delay }),
-        Animated.timing(translateY, { toValue: 0, duration: 300, useNativeDriver: true, delay }),
-      ];
-      Animated.parallel(anims).start();
-    }, []);
-
-    return (
-      <Animated.View style={{ margin: 5, opacity, transform: [{ translateX }, { translateY }] }}>
-        <Chip selected={selected} onPress={onPress}>
-          {children}
-        </Chip>
-      </Animated.View>
-    );
-  };
 
 
   const loadClubMembers = async (eventId: string) => {
@@ -207,24 +183,24 @@ const EventDetails = () => {
           >
             {isLoadingMembers && <LoadingSpinner />}
             {!isLoadingMembers &&
-              attendedMembers.map((item: any, idx: number) => (
-                <AnimatedChip key={item.memberId} selected={true} onPress={() => removeFromAttended(item)} delay={idx * 40}>
+              attendedMembers.map((item: any) => (
+                <Chip selected={true} key={item.memberId} onPress={() => removeFromAttended(item)}>
                   <ThemedText>
                     {item?.firstName} {item?.lastName}
                   </ThemedText>
-                </AnimatedChip>
+                </Chip>
               ))}
             
             {!isLoadingMembers && remainingMembers.length == 0 && (
               <ThemedText style={{ textAlign: "center" }}>Yay!! All members attended 👏</ThemedText>
             )}
             {!isLoadingMembers &&
-              remainingMembers.map((item: any, idx: number) => (
-                <AnimatedChip key={item.memberId} selected={false} onPress={() => addToAttended(item)} delay={idx * 40}>
+              remainingMembers.map((item: any) => (
+                <Chip selected={false} key={item.memberId} onPress={() => addToAttended(item)}>
                   <ThemedText>
                     {item?.firstName} {item?.lastName}
                   </ThemedText>
-                </AnimatedChip>
+                </Chip>
               ))}
           </ThemedView>
           <Spacer space={40} />
@@ -249,19 +225,19 @@ const EventDetails = () => {
                     width: "85%",
                   }}
                 >
-                  {attendanceDiff.added.map((item: any, idx: number) => (
-                    <AnimatedChip key={item.memberId} selected={true} delay={idx * 40}>
+                  {attendanceDiff.added.map((item: any) => (
+                    <Chip selected={true} key={item.memberId}>
                       <ThemedText>
                         {item?.firstName} {item?.lastName}
                       </ThemedText>
-                    </AnimatedChip>
+                    </Chip>
                   ))}
-                  {attendanceDiff.removed.map((item: any, idx: number) => (
-                    <AnimatedChip key={item.memberId} selected={false} delay={idx * 40}>
+                  {attendanceDiff.removed.map((item: any) => (
+                    <Chip selected={false} key={item.memberId}>
                       <ThemedText>
                         {item?.firstName} {item?.lastName}
                       </ThemedText>
-                    </AnimatedChip>
+                    </Chip>
                   ))}
                 </ThemedView>
                 <Spacer space={10} />

@@ -24,7 +24,7 @@ export const useTheme = () => {
 
   useEffect(() => {
     AsyncStorage.getItem("theme")
-      .then(storedTheme => storedTheme ? setTheme(storedTheme) : setTheme("system"))
+      .then(storedTheme => storedTheme ? setTheme(storedTheme) : setTheme("light"))
   }, [])
 
   return {

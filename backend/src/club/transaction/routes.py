@@ -9,7 +9,7 @@ from src.db import get_connection
 club_transaction_bp = Blueprint('club_transaction', __name__, url_prefix='/club/transaction')
 
 @club_transaction_bp.route('/', methods=['GET'], strict_slashes=False)
-@jwt_required()
+@role_required([constants.ROLE_MEMBER])
 def get_club_transaction():
     service = ClubTransactionService()
     params = util.get_params(request)
