@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router/build/hooks";
 import TouchableCard from "@/src/components/TouchableCard";
@@ -6,9 +6,13 @@ import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
+import Divider from "@/src/components/Divider";
+import { useTheme } from "@/src/hooks/use-theme";
+import RoundedContainer from "@/src/components/RoundedContainer";
 
 const MyClubs = (props: { clubs: [] }) => {
   const router = useRouter();
+  const { colors } = useTheme();
 
   const showDetails = (
     clubId: number,
@@ -37,21 +41,25 @@ const MyClubs = (props: { clubs: [] }) => {
           <ThemedIcon name="MaterialIcons:add-circle" size={50} onPress={() => router.push(`/(main)/createclub`)} />
         </ThemedView>
       )}
-      {props.clubs?.map((item: any, idx: number) => (
-        <View key={item.clubId}>
-          <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
-            <TouchableCard
-              onPress={() =>
-                showDetails(item.clubId, item.clubName, item.description, item.location, item.roleName, item.upiId)
-              }
-              id={item.clubId}
-            >
-              <ThemedText>{item.clubName}</ThemedText>
-            </TouchableCard>
-            <Spacer space={4} />
-          </Animated.View>
-        </View>
-      ))}
+      <RoundedContainer>
+        {props.clubs?.map((item: any, idx: number) => (
+          <View key={item.clubId} >
+            <View style={{ marginVertical: 5 }}>
+              <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
+                <TouchableCard
+                  onPress={() =>
+                    showDetails(item.clubId, item.clubName, item.description, item.location, item.roleName, item.upiId)
+                  }
+                  id={item.clubId}
+                >
+                  <ThemedText style={{ fontSize: 16 }}>{item.clubName}</ThemedText>
+                </TouchableCard>
+              </Animated.View>
+            </View>
+            {idx < props.clubs.length - 1 && <Divider />}
+          </View>
+        ))}
+      </RoundedContainer>
     </ThemedView>
   );
 };

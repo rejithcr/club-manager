@@ -11,30 +11,36 @@ export const colors = {
     error: "#b00020",
     warning: "#fdb924",
     disabled: "#869c98",
-    success: "#5ac983",
+    success: "#16a149",
     button: "#007acc",
     info: "#007acc",
     nav: "#000000",
     add: "#5ac983",
     heading: "#5ac983",
+    border: "#rgba(136, 136, 136, 0.2)",
+    subText: "#869c98",
   },
   dark:{
     statusbar: "light",
     primary: "#333333",
     secondary: "#252526",
-    background: "#1e1e1e",
+    background: "#252526",
     text: "#ffffff",
     error: "#ff6b6b",
     warning: "#fdb924",
     disabled: "#869c98",
-    success: "#5ac983",
+    success: "#16a149",
     button: "#007acc",
     info: "#007acc",
     nav: "#ffffff", //"#007acc",
     add: "#5ac983",
     heading: "#5ac983",
+    border: "#rgba(136, 136, 136, 0.2)",
+    subText: "#869c98",
   }
 }
+
+export const borderRadius = 25;
 
 export const appStyles = StyleSheet.create({
     title: {

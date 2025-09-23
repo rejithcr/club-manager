@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
         minWidth: 100,
         borderColor: "#eee",
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
-        borderRadius: 5,
-        padding: 10
+        borderRadius: 25,
+        padding: 15
     }
 });

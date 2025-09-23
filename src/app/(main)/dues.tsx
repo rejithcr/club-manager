@@ -8,6 +8,8 @@ import Spacer from "@/src/components/Spacer";
 import Divider from "@/src/components/Divider";
 import * as Linking from "expo-linking";
 import { useState } from "react";
+import RoundedContainer from "@/src/components/RoundedContainer";
+import Collapsible from "@/src/components/Collapsible";
 
 type ClubDueType = {
   clubId: string;
@@ -45,7 +47,6 @@ const FeeSummary = (props: { duesByMember: ClubDueType[] }) => {
 export default FeeSummary;
 
 const ClubDue = ({ club }: { club: ClubDueType }) => {
-  const [showDues, setShowDues] = useState(false);
   const { colors } = useTheme();
 
   const makeUpiPayment = async (amount: number, clubName: string, upiId: string) => {
@@ -60,59 +61,44 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
   };
 
   return (
-    <View key={club.clubId}>
-      <ShadowBox>
-        <TouchableOpacity
-          onPress={() => setShowDues((prev) => !prev)}
-          style={{
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <ThemedIcon
-            size={20}
-            name={
-              showDues ? "MaterialCommunityIcons:chevron-down-circle" : "MaterialCommunityIcons:chevron-right-circle"
-            }
-            color={colors.nav}
-          />
+    <Collapsible
+      header={
+        <>
           <ThemedText style={{ width: "60%", fontSize: 15 }}>{club.clubName}</ThemedText>
           <ThemedText style={{ width: "30%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}>
             Rs. {club.dueAmount}
           </ThemedText>
-        </TouchableOpacity>
-      </ShadowBox>
-      {showDues &&
-        club.dues.map((due: any) => (
-          <View key={due.paymentId.toString() + due.feeType} style={styles.item}>
-            <Divider />
-            <View style={{ paddingVertical: 5 }}>
-              <ThemedText style={styles.label}>{due.fee} </ThemedText>
-              <ThemedText style={styles.subLabel}>{due.feeDesc} </ThemedText>
-            </View>
-            <ThemedText style={styles.amount}>Rs. {due.amount}</ThemedText>
+        </>
+      }
+    >
+      <Spacer space={4} />
+      {club.dues.map((due: any, idx: number) => (
+        <View key={due.paymentId.toString() + due.feeType} style={styles.item}>
+          {idx > 0 && <Divider />}
+          <View style={{ paddingVertical: 5, marginLeft: 10 }}>
+            <ThemedText style={styles.label}>{due.fee} </ThemedText>
+            <ThemedText style={{...styles.subLabel, color: colors.subText}}>{due.feeDesc} </ThemedText>
           </View>
-        ))}
-
-      {showDues && club.upiId && (
+          <ThemedText style={styles.amount}>Rs. {due.amount}</ThemedText>
+        </View>
+      ))}
+      {club.upiId && (
         <TouchableOpacity onPress={() => makeUpiPayment(club.dueAmount, club.clubName, club.upiId)}>
-          <ThemedText style={{...styles.button, backgroundColor: colors.primary}}>Pay Now</ThemedText>
+          <ThemedText style={{ ...styles.button, backgroundColor: colors.primary }}>Pay Now</ThemedText>
         </TouchableOpacity>
       )}
-    </View>
+    </Collapsible>
   );
 };
 
 const styles = StyleSheet.create({
   button: {
-    borderRadius: 20,
-    width: 80,
+    borderRadius: 25,
+    width: 150,
     textAlign: "center",
-    paddingBottom: 2,
+    padding: 10,
     alignSelf: "center",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
+    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
   },
   item: {
     width: "80%",

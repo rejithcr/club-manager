@@ -22,6 +22,7 @@ import Alert, { AlertProps } from '@/src/components/Alert'
 import { useAddTransactionMutation, useDeleteTransactionMutation, useGetTransactionsQuery, useUpdateTransactionMutation } from '@/src/services/feeApi'
 import usePaginatedQuery from '@/src/hooks/usePaginatedQuery'
 import Spacer from '@/src/components/Spacer'
+import Divider from '@/src/components/Divider'
 
 const limit = 20;
 
@@ -133,8 +134,8 @@ const Transactions = () => {
           </View>
         </View>
         {isTxnsLoading ? <LoadingSpinner /> :
-          <FlatList style={{ width: "100%" }}
-            ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .3, borderBottomColor: "grey", width: "85%", alignSelf: "center" }} />}
+          <FlatList
+            ItemSeparatorComponent={() => <Divider style={{width: "85%", alignSelf: "center", marginVertical: 10}} />}
             ListFooterComponent={() => isTxnsFetching && <LoadingSpinner /> || <Spacer space={50} />}
             data={items}
             initialNumToRender={limit}

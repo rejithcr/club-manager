@@ -8,6 +8,8 @@ import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { router } from "expo-router";
 import { useContext } from "react";
 import { ClubContext } from "@/src/context/ClubContext";
+import RoundedContainer from "@/src/components/RoundedContainer";
+import Divider from "@/src/components/Divider";
 
 const UpcomingEvents = (props: { events: Event[]; clubs: any[] }) => {
   const { setClubInfo } = useContext(ClubContext);
@@ -18,7 +20,7 @@ const UpcomingEvents = (props: { events: Event[]; clubs: any[] }) => {
     router.push(`/(main)/(clubs)/(events)/eventdetails?event=${JSON.stringify(event)}`);
   };
   return (
-    <View style={{ width: "85%", alignSelf: "center" }}>
+    <RoundedContainer>
       {props.events?.length == 0 && <ThemedText style={{ ThemedTextAlign: "center" }}>No upcoming events!</ThemedText>}
       {props.events.map((event, idx) => {
         return (
@@ -26,11 +28,12 @@ const UpcomingEvents = (props: { events: Event[]; clubs: any[] }) => {
             <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
               <EventCard event={event} />
               <Spacer space={4} />
+              {idx < props.events.length - 1 && <Divider />}
             </Animated.View>
           </TouchableOpacity>
         );
       })}
-    </View>
+    </RoundedContainer>
   );
 };
 
@@ -54,7 +57,7 @@ export default UpcomingEvents;
 
 export const EventCard = ({ event, cardSize }: { event: Event | undefined; cardSize?: string }) => {
   return (
-    <Card>
+    <View style={{ paddingHorizontal: 25, paddingVertical: 15 }}>
       <View
         style={{
           flexDirection: "row",
@@ -120,6 +123,6 @@ export const EventCard = ({ event, cardSize }: { event: Event | undefined; cardS
           <ThemedText style={{ textAlign: "right", fontSize: 10 }}>{event?.clubName}</ThemedText>
         </View>
       </View>
-    </Card>
+    </View>
   );
 };

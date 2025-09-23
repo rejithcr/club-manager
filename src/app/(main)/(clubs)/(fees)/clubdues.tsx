@@ -17,11 +17,31 @@ import { ROLE_ADMIN } from "@/src/utils/constants";
 import { UserContext } from "@/src/context/UserContext";
 import { showSnackbar } from "@/src/components/snackbar/snackbarService";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import Collapsible from "@/src/components/Collapsible";
+import { colors } from "@/src/utils/styles";
+import Banner from "@/src/components/Banner";
 
 const ClubDues = () => {
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
-  const { data: duesByMembers, isLoading, isFetching, refetch } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true" });
+  const { colors } = useTheme();
+  const {
+    data: duesByMembers,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true" });
+
+  const totalDue = duesByMembers
+    ? duesByMembers.reduce(
+        (sum: number, member: any) =>
+          sum +
+          (member.dues
+            ? member.dues.reduce((mSum: number, due: any) => mSum + (due.amount || 0), 0)
+            : 0),
+        0
+      )
+    : 0;
 
   const [selectedItems, setSelectedItems] = useState<{ paymentId: number; feeType: string; amount?: number }[]>([]);
   const [markDuesPaid, { isLoading: isMarking }] = useMarkDuesPaidMutation();
@@ -54,7 +74,7 @@ const ClubDues = () => {
     setIsConfirmVisible(true);
   };
 
-  const confirmMarkAsPaid = async () => {    
+  const confirmMarkAsPaid = async () => {
     setIsConfirmVisible(false);
     if (paymentsPreview.length === 0) {
       showSnackbar("No dues to mark.");
@@ -67,21 +87,38 @@ const ClubDues = () => {
     } catch (err: any) {
       console.error(err);
       showSnackbar("Failed to mark as paid. Try again.", "error");
-    } 
+    }
   };
 
   return (
     <ThemedView style={{ flex: 1 }}>
+      <Spacer space={10} />
+      <Banner backgroundColor={colors.warning}>
+        <View>
+            <ThemedText style={{ fontSize: 16, color: colors.background }}>Total Due</ThemedText>
+            {isLoading ? <LoadingSpinner /> : 
+              <ThemedText style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}>
+                Rs. {totalDue}
+              </ThemedText>
+            }
+          </View>
+          <ThemedIcon name="MaterialCommunityIcons:account-cash" size={50} color={colors.background} />
+      </Banner>
       <ScrollView refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}>
-        <Spacer space={5} />
+        <Spacer space={10} />
         {isLoading && <LoadingSpinner />}
-        <View style={{ width: "85%", alignSelf: "center" }}>
+        <View>
           {!isLoading &&
             duesByMembers?.map((item: any, idx: number) => {
               return (
                 <View key={item.memberId}>
                   <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
-                    <MemberDue key={item.memberId} member={item} selectedItems={selectedItems} toggle={toggleSelected} />
+                    <MemberDue
+                      key={item.memberId}
+                      member={item}
+                      selectedItems={selectedItems}
+                      toggle={toggleSelected}
+                    />
                     <Spacer space={4} />
                   </Animated.View>
                 </View>
@@ -141,62 +178,40 @@ const MemberDue = (props: {
   toggle: (id: number, feeType: string, amount?: number) => void;
 }) => {
   const { selectedItems, toggle } = props;
-  const [isShown, setIsShown] = useState(false);
-  const { colors } = useTheme();
-  const showMemberDues = () => {
-    setIsShown(!isShown);
-  };
-  
   return (
-    <>
-      <ShadowBox style={{ width: "100%" }}>
-        <TouchableOpacity
-          onPress={showMemberDues}
-          style={{
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <View style={{ flexDirection: "row", width: "70%" }}>
-            <ThemedIcon
-              size={20}
-              name={
-                isShown ? "MaterialCommunityIcons:chevron-down-circle" : "MaterialCommunityIcons:chevron-right-circle"
-              }
-              color={colors.nav}
-            />
-            <Spacer hspace={5} />
-            <ThemedText style={{ fontSize: 15 }}>
-              {props?.member.firstName} {props?.member.lastName}
-            </ThemedText>
-          </View>
+    <Collapsible
+      header={
+        <>
+          <ThemedText style={{ width: "60%", fontSize: 15 }}>
+            {props?.member.firstName} {props?.member.lastName}
+          </ThemedText>
           <ThemedText style={{ width: "30%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}>
             Rs. {props?.member.totalDue}
           </ThemedText>
-        </TouchableOpacity>
-      </ShadowBox>
-      {isShown &&
-        props?.member.dues.map((item: any) => {
-          const checked = !!selectedItems.find((p) => p.paymentId === item.paymentId && p.feeType === item.feeType);
-          return (
-            <View key={item.paymentId.toString() + item.feeType}>
-              <Divider />
-              <MemberFeeItem
-                paymentId={item.paymentId}
-                fee={item.fee}
-                feeType={item.feeType}
-                feeDesc={item.feeDesc}
-                amount={item.amount}
-                checked={checked}
-                onToggle={() => toggle(item.paymentId, item.feeType, item.amount)}
-                key={item.paymentId.toString() + item.feeType}
-              />
-            </View>
-          );
-        })}
-    </>
+        </>
+      }
+    >
+      <Spacer space={4} />
+      {props?.member.dues.map((item: any, idx: number) => {
+        const checked = !!selectedItems.find((p) => p.paymentId === item.paymentId && p.feeType === item.feeType);
+        return (
+          <View key={item.paymentId.toString() + item.feeType}>
+            {idx > 0 && <Divider style={{width: "80%"}} />}
+            <MemberFeeItem
+              paymentId={item.paymentId}
+              fee={item.fee}
+              feeType={item.feeType}
+              feeDesc={item.feeDesc}
+              amount={item.amount}
+              checked={checked}
+              onToggle={() => toggle(item.paymentId, item.feeType, item.amount)}
+              key={item.paymentId.toString() + item.feeType}
+            />
+          </View>
+        );
+      })}
+      <Spacer space={5} />
+    </Collapsible>
   );
 };
 
@@ -212,6 +227,7 @@ const MemberFeeItem = (props: {
   onToggle?: () => void;
 }) => {
   const { paymentId, fee, feeDesc, amount, checked = false, onToggle } = props;
+  const { colors } = useTheme();
   return (
     <TouchableOpacity
       key={paymentId.toString() + props.feeType}
@@ -222,7 +238,7 @@ const MemberFeeItem = (props: {
         <ThemedCheckBox checked={checked} />
         <View style={{ paddingVertical: 5 }}>
           <ThemedText style={styles.label}>{fee} </ThemedText>
-          <ThemedText style={styles.subLabel}>{feeDesc} </ThemedText>
+          <ThemedText style={{...styles.subLabel, color: colors.disabled}}>{feeDesc} </ThemedText>
         </View>
       </View>
       <ThemedText style={styles.amount}>Rs. {amount}</ThemedText>
@@ -232,7 +248,7 @@ const MemberFeeItem = (props: {
 
 const styles = StyleSheet.create({
   item: {
-    width: "95%",
+    width: "75%",
     flexDirection: "row",
     flexWrap: "wrap",
     alignSelf: "center",

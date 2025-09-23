@@ -21,8 +21,10 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
-        padding: 10,
-        borderRadius: 5
+        paddingHorizontal: 25,
+        paddingVertical: 15,
+        borderRadius: 25,
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
     },
     text: {
         color: "white",
