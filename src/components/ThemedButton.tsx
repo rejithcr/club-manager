@@ -17,12 +17,11 @@ export default ThemedButton;
 const styles = StyleSheet.create({
     button: {
         minWidth:80,
-        height: 40,
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
         paddingHorizontal: 25,
-        paddingVertical: 15,
+        paddingVertical: 10,
         borderRadius: 25,
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
     },

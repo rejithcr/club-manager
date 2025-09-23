@@ -93,7 +93,7 @@ const ClubDues = () => {
   return (
     <ThemedView style={{ flex: 1 }}>
       <Spacer space={10} />
-      <Banner backgroundColor={colors.warning}>
+      <Banner backgroundColor={totalDue == 0 ? colors.success : colors.warning}>
         <View>
             <ThemedText style={{ fontSize: 16, color: colors.background }}>Total Due</ThemedText>
             {isLoading ? <LoadingSpinner /> : 
@@ -104,8 +104,8 @@ const ClubDues = () => {
           </View>
           <ThemedIcon name="MaterialCommunityIcons:account-cash" size={50} color={colors.background} />
       </Banner>
-      <ScrollView refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}>
-        <Spacer space={10} />
+      <Spacer space={10} />
+      <ScrollView refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}>        
         {isLoading && <LoadingSpinner />}
         <View>
           {!isLoading &&
@@ -125,6 +125,7 @@ const ClubDues = () => {
               );
             })}
         </View>
+        <Spacer space={50} />
       </ScrollView>
       {clubInfo.role === ROLE_ADMIN && (
         <>

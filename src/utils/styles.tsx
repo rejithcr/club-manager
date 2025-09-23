@@ -40,7 +40,13 @@ export const colors = {
   }
 }
 
-export const borderRadius = 25;
+export const sizes = {  
+  borderRadius: 25,
+  textFontSize: 16,
+  headerFontSize: 25,
+  subHeaderFontSize: 20,  
+  subTextFontSize: 14,
+}
 
 export const appStyles = StyleSheet.create({
     title: {

@@ -1,7 +1,7 @@
 import { View } from "react-native";
 import React from "react";
 import { useTheme } from "../hooks/use-theme";
-import { borderRadius } from "../utils/styles";
+import { sizes } from "../utils/styles";
 
 const Banner = (props: { backgroundColor?: string | undefined; children: React.ReactNode }) => {
   const { colors } = useTheme();
@@ -17,7 +17,7 @@ const Banner = (props: { backgroundColor?: string | undefined; children: React.R
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        borderRadius,
+        borderRadius: sizes.borderRadius,
         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
       }}
     >
