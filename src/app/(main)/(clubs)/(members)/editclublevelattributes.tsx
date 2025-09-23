@@ -60,7 +60,7 @@ const EditClubLevelAttributes = () => {
             return true;
         }
     }
-    const [saveClubMemberAttributes] = useSaveClubMemberAttributesMutation();
+    const [saveClubMemberAttributes, { isLoading: isSaving  }] = useSaveClubMemberAttributesMutation();
     const handleSave = async () => {
         setIsAttributeModalVisible(false)
         try {
@@ -95,7 +95,7 @@ const EditClubLevelAttributes = () => {
                         <ThemedText style={{ textAlign: "center", marginTop: 20 }}>No attributes found for this club.</ThemedText>
                         :
                         <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>
-                            <ThemedButton title={"   Save   "} onPress={() => handleShowSaveModal()} />
+                            {isSaving ? <LoadingSpinner /> : <ThemedButton title={"   Save   "} onPress={() => handleShowSaveModal()} />}
                             <Spacer space={10} />
                             <ThemedButton title="Cancel" onPress={() => router.back()} />
                         </View>

@@ -178,7 +178,7 @@ const MemberFeeItem = (props: {
     return (
         <RoundedContainer>
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "85%", justifyContent:"space-between" }}>
+            <ShadowBox style={{ width: "85%", justifyContent:"space-between" }}>
                 <ThemedText style={{ fontSize: 15 }}>{props?.firstName} {props?.lastName}</ThemedText>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <ThemedText style={{ fontSize: 15, paddingLeft: 15 }}>{props?.amount}</ThemedText>

@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Button, TextInput, Platform } from "react-native";
+import { View, Text, FlatList, Button, TextInput, Platform, TouchableOpacity } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useSearchParams } from "expo-router/build/hooks";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -10,7 +10,6 @@ import { UserContext } from "@/src/context/UserContext";
 import { router } from "expo-router";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import ThemedText from "@/src/components/themed-components/ThemedText";
-import TouchableCard from "@/src/components/TouchableCard";
 import Spacer from "@/src/components/Spacer";
 import { useTheme } from "@/src/hooks/use-theme";
 import { isValidYear } from "@/src/utils/validators";
@@ -32,6 +31,7 @@ const StartNextPeriod = () => {
 
   const [getNextPeriodFeeMemberList, { data: nextPeriodFee, isLoading: isLoadingPeriods }] =
     useLazyGetFeeCollectionsQuery();
+
   useEffect(() => {
     if (validate(year)) {
       if (interval != "YEARLY") {
@@ -92,7 +92,7 @@ const StartNextPeriod = () => {
       console.error("Error saving next period fee collection:", error);
     }
   };
-
+   
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
@@ -112,11 +112,7 @@ const StartNextPeriod = () => {
             {interval != "YEARLY" && (
               <Picker
                 style={{ width: "64%" }}
-                selectedValue={
-                  interval === "MONTHLY"
-                    ? getCurrentMonthItem(periods)?.startDate
-                    : getCurrentQuarterItem(periods)?.startDate
-                }
+                selectedValue={nextPeriodDate}
                 onValueChange={(itemValue, _itemIndex) => setNextPeriodDate(itemValue)}
               >
                 {periods?.map((monthObj) => {
@@ -140,6 +136,7 @@ const StartNextPeriod = () => {
             />
           </View>
         </View>
+        <Spacer space={5} />
         <View style={{ flex: 1 }}>
           {isLoadingPeriods && <LoadingSpinner />}
           {!isLoadingPeriods && (
@@ -185,12 +182,22 @@ const MemberFeeItem = (props: {
 }) => {
   return (
     <RoundedContainer>
-      <TouchableCard style={{ display: "flex", width: "85%", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+      <TouchableOpacity
+        style={{
+          display: "flex",
+          width: "85%",
+          padding: 10,
+          alignSelf: "center",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
         <ThemedText>
           {props?.firstName} {props?.lastName}
         </ThemedText>
         <ThemedText>{props?.clubFeeAmount}</ThemedText>
-      </TouchableCard>
+      </TouchableOpacity>
     </RoundedContainer>
   );
 };

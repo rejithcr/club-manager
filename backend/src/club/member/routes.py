@@ -86,7 +86,7 @@ def post_club_member_attribute():
         db.close_connection(conn)
 
 @club_member_bp.route('/attribute', methods=['PUT'], strict_slashes=False)
-@role_required([constants.ROLE_MAINTAINER])
+@role_required([constants.ROLE_MEMBER])
 def put_club_member_attribute():
     service = ClubMemberService()
     params = util.get_params(request)
