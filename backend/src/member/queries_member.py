@@ -57,7 +57,7 @@ GET_DUES_BY_MEMBER = """
          join membership ms on ms.membership_id = cafp.membership_id
          join "member" m on m.member_id = ms.member_id
          join club c on c.club_id = ms.club_id
-      where cafp.paid = 0  and m.member_id = %s and m.is_active = 1   
+      where cafp.paid = 0  and m.member_id = %s and ms.is_active = 1   
       union 
       select c.club_id, c.club_name, c.upi_id, m.member_id, m.first_name, m.last_name , cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount::REAL amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type
       from club_fee_payment cfp 
@@ -66,7 +66,7 @@ GET_DUES_BY_MEMBER = """
          join membership ms on ms.membership_id = cfp.membership_id
          join "member" m on m.member_id = ms.member_id
          join club c on c.club_id = ms.club_id
-      where cfp.paid = 0 and m.member_id = %s and m.is_active = 1 
+      where cfp.paid = 0 and m.member_id = %s and ms.is_active = 1 
    ) a
    group by  a.club_id, a.club_name, a.upi_id
 """
