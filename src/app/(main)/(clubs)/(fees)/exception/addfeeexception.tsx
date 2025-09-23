@@ -2,12 +2,10 @@ import { View, FlatList, TouchableOpacity } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import InputText from '@/src/components/InputText'
 import ThemedButton from '@/src/components/ThemedButton'
-import { addExceptionType } from '@/src/helpers/fee_helper'
 import { useSearchParams } from 'expo-router/build/hooks'
 import { UserContext } from '@/src/context/UserContext'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { router } from 'expo-router'
-import { getClubMembers } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import { ClubContext } from '@/src/context/ClubContext'
@@ -18,6 +16,7 @@ import ThemedCheckBox from '@/src/components/themed-components/ThemedCheckBox'
 import Spacer from '@/src/components/Spacer'
 import { useGetClubMembersQuery } from '@/src/services/clubApi'
 import { useAddFeesExceptionMutation } from '@/src/services/feeApi'
+import RoundedContainer from '@/src/components/RoundedContainer'
 
 const AddFeeException = () => {
     const [exceptionType, setExceptionType] = useState<string>("")
@@ -98,19 +97,20 @@ const AddFeeException = () => {
                     ListFooterComponent={() => <View style={{ height: 50 }} />}
                     ItemSeparatorComponent={() => <Spacer space={4}/>}
                     renderItem={({ item }) => (
+                        <RoundedContainer>
                         <TouchableOpacity onPress={() => toggleSelection(item.memberId)}>
-                            <ShadowBox style={{ ...appStyles.shadowBox, width: "80%", flexWrap: "wrap" }}>
+                            <ShadowBox style={{ flexWrap: "wrap" }}>
                                 <ThemedCheckBox checked={item.selected} />                                
-                                <ThemedText style={{ width: "90%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
+                                <ThemedText style={{ fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
-                        </TouchableOpacity>
+                        </TouchableOpacity></RoundedContainer>
                     )}
                     keyExtractor={(item) => item.memberId}
                 />
             </View>
             }
         </View>
-        <View style={{ position: "absolute", bottom: 30, alignSelf:"center" }} >
+        <View style={{ position: "absolute", bottom: 50, alignSelf:"center" }} >
            { isSaving ? <LoadingSpinner /> :  <ThemedButton title='Add Exception' onPress={saveException} /> }
         </View>
         </ThemedView>

@@ -23,6 +23,7 @@ import CircularProgress from '@/src/components/charts/CircularProgress';
 import InputText from '@/src/components/InputText';
 import DatePicker from '@/src/components/DatePicker';
 import { useDeleteFeesAdhocMutation, useGetFeesAdhocQuery, useSaveFeesAdhocMutation } from '@/src/services/feeApi';
+import RoundedContainer from '@/src/components/RoundedContainer';
 
 const Payments = () => {
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
@@ -133,7 +134,7 @@ const Payments = () => {
                 </View>
                 <Spacer space={5} />
                 <View style={{ flexDirection: "row", alignItems: "center", width: "85%", alignSelf: "center" }}>
-                    <CircularProgress value={Math.round(feeObj?.completionPercentage)} strokeWidth={6} size={35} />
+                    <CircularProgress value={Math.round(feeObj?.completionPercentage)} strokeWidth={8} size={50} />
                     <Spacer hspace={4} />
                     <ThemedText style={{ fontSize: 10 }}>Select the member to update payment status</ThemedText>
                 </View>
@@ -225,8 +226,9 @@ const MemberFeeItem = (props: {
     }
 
     return (
+        <RoundedContainer>
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "85%", justifyContent:"space-between" }}>
+            <ShadowBox style={{ justifyContent:"space-between" }}>
                 <ThemedText style={{ fontSize: 15 }}>{props?.firstName} {props?.lastName}</ThemedText>                
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <ThemedText style={{ fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
@@ -235,6 +237,7 @@ const MemberFeeItem = (props: {
                 </View>
             </ShadowBox>
         </TouchableOpacity>
+        </RoundedContainer>
     )
 }
 

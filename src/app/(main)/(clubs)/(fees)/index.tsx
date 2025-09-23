@@ -13,6 +13,7 @@ import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 import { useGetFeesQuery } from '@/src/services/feeApi'
+import RoundedContainer from '@/src/components/RoundedContainer'
 
 const Fees = () => {
   const { clubInfo } = useContext(ClubContext)
@@ -44,20 +45,20 @@ const Fees = () => {
         {isLoadingCurrent && <LoadingSpinner />}
         {!isLoadingCurrent && currentFeeStructure?.length == 0 && <ThemedText style={{ alignSelf: "center", width: "80%"}}>No fees defined. To define a fee type (eg. Membership fee), press the + icon.</ThemedText>}
         {!isLoadingCurrent && currentFeeStructure?.map((fee: any) => {
-          return <View key={fee.clubFeeTypeId}><TouchableCard onPress={showFeeTypeDetails} id={fee}>
+          return <><RoundedContainer key={fee.clubFeeTypeId}><TouchableCard onPress={showFeeTypeDetails} id={fee}>
             <View style={{
               flexDirection: "row", width: "90%",
               justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
             }}>
               <View>
-                <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
-                <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
+                <ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
+                <ThemedText style={{ fontSize: 10, marginTop: 5, color: colors.subText }}>{fee.clubFeeTypeInterval}</ThemedText>
               </View>
                 <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubFeeAmount}</ThemedText>
             </View>
           </TouchableCard>
-          <Spacer space={4}/> 
-          </View>
+          </RoundedContainer>
+          <Spacer space={4}/> </>
         })}
       </ScrollView>
     </GestureHandlerRootView>

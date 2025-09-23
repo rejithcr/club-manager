@@ -10,6 +10,7 @@ import { useContext } from "react";
 import { ClubContext } from "@/src/context/ClubContext";
 import RoundedContainer from "@/src/components/RoundedContainer";
 import Divider from "@/src/components/Divider";
+import { useTheme } from "@/src/hooks/use-theme";
 
 const UpcomingEvents = (props: { events: Event[]; clubs: any[] }) => {
   const { setClubInfo } = useContext(ClubContext);
@@ -56,6 +57,7 @@ const getEventIcon = (event: Event | undefined) => {
 export default UpcomingEvents;
 
 export const EventCard = ({ event, cardSize }: { event: Event | undefined; cardSize?: string }) => {
+  const { colors } = useTheme();
   return (
     <View style={{ paddingHorizontal: 25, paddingVertical: 15 }}>
       <View
@@ -68,7 +70,7 @@ export const EventCard = ({ event, cardSize }: { event: Event | undefined; cardS
         <View style={{ flexDirection: "row" }}>
           <View>
             <ThemedText style={{ fontWeight: "bold", fontSize: 15 }}>{event?.title}</ThemedText>
-            <ThemedText style={{ fontSize: 10 }}>{event?.description}</ThemedText>
+            <ThemedText style={{ fontSize: 10, color: colors.subText }}>{event?.description}</ThemedText>
           </View>
         </View>
         <Spacer hspace={10} />
@@ -120,7 +122,7 @@ export const EventCard = ({ event, cardSize }: { event: Event | undefined; cardS
               </>
             )}
           </View>
-          <ThemedText style={{ textAlign: "right", fontSize: 10 }}>{event?.clubName}</ThemedText>
+          <ThemedText style={{ textAlign: "right", fontSize: 10, color: colors.subText }}>{event?.clubName}</ThemedText>
         </View>
       </View>
     </View>

@@ -237,6 +237,7 @@ GET_FEE_PAYMENT_BY_FEE_COLLECTION_ID = """
                                        select cfp.club_fee_payment_id, \
                                               m.first_name, \
                                               m.last_name, \
+                                              m.photo, \
                                               cfp.paid, \
                                               cfp.club_fee_payment_amount::REAL as amount
                                        from club_fee_payment cfp

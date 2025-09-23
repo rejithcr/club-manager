@@ -18,10 +18,10 @@ import { ROLE_ADMIN } from '@/src/utils/constants'
 import Spacer from '@/src/components/Spacer'
 import { useLazyGetExceptionQuery, useUpdateFeesExceptionMutation } from '@/src/services/feeApi'
 import { useLazyGetClubMembersQuery } from '@/src/services/clubApi'
+import RoundedContainer from '@/src/components/RoundedContainer'
 
 const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
-    const [isLoadingException, setIsLoadingException] = useState(false)
     const [exceptionType, setExceptionType] = useState<string>("")
     const [exceptionAmount, setExceptionAmount] = useState<string>("")
     const [exceptionMembers, setExceptionMembers] = useState<any>([])
@@ -122,41 +122,41 @@ const EditFeeException = () => {
                     exceptionMembers?.map((member: {
                         memberId: number, lastName: string, firstName: string | undefined, startDate: string,
                         clubFeeTypeExceptionMemberId: number, endDate: string | undefined, endDateAdded: string | undefined
-                    }) => <View key={member?.memberId?.toString() + member?.endDate}>
+                    }) => <><RoundedContainer><View key={member?.memberId?.toString() + member?.endDate}>
                             <ShadowBox style={{
                                 flexDirection: "row", justifyContent: "space-between",
-                                width: "75%", padding: 10, 
                             }}>
                                 <View>
-                                    <ThemedText style={{ textDecorationLine: getStrikeOut(member.endDate || member.endDateAdded) }}>{member.firstName} {member.lastName}</ThemedText>
-                                    <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{member.startDate} {(member.endDate || member.endDateAdded) && " to "} {member.endDate || member.endDateAdded}</ThemedText>
+                                    <ThemedText style={{ fontSize: 15, textDecorationLine: getStrikeOut(member.endDate || member.endDateAdded) }}>{member.firstName} {member.lastName}</ThemedText>
+                                    <ThemedText style={{ fontSize: 12, marginTop: 5, color: colors.subText }}>{member.startDate} {(member.endDate || member.endDateAdded) && " to "} {member.endDate || member.endDateAdded}</ThemedText>
                                 </View>
                                 {!member.endDate && (member.endDateAdded ? <ThemedIcon name="MaterialIcons:undo" size={20} onPress={() => endException(member)} />
                                     : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} color={colors.error}/>)}
                             </ShadowBox>
-                            <Spacer space={4}/>
                         </View>
+                        </RoundedContainer>
+                            <Spacer space={4}/></>
                     )
                 }
 
                 <ThemedText style={{ ...appStyles.heading }}>Add Members</ThemedText>
                 {isLoadingMembers && <LoadingSpinner />}
                 {!isLoadingMembers &&
-                    members.map((item: any) =><>
+                    members.map((item: any) =><><RoundedContainer>
                         <TouchableOpacity key={item.memberId} onPress={() => addToException(item)}>
-                            <ShadowBox style={{ width: "80%", flexWrap: "wrap" }}>
+                            <ShadowBox>
                                 <ThemedIcon name="MaterialIcons:add-circle" size={20} color={colors.add}/>
-                                <ThemedText style={{ width: "85%", fontSize: 15, paddingLeft: 10 }}>{item?.firstName} {item?.lastName}</ThemedText>
+                                <ThemedText style={{ fontSize: 15, paddingLeft: 10}}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>
-                        <Spacer space={4} />
-                        </>
+                        </RoundedContainer>
+                        <Spacer space={4} /></>                        
                     )
                 }
             <View style={{marginVertical:40}} />
             </ScrollView>
             
-            {clubInfo.role === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 30, alignSelf: "center" }} >
+            {clubInfo.role === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 50, alignSelf: "center" }} >
                 {isSaving ? <LoadingSpinner /> : <ThemedButton title='Update Exception' onPress={handleSaveException} />}
             </View>}
         </ThemedView>

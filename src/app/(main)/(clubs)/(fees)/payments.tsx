@@ -1,4 +1,4 @@
-import { View, FlatList, TouchableOpacity } from 'react-native'
+import { View, FlatList, TouchableOpacity, Image } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
@@ -44,7 +44,6 @@ const Payments = () => {
       feeCollectionId: params.get("clubFeeCollectionId"),
       listPayments: "true",
     });
-
     const updatePaymentStatus = () => {
         if (paymentStatusUpdates.length == 0) {
             showSnackbar("No updates selected", "error");
@@ -136,7 +135,7 @@ const Payments = () => {
                         </ThemedView>
                     </ScrollView>
                 </Modal>
-                {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30 }}>
+                {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 50 }}>
                     <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
                     <ThemedIcon name='MaterialCommunityIcons:delete' size={30} onPress={() => deleteCollection()} color={colors.error} />
                 </View>}
@@ -151,7 +150,7 @@ export default Payments
 const MemberFeeItem = (props: {
     clubFeePaymentId: number; firstName: string | undefined; lastName: string | undefined;
     paid: number; amount: number; setpaymentStatusUpdates: any;
-    feeByMembers: any | undefined
+    feeByMembers: any | undefined, photo?: string;
 }) => {
     const [isSelected, setIsSelected] = useState(props?.paid != 0)
 
@@ -178,8 +177,12 @@ const MemberFeeItem = (props: {
     return (
         <RoundedContainer>
         <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ width: "85%", justifyContent:"space-between" }}>
+            <ShadowBox style={{ justifyContent:"space-between", padingLeft:5 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                {props?.photo ? <Image source={{ uri: props?.photo }} style={{ height: 32, width: 32, borderRadius: 100, }} />
+                    : <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />}
                 <ThemedText style={{ fontSize: 15 }}>{props?.firstName} {props?.lastName}</ThemedText>
+                </View>
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
                     <ThemedText style={{ fontSize: 15, paddingLeft: 15 }}>{props?.amount}</ThemedText>
                     <Spacer hspace={3}/>

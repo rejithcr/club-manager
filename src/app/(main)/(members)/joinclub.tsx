@@ -10,6 +10,7 @@ import React, { useContext, useState } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
 import Alert, {AlertProps} from '@/src/components/Alert'
 import { useLazyGetClubQuery, useRequestMembershipMutation } from '@/src/services/clubApi';
+import RoundedContainer from '@/src/components/RoundedContainer';
 
 const JoinClub = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -78,9 +79,11 @@ const JoinClub = () => {
                 data={filteredClubs}
                 keyExtractor={(item) => item.clubId.toString()}
                 renderItem={({ item }) => (
+                    <RoundedContainer>
                     <TouchableCard onPress={() => handleSelectClub(item)}>
                         <ThemedText style={styles.clubName}>{item.clubName}</ThemedText>
                     </TouchableCard>
+                    </RoundedContainer>
                 )}
                 ListEmptyComponent={<ThemedText style={styles.emptyText}>No clubs found</ThemedText>}
                 ItemSeparatorComponent={() => <Spacer space={2} />}

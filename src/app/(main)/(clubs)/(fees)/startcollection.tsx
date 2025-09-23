@@ -160,7 +160,7 @@ const StartNextPeriod = () => {
           <LoadingSpinner />
         ) : (
           <ThemedButton
-            style={{ position: "absolute", bottom: 20, alignSelf: "center" }}
+            style={{ position: "absolute", bottom: 50, alignSelf: "center" }}
             title="Start Collection"
             onPress={handleStartCollection}
             disabled={!isStartCollectionEnabled}

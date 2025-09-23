@@ -131,7 +131,7 @@ const ClubDues = () => {
         <>
           <ThemedButton
             disabled={isMarking || selectedItems.length === 0}
-            style={{ bottom: 30, position: "absolute", alignSelf: "center" }}
+            style={{ bottom: 50, position: "absolute", alignSelf: "center" }}
             title={isMarking ? "Marking..." : "Mark as paid"}
             onPress={() => handleMarkAsPaid()}
           />
