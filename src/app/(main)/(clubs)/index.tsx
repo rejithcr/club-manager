@@ -106,6 +106,17 @@ const ClubHome = () => {
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
       <Spacer space={10} />
+        <ScrollView
+          contentContainerStyle={{ flexGrow: 1 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={
+                isFetchingCurrent || isFetchingFundBalance || isFetchingTotalDue || isFetchingEvents || isFetchingSplits
+              }
+              onRefresh={onRefresh}
+            />
+          }
+        >          
         <Banner backgroundColor={fbr?.fundBalance < 1 ? colors.error : colors.success}>
           <View>
             <ThemedText style={{ fontSize: 16, color: colors.background }}>Fund Balance</ThemedText>
@@ -117,19 +128,7 @@ const ClubHome = () => {
           </View>
           <ThemedIcon name="MaterialCommunityIcons:wallet" size={50} color={colors.background} />
         </Banner>
-
         <Spacer space={10} />
-        <ScrollView
-          contentContainerStyle={{ flexGrow: 1 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={
-                isFetchingCurrent || isFetchingFundBalance || isFetchingTotalDue || isFetchingEvents || isFetchingSplits
-              }
-              onRefresh={onRefresh}
-            />
-          }
-        >
           <RoundedContainer>
             <TouchableCard
               onPress={showClubDues}

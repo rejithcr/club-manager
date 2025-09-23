@@ -102,7 +102,7 @@ const EditFeeType = () => {
         <ThemedText style={{ width: "40%" }}>Select Interval</ThemedText>
         <Picker
           style={{ width: "60%", textAlign: "right" }}
-          selectedValue={params.get("clubFeeTypeInterval")}
+          selectedValue={clubFeeTypeInterval}
           enabled={isEditable}
           onValueChange={(itemValue, _itemIndex) => setClubFeeTypeInterval(itemValue)}
         >

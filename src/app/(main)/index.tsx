@@ -61,22 +61,21 @@ const Main = () => {
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
-        <Spacer space={5} />
         <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues} onRefresh={onRefresh} />}>
           <ThemedHeading>My Clubs</ThemedHeading>
           {isLoadingMyClubs && <LoadingSpinner />}
           {!isLoadingMemberDues && <MyClubs clubs={clubs} />}
-
+          <Spacer space={10} />
           {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
           {isLoadingMemberDues && <LoadingSpinner />}
           {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
-
           {isLoadingEvents && (
             <>
               <Spacer space={10} />
               <LoadingSpinner />
             </>
           )}
+          <Spacer space={10} />
           {events?.length > 0 && (
             <>
               <ThemedHeading>Upcoming Events</ThemedHeading>
