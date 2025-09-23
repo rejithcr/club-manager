@@ -28,7 +28,6 @@ const UpcomingEvents = (props: { events: Event[]; clubs: any[] }) => {
           <TouchableOpacity key={event.eventId} onPress={() => gotoEventDetails(event)}>
             <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
               <EventCard event={event} />
-              <Spacer space={4} />
               {idx < props.events.length - 1 && <Divider />}
             </Animated.View>
           </TouchableOpacity>

@@ -156,7 +156,7 @@ const EditFeeException = () => {
             <View style={{marginVertical:40}} />
             </ScrollView>
             
-            {clubInfo.role === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 50, alignSelf: "center" }} >
+            {clubInfo.role === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 40, alignSelf: "center" }} >
                 {isSaving ? <LoadingSpinner /> : <ThemedButton title='Update Exception' onPress={handleSaveException} />}
             </View>}
         </ThemedView>

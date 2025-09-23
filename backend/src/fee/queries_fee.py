@@ -184,11 +184,13 @@ GET_NEXT_PAYTMENT_COLLECTION_LIST = """
                                     select s.member_id, \
                                            s.first_name, \
                                            s.last_name, \
+                                           s.photo, \
                                            s.membership_id,
                                            json_agg(distinct jsonb_build_object('club_fee_amount', s.club_fee_amount::REAL, 'club_fee_type_exception_member_id', s.club_fee_type_exception_member_id)) exceptions
                                     from (select m.member_id, \
                                                  m.first_name, \
                                                  m.last_name, \
+                                                 m.photo, \
                                                  ms.membership_id, \
                                                  (case \
                                                       when cftem.membership_id is not null \
@@ -208,7 +210,7 @@ GET_NEXT_PAYTMENT_COLLECTION_LIST = """
                                                                 cftem.end_date is null \
                                           where cft.club_fee_type_id = %s \
                                             and ms.is_active = 1) s
-                                    group by s.member_id, s.first_name, s.last_name, s.membership_id
+                                    group by s.member_id, s.first_name, s.last_name, s.photo, s.membership_id
                                     order by s.first_name asc \
                                     """
 

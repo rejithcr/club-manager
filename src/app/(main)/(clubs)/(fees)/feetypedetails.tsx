@@ -157,7 +157,6 @@ const FeeTypeDetails = () => {
                         keyName={et.clubFeeTypeExceptionReason}
                         keyValue={`Rs. ${et.clubFeeExceptionAmount}`}
                       />
-                      <Spacer space={4} />
                     </View>
                   ))}
               </RoundedContainer>
@@ -222,7 +221,7 @@ const FeeTypeDetails = () => {
         </View>
         {clubInfo.role === ROLE_ADMIN && (
           <ThemedButton
-            style={{ position: "absolute", bottom: 50, alignSelf: "center" }}
+            style={{ position: "absolute", bottom: 40, alignSelf: "center" }}
             title="Start new collection"
             onPress={showStartCollectionPage}
           />

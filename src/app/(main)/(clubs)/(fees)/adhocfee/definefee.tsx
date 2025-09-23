@@ -9,16 +9,13 @@ import { router } from 'expo-router'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { UserContext } from '@/src/context/UserContext'
 import { ClubContext } from '@/src/context/ClubContext'
-import { getClubMembers } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ShadowBox from '@/src/components/ShadowBox'
 import { useTheme } from '@/src/hooks/use-theme'
-import Alert, { AlertProps } from '@/src/components/Alert'
 import DatePicker from '@/src/components/DatePicker'
 import { useAddFeesAdhocMutation } from '@/src/services/feeApi'
-import { snackbarRef } from '@/src/components/snackbar/SnackbarRef'
 import { useGetClubMembersQuery } from '@/src/services/clubApi'
 
 const DefineFee = () => {
@@ -131,7 +128,7 @@ const DefineFee = () => {
                     }
                 </View>
             </ScrollView>
-            <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 30 }} title='Start Collection' onPress={handleAddFeeAdhoc} />
+            <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 40 }} title='Start Collection' onPress={handleAddFeeAdhoc} />
         </GestureHandlerRootView>
         </ThemedView>
     )

@@ -110,7 +110,7 @@ const AddFeeException = () => {
             </View>
             }
         </View>
-        <View style={{ position: "absolute", bottom: 50, alignSelf:"center" }} >
+        <View style={{ position: "absolute", bottom: 40, alignSelf:"center" }} >
            { isSaving ? <LoadingSpinner /> :  <ThemedButton title='Add Exception' onPress={saveException} /> }
         </View>
         </ThemedView>

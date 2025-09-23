@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Button, TextInput, Platform, TouchableOpacity } from "react-native";
+import { View, Text, FlatList, Button, TextInput, Platform, TouchableOpacity, Image, ScrollView } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { useSearchParams } from "expo-router/build/hooks";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -16,6 +16,8 @@ import { isValidYear } from "@/src/utils/validators";
 import { getCurrentMonthItem, getCurrentQuarterItem, getMonths, getQuarters } from "@/src/utils/common";
 import { useLazyGetFeeCollectionsQuery, useSaveFeeCollectionMutation } from "@/src/services/feeApi";
 import RoundedContainer from "@/src/components/RoundedContainer";
+import Divider from "@/src/components/Divider";
+import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 
 const StartNextPeriod = () => {
   const [year, setYear] = useState(new Date().getFullYear().toString());
@@ -92,7 +94,7 @@ const StartNextPeriod = () => {
       console.error("Error saving next period fee collection:", error);
     }
   };
-   
+
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
@@ -137,19 +139,19 @@ const StartNextPeriod = () => {
           </View>
         </View>
         <Spacer space={5} />
-        <View style={{ flex: 1 }}>
-          {isLoadingPeriods && <LoadingSpinner />}
-          {!isLoadingPeriods && (
-            <FlatList
-              style={{ width: "100%" }}
-              data={nextPeriodFee}
-              initialNumToRender={8}
-              ListFooterComponent={() => <Spacer space={40} />}
-              ItemSeparatorComponent={() => <Spacer space={4} />}
-              renderItem={({ item }) => <MemberFeeItem {...item} key={item.memberId} />}
-            />
-          )}
-        </View>
+          <RoundedContainer style={{ flex: 1 }}>
+            {isLoadingPeriods && <LoadingSpinner />}
+            {!isLoadingPeriods && (
+              <FlatList
+                style={{ width: "100%" }}
+                data={nextPeriodFee}
+                initialNumToRender={8}
+                ItemSeparatorComponent={() => <Divider />}
+                renderItem={({ item }) => <MemberFeeItem {...item} key={item.memberId} />}
+              />
+            )}
+          </RoundedContainer>
+          <Spacer space={50} />
         <Modal isVisible={isConfirmVisible}>
           <View style={{ backgroundColor: "white" }}>
             <Text>Test</Text>
@@ -160,7 +162,7 @@ const StartNextPeriod = () => {
           <LoadingSpinner />
         ) : (
           <ThemedButton
-            style={{ position: "absolute", bottom: 50, alignSelf: "center" }}
+            style={{ position: "absolute", bottom: 40, alignSelf: "center" }}
             title="Start Collection"
             onPress={handleStartCollection}
             disabled={!isStartCollectionEnabled}
@@ -179,26 +181,32 @@ const MemberFeeItem = (props: {
   lastName: string | undefined;
   clubFeeAmount: number;
   exemption: string;
+  photo?: string;
 }) => {
   return (
-    <RoundedContainer>
-      <TouchableOpacity
-        style={{
-          display: "flex",
-          width: "85%",
-          padding: 10,
-          alignSelf: "center",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
+    <TouchableOpacity
+      style={{
+        display: "flex",
+        width: "90%",
+        padding: 10,
+        alignSelf: "center",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}
+    >
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        {props?.photo ? (
+          <Image source={{ uri: props?.photo }} style={{ height: 32, width: 32, borderRadius: 100 }} />
+        ) : (
+          <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
+        )}
         <ThemedText>
           {props?.firstName} {props?.lastName}
         </ThemedText>
-        <ThemedText>{props?.clubFeeAmount}</ThemedText>
-      </TouchableOpacity>
-    </RoundedContainer>
+      </View>
+      <ThemedText>{props?.clubFeeAmount}</ThemedText>
+    </TouchableOpacity>
   );
 };
 

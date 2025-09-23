@@ -186,7 +186,7 @@ const Payments = () => {
                         </View>
                     </ThemedView>
                 </Modal>
-                {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30 }}>
+                {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 40 }}>
                     <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
                     <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} color={colors.error} />
                 </View>}
