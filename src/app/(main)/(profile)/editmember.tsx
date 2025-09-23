@@ -17,6 +17,7 @@ import { ClubContext } from "@/src/context/ClubContext";
 import DatePicker from "@/src/components/DatePicker";
 import { useGetMembersQuery, useUpdateMemberMutation } from "@/src/services/memberApi";
 import { useGetClubQuery } from "@/src/services/clubApi";
+import RoundedContainer from "@/src/components/RoundedContainer";
 
 const Editmember = () => {
   const params = useSearchParams();
@@ -91,7 +92,7 @@ const Editmember = () => {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      {(isMemberLoading || isMemberUpdating)&& <LoadingSpinner />}
+      {(isMemberLoading || isMemberUpdating) && <LoadingSpinner />}
       {!(isMemberLoading || isMemberUpdating) && (
         <ScrollView>
           <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
@@ -119,12 +120,14 @@ const Editmember = () => {
           {isLoadingMyClubs && <LoadingSpinner />}
           {!isLoadingMyClubs &&
             clubs?.map((item: any) => (
-              <View key={item.clubId}>
-                <TouchableCard onPress={() => showDetails(item)} id={item.clubId}>
-                  <ThemedText>{item.clubName}</ThemedText>
-                </TouchableCard>
+              <>
+                <RoundedContainer key={item.clubId}>
+                  <TouchableCard onPress={() => showDetails(item)} id={item.clubId}>
+                    <ThemedText>{item.clubName}</ThemedText>
+                  </TouchableCard>
+                </RoundedContainer>
                 <Spacer space={4} />
-              </View>
+              </>
             ))}
           <Spacer space={10} />
         </ScrollView>
