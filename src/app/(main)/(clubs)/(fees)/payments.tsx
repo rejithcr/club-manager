@@ -156,9 +156,13 @@ const Payments = () => {
           <ScrollView>
             <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
               <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
+              <Spacer space={10} />
+              <RoundedContainer>
               {paymentStatusUpdates.map((item) => {
                 return <PaymentUpdates key={item.clubFeePaymentId} {...item} />;
               })}
+              </RoundedContainer>
+              <Spacer space={10} />
               {isLoading ? (
                 <LoadingSpinner />
               ) : (
@@ -222,6 +226,7 @@ const MemberFeeItem = (props: {
           lastName?: string | undefined;
           amount: number;
           paymentDate: Date;
+          photo?: string
         }[]
       ) => {
         let item = prev.find((item) => item.clubFeePaymentId == props.clubFeePaymentId);
@@ -238,6 +243,7 @@ const MemberFeeItem = (props: {
             lastName: props.lastName,
             amount: props.amount,
             paymentDate: new Date(),
+            photo: props?.photo
           };
           prev.push(item);
         }
@@ -276,21 +282,26 @@ const PaymentUpdates = (props: {
   clubFeePaymentId: number | undefined;
   firstName?: string | null | undefined;
   lastName?: string | null | undefined;
-  paid: boolean | undefined;
+  paid: boolean | undefined; photo?: string
 }) => {
   return (
     <ShadowBox
       style={{
-        ...appStyles.shadowBox,
         width: "85%",
-        marginBottom: 15,
         flexWrap: "wrap",
         justifyContent: "space-between",
       }}
     >
-      <ThemedText numberOfLines={1} style={{ fontSize: 15, paddingLeft: 5, textAlign: "left" }}>
-        {props?.firstName} {props?.lastName}
-      </ThemedText>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        {props?.photo ? (
+          <Image source={{ uri: props?.photo }} style={{ height: 32, width: 32, borderRadius: 100 }} />
+        ) : (
+          <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
+        )}
+        <ThemedText style={{ fontSize: 15 }}>
+          {props?.firstName} {props?.lastName}
+        </ThemedText>
+      </View>
       <ThemedCheckBox checked={props?.paid} />
     </ShadowBox>
   );
