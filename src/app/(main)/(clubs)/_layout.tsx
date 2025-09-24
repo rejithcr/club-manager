@@ -8,9 +8,8 @@ export default function ClubLayout() {
   const { clubInfo } = useContext(ClubContext)
   const { colors } = useTheme();
   return (
-    <Stack screenOptions={{
+    <Stack screenOptions={{headerShadowVisible: false,
       headerStyle: { backgroundColor: colors.background },
-     // headerTitleContainerStyle: { padding: 0 },
       headerTintColor: colors.text
     }}>
       <Stack.Screen

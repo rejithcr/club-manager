@@ -20,7 +20,8 @@ GET_CLUBS_BY_MEMBER = """
     where ms.member_id = %s and ms.is_active = 1 and c.is_active = 1
 """
 GET_CLUB_MEMBER = """
-    select m.first_name, m.last_name, m.email, m.phone, m.photo, m.is_registered, r.role_name role, m.updated_by, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth
+    select m.first_name, m.last_name, m.email, m.phone, m.photo, m.is_registered, r.role_name role, m2.is_active, 
+        m.updated_by, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth
     from "member" m 
         join membership m2 on m.member_id = m2.member_id
         join club c on c.club_id = m2.club_id
@@ -43,6 +44,12 @@ GET_CLUB_MEMBERS = """
 UPDATE_CLUB_MEMBER_ROLE = """
     update membership 
     set role_id = (select role_id from role where role_name = %s)
+    where club_id = %s and member_id = %s
+"""
+
+UPDATE_MEMBERSHIP = """
+    update membership
+    set is_active = %s, updated_by = %s, updated_ts = now()
     where club_id = %s and member_id = %s
 """
 
@@ -215,8 +222,3 @@ GET_CLUB_COUNTS = """
     where mr.club_id = %s and mr.status = 'REQUESTED'
 """
 
-REMOVE_MEMBERSHIP = """
-    update membership
-    set is_active = 0, updated_by = %s, updated_ts = now()
-    where club_id = %s and member_id = %s
-"""

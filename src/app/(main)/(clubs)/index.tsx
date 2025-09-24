@@ -174,11 +174,12 @@ const ClubHome = () => {
               No fees defined. To define a fee type (eg. Membership fee), press the + icon.
             </ThemedText>
           )}
+          {currentFeeStructure && currentFeeStructure?.length !== 0 && <RoundedContainer>
           {!isLoadingCurrent &&
             currentFeeStructure?.map((fee: any, idx: number) => {
               return (
                 <View key={fee.clubFeeTypeId}>
-                  <RoundedContainer>
+                  {idx > 0 && <Divider />}
                     <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
                       <TouchableCard
                         onPress={showFeeTypeDetails}
@@ -192,13 +193,11 @@ const ClubHome = () => {
                           </ThemedText>
                         </View>
                       </TouchableCard>
-                      <Spacer space={2} />
                     </Animated.View>
-                  </RoundedContainer>
-                  <Spacer space={6} />
                 </View>
               );
             })}
+            </RoundedContainer>}
           {/* <Spacer space={4} />
           <View
             style={{

@@ -183,10 +183,10 @@ const MemberDue = (props: {
     <Collapsible
       header={
         <>
-          <ThemedText style={{ width: "60%", fontSize: 15 }}>
+          <ThemedText style={{ width: "60%", fontSize: 16 }}>
             {props?.member.firstName} {props?.member.lastName}
           </ThemedText>
-          <ThemedText style={{ width: "30%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}>
+          <ThemedText style={{ width: "30%", fontWeight: "bold", fontSize: 16, textAlign: "right" }}>
             Rs. {props?.member.totalDue}
           </ThemedText>
         </>

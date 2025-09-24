@@ -54,8 +54,14 @@ class ClubMemberService():
             return {"message": f"Attribute added."}
 
         if addToClub and club_id and member_id:
-            db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id,
-                                                              constants.ROLE_MEMBER, email, email))
+            member = db.fetch_one(conn, queries_club.GET_CLUB_MEMBER, (member_id, club_id))
+            if member:
+                if member['is_active'] == 1:
+                    return {"message": f"{member['first_name']} is already a member of the club"}
+                else:
+                    db.execute(conn, queries_club.UPDATE_MEMBERSHIP, (1, email, club_id, member_id))
+            else:
+                db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id, constants.ROLE_MEMBER, email, email))
             conn.commit()
             return {"message": f"Member with id {member_id} added to the club {club_id}"}
 
@@ -139,7 +145,7 @@ class ClubMemberService():
             conn.commit()
             return {"message": f"Member attribute deleted successfully"}
         # TBD: delete member if not part onf any other club
-        db.execute(conn, queries_club.REMOVE_MEMBERSHIP, (email, club_id, member_id))
+        db.execute(conn, queries_club.UPDATE_MEMBERSHIP, (0, email, club_id, member_id))
         conn.commit()
 
         return {"message": f"Membership revoked"}
