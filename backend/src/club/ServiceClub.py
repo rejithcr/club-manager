@@ -18,6 +18,8 @@ class ClubService():
         clubName = params.get('clubName')
         membershipRequests = params.get('membershipRequests')
         counts = params.get('counts')
+        limit = params.get("limit")
+        offset = params.get("offset")
 
         if memberId:
             clubs = db.fetch(conn, queries_club.GET_CLUBS_BY_MEMBER, (memberId,))
@@ -37,6 +39,9 @@ class ClubService():
         elif counts:
             counts = db.fetch(conn, queries_club.GET_CLUB_COUNTS, (clubId,))
             return [helper.convert_to_camel_case(count) for count in counts]
+        elif offset and offset:
+            clubs = db.fetch(conn, queries_club.GET_CLUBS, (limit, offset))
+            return [helper.convert_to_camel_case(club) for club in clubs]
         else:
             club = db.fetch_one(conn, queries_club.GET_CLUB, (clubId,))
             return helper.convert_to_camel_case(club) if club else {}

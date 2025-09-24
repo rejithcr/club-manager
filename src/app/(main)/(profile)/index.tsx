@@ -133,12 +133,14 @@ const Profile = () => {
         {userInfo?.isSuperUser == 1 && (
           <>
             <ThemedHeading>Super User Options</ThemedHeading>
-            {/* <TouchableCard onPress={() => router.push(`/(main)/(profile)/clubs`)}>
-                    <ThemedText>Show Clubs</ThemedText>
-                </TouchableCard> */}
+            <RoundedContainer>
+            <TouchableCard onPress={() => router.push(`/(main)/(profile)/(superuser)/clubs`)}>
+                <ThemedText>Show Clubs</ThemedText>
+            </TouchableCard>
+            </RoundedContainer>
             <Spacer space={4} />
             <RoundedContainer>
-              <TouchableCard onPress={() => router.push(`/(main)/(profile)/users`)}>
+              <TouchableCard onPress={() => router.push(`/(main)/(profile)/(superuser)/users`)}>
                 <ThemedText>Show Users</ThemedText>
               </TouchableCard>
             </RoundedContainer>

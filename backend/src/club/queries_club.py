@@ -1,5 +1,7 @@
-GET_CLUBS = """
-    select club_id, club_name from club
+GET_CLUBS = """    
+    select club_id, club_name, is_active, created_ts, created_by from club 
+    order by created_ts desc
+    limit %s offset %s
 """
 
 GET_CLUB = """
