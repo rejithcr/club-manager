@@ -1,4 +1,4 @@
-import { FlatList, View } from "react-native";
+import { FlatList, TouchableOpacity, View } from "react-native";
 import React, { useContext, useState } from "react";
 import { ClubContext } from "@/src/context/ClubContext";
 import ThemedText from "@/src/components/themed-components/ThemedText";
@@ -8,7 +8,6 @@ import Modal from "react-native-modal";
 import ThemedButton from "@/src/components/ThemedButton";
 import InputText from "@/src/components/InputText";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
-import TouchableCard from "@/src/components/TouchableCard";
 import { appStyles } from "@/src/utils/styles";
 import Spacer from "@/src/components/Spacer";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
@@ -17,6 +16,7 @@ import { useTheme } from "@/src/hooks/use-theme";
 import { isValidLength } from "@/src/utils/validators";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import { useGetClubQuery, useUpdateClubMutation } from "@/src/services/clubApi";
+import Divider from "@/src/components/Divider";
 
 const MembershipRequests = () => {
   const { colors } = useTheme();
@@ -62,20 +62,21 @@ const MembershipRequests = () => {
       <ThemedView style={{ flex: 1 }}>
         <Spacer space={5} />
         <ThemedText style={{ ...appStyles.heading, marginBottom: 2 }}>Requests</ThemedText>
-        <ThemedText style={{ fontSize: 10, width: "80%", alignSelf: "center" }}>
+        <ThemedText style={{ fontSize: 12, width: "80%", alignSelf: "center" , color: colors.subText}}>
           Press the item to approve or reject
         </ThemedText>
-        <Spacer space={5} />
+        <Spacer space={10} />
         {(isLoading || isUpdating) && <LoadingSpinner />}
         {!(isLoading || isUpdating) && (
           <FlatList
             data={data}
             keyExtractor={(item) => item.memberId}
             ListEmptyComponent={() => <ThemedText style={{ alignSelf: "center" }}>No requests found.</ThemedText>}
-            ItemSeparatorComponent={() => <Spacer space={2} />}
+            ItemSeparatorComponent={() => <><Spacer hspace={2} /><Divider style={{ width: "80%" }} /><Spacer hspace={2} /></>}
             ListFooterComponent={() => <Spacer space={20} />}
             renderItem={({ item }) => (
-              <TouchableCard
+              <TouchableOpacity
+                style={{ alignSelf: "center", width: "80%" }}
                 onPress={() => showApproveModal(item.memberId, item.clubId, item.phone, item.email, item.firstName, item.lastName)}
               >
                 <View style={{ flexDirection: "row", alignItems: "center", width: "80%" }}>
@@ -105,7 +106,7 @@ const MembershipRequests = () => {
                     <ThemedText style={{ fontSize: 10 }}>{item.comments}</ThemedText>
                   </View>
                 </View>
-              </TouchableCard>
+              </TouchableOpacity>
             )}
           />
         )}

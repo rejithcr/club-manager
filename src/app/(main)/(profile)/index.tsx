@@ -16,6 +16,7 @@ import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import Chip from "@/src/components/Chip";
 import { useGetMembersQuery } from "@/src/services/memberApi";
 import RoundedContainer from "@/src/components/RoundedContainer";
+import Divider from "@/src/components/Divider";
 
 const Profile = () => {
   const { userInfo } = useContext(UserContext);
@@ -134,12 +135,10 @@ const Profile = () => {
           <>
             <ThemedHeading>Super User Options</ThemedHeading>
             <RoundedContainer>
-            <TouchableCard onPress={() => router.push(`/(main)/(profile)/(superuser)/clubs`)}>
+              <TouchableCard onPress={() => router.push(`/(main)/(profile)/(superuser)/clubs`)}>
                 <ThemedText>Show Clubs</ThemedText>
-            </TouchableCard>
-            </RoundedContainer>
-            <Spacer space={4} />
-            <RoundedContainer>
+              </TouchableCard>
+              <Divider />
               <TouchableCard onPress={() => router.push(`/(main)/(profile)/(superuser)/users`)}>
                 <ThemedText>Show Users</ThemedText>
               </TouchableCard>

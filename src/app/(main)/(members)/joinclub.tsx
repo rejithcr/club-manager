@@ -51,7 +51,7 @@ const JoinClub = () => {
                         setIsLoading(true);
                         try {
                             await requestMembership({memberId: userInfo.memberId, clubId: club.clubId, membershipRequest: true, email: userInfo.email}).unwrap();
-                            router.dismissTo('/(main)/(profile)');
+                            router.back();
                         } catch (error) {
                             console.log(error);
                         }finally {

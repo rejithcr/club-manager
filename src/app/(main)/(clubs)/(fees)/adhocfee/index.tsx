@@ -87,30 +87,30 @@ const AdocFeesHome = () => {
             refreshing={refreshing}
             renderItem={({ item }) => (
               <RoundedContainer>
-              <TouchableCard onPress={showAdhocFeeDetails} id={item}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    width: "90%",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <View style={{ width: "75%" }}>
-                    <ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
-                    <ThemedText style={{ fontSize: 12, color: colors.subText}}>{item.clubAdhocFeeDesc}</ThemedText>
-                    <ThemedText style={{ fontSize: 10, marginTop: 5 }}>
-                      {item.clubAdhocFeeDate} 
-                    </ThemedText>
+                <TouchableCard onPress={showAdhocFeeDetails} id={item}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      width: "90%",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <View style={{ width: "75%" }}>
+                      <ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
+                      <ThemedText style={{ fontSize: 12, color: colors.subText}}>{item.clubAdhocFeeDesc}</ThemedText>
+                      <ThemedText style={{ fontSize: 10, marginTop: 5 }}>
+                        {item.clubAdhocFeeDate} 
+                      </ThemedText>
+                    </View>
+                    <View style={{ width: "25%" }}>
+                      <ThemedText style={{ textAlign: "right" }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>
+                      <Spacer space={2} />
+                      <ProgressBar height={8} value={Math.round(item.completionPercentage)} />
+                    </View>
                   </View>
-                  <View style={{ width: "25%" }}>
-                    <ThemedText style={{ textAlign: "right" }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>
-                    <Spacer space={2} />
-                    <ProgressBar height={8} value={Math.round(item.completionPercentage)} />
-                  </View>
-                </View>
-              </TouchableCard>
+                </TouchableCard>
               </RoundedContainer>
             )}
           />

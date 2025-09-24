@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, StyleSheet, ScrollView, RefreshControl } from "react-native";
+import { TouchableOpacity, View, StyleSheet, ScrollView, RefreshControl, Image } from "react-native";
 import React, { useContext, useState } from "react";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
@@ -182,14 +182,21 @@ const MemberDue = (props: {
   return (
     <Collapsible
       header={
-        <>
-          <ThemedText style={{ width: "60%", fontSize: 16 }}>
+        <View style={{width: "95%", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+        <View style={{flexDirection: "row", alignItems: "center", gap: 10}}>
+          {props.member?.photo ? (
+            <Image source={{ uri: props.member?.photo }} style={{ height: 32, width: 32, borderRadius: 100 }} />
+          ) : (
+            <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
+          )}
+          <ThemedText style={{fontSize: 16 }}>
             {props?.member.firstName} {props?.member.lastName}
           </ThemedText>
-          <ThemedText style={{ width: "30%", fontWeight: "bold", fontSize: 16, textAlign: "right" }}>
+          </View>
+          <ThemedText style={{ fontWeight: "bold", fontSize: 16, textAlign: "right" }}>
             Rs. {props?.member.totalDue}
           </ThemedText>
-        </>
+        </View>
       }
     >
       <Spacer space={4} />

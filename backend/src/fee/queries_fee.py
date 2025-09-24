@@ -389,6 +389,7 @@ GET_FEE_ADHOC_COLLECTION_BY_ID = """
                                                 'paid', cafp.paid,
                                                 'first_name', m.first_name,
                                                 'last_name', m.last_name,
+                                                'photo', m.photo,
                                                 'club_adhoc_fee_payment_amount', cafp.club_adhoc_fee_payment_amount
                                                  ))                             member_adhoc_fees
                                  from club_adhoc_fee caf

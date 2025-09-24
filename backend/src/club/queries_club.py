@@ -170,7 +170,7 @@ TOTAL_DUE = """
 
 
 GET_DUES = """
-   select a.member_id, a.first_name, a.last_name, sum(a.amount)::REAL total_due, 
+   select a.member_id, a.first_name, a.last_name, a.photo, sum(a.amount)::REAL total_due, 
       json_agg(jsonb_build_object(	
          'fee', a.fee,
          'fee_desc', a.fee_desc,
@@ -179,14 +179,14 @@ GET_DUES = """
          'fee_type', a.fee_type
       )) dues
    from (
-      select m.member_id, m.first_name, m.last_name , caf.club_adhoc_fee_name fee, caf.club_adhoc_fee_desc fee_desc, cafp.club_adhoc_fee_payment_amount amount, cafp.club_adhoc_fee_payment_id payment_id, 'ADHOC-FEE' fee_type
+      select m.member_id, m.first_name, m.last_name, m.photo, caf.club_adhoc_fee_name fee, caf.club_adhoc_fee_desc fee_desc, cafp.club_adhoc_fee_payment_amount amount, cafp.club_adhoc_fee_payment_id payment_id, 'ADHOC-FEE' fee_type
       from club_adhoc_fee_payment cafp 
          join club_adhoc_fee caf on caf.club_adhoc_fee_id =cafp.club_adhoc_fee_id
          join membership ms on ms.membership_id = cafp.membership_id
          join "member" m on m.member_id = ms.member_id
       where cafp.paid =0 and ms.club_id = %s    
       union 
-      select m.member_id, m.first_name, m.last_name , cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type
+      select m.member_id, m.first_name, m.last_name, m.photo, cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type
       from club_fee_payment cfp 
          join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id
          join club_fee_type cft on cft.club_fee_type_id =cfc.club_fee_type_id
@@ -194,7 +194,7 @@ GET_DUES = """
          join "member" m on m.member_id = ms.member_id
       where cfp.paid = 0 and ms.club_id = %s
    ) a
-   group by a.member_id, a.first_name, a.last_name
+   group by a.member_id, a.first_name, a.last_name, a.photo
    order by 4 desc, 2
 """
 
