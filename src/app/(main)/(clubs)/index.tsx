@@ -16,7 +16,6 @@ import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import Card from "@/src/components/Card";
 import CircularProgress from "@/src/components/charts/CircularProgress";
 import FloatingMenu from "@/src/components/FloatingMenu";
-import { EventCard } from "../upcoming_events";
 import { router } from "expo-router";
 import { useGetClubEventsQuery } from "@/src/services/clubApi";
 import {
@@ -25,7 +24,7 @@ import {
   useGetFundBalanceQuery,
   useGetTotalDueQuery,
 } from "@/src/services/feeApi";
-import Animated, { FadeInLeft, FadeInRight, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeInRight, FadeInUp } from "react-native-reanimated";
 import RoundedContainer from "@/src/components/RoundedContainer";
 import Divider from "@/src/components/Divider";
 import Banner from "@/src/components/Banner";
@@ -80,7 +79,12 @@ const ClubHome = () => {
   };
 
   useEffect(() => {
-    setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") });
+    setClubInfo({
+      clubId: params.get("clubId"),
+      clubName: params.get("clubName"),
+      role: params.get("role"),
+      upiId: params.get("upiId"),
+    });
   }, []);
 
   const showClubDues = (_: GestureResponderEvent): void => {

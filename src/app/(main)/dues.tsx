@@ -1,14 +1,10 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import ThemedView from "@/src/components/themed-components/ThemedView";
-import ShadowBox from "@/src/components/ShadowBox";
 import ThemedText from "@/src/components/themed-components/ThemedText";
-import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { useTheme } from "@/src/hooks/use-theme";
 import Spacer from "@/src/components/Spacer";
 import Divider from "@/src/components/Divider";
 import * as Linking from "expo-linking";
-import { useState } from "react";
-import RoundedContainer from "@/src/components/RoundedContainer";
 import Collapsible from "@/src/components/Collapsible";
 
 type ClubDueType = {

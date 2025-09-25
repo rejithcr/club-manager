@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, StyleSheet, ScrollView, RefreshControl, Image } from "react-native";
+import { TouchableOpacity, View, StyleSheet, ScrollView, RefreshControl, Image, Linking } from "react-native";
 import React, { useContext, useState } from "react";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
@@ -85,6 +85,41 @@ const ClubDues = () => {
     }
   };
 
+  const handleShareToWhatsApp = async () => {
+    if (!duesByMembers || duesByMembers.length === 0) {
+      showSnackbar("No dues to share");
+      return;
+    }
+    const lines: string[] = [];
+    (duesByMembers || []).forEach((member: any) => {
+      const name = [member.firstName, member.lastName].filter(Boolean).join(" ") || member.email || "Member";
+      const amount = member.totalDue ?? (member.dues || []).reduce((s: number, d: any) => s + (d.amount || 0), 0);
+      const upi = clubInfo?.upiId || "";
+      const tn = `${clubInfo?.clubName || "Club"} fee payment`;
+      const link = `upi://pay?pa=${upi}&tn=${encodeURIComponent(tn)}&am=${amount}&cu=INR`;
+      lines.push(`*${name}: Rs. ${amount}*\n${link}\n`);
+    });
+
+    const intro = `Dear Member,\n\nThis is a polite request to clear the following club dues. Timely payments help the functioning of the club and are much appreciated. Please clear the dues by clicking the payment link provided for each entry below:\n\n`;
+    const outro = `\n\nThank you for supporting\n${clubInfo?.clubName}.`;
+
+    const message = intro + lines.join("\n") + outro;
+
+    const appUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
+    const webUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    try {
+      const canOpen = await Linking.canOpenURL(appUrl);
+      if (canOpen) {
+        await Linking.openURL(appUrl);
+      } else {
+        await Linking.openURL(webUrl);
+      }
+    } catch (err) {
+      console.error("WhatsApp share failed", err);
+      showSnackbar("Unable to open WhatsApp. Try copying the message.", "error");
+    }
+  };
+
   return (
     <ThemedView style={{ flex: 1 }}>
       <Spacer space={10} />
@@ -124,18 +159,24 @@ const ClubDues = () => {
             })}
           </RoundedContainer>
         ) : (
-          <ThemedText style={{ textAlign: "center", marginTop: 12 }}>Yay!! No dues 👏</ThemedText>
+          !isLoading && <ThemedText style={{ textAlign: "center", marginTop: 12 }}>Yay!! No dues 👏</ThemedText>
         )}
         <Spacer space={50} />
       </ScrollView>
       {clubInfo.role === ROLE_ADMIN && (
         <>
-          <ThemedButton
+          <ThemedButton 
             disabled={isMarking || selectedItems.length === 0}
             style={{ bottom: 40, position: "absolute", alignSelf: "center" }}
             title={isMarking ? "Marking..." : "Mark as paid"}
             onPress={() => handleMarkAsPaid()}
           />
+          <TouchableOpacity disabled={isLoading || duesByMembers?.length === 0}
+            onPress={handleShareToWhatsApp}
+            style={{ position: "absolute", right: 50, bottom: 40, padding: 8, borderRadius: 20 }}
+          >
+            <ThemedIcon name={"MaterialIcons:share"} size={22} color={duesByMembers?.length === 0 ? colors.disabled : colors.text}/>
+          </TouchableOpacity>
           <ConfirmModal
             visible={isConfirmVisible}
             payments={paymentsPreview}
@@ -196,20 +237,20 @@ const MemberDue = (props: {
         }}
       >
         <View style={{ width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10,}}>
             <ThemedIcon
-            size={20}
-            name={
-              showDues ? "MaterialCommunityIcons:chevron-down-circle" : "MaterialCommunityIcons:chevron-right-circle"
-            }
-            color={colors.nav}
-          />
+              size={20}
+              name={
+                showDues ? "MaterialCommunityIcons:chevron-down-circle" : "MaterialCommunityIcons:chevron-right-circle"
+              }
+              color={colors.nav}
+            />
             {props.member?.photo ? (
               <Image source={{ uri: props.member?.photo }} style={{ height: 32, width: 32, borderRadius: 100 }} />
             ) : (
               <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
             )}
-            <ThemedText style={{ fontSize: 16 }}>
+            <ThemedText style={{ fontSize: 16 }} ellipsizeMode="tail">
               {props?.member.firstName} {props?.member.lastName}
             </ThemedText>
           </View>

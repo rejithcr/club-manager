@@ -23,7 +23,7 @@ const MyClubs = (props: { clubs: [] }) => {
     upiId: string
   ) => {
     router.push(
-      `/(main)/(clubs)?clubId=${clubId}&clubName=${clubName}&clubDesc=${clubDesc}&clubLocation=${clubLocation}&role=${role}&UpiId=${upiId}`
+      `/(main)/(clubs)?clubId=${clubId}&clubName=${clubName}&clubDesc=${clubDesc}&clubLocation=${clubLocation}&role=${role}&upiId=${upiId}`
     );
   };
 
@@ -43,7 +43,7 @@ const MyClubs = (props: { clubs: [] }) => {
       )}
       <RoundedContainer>
         {props.clubs?.map((item: any, idx: number) => (
-          <View key={item.clubId} >
+          <View key={item.clubId}>
             <View style={{ marginVertical: 5 }}>
               <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
                 <TouchableCard
