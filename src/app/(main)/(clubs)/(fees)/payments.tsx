@@ -158,9 +158,12 @@ const Payments = () => {
               <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
               <Spacer space={10} />
               <RoundedContainer>
-              {paymentStatusUpdates.map((item) => {
-                return <PaymentUpdates key={item.clubFeePaymentId} {...item} />;
-              })}
+              {paymentStatusUpdates.map((item, idx) => (
+                <>
+                    {idx > 0 && <Divider />}
+                    <PaymentUpdates key={item.clubFeePaymentId} {...item} />
+                </>
+                ))}
               </RoundedContainer>
               <Spacer space={10} />
               {isLoading ? (
