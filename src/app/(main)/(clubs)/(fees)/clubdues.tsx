@@ -7,7 +7,6 @@ import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { useTheme } from "@/src/hooks/use-theme";
 import Spacer from "@/src/components/Spacer";
-import ShadowBox from "@/src/components/ShadowBox";
 import Divider from "@/src/components/Divider";
 import { useGetClubDuesQuery, useMarkDuesPaidMutation } from "@/src/services/feeApi";
 import Modal from "react-native-modal";
@@ -17,8 +16,6 @@ import { ROLE_ADMIN } from "@/src/utils/constants";
 import { UserContext } from "@/src/context/UserContext";
 import { showSnackbar } from "@/src/components/snackbar/snackbarService";
 import Animated, { FadeInUp } from "react-native-reanimated";
-import Collapsible from "@/src/components/Collapsible";
-import { colors } from "@/src/utils/styles";
 import Banner from "@/src/components/Banner";
 import RoundedContainer from "@/src/components/RoundedContainer";
 

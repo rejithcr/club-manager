@@ -65,7 +65,7 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
       header={
         <>
           <ThemedText style={{ width: "60%", fontSize: 15 }}>{club.clubName}</ThemedText>
-          <ThemedText style={{ width: "30%", fontWeight: "bold", fontSize: 15, textAlign: "right" }}>
+          <ThemedText style={{ width: "30%", fontWeight: "500", fontSize: 15, textAlign: "right" }}>
             Rs. {club.dueAmount}
           </ThemedText>
         </>
