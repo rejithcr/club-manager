@@ -29,7 +29,7 @@ class ClubMemberService():
             club_dues = db.fetch(conn, queries_club.GET_DUES, (club_id, club_id))
             return [helper.convert_to_camel_case(member) for member in club_dues]
         if duesByMember:
-            member_dues = db.fetch(conn, queries_member.GET_DUES_BY_MEMBER, (memberId, memberId))
+            member_dues = db.fetch(conn, queries_member.GET_DUES_BY_MEMBER, (memberId, club_id, club_id, memberId, club_id, club_id))
             return [helper.convert_to_camel_case(fee_due) for fee_due in member_dues]
         if club_id and memberId:
             member = db.fetch_one(conn, queries_club.GET_CLUB_MEMBER, (memberId, club_id))

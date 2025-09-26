@@ -5,7 +5,6 @@ import { ThemeContext } from "../context/ThemeContext";
 import { Provider } from "react-redux";
 import { store } from "../store/store";
 import { SnackbarProvider } from "../components/snackbar/SnackbarProvider";
-import ErrorBoundary from "react-native-error-boundary";
 
 export default function RootLayout() {
   const [userInfo, setUserInfo] = useState<any | undefined>(undefined);

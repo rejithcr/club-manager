@@ -2,12 +2,12 @@ import { RefreshControl, ScrollView } from "react-native";
 import { useRouter } from "expo-router/build/hooks";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import FeeSummary from "./dues";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { UserContext } from "../../context/UserContext";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyClubs from "./myclubs";
-import { router } from "expo-router";
+import { router, useGlobalSearchParams } from "expo-router";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
@@ -23,7 +23,9 @@ import {
 
 const Main = () => {
   const router = useRouter();
+  const searchParams = useGlobalSearchParams();
   const { userInfo } = useContext(UserContext);
+
   const {
     data: clubs,
     isLoading: isLoadingMyClubs,
@@ -37,7 +39,7 @@ const Main = () => {
     isLoading: isLoadingMemberDues,
     isFetching: isFetchingMemberDues,
     refetch: refetchMemberDues,
-  } = useGetClubMembersQuery({ memberId: userInfo?.memberId, duesByMember: "true" });
+  } = useGetClubMembersQuery({ clubId: "-1", memberId: userInfo?.memberId, duesByMember: "true" });
 
   const onRefresh = () => {
     refetchMemberDues();
@@ -52,12 +54,15 @@ const Main = () => {
   const [triggerGetEvents, { data: events, isLoading: isLoadingEvents }] = useLazyGetClubEventsQuery();
 
   useEffect(() => {
+    if (searchParams.showClubDues) {
+      router.push(`/(main)/(profile)/duesbyclub?clubId=${searchParams.showClubDues}&memberId=${userInfo?.memberId}`);
+    }
     if (clubs) {
       const clubIds = clubs.map((c: { clubId: any }) => c.clubId);
-      triggerGetEvents({clubIds, limit: 10, offset:0});
+      triggerGetEvents({ clubIds, limit: 10, offset: 0 });
     }
   }, [clubs]);
-    
+
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>

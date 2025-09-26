@@ -97,11 +97,11 @@ const ClubDues = () => {
       const upi = clubInfo?.upiId || "";
       const tn = `${clubInfo?.clubName || "Club"} fee payment`;
       const link = `upi://pay?pa=${upi}&tn=${encodeURIComponent(tn)}&am=${amount}&cu=INR`;
-      lines.push(`*${name}: Rs. ${amount}*\n${link}\n`);
+      lines.push(`*${name}: Rs. ${amount}*`);
     });
 
     const intro = `Dear Member,\n\nThis is a polite request to clear the following club dues. Timely payments help the functioning of the club and are much appreciated. Please clear the dues by clicking the payment link provided for each entry below:\n\n`;
-    const outro = `\n\nThank you for supporting\n${clubInfo?.clubName}.`;
+    const outro = `\n\nPlease click on below link for due details and paying the fees now.\nhttps://club-manager-33a8c.web.app?showClubDues=${clubInfo?.clubId}\n\nThank you for supporting\n${clubInfo?.clubName}.`;
 
     const message = intro + lines.join("\n") + outro;
 

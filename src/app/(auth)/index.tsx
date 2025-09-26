@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import ThemedButton from "@/src/components/ThemedButton";
-import { useRouter } from "expo-router";
+import { useGlobalSearchParams, useRouter } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,6 +18,7 @@ WebBrowser.maybeCompleteAuthSession();
 
 const AuthHome = () => {
   const { setUserInfo } = useContext(UserContext);
+  const searchParams = useGlobalSearchParams();
   const [isLoading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -48,10 +49,14 @@ const AuthHome = () => {
     const userInfoFromAsyncStorageParsed = userInfoFromAsyncStorage ? JSON.parse(userInfoFromAsyncStorage) : null;
     if (accessToken) {
       setUserInfo(userInfoFromAsyncStorageParsed);
-      router.replace("/(main)");
+       router.replace({
+        pathname: "/(main)",
+        params: { ...searchParams }, 
+      });
     }
   };
   const [authenticateMember] = useAuthenticateMemberMutation();
+
   const authenticate = async () => {
     setLoading(true);
     try {
@@ -59,7 +64,10 @@ const AuthHome = () => {
       const authResponse = await authenticateMember({ email: gInfo.email, gToken: gInfo.gtoken }).unwrap();
       if (authResponse?.isRegistered === 1) {
         setUserInfo({ ...gInfo, ...authResponse });
-        router.replace("/(main)");
+        router.replace({
+          pathname: "/(main)",
+          params: { ...searchParams },
+        });
       } else if (authResponse?.isRegistered === 0) {
         const memberInfo = { ...authResponse, photo: gInfo.photo };
         router.replace(`/(auth)/verify?memberInfo=${JSON.stringify(memberInfo)}`);

@@ -4,8 +4,8 @@ import ThemedText from "@/src/components/themed-components/ThemedText";
 import { useTheme } from "@/src/hooks/use-theme";
 import Spacer from "@/src/components/Spacer";
 import Divider from "@/src/components/Divider";
-import * as Linking from "expo-linking";
 import Collapsible from "@/src/components/Collapsible";
+import { makeUpiPayment } from "@/src/utils/payment";
 
 type ClubDueType = {
   clubId: string;
@@ -44,17 +44,6 @@ export default FeeSummary;
 
 const ClubDue = ({ club }: { club: ClubDueType }) => {
   const { colors } = useTheme();
-
-  const makeUpiPayment = async (amount: number, clubName: string, upiId: string) => {
-    const upiUri = `upi://pay?pa=${upiId}&tid=txn1d1&tr=REF123456&tn=${clubName}${" fee payment"}&am=${amount}&cu=INR`;
-    console.log(upiUri);
-    const canOpen = await Linking.canOpenURL(upiUri);
-    if (canOpen) {
-      Linking.openURL(upiUri);
-    } else {
-      alert("No UPI app found on device");
-    }
-  };
 
   return (
     <Collapsible
