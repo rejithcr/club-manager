@@ -165,18 +165,33 @@ const ClubDues = () => {
       </ScrollView>
       {clubInfo.role === ROLE_ADMIN && (
         <>
-          <ThemedButton 
-            disabled={isMarking || selectedItems.length === 0}
-            style={{ bottom: 40, position: "absolute", alignSelf: "center" }}
-            title={isMarking ? "Marking..." : "Mark as paid"}
-            onPress={() => handleMarkAsPaid()}
-          />
-          <TouchableOpacity disabled={isLoading || duesByMembers?.length === 0}
-            onPress={handleShareToWhatsApp}
-            style={{ position: "absolute", right: 50, bottom: 40, padding: 8, borderRadius: 20 }}
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "space-around",
+              alignItems: "center",
+              position: "absolute",
+              bottom: 40,
+            }}
           >
-            <ThemedIcon name={"MaterialIcons:share"} size={22} color={duesByMembers?.length === 0 ? colors.disabled : colors.text}/>
-          </TouchableOpacity>
+            <ThemedButton
+              disabled={isMarking || selectedItems.length === 0}
+              title={isMarking ? "Marking..." : "Mark as paid"}
+              onPress={() => handleMarkAsPaid()}
+            />
+            <TouchableOpacity
+              disabled={isLoading || duesByMembers?.length === 0}
+              onPress={handleShareToWhatsApp}
+            >
+              <ThemedIcon
+                name={"MaterialIcons:share"}
+                size={22}
+                color={duesByMembers?.length === 0 ? colors.disabled : colors.text}
+              />
+            </TouchableOpacity>
+          </View>
+
           <ConfirmModal
             visible={isConfirmVisible}
             payments={paymentsPreview}
@@ -233,11 +248,11 @@ const MemberDue = (props: {
           justifyContent: "space-between",
           alignItems: "center",
           paddingVertical: 10,
-          paddingHorizontal: 20,
+          paddingHorizontal:18,
         }}
       >
         <View style={{ width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 10,}}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 5 }}>
             <ThemedIcon
               size={20}
               name={
@@ -250,11 +265,11 @@ const MemberDue = (props: {
             ) : (
               <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
             )}
-            <ThemedText style={{ fontSize: 16 }} ellipsizeMode="tail">
+            <ThemedText style={{ fontSize: 15, marginLeft: 3}} ellipsizeMode="tail">
               {props?.member.firstName} {props?.member.lastName}
             </ThemedText>
           </View>
-          <ThemedText style={{ fontWeight: "500", fontSize: 16, textAlign: "right" }}>
+          <ThemedText style={{ fontWeight: "500", fontSize: 15, textAlign: "right" }}>
             Rs. {props?.member.totalDue}
           </ThemedText>
         </View>

@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, ScrollView, RefreshControl } from "react-native";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import ThemedText from "@/src/components/themed-components/ThemedText";
-import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import { router, useLocalSearchParams } from "expo-router";
 import { useGetClubDuesQuery } from "@/src/services/feeApi";
 import Banner from "@/src/components/Banner";
@@ -14,9 +13,11 @@ import { useTheme } from "@/src/hooks/use-theme";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import ThemedButton from "@/src/components/ThemedButton";
 import { makeUpiPayment } from "@/src/utils/payment";
+import { UserContext } from "@/src/context/UserContext";
 
 const DuesByClub = () => {
   const params = useLocalSearchParams();
+    const { userInfo } = useContext(UserContext);
   const clubId = params?.clubId as string | undefined;
   const memberId = params?.memberId as string | undefined;
   const { colors } = useTheme();
@@ -36,9 +37,7 @@ const DuesByClub = () => {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <Spacer space={8} />
-      <ThemedHeading>{clubDues?.clubName}</ThemedHeading>
-      <Spacer space={8} />
+      <Spacer space={10} />
       <Banner backgroundColor={clubDues?.dueAmount === 0 ? colors.success : colors.info}>
         <View>
           <ThemedText style={{ fontSize: 14, color: colors.background }}>Total Due</ThemedText>
@@ -49,8 +48,12 @@ const DuesByClub = () => {
               Rs. {clubDues?.dueAmount || "0"}
             </ThemedText>
           )}
+           <ThemedText style={{ fontSize: 14, color: colors.background }}>{clubDues?.clubName}</ThemedText>
         </View>
-        <ThemedIcon name="MaterialCommunityIcons:account-cash" size={50} color={colors.background} />
+        <View style={{alignItems:"flex-end"}}>
+            <ThemedIcon name="MaterialCommunityIcons:account-cash" size={50} color={colors.background} />
+            <ThemedText style={{ fontSize: 14, color: colors.background }}>{userInfo.name}</ThemedText>
+        </View>
       </Banner>
 
       <Spacer space={10} />
