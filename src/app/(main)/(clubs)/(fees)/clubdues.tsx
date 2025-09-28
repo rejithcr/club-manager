@@ -130,7 +130,7 @@ const ClubDues = () => {
             <LoadingSpinner />
           ) : (
             <ThemedText style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}>
-              Rs. {totalDue}
+              Rs. {totalDue?.toFixed(2)}
             </ThemedText>
           )}
         </View>
@@ -265,7 +265,7 @@ const MemberDue = (props: {
             ) : (
               <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
             )}
-            <ThemedText style={{ fontSize: 15, marginLeft: 3}} ellipsizeMode="tail">
+            <ThemedText style={{ fontSize: 15, marginLeft: 3, maxWidth: 125}} ellipsizeMode="tail">
               {props?.member.firstName} {props?.member.lastName}
             </ThemedText>
           </View>
@@ -275,11 +275,12 @@ const MemberDue = (props: {
         </View>
       </TouchableOpacity>
       {showDues &&
-        props?.member.dues.map((item: any, idx: number) => {
+        <>
+        {props?.member.dues.map((item: any, idx: number) => {
           const checked = !!selectedItems.find((p) => p.paymentId === item.paymentId && p.feeType === item.feeType);
           return (
             <View key={item.paymentId.toString() + item.feeType}>
-              {idx > 0 && <Divider style={{ width: "80%" }} />}
+              {idx > 0 && <Divider style={{ width: "75%" }} />}
               <MemberFeeItem
                 paymentId={item.paymentId}
                 fee={item.fee}
@@ -293,6 +294,8 @@ const MemberDue = (props: {
             </View>
           );
         })}
+        <Spacer space={10} />
+        </>}
     </>
   );
 };
@@ -330,12 +333,13 @@ const MemberFeeItem = (props: {
 
 const styles = StyleSheet.create({
   item: {
-    width: "75%",
+    width: "80%",
     flexDirection: "row",
     flexWrap: "wrap",
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "space-between",
+    marginLeft: "9%"
   },
   label: {
     paddingHorizontal: 10,
