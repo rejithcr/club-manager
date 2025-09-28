@@ -90,19 +90,20 @@ const DuesByClub = () => {
           </View>
         ) : (
           <>
-            <ThemedText style={{ textAlign: "center", marginTop: 12 }}>Yay!! you don't have any outstanding dues with the club 👏</ThemedText>
+            <ThemedText style={{ textAlign: "center", marginTop: 12, width: "80%", alignSelf: "center" }}>Yay!! you don't have any outstanding dues with the club 👏</ThemedText>
             <Spacer space={10} />
-            <ThemedButton
-              title={"Home"}
-              onPress={() => router.back()}
-            />
           </>
         )}
-      </ScrollView>      
+      </ScrollView>     
+      {clubDues?.dues?.length > 0 ? 
         <ThemedButton style={{bottom: 40, position: "absolute"}}
             title={"Pay Now"}
             onPress={() => makeUpiPayment(clubDues.dueAmount, clubDues.clubName, clubDues.upiId)}
-        />
+        /> :
+        <ThemedButton style={{bottom: 40, position: "absolute"}}
+            title={"Home"}
+            onPress={() => router.back()}
+        />}
     </ThemedView>
   );
 };
