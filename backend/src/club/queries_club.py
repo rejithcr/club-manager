@@ -93,6 +93,7 @@ GET_TRANSACTIONS = """
     where t.club_id = %s
 	    and t.club_fee_payment_id is null and t.club_adhoc_fee_payment_id is null
         and (%s = 'ALL' OR t.club_transcation_type = %s)
+        and (%s = '-1' OR t.club_transaction_category_type_id = %s)
     order by t.club_transaction_date desc
     limit %s offset %s
 """
@@ -120,14 +121,14 @@ GET_TRANSACTIONS_ALL = """
 
 ADD_TRANSACTION = """
     insert into club_transaction(club_transaction_id, club_id, club_transaction_amount, club_transcation_type, 
-        club_transaction_category, club_transaction_comment, club_transaction_date, created_by, updated_by)
-    values(nextval('club_transaction_id_seq'), %s, %s, %s, %s, %s, %s, %s, %s)
+        club_transaction_category_type_id, club_transaction_category, club_transaction_comment, club_transaction_date, created_by, updated_by)
+    values(nextval('club_transaction_id_seq'), %s, %s, %s, %s, %s, %s, %s, %s, %s)
 """
 
 UPDATE_TRANSACTION = """
     update club_transaction 
     set club_transaction_amount = %s, club_transcation_type = %s, club_transaction_category = %s, club_transaction_comment = %s, 
-    club_transaction_date = %s, updated_by = %s, updated_ts = now()
+    club_transaction_category_type_id = %s, club_transaction_date = %s, updated_by = %s, updated_ts = now()
     where club_transaction_id = %s
 """
 
@@ -224,3 +225,16 @@ GET_CLUB_COUNTS = """
     where mr.club_id = %s and mr.status = 'REQUESTED'
 """
 
+GET_TRANSACTIONS_CATEGORIES_SEQ_NEXT_VAL="select nextval('category_type_id_seq')"
+
+GET_TRANSACTIONS_CATEGORIES = """
+    select category_type_id category_id, category_name from transaction_category_types where club_id = %s
+"""
+
+ADD_TRANSACTIONS_CATEGORY = """
+    INSERT INTO transaction_category_types (club_id, category_name, created_by) VALUES  (%s, %s, %s);
+"""
+
+ADD_TRANSACTIONS_CATEGORY_WITH_ID = """
+    INSERT INTO transaction_category_types (category_type_id, club_id, category_name, created_by) VALUES  (%s, %s, %s, %s);
+"""

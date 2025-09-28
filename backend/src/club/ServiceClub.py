@@ -54,6 +54,7 @@ class ClubService():
         member_id = params.get('memberId')
         upi_id = params.get('upiId')
         event_types = params.get('eventTypes', [])
+        txn_category_types = constants.TXN_CATEGORY_TYPES
 
         club_id = db.fetch_one(conn, queries_club.GET_CLUB_SEQ_NEXT_VAL, None)['nextval']
         db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, club_description, location, upi_id, email, email))
@@ -61,6 +62,9 @@ class ClubService():
         for event in event_types:
             if event["isSelected"]:
                 db.execute(conn, queries_events.INSERT_EVENT_TYPES, (club_id, event["name"]))
+        for cat_type in txn_category_types:
+            db.execute(conn, queries_club.ADD_TRANSACTIONS_CATEGORY, (club_id, cat_type, email))
+
         conn.commit()
 
         return {"clubId": club_id}

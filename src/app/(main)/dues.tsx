@@ -27,10 +27,10 @@ const FeeSummary = (props: { duesByMember: ClubDueType[] }) => {
       {props.duesByMember?.length == 0 ? (
         <ThemedText style={{ textAlign: "center" }}>Yay!! You are all clear 👏</ThemedText>
       ) : (
-        props.duesByMember.map((item) => {
+        props.duesByMember.map((item, idx) => {
           return (
             <View key={item.clubId}>
-              <Spacer space={4} />
+              { idx > 0 &&<Spacer space={4} />}
               <ClubDue club={item} />
             </View>
           );

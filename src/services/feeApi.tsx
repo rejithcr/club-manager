@@ -5,7 +5,7 @@ import { baseQueryWithReauth } from "./baseQuery";
 export const feeApi = createApi({
   reducerPath: "feeApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["adhoc", "fee", "transaction", "exception"],
+  tagTypes: ["adhoc", "fee", "transaction", "exception", "transactionCategory"],
   endpoints: (builder) => ({
     getFundBalance: builder.query({
       query: (params) => `/club?${new URLSearchParams(params).toString()}`,
@@ -27,6 +27,19 @@ export const feeApi = createApi({
       query: (params) => `/club/member?${new URLSearchParams(params).toString()}`,
       providesTags: ["fee", "adhoc"],
     }), 
+    // transaction categories
+    getTransactionCategories: builder.query({
+      query: (params) => `/club/transaction/category?${new URLSearchParams(params).toString()}`,
+      providesTags: ["transactionCategory"],
+    }),
+    addTransactionCategory: builder.mutation({
+      query: (body) => ({
+        url: "/club/transaction/category",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["transactionCategory"],
+    }),
     addFee: builder.mutation({
       query: (body) => ({
         url: "/fee",
@@ -163,6 +176,8 @@ export const {
   useSaveFeesAdhocMutation,
   useDeleteFeesAdhocMutation,
   useGetTransactionsQuery,
+  useGetTransactionCategoriesQuery,
+  useAddTransactionCategoryMutation,
   useAddTransactionMutation,
   useUpdateTransactionMutation,
   useDeleteTransactionMutation,

@@ -21,6 +21,8 @@ PII_ATTRIBUTES_MAPPING = [
     {'key': -5, 'label': "date_of_birth"}
 ]
 
+TXN_CATEGORY_TYPES = ["Misc", "Other"]
+
 CORS_ORIGINS = ["http://localhost:8081"]
 
 WEB_CLIENT_ID_1="586660286227-lsrcprib6rmjvsnhsirc9dtpf46vvnb3.apps.googleusercontent.com"
