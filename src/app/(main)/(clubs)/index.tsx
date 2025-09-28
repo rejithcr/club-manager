@@ -296,7 +296,7 @@ const ClubHome = () => {
                       style={{ overflow: "hidden" }}
                     >
                       <Card style={{ height: 180, paddingHorizontal: 30 }}>
-                        <ThemedText style={{ fontSize: 15, fontWeight: "bold", alignSelf: "center"  }}>{item.clubAdhocFeeName}</ThemedText>
+                        <ThemedText style={{ fontSize: 15, fontWeight: "bold", alignSelf: "center", maxWidth: 80 }} numberOfLines={1} ellipsizeMode="tail">{item.clubAdhocFeeName}</ThemedText>
                         <ThemedText style={{ fontSize: 12, alignSelf: "center", color: colors.subText, maxWidth: 80 }} numberOfLines={1} ellipsizeMode="tail">{item.clubAdhocFeeDesc}</ThemedText>
                          <Spacer hspace={10} />
                          <CircularProgress value={Math.round(item.completionPercentage)} strokeWidth={6} size={50} />

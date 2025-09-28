@@ -60,7 +60,7 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
       {club.dues.map((due: any, idx: number) => (
         <View key={due.paymentId.toString() + due.feeType} style={styles.item}>
           {idx > 0 && <Divider />}
-          <View style={{ paddingVertical: 5, marginLeft: 10 }}>
+          <View style={{ paddingVertical: 5, marginLeft: 10, maxWidth: 180 }}>
             <ThemedText style={styles.label}>{due.fee} </ThemedText>
             <ThemedText style={{...styles.subLabel, color: colors.subText}}>{due.feeDesc} </ThemedText>
           </View>

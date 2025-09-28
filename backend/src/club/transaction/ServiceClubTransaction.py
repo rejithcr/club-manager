@@ -62,7 +62,7 @@ class ClubTransactionService():
 
     def add_category(self, conn, params):
         clubId = params.get("clubId")
-        categoryName  = params.get("categoryName")
+        categoryName  = params.get("categoryName").upper().strip()
         email = params.get("email")
         categoryId = db.fetch_one(conn, queries_club.GET_TRANSACTIONS_CATEGORIES_SEQ_NEXT_VAL, None)['nextval']
         db.execute(conn, queries_club.ADD_TRANSACTIONS_CATEGORY_WITH_ID,(categoryId, clubId, categoryName, email))

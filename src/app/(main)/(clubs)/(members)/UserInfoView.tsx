@@ -14,8 +14,8 @@ const UserInfoView = (props: Member) => {
                 {props?.photo ? <Image source={{ uri: props?.photo }} style={{ height: 32, width: 32, borderRadius: 100, }} />
                     : <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />}
                 <View style={{ paddingLeft: 10 }}>
-                    <View style={{ flexDirection: "row"}}>
-                        <ThemedText>{props.firstName} {props.lastName}</ThemedText>
+                    <View style={{ flexDirection: "row",  maxWidth: 175}}>
+                        <ThemedText style={{}}>{props.firstName} {props.lastName}</ThemedText>
                         <Spacer hspace={2} />
                         {props.isRegistered === 1 && <ThemedIcon name='MaterialIcons:verified-user' color={colors.success} size={12}/>}                    
                     </View>                    

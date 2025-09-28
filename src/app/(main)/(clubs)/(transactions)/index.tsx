@@ -166,7 +166,18 @@ const Transactions = () => {
         {isTxnsLoading ? <LoadingSpinner /> :
           <FlatList
             ItemSeparatorComponent={() => <Divider style={{width: "85%", alignSelf: "center", marginVertical: 10}} />}
-            ListFooterComponent={() => isTxnsFetching && <LoadingSpinner /> || <Spacer space={50} />}
+            ListFooterComponent={() =>
+            (isTxnsFetching && (
+              <>
+                <Spacer space={10} />
+                <LoadingSpinner />
+              </>
+            )) || (
+              <ThemedText style={{ alignSelf: "center", paddingBottom: 60, paddingTop: 10 }}>
+                No more transactions
+              </ThemedText>
+            )
+          }
             data={items}
             initialNumToRender={limit}
             onEndReached={loadMore}

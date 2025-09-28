@@ -321,7 +321,7 @@ const MemberFeeItem = (props: {
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <ThemedCheckBox checked={checked} />
-        <View style={{ paddingVertical: 5 }}>
+        <View style={{ paddingVertical: 5, maxWidth: 150 }}>
           <ThemedText style={styles.label}>{fee} </ThemedText>
           <ThemedText style={{ ...styles.subLabel, color: colors.disabled }}>{feeDesc} </ThemedText>
         </View>
