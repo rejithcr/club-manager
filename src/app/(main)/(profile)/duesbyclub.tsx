@@ -86,11 +86,7 @@ const DuesByClub = () => {
                 </>
               ))}
             </RoundedContainer>
-            <Spacer space={20} />
-            <ThemedButton
-              title={"Pay Now"}
-              onPress={() => makeUpiPayment(clubDues.dueAmount, clubDues.clubName, clubDues.upiId)}
-            />
+            <Spacer space={50} />
           </View>
         ) : (
           <>
@@ -102,7 +98,11 @@ const DuesByClub = () => {
             />
           </>
         )}
-      </ScrollView>
+      </ScrollView>      
+        <ThemedButton style={{bottom: 40, position: "absolute"}}
+            title={"Pay Now"}
+            onPress={() => makeUpiPayment(clubDues.dueAmount, clubDues.clubName, clubDues.upiId)}
+        />
     </ThemedView>
   );
 };
