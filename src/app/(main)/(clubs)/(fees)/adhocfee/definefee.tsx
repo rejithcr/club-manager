@@ -109,7 +109,7 @@ const DefineFee = () => {
                 {!isLoading && addedMembers && addedMembers.length > 0 && addedMembers.map((item: any, index) => 
                     <TouchableOpacity key={item.memberId} onPress={() => removeMember(item)}>
                         <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 5, width: "70%", justifyContent:"space-between", flexWrap: "wrap" }}>
-                            <ThemedText style={{ fontSize: 15}}>{index+1}. {item?.firstName} {item?.lastName}</ThemedText>
+                            <ThemedText style={{ fontSize: 15, maxWidth: 200 }}>{index+1}. {item?.firstName} {item?.lastName}</ThemedText>
                             <MaterialIcons name="remove-circle" size={20} color={colors.error}/>
                         </ShadowBox>
                     </TouchableOpacity>

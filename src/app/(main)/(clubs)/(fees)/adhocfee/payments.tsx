@@ -133,18 +133,18 @@ const Payments = () => {
                 <Spacer hspace={2} />
                 <ThemedIcon name="MaterialCommunityIcons:square-edit-outline" size={12} />
               </TouchableOpacity>
-              <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeDescription}</ThemedText>
+              <ThemedText style={{ fontSize: 12, marginTop: 5, maxWidth: 200, color: colors.subText }}>{feeDescription}</ThemedText>
             </View>
             <View>
-              <ThemedText style={{ textAlign: "right" }}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
-              <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeDate.toDateString()}</ThemedText>
+              <ThemedText style={{ textAlign: "right" , fontWeight: 500}}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
+              <ThemedText style={{ fontSize: 12, marginTop: 5 }}>{feeDate.toDateString()}</ThemedText>
             </View>
           </View>
           <Spacer space={5} />
           <View style={{ flexDirection: "row", alignItems: "center", width: "85%", alignSelf: "center" }}>
             <CircularProgress value={Math.round(feeObj?.completionPercentage)} strokeWidth={8} size={50} />
             <Spacer hspace={4} />
-            <ThemedText style={{ fontSize: 10 }}>Select the member to update payment status</ThemedText>
+            <ThemedText style={{ fontSize: 12, color: colors.subText }}>Select the member to update payment status</ThemedText>
           </View>
           <Spacer space={5} />
           <RoundedContainer style={{ flex: 1 }}>
@@ -262,7 +262,7 @@ const MemberFeeItem = (props: {
                     ) : (
                     <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
                     )}
-                    <ThemedText style={{ fontSize: 15 }}>
+                    <ThemedText style={{ fontSize: 15, maxWidth: 125  }}>
                     {props?.firstName} {props?.lastName}
                     </ThemedText>
                 </View>           
@@ -286,7 +286,7 @@ const PaymentUpdates = (props: { photo?: string; clubFeePaymentId: number | unde
                 ) : (
                 <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
                 )}
-                <ThemedText style={{ fontSize: 15 }}>
+                <ThemedText style={{ fontSize: 15, maxWidth: 125 }}>
                 {props?.firstName} {props?.lastName}
                 </ThemedText>
             </View>       

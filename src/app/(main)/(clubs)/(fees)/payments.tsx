@@ -267,7 +267,7 @@ const MemberFeeItem = (props: {
           ) : (
             <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
           )}
-          <ThemedText style={{ fontSize: 15 }}>
+          <ThemedText style={{ fontSize: 15, maxWidth: 125 }}>
             {props?.firstName} {props?.lastName}
           </ThemedText>
         </View>
@@ -301,7 +301,7 @@ const PaymentUpdates = (props: {
         ) : (
           <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
         )}
-        <ThemedText style={{ fontSize: 15 }}>
+        <ThemedText style={{ fontSize: 15, maxWidth: 125  }}>
           {props?.firstName} {props?.lastName}
         </ThemedText>
       </View>
