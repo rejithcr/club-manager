@@ -77,7 +77,7 @@ const DuesByClub = () => {
                       paddingVertical: 10,
                     }}
                   >
-                    <View>
+                    <View style={{width: 200}}>
                       <ThemedText style={{ fontSize: 16 }}>{d.fee}</ThemedText>
                       <ThemedText style={{ color: colors.subText, fontSize: 12 }}>{d.feeDesc}</ThemedText>
                     </View>

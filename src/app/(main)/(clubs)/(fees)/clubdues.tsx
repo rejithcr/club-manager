@@ -96,14 +96,15 @@ const ClubDues = () => {
       const amount = member.totalDue ?? (member.dues || []).reduce((s: number, d: any) => s + (d.amount || 0), 0);
       const upi = clubInfo?.upiId || "";
       const tn = `${clubInfo?.clubName || "Club"} fee payment`;
-      const link = `upi://pay?pa=${upi}&tn=${encodeURIComponent(tn)}&am=${amount}&cu=INR`;
+      const link = `upi://pay?pa=${upi}&tn=${encodeURIComponent(tn)}&am=${amount?.toFixed(2)}&cu=INR`;
       lines.push(`*${name}: Rs. ${amount}*`);
     });
 
-    const intro = `Dear Member,\n\nThis is a polite request to clear the following club dues. Timely payments help the functioning of the club and are much appreciated. Please clear the dues by clicking the payment link provided for each entry below:\n\n`;
-    const outro = `\n\nPlease click on below link for due details and paying the fees now.\nhttps://club-manager-33a8c.web.app?showClubDues=${clubInfo?.clubId}\n\nThank you for supporting\n${clubInfo?.clubName}.`;
+    const intro = `Dear Member,\n\nThis is a polite request to clear the following club dues. Timely payments help the functioning of the club and are much appreciated.\n\n`;
+    const dueAmount =`*Total Due: Rs. ${totalDue?.toFixed(2)}* \n\n`
+    const outro = `\n\nPlease click on below link to see the your dues breakdown and pay.\nhttps://club-manager-33a8c.web.app?showClubDues=${clubInfo?.clubId}\n\nThank you for supporting\n${clubInfo?.clubName}.`;
 
-    const message = intro + lines.join("\n") + outro;
+    const message = intro + dueAmount + lines.join("\n") + outro;
 
     const appUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
     const webUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
