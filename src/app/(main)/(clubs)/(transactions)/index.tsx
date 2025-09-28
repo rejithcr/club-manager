@@ -76,7 +76,7 @@ const Transactions = () => {
           txnId: txnValues.txnId,
           txnType: txnValues.txnType,
           txnDate: txnValues.txnDate,
-          txnCategory: txnValues.txnCategory,
+          txnCategory: getCategory(txnValues.txnCategoryId),
           txnCategoryId: txnValues.txnCategoryId,
           txnComment: txnValues.txnComment,
           txnAmount: Number(txnValues.txnAmount),
@@ -87,7 +87,7 @@ const Transactions = () => {
           clubId: clubInfo.clubId,
           txnDate: txnValues.txnDate || new Date(),
           txnType: txnValues.txnType,
-          txnCategory: txnValues.txnCategory,
+          txnCategory: getCategory(txnValues.txnCategoryId),
           txnCategoryId: txnValues.txnCategoryId,
           txnComment: txnValues.txnComment,
           txnAmount: Number(txnValues.txnAmount),
@@ -117,10 +117,11 @@ const Transactions = () => {
   };
   
   const handleEdit = (item: any) => {
+    console.log(item);
     if(item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && clubInfo.role === ROLE_ADMIN){
       setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnDate: new Date(item.clubTransactionDate), 
         txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount,
-        lastUpdatedBy: item.updatedBy });
+        txnCategoryId: item.clubTransactionCategoryTypeId, lastUpdatedBy: item.updatedBy });
       setIsAddTxnVisible(true);
     } else if (clubInfo.role === ROLE_ADMIN){
       setTxnValues({ lastUpdatedBy: item.updatedBy, feeType: item.clubTransactionCategory });
@@ -132,10 +133,9 @@ const Transactions = () => {
   }
 
   const getCategory = (id: number) => {
-    console.log(id, categories)
-    return "Test";
+    return categories.find((c: any)=> c.categoryId == id)?.categoryName;
   }
-
+  console.log(txnValues);
   return (
     <GestureHandlerRootView>
       <ThemedView style={{ flex: 1 }}> 
@@ -172,7 +172,7 @@ const Transactions = () => {
                 <Spacer space={10} />
                 <LoadingSpinner />
               </>
-            )) || (
+            )) || items?.length !== 0 && (
               <ThemedText style={{ alignSelf: "center", paddingBottom: 60, paddingTop: 10 }}>
                 No more transactions
               </ThemedText>
@@ -256,11 +256,12 @@ const Transactions = () => {
               const res: any = await addCategory({ clubId: clubInfo.clubId, categoryName: newCategoryName.trim() });
               // API expected to return { categoryId, categoryName }
               const createdId = res?.data?.categoryId || res?.categoryId || null;
+              const createdName = res?.data?.createdName || res?.createdName || null;
               setIsAddCategoryVisible(false);
               // refresh categories and set selection
               await refetchCategories();
               if (createdId) {
-                setTxnValues((prev: any) => ({ ...prev, txnCategory: getCategory(createdId), txnCategoryId: createdId }));
+                setTxnValues((prev: any) => ({ ...prev, txnCategory: createdName, txnCategoryId: createdId }));
               }
             }} />}
             <ThemedButton title="Cancel" onPress={() => setIsAddCategoryVisible(false)} />
@@ -294,7 +295,7 @@ const validate = (txnCategoryId: string | null, txnTypeComment: string | null, t
     return false
   }
   if (!isValidLength(txnTypeComment, 2)) {
-    alert("Enter atleast 2 characters for comment")
+    alert("Enter atleast 2 characters for details")
     return false
   }
   if (!isCurrency(txnAmount)) {

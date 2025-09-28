@@ -75,7 +75,7 @@ MARK_CLUB_FOR_DELETION = """
 """
 
 GET_TRANSACTIONS = """
-    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, 
+    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, t.club_transaction_category_type_id,
         t.club_transaction_category, t.club_transaction_comment, t.created_by, to_char(t.club_transaction_date, 'YYYY-mm-dd') club_transaction_date,
         coalesce(caf.club_adhoc_fee_name, coalesce(cft.club_fee_type, t.club_transaction_category, concat(cft.club_fee_type, '(', cfc.club_fee_type_period, ')'))) fee_name,
         coalesce(m.first_name || ' ' || m.last_name, am.first_name || ' ' || am.last_name) member_name,
@@ -99,7 +99,7 @@ GET_TRANSACTIONS = """
 """
 
 GET_TRANSACTIONS_ALL = """
-    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, 
+    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, t.club_transaction_category_type_id,
         t.club_transaction_category, t.club_transaction_comment, t.created_by, to_char(t.club_transaction_date, 'YYYY-mm-dd') club_transaction_date,
         coalesce(caf.club_adhoc_fee_name, coalesce(cft.club_fee_type, t.club_transaction_category, concat(cft.club_fee_type, '(', cfc.club_fee_type_period, ')'))) fee_name,
         coalesce(m.first_name || ' ' || m.last_name, am.first_name || ' ' || am.last_name) member_name,
