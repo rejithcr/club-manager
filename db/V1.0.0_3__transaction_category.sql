@@ -1,13 +1,15 @@
+-- fix duplciate transactions
 ALTER TABLE public.club_transaction ADD CONSTRAINT club_transaction_unique_fee_payment_id UNIQUE (club_fee_payment_id);
 ALTER TABLE public.club_transaction ADD CONSTRAINT club_transaction_unique_adhoc_fee_payment_id UNIQUE (club_adhoc_fee_payment_id);
 
+-- transaction categories
 -- Sequences
-CREATE SEQUENCE category_type_id_seq START 1;
+CREATE SEQUENCE transaction_category_type_id_seq START 1;
 
 
 -- category_types: fee , split, balls, match other etc. 
 CREATE TABLE public.transaction_category_types (
-	category_type_id int4 DEFAULT nextval('category_type_id_seq') NOT NULL,
+	category_type_id int4 DEFAULT nextval('transaction_category_type_id_seq') NOT NULL,
 	club_id int4 NOT NULL,
 	category_name varchar(50) NOT NULL,
 	created_by varchar(50) NULL,

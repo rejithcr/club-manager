@@ -225,7 +225,7 @@ GET_CLUB_COUNTS = """
     where mr.club_id = %s and mr.status = 'REQUESTED'
 """
 
-GET_TRANSACTIONS_CATEGORIES_SEQ_NEXT_VAL="select nextval('category_type_id_seq')"
+GET_TRANSACTIONS_CATEGORIES_SEQ_NEXT_VAL="select nextval('transaction_category_type_id_seq')"
 
 GET_TRANSACTIONS_CATEGORIES = """
     select category_type_id category_id, category_name from transaction_category_types where club_id = %s
