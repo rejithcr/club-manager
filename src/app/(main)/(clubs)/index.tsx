@@ -126,7 +126,7 @@ const ClubHome = () => {
             <ThemedText style={{ fontSize: 16, color: colors.background }}>Fund Balance</ThemedText>
             {isFundBalanceLoading ? <LoadingSpinner /> : 
               <ThemedText style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}>
-                Rs. {fbr?.fundBalance || 0}
+                ₹ {fbr?.fundBalance || 0}
               </ThemedText>
             }
           </View>
@@ -136,7 +136,7 @@ const ClubHome = () => {
           <RoundedContainer>
             <TouchableCard
               onPress={showClubDues}
-              rightComponent={isTotalDueLoading ? <LoadingSpinner /> : <ThemedText>Rs. {clubDue?.totalDue}</ThemedText>}
+              rightComponent={isTotalDueLoading ? <LoadingSpinner /> : <ThemedText>₹ {clubDue?.totalDue}</ThemedText>}
             >
               <ThemedText style={{ fontSize: 16 }}>Dues</ThemedText>
             </TouchableCard>
@@ -188,7 +188,7 @@ const ClubHome = () => {
                       <TouchableCard
                         onPress={showFeeTypeDetails}
                         id={fee}
-                        rightComponent={<ThemedText>Rs. {fee.clubFeeAmount}</ThemedText>}
+                        rightComponent={<ThemedText>₹ {fee.clubFeeAmount}</ThemedText>}
                       >
                         <View>
                           <ThemedText style={{ fontSize: 17, fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
@@ -303,7 +303,7 @@ const ClubHome = () => {
                          <Spacer hspace={10} />
                           <View style={{ alignSelf: "center" }}>
                             <ThemedText style={{ fontSize: 15, textAlign: "center", fontWeight: "bold" }}>
-                              Rs. {item.clubAdhocFeePaymentAmount}
+                              ₹ {item.clubAdhocFeePaymentAmount}
                             </ThemedText>
                             <ThemedText style={{ fontSize: 12, textAlign: "center", color: colors.subText }}>
                               {item.clubAdhocFeeDate}

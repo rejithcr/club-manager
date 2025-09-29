@@ -54,7 +54,7 @@ const Fees = () => {
                 <ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
                 <ThemedText style={{ fontSize: 10, marginTop: 5, color: colors.subText }}>{fee.clubFeeTypeInterval}</ThemedText>
               </View>
-                <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubFeeAmount}</ThemedText>
+                <ThemedText style={{ marginRight: 10 }}>₹ {fee.clubFeeAmount}</ThemedText>
             </View>
           </TouchableCard>
           </RoundedContainer>

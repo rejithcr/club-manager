@@ -136,7 +136,7 @@ const Payments = () => {
               <ThemedText style={{ fontSize: 12, marginTop: 5, maxWidth: 200, color: colors.subText }}>{feeDescription}</ThemedText>
             </View>
             <View>
-              <ThemedText style={{ textAlign: "right" , fontWeight: 500}}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
+              <ThemedText style={{ textAlign: "right" , fontWeight: 500}}>₹ {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
               <ThemedText style={{ fontSize: 12, marginTop: 5 }}>{feeDate.toDateString()}</ThemedText>
             </View>
           </View>
@@ -267,7 +267,7 @@ const MemberFeeItem = (props: {
                     </ThemedText>
                 </View>           
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <ThemedText style={{ fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
+                    <ThemedText style={{ fontSize: 15, paddingLeft: 15 }}>₹ {props?.clubAdhocFeePaymentAmount}</ThemedText>
                     <Spacer hspace={3}/>
                     <ThemedCheckBox checked={isSelected} />
                 </View>
@@ -286,7 +286,7 @@ const PaymentUpdates = (props: { photo?: string; clubFeePaymentId: number | unde
                 ) : (
                 <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
                 )}
-                <ThemedText style={{ fontSize: 15, maxWidth: 125 }}>
+                <ThemedText style={{ fontSize: 15, maxWidth: 150 }}>
                 {props?.firstName} {props?.lastName}
                 </ThemedText>
             </View>       

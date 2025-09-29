@@ -201,11 +201,11 @@ const MemberFeeItem = (props: {
         ) : (
           <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
         )}
-        <ThemedText>
+        <ThemedText style={{maxWidth: 140}}>
           {props?.firstName} {props?.lastName}
         </ThemedText>
       </View>
-      <ThemedText>{props?.clubFeeAmount}</ThemedText>
+      <ThemedText>₹ {props?.clubFeeAmount}</ThemedText>
     </TouchableOpacity>
   );
 };

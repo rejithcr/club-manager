@@ -200,7 +200,7 @@ const Transactions = () => {
                     <MaterialCommunityIcons name='square-edit-outline' size={12} color={"#546E7A"} /> : <Spacer hspace={5} />}
                 </View>
                 <View style={{ alignItems: "flex-end"}}>
-                  <ThemedText style={{ fontWeight: 'bold', color: item.clubTranscationType === 'CREDIT' ? colors.success : colors.error }}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} Rs. {item.clubTransactionAmount}</ThemedText>
+                  <ThemedText style={{ fontWeight: 'bold', color: item.clubTranscationType === 'CREDIT' ? colors.success : colors.error }}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} ₹ {item.clubTransactionAmount}</ThemedText>
                   <ThemedText style={{ fontSize: 8 }}>{item.clubTransactionDate}</ThemedText>
                 </View>
               </TouchableOpacity>

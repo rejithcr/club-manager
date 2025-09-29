@@ -102,7 +102,7 @@ const DefineFee = () => {
                             keyboardType={'numeric'}
                             defaultValue={feeAmount}
                         />
-                        <ThemedText>Rs. {amountPerMember}/member</ThemedText>
+                        <ThemedText>₹ {amountPerMember}/member</ThemedText>
                     </View>
                 }
                 <View style={{ marginBottom: 10 }} />

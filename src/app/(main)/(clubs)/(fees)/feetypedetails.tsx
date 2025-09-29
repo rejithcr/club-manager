@@ -100,7 +100,7 @@ const FeeTypeDetails = () => {
                 </ThemedText>
               </View>
               <View>
-                <ThemedText>Rs. {fee?.clubFeeAmount}</ThemedText>
+                <ThemedText>₹ {fee?.clubFeeAmount}</ThemedText>
               </View>
             </View>
           </TouchableCard>
@@ -155,7 +155,7 @@ const FeeTypeDetails = () => {
                         edit
                         onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
                         keyName={et.clubFeeTypeExceptionReason}
-                        keyValue={`Rs. ${et.clubFeeExceptionAmount}`}
+                        keyValue={`₹ ${et.clubFeeExceptionAmount}`}
                       />
                     </View>
                   ))}

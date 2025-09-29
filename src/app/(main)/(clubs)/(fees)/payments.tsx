@@ -118,7 +118,7 @@ const Payments = () => {
           }}
         >
           <ThemedHeading style={{ width: 200 }}>{params.get("clubFeeTypePeriod")}</ThemedHeading>
-          <ThemedText style={{ textAlign: "right" }}>Rs. {params.get("total")}</ThemedText>
+          <ThemedText style={{ textAlign: "right" }}>₹ {params.get("total")}</ThemedText>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", width: "85%", alignSelf: "center" }}>
           <CircularProgress
@@ -267,7 +267,7 @@ const MemberFeeItem = (props: {
           ) : (
             <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
           )}
-          <ThemedText style={{ fontSize: 15, maxWidth: 125 }}>
+          <ThemedText style={{ fontSize: 15, maxWidth: 140 }}>
             {props?.firstName} {props?.lastName}
           </ThemedText>
         </View>
@@ -301,7 +301,7 @@ const PaymentUpdates = (props: {
         ) : (
           <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
         )}
-        <ThemedText style={{ fontSize: 15, maxWidth: 125  }}>
+        <ThemedText style={{ fontSize: 15, maxWidth: 140  }}>
           {props?.firstName} {props?.lastName}
         </ThemedText>
       </View>

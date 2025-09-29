@@ -97,11 +97,11 @@ const ClubDues = () => {
       const upi = clubInfo?.upiId || "";
       const tn = `${clubInfo?.clubName || "Club"} fee payment`;
       const link = `upi://pay?pa=${upi}&tn=${encodeURIComponent(tn)}&am=${amount?.toFixed(2)}&cu=INR`;
-      lines.push(`- ${name}: *Rs. ${amount}*`);
+      lines.push(`- ${name}: *₹ ${amount}*`);
     });
 
     const intro = `Dear Member,\n\nThis is a polite request to clear the following club dues. Timely payments help the functioning of the club and are much appreciated.\n\n`;
-    const dueAmount =`*Total Due: Rs. ${totalDue?.toFixed(0)}* \n\n`
+    const dueAmount =`*Total Due: ₹ ${totalDue?.toFixed(0)}* \n\n`
     const outro = `\n\nPlease click on below link to see the your dues breakdown and pay.\nhttps://club-manager-33a8c.web.app?showClubDues=${clubInfo?.clubId}\n\nThank you for supporting\n${clubInfo?.clubName}.`;
 
     const message = intro + dueAmount + lines.join("\n") + outro;
@@ -131,7 +131,7 @@ const ClubDues = () => {
             <LoadingSpinner />
           ) : (
             <ThemedText style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}>
-              Rs. {totalDue?.toFixed(0)}
+              ₹ {totalDue?.toFixed(0)}
             </ThemedText>
           )}
         </View>
@@ -218,7 +218,7 @@ const ConfirmModal = (props: {
       <ThemedView style={{ padding: 16, borderRadius: 6 }}>
         <ThemedText style={{ fontWeight: "bold", marginBottom: 8, fontSize: 20 }}>Confirm updates</ThemedText>
         <ThemedText>Items: {payments.length}</ThemedText>
-        <ThemedText>Total: Rs. {total}</ThemedText>
+        <ThemedText>Total: ₹ {total}</ThemedText>
         <ThemedText style={{ marginTop: 8, fontSize: 12, color: "gray" }}>
           You are about to mark the listed dues as paid.
         </ThemedText>
@@ -266,12 +266,12 @@ const MemberDue = (props: {
             ) : (
               <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
             )}
-            <ThemedText style={{ fontSize: 15, marginLeft: 3, maxWidth: 125}} ellipsizeMode="tail">
+            <ThemedText style={{ fontSize: 15, marginLeft: 3, maxWidth: 135}}>
               {props?.member.firstName} {props?.member.lastName}
             </ThemedText>
           </View>
-          <ThemedText style={{ fontWeight: "500", fontSize: 15, textAlign: "right" }}>
-            Rs. {props?.member.totalDue}
+          <ThemedText style={{ fontSize: 15, textAlign: "right" }}>
+            ₹ {props?.member.totalDue}
           </ThemedText>
         </View>
       </TouchableOpacity>
@@ -327,7 +327,7 @@ const MemberFeeItem = (props: {
           <ThemedText style={{ ...styles.subLabel, color: colors.disabled }}>{feeDesc} </ThemedText>
         </View>
       </View>
-      <ThemedText style={styles.amount}>Rs. {amount}</ThemedText>
+      <ThemedText style={styles.amount}>₹ {amount}</ThemedText>
     </TouchableOpacity>
   );
 };

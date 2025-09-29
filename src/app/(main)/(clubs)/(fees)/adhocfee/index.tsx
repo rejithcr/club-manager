@@ -105,7 +105,7 @@ const AdocFeesHome = () => {
                       </ThemedText>
                     </View>
                     <View style={{ width: "30%" }}>
-                      <ThemedText style={{ textAlign: "right" }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>
+                      <ThemedText style={{ textAlign: "right" }}>₹ {item.clubAdhocFeePaymentAmount}</ThemedText>
                       <Spacer space={2} />
                       <ProgressBar height={8} value={Math.round(item.completionPercentage)} />
                     </View>

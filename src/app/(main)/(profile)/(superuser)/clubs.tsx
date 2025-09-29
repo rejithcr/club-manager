@@ -40,7 +40,7 @@ const Clubs = () => {
         >
           <View>
             <ThemedText style={{ fontSize: 16 }}>{club.clubName}</ThemedText>
-            <ThemedText style={{ fontSize: 14, color: colors.subText }}>{club.createdBy}</ThemedText>
+            <ThemedText style={{ fontSize: 12, color: colors.subText }}>{club.createdBy}</ThemedText>
           </View>
           <ThemedText style={{ fontSize: 12, color: "grey" }}>
             {club.createdTs ? new Date(club.createdTs).toLocaleDateString() : ""}

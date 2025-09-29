@@ -51,7 +51,7 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
         <>
           <ThemedText style={{ width: "55%", fontSize: 15 }}>{club.clubName}</ThemedText>
           <ThemedText style={{ width: "35%", fontWeight: "500", fontSize: 15, textAlign: "right" }}>
-            Rs. {club.dueAmount}
+            ₹ {club.dueAmount}
           </ThemedText>
         </>
       }
@@ -64,7 +64,7 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
             <ThemedText style={styles.label}>{due.fee} </ThemedText>
             <ThemedText style={{...styles.subLabel, color: colors.subText}}>{due.feeDesc} </ThemedText>
           </View>
-          <ThemedText style={styles.amount}>Rs. {due.amount}</ThemedText>
+          <ThemedText style={styles.amount}>₹ {due.amount}</ThemedText>
         </View>
       ))}
       {club.upiId && (

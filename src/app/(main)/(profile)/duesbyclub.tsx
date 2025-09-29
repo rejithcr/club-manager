@@ -45,7 +45,7 @@ const DuesByClub = () => {
             <LoadingSpinner />
           ) : (
             <ThemedText style={{ fontSize: 28, fontWeight: "700", color: colors.background }}>
-              Rs. {clubDues?.dueAmount || "0"}
+              ₹ {clubDues?.dueAmount || "0"}
             </ThemedText>
           )}
            <ThemedText style={{ fontSize: 14, color: colors.background }}>{clubDues?.clubName}</ThemedText>
@@ -81,11 +81,12 @@ const DuesByClub = () => {
                       <ThemedText style={{ fontSize: 16 }}>{d.fee}</ThemedText>
                       <ThemedText style={{ color: colors.subText, fontSize: 12 }}>{d.feeDesc}</ThemedText>
                     </View>
-                    <ThemedText>Rs. {d.amount}</ThemedText>
+                    <ThemedText>₹ {d.amount}</ThemedText>
                   </View>
                 </>
               ))}
-            </RoundedContainer>
+            </RoundedContainer>            
+            {clubDues?.upiId && <><Spacer space={5} /><ThemedText style={{ textAlign: "center", marginTop: 12, width: "80%", alignSelf: "center" }}>Payments should be done to the vpa: {clubDues.upiId}</ThemedText></>}
             <Spacer space={50} />
           </View>
         ) : (
