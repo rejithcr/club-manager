@@ -196,7 +196,7 @@ GET_DUES = """
       where cfp.paid = 0 and ms.club_id = %s
    ) a
    group by a.member_id, a.first_name, a.last_name, a.photo
-   order by 4 desc, 2
+   order by 5 desc, 2
 """
 
 GET_MEMBERSHIP_REQUESTS = """
