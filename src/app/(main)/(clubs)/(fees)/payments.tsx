@@ -127,7 +127,7 @@ const Payments = () => {
             size={50}
           />
           <Spacer hspace={4} />
-          <ThemedText style={{ fontSize: 10, color: colors.subText }}>
+          <ThemedText style={{ fontSize: 12, color: colors.subText }}>
             Select the member to update payment status
           </ThemedText>
         </View>

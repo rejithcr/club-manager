@@ -6,6 +6,7 @@ import Spacer from "@/src/components/Spacer";
 import Divider from "@/src/components/Divider";
 import Collapsible from "@/src/components/Collapsible";
 import { makeUpiPayment } from "@/src/utils/payment";
+import ThemedButton from "@/src/components/ThemedButton";
 
 type ClubDueType = {
   clubId: string;
@@ -48,12 +49,12 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
   return (
     <Collapsible
       header={
-        <>
-          <ThemedText style={{ width: "55%", fontSize: 15 }}>{club.clubName}</ThemedText>
-          <ThemedText style={{ width: "35%", fontWeight: "500", fontSize: 15, textAlign: "right" }}>
+        <View style={{width: "90%", flexDirection:"row", justifyContent: "space-between", alignItems:"center"}}>
+          <ThemedText style={{ fontSize: 16 }}>{club.clubName}</ThemedText>
+          <ThemedText style={{ fontSize: 16, textAlign: "right" }}>
             ₹ {club.dueAmount}
           </ThemedText>
-        </>
+        </View>
       }
     >
       <Spacer space={4} />
@@ -67,11 +68,11 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
           <ThemedText style={styles.amount}>₹ {due.amount}</ThemedText>
         </View>
       ))}
+      <Spacer space={4} />
       {club.upiId && (
-        <TouchableOpacity onPress={() => makeUpiPayment(club.dueAmount, club.clubName, club.upiId)}>
-          <ThemedText style={{ ...styles.button, backgroundColor: colors.primary }}>Pay Now</ThemedText>
-        </TouchableOpacity>
+        <ThemedButton onPress={() => makeUpiPayment(club.dueAmount, club.clubName, club.upiId)} title="Pay Now" />
       )}
+      <Spacer space={4} />
     </Collapsible>
   );
 };

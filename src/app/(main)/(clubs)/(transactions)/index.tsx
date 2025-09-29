@@ -253,7 +253,7 @@ const Transactions = () => {
                 alert('Enter at least 2 characters');
                 return;
               }
-              const res: any = await addCategory({ clubId: clubInfo.clubId, categoryName: newCategoryName.trim() });
+              const res: any = await addCategory({ clubId: clubInfo.clubId, categoryName: newCategoryName.trim(), email: userInfo.email });
               // API expected to return { categoryId, categoryName }
               const createdId = res?.data?.categoryId || res?.categoryId || null;
               const createdName = res?.data?.createdName || res?.createdName || null;
