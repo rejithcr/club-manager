@@ -15,7 +15,6 @@ import { Picker } from "@react-native-picker/picker";
 import InputText from "@/src/components/InputText";
 import { View } from "react-native";
 import { arrayDifference } from "@/src/utils/array";
-import { EventItem } from ".";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { router } from "expo-router";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
@@ -24,6 +23,7 @@ import { useTheme } from "@/src/hooks/use-theme";
 import Alert, { AlertProps } from "@/src/components/Alert";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import { useDeleteEventMutation, useLazyGetClubMembersQuery, useLazyGetEventMembersQuery, useUpdateEventAttendanceMutation } from "@/src/services/clubApi";
+import RoundedContainer from "@/src/components/RoundedContainer";
 
 const EventDetails = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
@@ -164,9 +164,9 @@ const EventDetails = () => {
         )}
       </ThemedView>
 
-      {event && <EventItem event={event} />}
+      {event && <EventItemDetails event={event} />}
       <Spacer space={8} />
-      <ThemedText style={{ width: "85%", textAlign: "center" }}>
+      <ThemedText style={{ width: "85%", textAlign: "center", alignSelf: "center" }}>
         Please select from the below list to mark attendance
       </ThemedText>
       <Spacer space={8} />
@@ -296,3 +296,52 @@ const EventDetails = () => {
 };
 
 export default EventDetails;
+
+
+
+export const EventItemDetails = ({ event }: { event: any }) => {
+  const { colors } = useTheme();
+  return (
+    <RoundedContainer>
+      <View style={{ paddingVertical: 10, paddingHorizontal: 15 }}>
+        <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", alignItems:"center" }}>
+          <ThemedText style={{ fontWeight: "bold" }}>{event.name}</ThemedText>          
+          <ThemedText
+            style={{textAlign: "right",
+              fontSize: 12,
+              fontWeight: "bold",
+              color:
+                event.status === "Completed"
+                  ? colors.success
+                  : event.status === "Scheduled"
+                  ? colors.warning
+                  : colors.error,
+            }}
+          >
+            {event.status}
+          </ThemedText>
+        </View>
+        <Spacer space={3} />
+        <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between",  alignItems:"center" }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <ThemedIcon name={"MaterialIcons:calendar-today"} size={15} />
+            <Spacer hspace={2} />
+            <ThemedText style={{ textAlign: "right", fontSize: 12 }}>{event.eventDate}</ThemedText>
+          </View>
+          <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+             {event.startTime && (
+            <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+              <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
+              <Spacer hspace={2} />
+              <ThemedText style={{ fontSize: 12 }}>
+                {event.startTime} {event.endTime && " - " + event.endTime}
+              </ThemedText>
+            </View>
+          )}
+          </View>
+        </View>
+      </View>
+      <ThemedText style={{alignSelf: "center", paddingHorizontal: 15, paddingBottom: 5}}>{event.description}</ThemedText>
+    </RoundedContainer>
+  );
+};

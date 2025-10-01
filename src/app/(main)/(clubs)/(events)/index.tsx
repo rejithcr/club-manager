@@ -13,8 +13,8 @@ import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
 import { useGetClubEventsQuery, useGetClubEventTypesQuery } from "@/src/services/clubApi";
-import ShadowBox from "@/src/components/ShadowBox";
 import { Picker } from "@react-native-picker/picker";
+import RoundedContainer from "@/src/components/RoundedContainer";
 
 const limit = 20;
 
@@ -37,7 +37,7 @@ const EventsHome = () => {
   return (
     <>
       <ThemedView style={{ flex: 1 }}>
-        <Spacer space={ Platform.OS == 'web' ? 10 : 5} />
+        <Spacer space={Platform.OS == "web" ? 10 : 5} />
         {isLoadingEventTypes ? (
           <LoadingSpinner />
         ) : (
@@ -52,7 +52,7 @@ const EventsHome = () => {
             ))}
           </Picker>
         )}
-        <Spacer space={ Platform.OS == 'web' ? 10 : 0} />
+        <Spacer space={Platform.OS == "web" ? 10 : 0} />
         {isLoading ? (
           <LoadingSpinner />
         ) : (
@@ -127,37 +127,35 @@ const actions = [
 export const EventItem = ({ event }: { event: any }) => {
   const { colors } = useTheme();
   return (
-    <ShadowBox style={{ width: "85%" }}>
-      <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between" }}>
-        <View style={{ rowGap: 3 }}>
+    <RoundedContainer>
+      <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", 
+                    paddingVertical: 10, paddingHorizontal: 15 }}>
+        <View style={{ rowGap: 5 }}>
           <ThemedText style={{ fontWeight: "bold" }}>{event.title}</ThemedText>
-          <ThemedText style={{ fontSize: 10 }}>{event.description}</ThemedText>
-          <View style={{ flexDirection: "row" }}>
-            <ThemedText style={{ fontSize: 12, fontWeight: "bold", color: colors.button }}>{event.name}</ThemedText>
-            <Spacer hspace={2} />
-            <ThemedText
-              style={{
-                fontSize: 12,
-                fontWeight: "bold",
-                color:
-                  event.status === "Completed"
-                    ? colors.success
-                    : event.status === "Scheduled"
-                    ? colors.warning
-                    : colors.error,
-              }}
-            >
-              {event.status}
-            </ThemedText>
-          </View>
-        </View>
-        <View style={{ rowGap: 3 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <ThemedIcon name={"MaterialIcons:calendar-today"} size={15} />
             <Spacer hspace={2} />
-            <ThemedText style={{ textAlign: "right", fontSize: 12, fontWeight: "bold" }}>{event.eventDate}</ThemedText>
+            <ThemedText style={{ textAlign: "right", fontSize: 12 }}>{event.eventDate}</ThemedText>
           </View>
-          {event.startTime && (
+        </View>
+        <View style={{ rowGap: 5 }}>
+          <ThemedText
+            style={{textAlign: "right",
+              fontSize: 12,
+              fontWeight: "bold",
+              color:
+                event.status === "Completed"
+                  ? colors.success
+                  : event.status === "Scheduled"
+                  ? colors.warning
+                  : colors.error,
+            }}
+          >
+            {event.status}
+          </ThemedText>
+         
+          <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+             {event.startTime && (
             <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
               <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
               <Spacer hspace={2} />
@@ -166,17 +164,9 @@ export const EventItem = ({ event }: { event: any }) => {
               </ThemedText>
             </View>
           )}
-          {
-            event.location ? (
-              <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
-                <ThemedIcon name={"MaterialIcons:location-pin"} size={15} />
-                <Spacer hspace={2} />
-                <ThemedText style={{ textAlign: "right", fontSize: 12 }}>{event.location}</ThemedText>
-              </View>
-            ) : null // i dont know why erro txt  inside view. this worked though
-          }
+          </View>
         </View>
       </View>
-    </ShadowBox>
+    </RoundedContainer>
   );
 };

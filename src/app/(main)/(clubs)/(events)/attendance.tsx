@@ -1,4 +1,4 @@
-import { View, FlatList, Platform } from "react-native";
+import { View, FlatList, Platform, Image } from "react-native";
 import React, { useContext, useEffect, useState } from "react";
 import { ClubContext } from "@/src/context/ClubContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
@@ -8,9 +8,11 @@ import Spacer from "@/src/components/Spacer";
 import DatePicker from "@/src/components/DatePicker";
 import ThemedButton from "@/src/components/ThemedButton";
 import ProgressBar from "@/src/components/charts/ProgressBar";
-import ShadowBox from "@/src/components/ShadowBox";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import { useGetClubEventTypesQuery, useLazyGetAttendanceReportQuery } from "@/src/services/clubApi";
+import RoundedContainer from "@/src/components/RoundedContainer";
+import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
+import Divider from "@/src/components/Divider";
 
 const AttendanceReport = () => {
   const { clubInfo } = useContext(ClubContext);
@@ -26,7 +28,7 @@ const AttendanceReport = () => {
     eventTypes && setEventTypeId(eventTypes[0].eventTypeId);
   }, [eventTypes]);
 
-  const [getAttendanceReport, { data: report, isLoading: isLoadingReport }] = useLazyGetAttendanceReportQuery();
+  const [getAttendanceReport, { data: report, isFetching: isLoadingReport }] = useLazyGetAttendanceReportQuery();
 
   const handleShowReport = () => {
     getAttendanceReport({
@@ -56,28 +58,34 @@ const AttendanceReport = () => {
       {!isLoadingEventTypes && <ThemedButton title="Show Report" onPress={handleShowReport} />}
 
       <Spacer space={10} />
+       <RoundedContainer>
       {isLoadingReport ? (
         <LoadingSpinner />
       ) : (
         <FlatList
           data={report}
           keyExtractor={(r: any) => r.memberId}
-          ItemSeparatorComponent={() => <Spacer space={4} />}
-          ListFooterComponent={() => <Spacer space={10} />}
+          ItemSeparatorComponent={() => <Divider/>}
           renderItem={({ item }) => (
-            <ShadowBox
-              style={{ width: "85%", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}
+            <View
+              style={{ width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 15, paddingVertical: 10 }}
             >
-              <ThemedText style={{ width: "60%" }}>
+              {item.photo ? (
+                <Image source={{ uri: item.photo }} style={{ height: 32, width: 32, borderRadius: 100 }} />
+              ) : (
+                <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
+              )}
+              <ThemedText style={{ width: "40%" }}>
                 {item.firstName} {item.lastName}
               </ThemedText>
               <View style={{ width: "40%" }}>
                 <ProgressBar height={12} value={Math.round(item.attendancePercentage)} />
               </View>
-            </ShadowBox>
+            </View>
           )}
         />
       )}
+      </RoundedContainer>
     </ThemedView>
   );
 };

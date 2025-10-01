@@ -18,6 +18,7 @@ import { showSnackbar } from "@/src/components/snackbar/snackbarService";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import Banner from "@/src/components/Banner";
 import RoundedContainer from "@/src/components/RoundedContainer";
+import NumberTicker from "@/src/components/NumberTicker";
 
 const ClubDues = () => {
   const { clubInfo } = useContext(ClubContext);
@@ -126,14 +127,12 @@ const ClubDues = () => {
       <Spacer space={10} />
       <Banner backgroundColor={totalDue == 0 ? colors.success : colors.warning}>
         <View>
-          <ThemedText style={{color: colors.background }}>Total Due</ThemedText>
-          {isLoading ? (
-            <LoadingSpinner />
-          ) : (
-            <ThemedText style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}>
-              ₹ {totalDue?.toFixed(0)}
-            </ThemedText>
-          )}
+          <ThemedText style={{color: colors.background }}>Total Due</ThemedText>          
+          <NumberTicker
+            value={totalDue?.toFixed(0)}
+            isLoading={isLoading}
+            style={{ fontSize: 30, fontWeight: 'bold', color: colors.background }}
+          />
         </View>
         <ThemedIcon name="MaterialCommunityIcons:account-cash" size={50} color={colors.background} />
       </Banner>

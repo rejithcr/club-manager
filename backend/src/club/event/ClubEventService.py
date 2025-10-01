@@ -218,6 +218,7 @@ class ClubEventService():
                             m.member_id,
                             m.first_name,
                             m.last_name,
+                            m.photo,
                             COUNT(e.event_id) AS total_events,
                             COUNT(a.event_id) FILTER (WHERE a.present IS TRUE) AS attended_events,
                             ROUND(

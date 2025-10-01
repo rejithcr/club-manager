@@ -11,15 +11,17 @@ type Props = {
 
 const formatNumber = (n: number) => {
   try {
-    return n.toLocaleString('en-IN');
+    // always show rounded integer (no decimals)
+    const rounded = Math.round(n);
+    return new Intl.NumberFormat('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(rounded);
   } catch (e) {
-    return String(n);
+    return String(Math.round(n));
   }
 };
 
 export default function NumberTicker({ value, isLoading = false, style, containerStyle, duration = 1200 }: Props) {
-  const animated = useRef(new Animated.Value(0)).current;
-  const [display, setDisplay] = useState<number>(Math.max(0, Math.floor(value || 0)));
+  const animated = useRef(new Animated.Value(Math.round(Number(value || 0)))).current;
+  const [display, setDisplay] = useState<number>(Math.round(Number(value || 0)));
   const intervalRef = useRef<any>(null);
 
   useEffect(() => {
@@ -27,7 +29,9 @@ export default function NumberTicker({ value, isLoading = false, style, containe
 
     // keep animated value in sync with display when animating to final value
     listenerId = animated.addListener(({ value: v }) => {
-      setDisplay(Math.max(0, Math.floor(v)));
+      // round to nearest integer for display
+      const rounded = Math.round(v);
+      setDisplay(Math.max(0, rounded));
     });
 
     if (isLoading) {
@@ -46,14 +50,19 @@ export default function NumberTicker({ value, isLoading = false, style, containe
         intervalRef.current = null;
       }
 
-      // set animated start point to current display, then animate to target
+      // set animated start point to current display, then animate to rounded target value
+      const target = Math.max(0, Math.round(Number(value || 0)));
       animated.setValue(display);
       Animated.timing(animated, {
-        toValue: Math.max(0, Math.floor(value || 0)),
+        toValue: target,
         duration,
         easing: Easing.out(Easing.exp),
         useNativeDriver: false,
-      }).start();
+      }).start(() => {
+        // ensure final display equals the rounded prop exactly
+        setDisplay(target);
+        animated.setValue(target);
+      });
     }
 
     return () => {
