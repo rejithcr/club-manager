@@ -28,6 +28,7 @@ import Animated, { FadeInRight, FadeInUp } from "react-native-reanimated";
 import RoundedContainer from "@/src/components/RoundedContainer";
 import Divider from "@/src/components/Divider";
 import Banner from "@/src/components/Banner";
+import NumberTicker from "@/src/components/NumberTicker";
 
 const ClubHome = () => {
   const router = useRouter();
@@ -124,11 +125,11 @@ const ClubHome = () => {
         <Banner backgroundColor={fbr?.fundBalance < 1 ? colors.error : colors.success}>
           <View>
             <ThemedText style={{ color: colors.background }}>Fund Balance</ThemedText>
-            {isFundBalanceLoading ? <LoadingSpinner /> : 
-              <ThemedText style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}>
-                ₹ {fbr?.fundBalance || 0}
-              </ThemedText>
-            }
+            <NumberTicker
+              value={fbr?.fundBalance || 0}
+              isLoading={isFundBalanceLoading}
+              style={{ fontSize: 30, fontWeight: 'bold', color: colors.background }}
+            />
           </View>
           <ThemedIcon name="MaterialCommunityIcons:wallet" size={50} color={colors.background} />
         </Banner>
