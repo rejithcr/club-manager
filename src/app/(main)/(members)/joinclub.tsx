@@ -81,7 +81,7 @@ const JoinClub = () => {
                 renderItem={({ item }) => (
                     <RoundedContainer>
                     <TouchableCard onPress={() => handleSelectClub(item)}>
-                        <ThemedText style={styles.clubName}>{item.clubName}</ThemedText>
+                        <ThemedText>{item.clubName}</ThemedText>
                     </TouchableCard>
                     </RoundedContainer>
                 )}
@@ -111,9 +111,6 @@ const styles = StyleSheet.create({
         padding: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#eee',
-    },
-    clubName: {
-        fontSize: 16,
     },
     emptyText: {
         textAlign: 'center',

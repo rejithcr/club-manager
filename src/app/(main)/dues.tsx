@@ -50,8 +50,8 @@ const ClubDue = ({ club }: { club: ClubDueType }) => {
     <Collapsible
       header={
         <View style={{width: "90%", flexDirection:"row", justifyContent: "space-between", alignItems:"center"}}>
-          <ThemedText style={{ fontSize: 16 }}>{club.clubName}</ThemedText>
-          <ThemedText style={{ fontSize: 16, textAlign: "right" }}>
+          <ThemedText>{club.clubName}</ThemedText>
+          <ThemedText style={{textAlign: "right" }}>
             ₹ {club.dueAmount}
           </ThemedText>
         </View>

@@ -123,7 +123,7 @@ const ClubHome = () => {
         >          
         <Banner backgroundColor={fbr?.fundBalance < 1 ? colors.error : colors.success}>
           <View>
-            <ThemedText style={{ fontSize: 16, color: colors.background }}>Fund Balance</ThemedText>
+            <ThemedText style={{ color: colors.background }}>Fund Balance</ThemedText>
             {isFundBalanceLoading ? <LoadingSpinner /> : 
               <ThemedText style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}>
                 ₹ {fbr?.fundBalance || 0}
@@ -138,19 +138,19 @@ const ClubHome = () => {
               onPress={showClubDues}
               rightComponent={isTotalDueLoading ? <LoadingSpinner /> : <ThemedText>₹ {clubDue?.totalDue}</ThemedText>}
             >
-              <ThemedText style={{ fontSize: 16 }}>Dues</ThemedText>
+              <ThemedText>Dues</ThemedText>
             </TouchableCard>
             <Spacer space={2} />
             <Divider />
             <Spacer space={2} />
             <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(transactions)`)}>
-              <ThemedText style={{ fontSize: 16 }}>Transactions</ThemedText>
+              <ThemedText>Transactions</ThemedText>
             </TouchableCard>
             <Spacer space={2} />
             <Divider />
             <Spacer space={2} />
             <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(members)`)}>
-              <ThemedText style={{ fontSize: 16 }}>Members</ThemedText>
+              <ThemedText>Members</ThemedText>
             </TouchableCard>
           </RoundedContainer>
           <Spacer space={4} />
@@ -191,7 +191,7 @@ const ClubHome = () => {
                         rightComponent={<ThemedText>₹ {fee.clubFeeAmount}</ThemedText>}
                       >
                         <View>
-                          <ThemedText style={{ fontSize: 17, fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
+                          <ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
                           <ThemedText style={{ fontSize: 10, marginTop: 5, color: colors.disabled }}>
                             {fee.clubFeeTypeInterval}
                           </ThemedText>

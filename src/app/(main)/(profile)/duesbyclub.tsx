@@ -78,7 +78,7 @@ const DuesByClub = () => {
                     }}
                   >
                     <View style={{width: 200}}>
-                      <ThemedText style={{ fontSize: 16 }}>{d.fee}</ThemedText>
+                      <ThemedText>{d.fee}</ThemedText>
                       <ThemedText style={{ color: colors.subText, fontSize: 12 }}>{d.feeDesc}</ThemedText>
                     </View>
                     <ThemedText>₹ {d.amount}</ThemedText>

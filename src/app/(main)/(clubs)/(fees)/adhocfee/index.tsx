@@ -98,7 +98,7 @@ const AdocFeesHome = () => {
                     }}
                   >
                     <View style={{ width: "70%" }}>
-                      <ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
+                      <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
                       <ThemedText style={{ fontSize: 12, color: colors.subText}}>{item.clubAdhocFeeDesc}</ThemedText>
                       <ThemedText style={{ fontSize: 10, marginTop: 5 }}>
                         {item.clubAdhocFeeDate} 

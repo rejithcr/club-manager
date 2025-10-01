@@ -39,7 +39,7 @@ const Clubs = () => {
           }}
         >
           <View>
-            <ThemedText style={{ fontSize: 16 }}>{club.clubName}</ThemedText>
+            <ThemedText>{club.clubName}</ThemedText>
             <ThemedText style={{ fontSize: 12, color: colors.subText }}>{club.createdBy}</ThemedText>
           </View>
           <ThemedText style={{ fontSize: 12, color: "grey" }}>

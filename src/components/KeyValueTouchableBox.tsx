@@ -28,11 +28,11 @@ const KeyValueTouchableBox = (props: {
           paddingVertical: 10
         }}
       >
-        <ThemedText numberOfLines={1} style={{ fontSize: 16}}>
+        <ThemedText numberOfLines={1}>
           {props.keyName}
         </ThemedText>
         <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "flex-end" }}>
-          <ThemedText style={{ fontSize: 16, textAlign: "right" }}>{props.keyValue} </ThemedText>
+          <ThemedText style={{ textAlign: "right" }}>{props.keyValue} </ThemedText>
           <ThemedIcon
             style={{ paddingLeft: 5 }}
             name={

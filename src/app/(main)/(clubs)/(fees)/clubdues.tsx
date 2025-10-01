@@ -126,7 +126,7 @@ const ClubDues = () => {
       <Spacer space={10} />
       <Banner backgroundColor={totalDue == 0 ? colors.success : colors.warning}>
         <View>
-          <ThemedText style={{ fontSize: 16, color: colors.background }}>Total Due</ThemedText>
+          <ThemedText style={{color: colors.background }}>Total Due</ThemedText>
           {isLoading ? (
             <LoadingSpinner />
           ) : (
@@ -266,7 +266,7 @@ const MemberDue = (props: {
             ) : (
               <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
             )}
-            <ThemedText style={{ fontSize: 15, marginLeft: 3, maxWidth: 135}}>
+            <ThemedText style={{ marginLeft: 3, maxWidth: 135}}>
               {props?.member.firstName} {props?.member.lastName}
             </ThemedText>
           </View>

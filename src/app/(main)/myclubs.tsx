@@ -52,7 +52,7 @@ const MyClubs = (props: { clubs: [] }) => {
                   }
                   id={item.clubId}
                 >
-                  <ThemedText style={{ fontSize: 16 }}>{item.clubName}</ThemedText>
+                  <ThemedText>{item.clubName}</ThemedText>
                 </TouchableCard>
               </Animated.View>
             </View>
