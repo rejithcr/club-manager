@@ -117,7 +117,6 @@ const Transactions = () => {
   };
   
   const handleEdit = (item: any) => {
-    console.log(item);
     if(item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && clubInfo.role === ROLE_ADMIN){
       setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnDate: new Date(item.clubTransactionDate), 
         txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount,
@@ -135,7 +134,7 @@ const Transactions = () => {
   const getCategory = (id: number) => {
     return categories.find((c: any)=> c.categoryId == id)?.categoryName;
   }
-  console.log(txnValues);
+  
   return (
     <GestureHandlerRootView>
       <ThemedView style={{ flex: 1 }}> 

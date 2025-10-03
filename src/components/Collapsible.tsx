@@ -1,18 +1,17 @@
 import { TouchableOpacity, View } from "react-native";
 import React from "react";
-import ThemedView from "./themed-components/ThemedView";
 import ThemedIcon from "./themed-components/ThemedIcon";
 import { useTheme } from "../hooks/use-theme";
 import RoundedContainer from "./RoundedContainer";
 
 const Collapsible = (props: { children: any; header: React.ReactNode }) => {
-  const [showDues, setShowDues] = React.useState(false);
+  const [collapsed, setCollpsed] = React.useState(true);
   const { colors } = useTheme();
   return (
     <View>
       <RoundedContainer>
         <TouchableOpacity
-          onPress={() => setShowDues((prev) => !prev)}
+          onPress={() => setCollpsed((prev) => !prev)}
           style={{
             flexDirection: "row",
             width: "100%",
@@ -24,14 +23,14 @@ const Collapsible = (props: { children: any; header: React.ReactNode }) => {
           <ThemedIcon
             size={20}
             name={
-              showDues ? "MaterialCommunityIcons:chevron-down-circle" : "MaterialCommunityIcons:chevron-right-circle"
+              !collapsed ? "MaterialCommunityIcons:chevron-down-circle" : "MaterialCommunityIcons:chevron-right-circle"
             }
             color={colors.nav}
           />
           {props.header}
         </TouchableOpacity>
       </RoundedContainer>
-      {showDues && <View>{props.children}</View>}
+      {!collapsed && <View>{props.children}</View>}
     </View>
   );
 };

@@ -142,15 +142,15 @@ const EditFeeException = () => {
                 <ThemedText style={{ ...appStyles.heading }}>Add Members</ThemedText>
                 {isLoadingMembers && <LoadingSpinner />}
                 {!isLoadingMembers &&
-                    members.map((item: any) =><><RoundedContainer>
-                        <TouchableOpacity key={item.memberId} onPress={() => addToException(item)}>
+                    members.map((item: any) =><View key={item.memberId}><RoundedContainer>
+                        <TouchableOpacity onPress={() => addToException(item)}>
                             <ShadowBox>
                                 <ThemedIcon name="MaterialIcons:add-circle" size={20} color={colors.add}/>
                                 <ThemedText style={{ fontSize: 15, paddingLeft: 10}}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>
                         </RoundedContainer>
-                        <Spacer space={4} /></>                        
+                        <Spacer space={4} /></View>                        
                     )
                 }
             <View style={{marginVertical:40}} />

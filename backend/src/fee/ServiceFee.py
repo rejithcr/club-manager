@@ -48,15 +48,17 @@ class FeeService():
         for payment in payments:
             if payment['feeType'] == constants.FEE_TYPE_ADHOC_FEE:
                 db.execute(conn, queries_fee.MARK_ADHOC_FEE_AS_PAID,(email, payment['paymentId']))
-                db.execute(conn, queries_fee.ADD_ADHOC_FEE_TRANSACTION,
-                           (clubId, payment['amount'], "CREDIT", constants.FEE_TYPE_ADHOC_FEE,
-                            f"Fee collection for adhoc paymentId {payment['paymentId']}",
-                            payment['paymentId'], date.today(), email, email))
+                if payment['amount'] != 0:
+                    db.execute(conn, queries_fee.ADD_ADHOC_FEE_TRANSACTION,
+                               (clubId, payment['amount'], "CREDIT", constants.FEE_TYPE_ADHOC_FEE,
+                                f"Fee collection for adhoc paymentId {payment['paymentId']}",
+                                payment['paymentId'], date.today(), email, email))
             elif payment['feeType'] == constants.FEE_TYPE_FEE:
                 db.execute(conn, queries_fee.MARK_FEE_AS_PAID,(email, payment['paymentId']))
-                db.execute(conn, queries_fee.ADD_FEE_TRANSACTION,
-                           (clubId, payment['amount'], "CREDIT", constants.FEE_TYPE_FEE,
-                            f"Fee collection for paymentId {payment['paymentId']}",
-                            payment['paymentId'], date.today(), email, email))
+                if payment['amount'] != 0:
+                    db.execute(conn, queries_fee.ADD_FEE_TRANSACTION,
+                               (clubId, payment['amount'], "CREDIT", constants.FEE_TYPE_FEE,
+                                f"Fee collection for paymentId {payment['paymentId']}",
+                                payment['paymentId'], date.today(), email, email))
         conn.commit()
         return {"message": f"{len(payments)} Payments updated"}

@@ -290,8 +290,8 @@ DELETE_ADHOC_FEE_COLLECTION = """
 ADD_FEE_TYPE_PAYMENT = """
                        insert into club_fee_payment(club_fee_payment_id, club_fee_collection_id, membership_id,
                                                     club_fee_payment_amount, club_fee_type_exception_member_id, \
-                                                    created_by, updated_by)
-                       values (nextval('club_fee_payment_id_seq'), %s, %s, %s, %s, %s, %s) \
+                                                    paid, created_by, updated_by)
+                       values (nextval('club_fee_payment_id_seq'), %s, %s, %s, %s, %s, %s, %s) \
                        """
 
 UPDATE_FEE_PAYMENT_STATUS = """

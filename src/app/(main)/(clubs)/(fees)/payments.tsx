@@ -159,10 +159,10 @@ const Payments = () => {
               <Spacer space={10} />
               <RoundedContainer>
               {paymentStatusUpdates.map((item, idx) => (
-                <>
+                <View key={item.clubFeePaymentId}>
                     {idx > 0 && <Divider />}
-                    <PaymentUpdates key={item.clubFeePaymentId} {...item} />
-                </>
+                    <PaymentUpdates {...item} />
+                </View>
                 ))}
               </RoundedContainer>
               <Spacer space={10} />

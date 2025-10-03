@@ -166,7 +166,7 @@ const EventDetails = () => {
 
       {event && <EventItemDetails event={event} />}
       <Spacer space={8} />
-      <ThemedText style={{ width: "85%", textAlign: "center", alignSelf: "center" }}>
+      <ThemedText style={{ width: "85%", textAlign: "center", alignSelf: "center", fontSize: 14, color: colors.subText }}>
         Please select from the below list to mark attendance
       </ThemedText>
       <Spacer space={8} />
@@ -341,7 +341,7 @@ export const EventItemDetails = ({ event }: { event: any }) => {
           </View>
         </View>
       </View>
-      <ThemedText style={{alignSelf: "center", paddingHorizontal: 15, paddingBottom: 5}}>{event.description}</ThemedText>
+      <ThemedText style={{paddingHorizontal: 15, paddingBottom: 5, fontSize: 12, color: colors.subText}}>{event.description}</ThemedText>
     </RoundedContainer>
   );
 };

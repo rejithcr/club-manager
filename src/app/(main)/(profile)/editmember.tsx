@@ -120,14 +120,14 @@ const Editmember = () => {
           {isLoadingMyClubs && <LoadingSpinner />}
           {!isLoadingMyClubs &&
             clubs?.map((item: any) => (
-              <>
-                <RoundedContainer key={item.clubId}>
+              <View key={item.clubId}>
+                <RoundedContainer>
                   <TouchableCard onPress={() => showDetails(item)} id={item.clubId}>
                     <ThemedText>{item.clubName}</ThemedText>
                   </TouchableCard>
                 </RoundedContainer>
                 <Spacer space={4} />
-              </>
+              </View>
             ))}
           <Spacer space={10} />
         </ScrollView>
