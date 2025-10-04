@@ -34,6 +34,7 @@ import NumberTicker from "@/src/components/NumberTicker";
 import { useGetEventTransactionsQuery } from "@/src/services/feeApi";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
 import Divider from "@/src/components/Divider";
+import { preventAutoHideAsync } from "expo-router/build/utils/splash";
 
 const EventDetails = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
@@ -121,7 +122,8 @@ const EventDetails = () => {
         eventId: event?.eventId,
         records: [...added, ...removed],
         status: eventStatus,
-      }).unwrap();
+      }).unwrap();      
+      setEvent(prev => prev ? {...prev, status: eventStatus} : prev);
     } catch (error) {
       console.error("Error updating attendance:", error);
     } finally {
