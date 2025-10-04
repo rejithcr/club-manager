@@ -54,6 +54,22 @@ export const clubApi = createApi({
       }),
       invalidatesTags: ["eventType"],
     }),
+    updateClubEventType: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/types",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["eventType"],
+    }),
+    deleteClubEventType: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/types",
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: ["eventType"],
+    }),
     deleteClubMemberAttribute: builder.mutation({
       query: (body) => ({
         url: "/club/member/attribute",
@@ -193,5 +209,7 @@ export const {
   useGetEventMembersQuery,
   useLazyGetEventMembersQuery,
   useLazyGetClubMembersQuery,
-  useAddClubEventTypeMutation
+  useAddClubEventTypeMutation,
+  useUpdateClubEventTypeMutation,
+  useDeleteClubEventTypeMutation
 } = clubApi;

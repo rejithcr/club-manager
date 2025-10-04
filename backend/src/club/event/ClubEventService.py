@@ -92,6 +92,38 @@ class ClubEventService():
         conn.commit()
         return {'message': 'Event type added', 'name': name.strip()}
 
+    def update_event_type(self, conn, params):
+        club_id = params.get('clubId')
+        event_type_id = params.get('eventTypeId')
+        name = params.get('name')
+        
+        if not event_type_id:
+            return ({'error': 'Event type ID is required'}, 400)
+        if not name or len(name.strip()) < 2:
+            return ({'error': 'Invalid name'}, 400)
+            
+        db.execute(conn, queries_events.UPDATE_EVENT_TYPES, (name.strip(), club_id, event_type_id))
+        conn.commit()
+        return {'message': 'Event type updated', 'name': name.strip()}
+
+    def delete_event_type(self, conn, params):
+        club_id = params.get('clubId')
+        event_type_id = params.get('eventTypeId')
+        
+        if not event_type_id:
+            return ({'error': 'Event type ID is required'}, 400)
+            
+        try:
+            db.execute(conn, queries_events.DELETE_EVENT_TYPES, (club_id, event_type_id))
+            conn.commit()
+            return {'message': 'Event type deleted'}
+        except Exception as e:
+            # Handle foreign key constraint violations
+            if 'foreign key constraint' in str(e).lower() or 'violates foreign key' in str(e).lower():
+                return ({'error': 'Cannot delete event type. It is being used by existing events.'}, 400)
+            else:
+                raise e
+
 
     def filtered_events(self, conn, params):
         status = params.get('status')

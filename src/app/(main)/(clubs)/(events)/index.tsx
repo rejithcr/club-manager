@@ -34,6 +34,14 @@ const EventsHome = () => {
     router.push(url);
   };
 
+  const handleEventTypeChange = (value: string) => {
+    if (value === "__edit__") {
+      router.push("/(main)/(clubs)/(events)/eventtypes");
+      return;
+    }
+    setEventTypeId(value);
+  };
+
   return (
     <>
       <ThemedView style={{ flex: 1 }}>
@@ -44,12 +52,13 @@ const EventsHome = () => {
           <Picker
             style={{ width: "85%", alignSelf: "center" }}
             selectedValue={eventTypeId}
-            onValueChange={(value) => setEventTypeId(value)}
+            onValueChange={handleEventTypeChange}
           >
             <Picker.Item label="All" value="-1" />
             {eventTypes?.map((type: any) => (
               <Picker.Item key={type.eventTypeId} label={type.name} value={type.eventTypeId} />
             ))}
+            <Picker.Item value="__edit__" label="⚙ Edit Event Types" />
           </Picker>
         )}
         <Spacer space={Platform.OS == "web" ? 10 : 0} />

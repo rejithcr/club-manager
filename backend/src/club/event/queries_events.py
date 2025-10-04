@@ -65,6 +65,17 @@ INSERT_EVENT_TYPES = """
     INSERT INTO event_types (club_id, name) VALUES  (%s, %s);
 """
 
+UPDATE_EVENT_TYPES = """
+    UPDATE event_types 
+    SET name = %s 
+    WHERE club_id = %s AND event_type_id = %s;
+"""
+
+DELETE_EVENT_TYPES = """
+    DELETE FROM event_types 
+    WHERE club_id = %s AND event_type_id = %s;
+"""
+
 GET_EVENT_TRANSACTIONS = """
      select t.event_transaction_id, t.event_transaction_amount::REAL, t.event_transaction_type, t.event_transaction_category_type_id,
         t.event_transaction_comment, t.created_by, to_char(t.event_transaction_date, 'YYYY-mm-dd') event_transaction_date,

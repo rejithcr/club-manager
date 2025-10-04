@@ -31,6 +31,30 @@ def post_event_type():
     finally:
         db.close_connection(conn)
 
+
+@club_event_bp.route('/types', methods=['PUT'], strict_slashes=False)
+@role_required([constants.ROLE_MAINTAINER])
+def put_event_type():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.update_event_type(conn, params), 200
+    finally:
+        db.close_connection(conn)
+
+
+@club_event_bp.route('/types', methods=['DELETE'], strict_slashes=False)
+@role_required([constants.ROLE_MAINTAINER])
+def delete_event_type():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.delete_event_type(conn, params), 200
+    finally:
+        db.close_connection(conn)
+
 @club_event_bp.route('/', methods=['GET'], strict_slashes=False)
 @role_required([constants.ROLE_MEMBER])
 def get_club_event():

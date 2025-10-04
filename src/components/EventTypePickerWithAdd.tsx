@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import Modal from "react-native-modal";
+import { router } from "expo-router";
 
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import InputText from "@/src/components/InputText";
@@ -34,6 +35,10 @@ const EventTypePickerWithAdd: React.FC<EventTypePickerWithAddProps> = ({
   const handleValueChange = (value: string) => {
     if (value === "__add__") {
       setIsAddTypeVisible(true);
+      return;
+    }
+    if (value === "__edit__") {
+      router.push("/(main)/(clubs)/(events)/eventtypes");
       return;
     }
     onValueChange(value);
@@ -80,6 +85,7 @@ const EventTypePickerWithAdd: React.FC<EventTypePickerWithAddProps> = ({
           <Picker.Item key={type.eventTypeId} label={type.name} value={type.eventTypeId} />
         ))}
         <Picker.Item value="__add__" label="+ Add New Event Type" />
+        <Picker.Item value="__edit__" label="⚙ Edit Event Types" />
       </Picker>
 
       <Modal isVisible={isAddTypeVisible}>
