@@ -10,19 +10,21 @@ import { isValidDate, isValidLength } from "@/src/utils/validators";
 import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
-import { Platform, StyleSheet } from "react-native";
+import { Platform, StyleSheet, Switch } from "react-native";
 import { useAddEventMutation, useGetClubEventTypesQuery } from "@/src/services/clubApi";
 import { handleTimeChange } from "@/src/utils/common";
+import FormSwitch from "@/src/components/FormSwitch";
 
 const AddEvent = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState(new Date());
-  const [startTime, setStartTime] = useState<string>("");
-  const [endTime, setEndTime] = useState<string>("");
+  const [startTime, setStartTime] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
   const [location, setLocation] = useState("");
   const [eventTypeId, setEventTypeId] = useState("");
-
+  const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
+  const [isAttendanceEnabled, setIsAttendanceEnabled] = useState(false);
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
 
@@ -46,6 +48,8 @@ const AddEvent = () => {
       endTime: endTime,
       location,
       eventTypeId: Number(eventTypeId),
+      isTransactionEnabled,
+      isAttendanceEnabled,
       createdBy: userInfo.email,
     };
     try {
@@ -92,7 +96,9 @@ const AddEvent = () => {
         keyboardType="numeric"
       />
       <InputText label={"Location"} value={location} onChangeText={setLocation} placeholder="" />
-      <Spacer space={5} />
+      <FormSwitch label={"Do you want to track transactions separatly for this event?"} onValueChange={() => setIsTransactionEnabled(prev => !prev)} value={isTransactionEnabled} />
+      <FormSwitch label={"Do you want to track attendance?"}onValueChange={() => setIsAttendanceEnabled(prev => !prev)} value={isAttendanceEnabled} />
+      <Spacer space={8} />
       {isAdding ? <LoadingSpinner /> : <ThemedButton title="Create Event" onPress={handleSubmit} />}
     </ThemedView>
   );

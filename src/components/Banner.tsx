@@ -1,12 +1,12 @@
-import { View } from "react-native";
+import { Touchable, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { useTheme } from "../hooks/use-theme";
 import { sizes } from "../utils/styles";
 
-const Banner = (props: { backgroundColor?: string | undefined; children: React.ReactNode }) => {
+const Banner = (props: { backgroundColor?: string | undefined; children: React.ReactNode , onPress?: any}) => {
   const { colors } = useTheme();
   return (
-    <View
+    <TouchableOpacity onPress={props.onPress} disabled={props.onPress ? false : true}
       style={{
         paddingHorizontal: 25,
         paddingVertical: 15,
@@ -22,7 +22,7 @@ const Banner = (props: { backgroundColor?: string | undefined; children: React.R
       }}
     >
       {props.children}
-    </View>
+    </TouchableOpacity>
   );
 };
 

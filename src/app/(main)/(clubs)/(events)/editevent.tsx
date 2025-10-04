@@ -14,16 +14,19 @@ import { Platform, StyleSheet } from "react-native";
 import { useSearchParams } from "expo-router/build/hooks";
 import { useGetClubEventTypesQuery, useUpdateEventMutation } from "@/src/services/clubApi";
 import { handleTimeChange, to24HourFormat } from "@/src/utils/common";
+import FormSwitch from "@/src/components/FormSwitch";
 
 const AddEvent = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState(new Date());
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
+  const [startTime, setStartTime] = useState<string| null>(null);
+  const [endTime, setEndTime] = useState<string| null>(null);
   const [location, setLocation] = useState("");
   const [eventTypeId, setEventTypeId] = useState("");
   const [eventId, setEventId] = useState();
+  const [isTransactionEnabled, setIsTransactionEnabled] = useState(false);
+  const [isAttendanceEnabled, setIsAttendanceEnabled] = useState(false);
 
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
@@ -40,6 +43,8 @@ const AddEvent = () => {
     setEndTime(to24HourFormat(eventObj.endTime))
     setLocation(eventObj.location)
     setEventId(eventObj.eventId)
+    setIsTransactionEnabled(eventObj.isTransactionEnabled)
+    setIsAttendanceEnabled(eventObj.isAttendanceEnabled)
     eventTypes && setEventTypeId(eventObj.eventTypeId)
   },[eventTypes])
 
@@ -57,6 +62,8 @@ const AddEvent = () => {
       endTime: endTime,
       location,
       eventTypeId: Number(eventTypeId),
+      isTransactionEnabled,
+      isAttendanceEnabled,
       createdBy: userInfo.email,
       eventId
     };
@@ -121,7 +128,9 @@ const AddEvent = () => {
         onChangeText={setLocation}
         placeholder=""
       />
-      <Spacer space={5} />
+      <FormSwitch label={"Do you want to track transactions separatly for this event?"} onValueChange={() => setIsTransactionEnabled(prev => !prev)} value={isTransactionEnabled} />
+      <FormSwitch label={"Do you want to track attendance?"}onValueChange={() => setIsAttendanceEnabled(prev => !prev)} value={isAttendanceEnabled} />
+      <Spacer space={8} />
       {isUpdating ? <LoadingSpinner/> :
       <ThemedButton title="Save Event" onPress={handleSubmit} />}
     </ThemedView>

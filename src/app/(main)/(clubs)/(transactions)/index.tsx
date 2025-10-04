@@ -25,7 +25,7 @@ import Spacer from '@/src/components/Spacer'
 import Divider from '@/src/components/Divider'
 import RoundedContainer from '@/src/components/RoundedContainer'
 
-const limit = 20;
+const limit = 50;
 
 const Transactions = () => {
   const [isAddTxnVisible, setIsAddTxnVisible] = useState(false);

@@ -5,7 +5,7 @@ import { baseQueryWithReauth } from "./baseQuery";
 export const feeApi = createApi({
   reducerPath: "feeApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["adhoc", "fee", "transaction", "exception", "transactionCategory"],
+  tagTypes: ["adhoc", "fee", "transaction", "exception", "transactionCategory", "eventTransaction", "eventTransactionCategory"],
   endpoints: (builder) => ({
     getFundBalance: builder.query({
       query: (params) => `/club?${new URLSearchParams(params).toString()}`,
@@ -39,6 +39,47 @@ export const feeApi = createApi({
         body,
       }),
       invalidatesTags: ["transactionCategory"],
+    }),
+    // event transactions
+    getEventTransactions: builder.query({
+      query: (params) => `/club/event/transaction?${new URLSearchParams(params).toString()}`,
+      providesTags: ["eventTransaction", "transaction"],
+    }),
+    addEventTransaction: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/transaction",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["eventTransaction"],
+    }),
+    updateEventTransaction: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/transaction",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["eventTransaction"],
+    }),
+    deleteEventTransaction: builder.mutation({
+      query: (params) => ({
+        url: `/club/event/transaction?${new URLSearchParams(params).toString()}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["eventTransaction"],
+    }),
+    // event transaction categories
+    getEventTransactionCategories: builder.query({
+      query: (params) => `/club/event/transaction/category?${new URLSearchParams(params).toString()}`,
+      providesTags: ["eventTransactionCategory"],
+    }),
+    addEventTransactionCategory: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/transaction/category",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["eventTransactionCategory"],
     }),
     addFee: builder.mutation({
       query: (body) => ({
@@ -192,6 +233,12 @@ export const {
   useGetFeeCollectionsQuery,
   useLazyGetFeeCollectionsQuery,
   useSaveFeeCollectionMutation,
-  useDeleteFeeCollectionMutation
-  ,useMarkDuesPaidMutation
+  useDeleteFeeCollectionMutation,
+  useMarkDuesPaidMutation,
+  useGetEventTransactionCategoriesQuery,
+  useAddEventTransactionCategoryMutation,
+  useDeleteEventTransactionMutation,
+  useUpdateEventTransactionMutation,
+  useGetEventTransactionsQuery,
+  useAddEventTransactionMutation
 } = feeApi;

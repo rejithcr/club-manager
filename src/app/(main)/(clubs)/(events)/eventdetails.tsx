@@ -22,8 +22,18 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useTheme } from "@/src/hooks/use-theme";
 import Alert, { AlertProps } from "@/src/components/Alert";
 import { ROLE_ADMIN } from "@/src/utils/constants";
-import { useDeleteEventMutation, useLazyGetClubMembersQuery, useLazyGetEventMembersQuery, useUpdateEventAttendanceMutation } from "@/src/services/clubApi";
+import {
+  useDeleteEventMutation,
+  useLazyGetClubMembersQuery,
+  useLazyGetEventMembersQuery,
+  useUpdateEventAttendanceMutation,
+} from "@/src/services/clubApi";
 import RoundedContainer from "@/src/components/RoundedContainer";
+import Banner from "@/src/components/Banner";
+import NumberTicker from "@/src/components/NumberTicker";
+import { useGetEventTransactionsQuery } from "@/src/services/feeApi";
+import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
+import Divider from "@/src/components/Divider";
 
 const EventDetails = () => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
@@ -43,11 +53,12 @@ const EventDetails = () => {
   const [getClubMembers] = useLazyGetClubMembersQuery();
   const [getAtendedMembers] = useLazyGetEventMembersQuery();
 
+  const eventObj = JSON.parse(params.get("event") || "{}");
 
   const loadClubMembers = async (eventId: string) => {
     setIsLoadingMembers(true);
     try {
-      const attendedMembers = await getAtendedMembers({eventId}).unwrap();
+      const attendedMembers = await getAtendedMembers({ eventId }).unwrap();
       const attendedMembersLocal = attendedMembers.filter((m: { present: any }) => m.present);
       setAttendedMembersBackup([...attendedMembersLocal]);
       setAttendedMembers(
@@ -55,24 +66,21 @@ const EventDetails = () => {
           m1.firstName.localeCompare(m2.firstName)
         )
       );
-      const members = await getClubMembers({clubId: clubInfo.clubId}).unwrap();
+      const members = await getClubMembers({ clubId: clubInfo.clubId }).unwrap();
       const difference = members.filter(
         (m: any) => !attendedMembersLocal.some((e: any) => e.membershipId == m.membershipId)
       );
       setRemainingMembers(
-        difference.sort((m1: { firstName: string }, m2: { firstName: any }) =>
-          m1.firstName.localeCompare(m2.firstName)
-        )
+        difference.sort((m1: { firstName: string }, m2: { firstName: any }) => m1.firstName.localeCompare(m2.firstName))
       );
-    } catch(error){
+    } catch (error) {
       console.log(error);
-    } finally{
+    } finally {
       setIsLoadingMembers(false);
     }
   };
 
   useEffect(() => {
-    const eventObj = JSON.parse(params.get("event") || "");
     setEvent(eventObj);
     loadClubMembers(eventObj.eventId);
   }, []);
@@ -104,12 +112,16 @@ const EventDetails = () => {
     setAttendanceChanged(diff.added.length > 0 || diff.removed.length > 0);
   }, [attendedMembers]);
 
-  const [updateEventAttendance, {isLoading: isSaving}] = useUpdateEventAttendanceMutation();
+  const [updateEventAttendance, { isLoading: isSaving }] = useUpdateEventAttendanceMutation();
   const handleSaveChanges = async () => {
     const added = attendanceDiff.added.map((m) => ({ membershipId: m.membershipId, present: true }));
     const removed = attendanceDiff.removed.map((m) => ({ membershipId: m.membershipId, present: false }));
     try {
-      await updateEventAttendance({ eventId: event?.eventId, records: [...added, ...removed], status: eventStatus }).unwrap();
+      await updateEventAttendance({
+        eventId: event?.eventId,
+        records: [...added, ...removed],
+        status: eventStatus,
+      }).unwrap();
     } catch (error) {
       console.error("Error updating attendance:", error);
     } finally {
@@ -129,10 +141,10 @@ const EventDetails = () => {
           text: "OK",
           onPress: async () => {
             setAlertConfig({ visible: false });
-            try{
+            try {
               await deleteEvent({ eventId: event?.eventId }).unwrap();
               router.dismissTo("/(main)/(clubs)/(events)");
-            }catch (error) {
+            } catch (error) {
               console.error("Error deleting event:", error);
             }
           },
@@ -141,6 +153,24 @@ const EventDetails = () => {
       ],
     });
   };
+  const gotoEventTransactions = (eventId: number | undefined) => {
+    router.push(`/(main)/(clubs)/(events)/transactions?eventId=${eventId}`);
+  };
+
+  const {
+    items: recentTxns = [],
+    isFetching: isTxnsFetching,
+  } = usePaginatedQuery(
+    useGetEventTransactionsQuery,
+    { eventId: eventObj.eventId, txnType: "ALL", txnCategoryId: -1 },
+    3
+  );
+
+  const {
+    data: fb = {fundBalance: 0},
+    isFetching: isFbFetching,
+  } = useGetEventTransactionsQuery({ eventId: eventObj.eventId, fundBalance: true});
+
   return (
     <ThemedView style={{ flex: 1 }}>
       <ThemedView
@@ -166,12 +196,76 @@ const EventDetails = () => {
 
       {event && <EventItemDetails event={event} />}
       <Spacer space={8} />
-      <ThemedText style={{ width: "85%", textAlign: "center", alignSelf: "center", fontSize: 14, color: colors.subText }}>
-        Please select from the below list to mark attendance
-      </ThemedText>
-      <Spacer space={8} />
+
       <GestureHandlerRootView>
         <ScrollView>
+          {event?.isTransactionEnabled && (
+            <>
+              <Banner onPress={() => gotoEventTransactions(event?.eventId)}>
+                <View>
+                  <ThemedText style={{ color: colors.background }}>Event Fund Balance</ThemedText>
+                  <NumberTicker
+                    value={fb.fundBalance}
+                    isLoading={isFbFetching}
+                    style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}
+                  />
+                </View>
+                <ThemedIcon name="MaterialCommunityIcons:wallet" size={50} color={colors.background} />
+              </Banner>
+              <Spacer space={5} />
+            </>
+          )}
+          {event?.isTransactionEnabled && (
+            <ThemedText style={{ color: colors.subText, width: "80%", alignSelf: "center" }}>Recent</ThemedText>
+          )}
+          {event?.isTransactionEnabled && isTxnsFetching && <LoadingSpinner />}
+          {event?.isTransactionEnabled && !isTxnsFetching && (
+            <>
+              {recentTxns.map((item, idx) => (
+                <View key={item.eventTransactionId}>
+                  {idx > 0 && <Divider style={{ width: "80%" }} />}
+                  <View
+                    style={{
+                      width: "80%",
+                      alignSelf: "center",
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      paddingVertical: 10,
+                    }}
+                  >
+                    <View>
+                      <ThemedText style={{ fontWeight: "600" }}>{item.eventCategoryName}</ThemedText>
+                      <ThemedText style={{ fontSize: 12 }}>{item.eventTransactionComment}</ThemedText>
+                    </View>
+                    <View style={{ alignItems: "flex-end" }}>
+                      <ThemedText
+                        style={{
+                          fontWeight: "bold",
+                          color: item.eventTransactionType === "CREDIT" ? colors.success : colors.error,
+                        }}
+                      >
+                        {item.eventTransactionType === "CREDIT" ? "+" : "-"} ₹ {item.eventTransactionAmount}
+                      </ThemedText>
+                      <ThemedText style={{ fontSize: 10 }}>{item.eventTransactionDate}</ThemedText>
+                    </View>
+                  </View>
+                </View>
+              ))}
+              <ThemedIcon
+                style={{ alignSelf: "center" }}
+                name={"MaterialIcons:expand-more"}
+                onPress={() => gotoEventTransactions(event?.eventId)}
+                size={32}
+              />
+            </>
+          )}
+          {event?.isAttendanceEnabled && <>
+          <ThemedText
+            style={{ width: "85%", textAlign: "center", alignSelf: "center", fontSize: 12, color: colors.subText }}
+          >
+            Please select from the below list to mark attendance
+          </ThemedText>
+          <Spacer space={8} />
           <ThemedView
             style={{
               flexDirection: "row",
@@ -190,7 +284,7 @@ const EventDetails = () => {
                   </ThemedText>
                 </Chip>
               ))}
-            
+
             {!isLoadingMembers && remainingMembers.length == 0 && (
               <ThemedText style={{ textAlign: "center" }}>Yay!! All members attended 👏</ThemedText>
             )}
@@ -202,7 +296,7 @@ const EventDetails = () => {
                   </ThemedText>
                 </Chip>
               ))}
-          </ThemedView>
+          </ThemedView></>}
           <Spacer space={40} />
           <Modal isVisible={isConfirmVisible}>
             <ScrollView>
@@ -297,17 +391,16 @@ const EventDetails = () => {
 
 export default EventDetails;
 
-
-
 export const EventItemDetails = ({ event }: { event: any }) => {
   const { colors } = useTheme();
   return (
     <RoundedContainer>
       <View style={{ paddingVertical: 10, paddingHorizontal: 15 }}>
-        <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", alignItems:"center" }}>
-          <ThemedText style={{ fontWeight: "bold" }}>{event.name}</ThemedText>          
+        <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
+          <ThemedText style={{ fontWeight: "bold" }}>{event.name}</ThemedText>
           <ThemedText
-            style={{textAlign: "right",
+            style={{
+              textAlign: "right",
               fontSize: 12,
               fontWeight: "bold",
               color:
@@ -322,26 +415,28 @@ export const EventItemDetails = ({ event }: { event: any }) => {
           </ThemedText>
         </View>
         <Spacer space={3} />
-        <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between",  alignItems:"center" }}>
+        <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
             <ThemedIcon name={"MaterialIcons:calendar-today"} size={15} />
             <Spacer hspace={2} />
             <ThemedText style={{ textAlign: "right", fontSize: 12 }}>{event.eventDate}</ThemedText>
           </View>
           <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
-             {event.startTime && (
-            <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
-              <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
-              <Spacer hspace={2} />
-              <ThemedText style={{ fontSize: 12 }}>
-                {event.startTime} {event.endTime && " - " + event.endTime}
-              </ThemedText>
-            </View>
-          )}
+            {event.startTime && (
+              <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+                <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
+                <Spacer hspace={2} />
+                <ThemedText style={{ fontSize: 12 }}>
+                  {event.startTime} {event.endTime && " - " + event.endTime}
+                </ThemedText>
+              </View>
+            )}
           </View>
         </View>
       </View>
-      <ThemedText style={{paddingHorizontal: 15, paddingBottom: 5, fontSize: 12, color: colors.subText}}>{event.description}</ThemedText>
+      <ThemedText style={{ paddingHorizontal: 15, paddingBottom: 5, fontSize: 12, color: colors.subText }}>
+        {event.description}
+      </ThemedText>
     </RoundedContainer>
   );
 };

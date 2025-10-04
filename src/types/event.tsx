@@ -11,4 +11,6 @@ export interface Event {
   createdBy: string;
   clubName?: string;
   clubId?: number;
+  isTransactionEnabled?: boolean;
+  isAttendanceEnabled?: boolean;
 }

@@ -121,3 +121,66 @@ def get_attendance():
     finally:
         db.close_connection(conn)
 
+
+
+@club_event_bp.route('/transaction', methods=['GET'])
+@role_required([constants.ROLE_MEMBER])
+def get_club_event_transaction():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.get_transaction(conn, params), 200
+    finally:
+        db.close_connection(conn)
+
+
+@club_event_bp.route('/transaction', methods=['POST'])
+@role_required([constants.ROLE_MAINTAINER])
+def post_club_event_transaction():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.post_transaction(conn, params), 200
+    finally:
+        db.close_connection(conn)
+
+
+@club_event_bp.route('/transaction', methods=['PUT'])
+@role_required([constants.ROLE_MAINTAINER])
+def put_club_event_transaction():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.put_transaction(conn, params), 200
+    finally:
+        db.close_connection(conn)
+
+@club_event_bp.route('/transaction', methods=['DELETE'])
+@role_required([constants.ROLE_MAINTAINER])
+def delete_club_event_transaction():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.delete_transaction(conn, params), 200
+    finally:
+        db.close_connection(conn)
+
+@club_event_bp.route('/transaction/category', methods=['GET'])
+@role_required([constants.ROLE_MEMBER])
+def get_club_transaction_category():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    return service.get_categories(conn, params), 200
+
+@club_event_bp.route('/transaction/category', methods=['POST'])
+@role_required([constants.ROLE_MAINTAINER])
+def add_category():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    return service.add_category(conn, params), 200
