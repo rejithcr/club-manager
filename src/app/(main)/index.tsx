@@ -61,7 +61,7 @@ const Main = () => {
       const clubIds = clubs.map((c: { clubId: any }) => c.clubId);
       triggerGetEvents({ clubIds, limit: 10, offset: 0 });
     }
-  }, [clubs]);
+  }, [clubs, isFetchingClubs]);
 
   return (
     <ThemedView style={{ flex: 1 }}>

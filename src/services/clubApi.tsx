@@ -71,7 +71,7 @@ export const clubApi = createApi({
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["attendance"],
+      invalidatesTags: ["attendance", "event"],
     }),
     addEvent: builder.mutation({
       query: (body) => ({
