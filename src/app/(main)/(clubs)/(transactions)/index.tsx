@@ -238,7 +238,7 @@ const Transactions = () => {
             {categories.map((c: any) => (
               <Picker.Item key={c.categoryId} value={c.categoryId} label={c.categoryName} />
             ))}
-            <Picker.Item value={"__ADD_NEW__"} label={"+ Add new category"} />
+            <Picker.Item value={"__ADD_NEW__"} label={"+ Add Category"} />
           </Picker>
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />

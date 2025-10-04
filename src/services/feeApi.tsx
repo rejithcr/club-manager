@@ -1,4 +1,3 @@
-// src/services/api.js
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
 
@@ -93,6 +92,21 @@ export const feeApi = createApi({
         url: "/club/event/transaction/category",
         method: "POST",
         body,
+      }),
+      invalidatesTags: ["eventTransactionCategory"],
+    }),
+    updateEventTransactionCategory: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/transaction/category",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["eventTransactionCategory"],
+    }),
+    deleteEventTransactionCategory: builder.mutation({
+      query: (params) => ({
+        url: `/club/event/transaction/category?${new URLSearchParams(params).toString()}`,
+        method: "DELETE",
       }),
       invalidatesTags: ["eventTransactionCategory"],
     }),
@@ -254,6 +268,8 @@ export const {
   useMarkDuesPaidMutation,
   useGetEventTransactionCategoriesQuery,
   useAddEventTransactionCategoryMutation,
+  useUpdateEventTransactionCategoryMutation,
+  useDeleteEventTransactionCategoryMutation,
   useDeleteEventTransactionMutation,
   useUpdateEventTransactionMutation,
   useGetEventTransactionsQuery,

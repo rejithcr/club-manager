@@ -23,7 +23,7 @@ import {
   useGetEventTransactionCategoriesQuery,
   useAddEventTransactionCategoryMutation,
 } from "@/src/services/feeApi";
-import { useSearchParams } from "expo-router/build/hooks";
+import { useSearchParams, useRouter } from "expo-router/build/hooks";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import RoundedContainer from "@/src/components/RoundedContainer";
@@ -49,6 +49,7 @@ const EventTransactions = () => {
   });
   const [isAddTxnVisible, setIsAddTxnVisible] = useState(false);
   const [txnCategoryFilter, setTxnCategoryFilter] = useState("-1");
+  const router = useRouter();
   const [txnTypeFilter, setTxnTypeFilter] = useState("ALL");
 
   const { data: categories = [], refetch: refetchCategories } = useGetEventTransactionCategoriesQuery({
@@ -136,7 +137,17 @@ const EventTransactions = () => {
             <Picker.Item value={"DEBIT"} label="DEBIT" />
             <Picker.Item value={"CREDIT"} label="CREDIT" />
           </Picker>
-          <Picker style={{ width: 125 }} onValueChange={setTxnCategoryFilter} selectedValue={txnCategoryFilter}>
+          <Picker
+            style={{ width: 125 }}
+            onValueChange={(val) => {
+              if (val === '__edit__') {
+                router.push({ pathname: '/(main)/(clubs)/(events)/categories', params: { eventId } });
+                return;
+              }
+              setTxnCategoryFilter(val);
+            }}
+            selectedValue={txnCategoryFilter}
+          >
             <Picker.Item value={"-1"} label={"ALL"} />
             {categories.map((c: any) => (
               <Picker.Item
@@ -145,6 +156,7 @@ const EventTransactions = () => {
                 label={c.eventCategoryName.toUpperCase()}
               />
             ))}
+            <Picker.Item value="__edit__" label="± Edit Categories" />
           </Picker>
         </View>
       </RoundedContainer>
@@ -244,7 +256,7 @@ const EventTransactions = () => {
             {categories.map((c: any) => (
               <Picker.Item key={c.eventCategoryTypeId} value={c.eventCategoryTypeId} label={c.eventCategoryName} />
             ))}
-            <Picker.Item value={"__ADD_NEW__"} label={"+ Add new category"} />
+            <Picker.Item value={"__ADD_NEW__"} label={"+ Add Category"} />
           </Picker>
           <InputText
             label="Details"

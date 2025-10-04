@@ -177,6 +177,7 @@ def get_club_transaction_category():
     conn = db.get_connection()
     return service.get_categories(conn, params), 200
 
+
 @club_event_bp.route('/transaction/category', methods=['POST'])
 @role_required([constants.ROLE_MAINTAINER])
 def add_category():
@@ -184,3 +185,19 @@ def add_category():
     params = util.get_params(request)
     conn = db.get_connection()
     return service.add_category(conn, params), 200
+
+@club_event_bp.route('/transaction/category', methods=['PUT'])
+@role_required([constants.ROLE_MAINTAINER])
+def update_category():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    return service.update_category(conn, params), 200
+
+@club_event_bp.route('/transaction/category', methods=['DELETE'])
+@role_required([constants.ROLE_MAINTAINER])
+def delete_category():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    return service.delete_category(conn, params)

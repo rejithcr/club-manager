@@ -5,6 +5,20 @@ from src.club.event import queries_events
 
 
 class ClubEventService():
+    def update_category(self, conn, params):
+        categoryId = params.get("categoryId")
+        categoryName = params.get("categoryName").upper().strip()
+        email = params.get("email")
+        db.execute(conn, queries_events.UPDATE_EVENT_TRANSACTIONS_CATEGORY, (categoryName, categoryId))
+        conn.commit()
+        return {"categoryId": categoryId, "categoryName": categoryName, "message": "Category updated"}
+
+    def delete_category(self, conn, params):
+        categoryId = params.get("categoryId")
+        db.execute(conn, queries_events.DELETE_EVENT_TRANSACTIONS_CATEGORY, (categoryId,))
+        conn.commit()
+        return {"categoryId": categoryId, "message": "Category deleted"}
+
     def get_event_types(self, conn, params):
         club_id = params.get('clubId')
 

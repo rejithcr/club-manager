@@ -119,3 +119,13 @@ GET_EVENT_FUND_BALANCE = """
     FROM event_transaction
     where event_id = %s
 """
+
+UPDATE_EVENT_TRANSACTIONS_CATEGORY = """
+    UPDATE event_transaction_category_types
+    SET event_category_name = %s
+    WHERE event_category_type_id = %s;
+"""
+
+DELETE_EVENT_TRANSACTIONS_CATEGORY = """
+    DELETE FROM event_transaction_category_types WHERE event_category_type_id = %s;
+"""
