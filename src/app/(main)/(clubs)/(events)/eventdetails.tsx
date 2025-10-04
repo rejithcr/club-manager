@@ -201,7 +201,9 @@ const EventDetails = () => {
         <ScrollView>
           {event?.isTransactionEnabled && (
             <>
-              <Banner onPress={() => gotoEventTransactions(event?.eventId)}>
+              <Banner 
+                backgroundColor={fb?.fundBalance < 0 ? colors.error : colors.success} 
+                onPress={() => gotoEventTransactions(event?.eventId)}>
                 <View>
                   <ThemedText style={{ color: colors.background }}>Event Fund Balance</ThemedText>
                   <NumberTicker

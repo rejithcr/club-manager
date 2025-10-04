@@ -94,7 +94,7 @@ GET_TRANSACTIONS = """
 	    and t.club_fee_payment_id is null and t.club_adhoc_fee_payment_id is null
         and (%s = 'ALL' OR t.club_transcation_type = %s)
         and (%s = '-1' OR t.club_transaction_category_type_id = %s)
-    order by t.club_transaction_date desc
+    order by t.club_transaction_date desc, t.club_transaction_id desc
     limit %s offset %s
 """
 
@@ -115,7 +115,7 @@ GET_TRANSACTIONS_ALL = """
         left join membership ams on ams.membership_id = cafp.membership_id 
         left join member am on am.member_id = ams.member_id
     where t.club_id = %s
-    order by t.club_transaction_date desc
+    order by t.club_transaction_date desc, t.club_transaction_id desc
     limit %s offset %s
 """
 

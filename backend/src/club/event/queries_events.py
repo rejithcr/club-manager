@@ -74,7 +74,7 @@ GET_EVENT_TRANSACTIONS = """
     where t.event_id = %s
         and (%s = 'ALL' OR t.event_transaction_type = %s)
         and (%s = '-1' OR t.event_transaction_category_type_id = %s)
-    order by t.event_transaction_date desc
+    order by t.event_transaction_date desc, t.event_transaction_id desc
     limit %s offset %s
 """
 
