@@ -15,13 +15,14 @@ import { useSearchParams } from "expo-router/build/hooks";
 import { useGetClubEventTypesQuery, useUpdateEventMutation } from "@/src/services/clubApi";
 import { handleTimeChange, to24HourFormat } from "@/src/utils/common";
 import FormSwitch from "@/src/components/FormSwitch";
+import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 
 const AddEvent = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [eventDate, setEventDate] = useState(new Date());
-  const [startTime, setStartTime] = useState<string| null>(null);
-  const [endTime, setEndTime] = useState<string| null>(null);
+  const [startTime, setStartTime] = useState<string | null>(null);
+  const [endTime, setEndTime] = useState<string | null>(null);
   const [location, setLocation] = useState("");
   const [eventTypeId, setEventTypeId] = useState("");
   const [eventId, setEventId] = useState();
@@ -30,23 +31,23 @@ const AddEvent = () => {
 
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
-  const params = useSearchParams()
+  const params = useSearchParams();
 
   const { data: eventTypes, isLoading: isLoadingEventTypes } = useGetClubEventTypesQuery({ clubId: clubInfo.clubId });
-  
-  useEffect(()=>{    
-    const eventObj = JSON.parse(params.get('event')||'')
-    setTitle(eventObj.title)
-    setDescription(eventObj.description)
-    setEventDate(new Date(eventObj.eventDate))
-    setStartTime(to24HourFormat(eventObj.startTime))
-    setEndTime(to24HourFormat(eventObj.endTime))
-    setLocation(eventObj.location)
-    setEventId(eventObj.eventId)
-    setIsTransactionEnabled(eventObj.isTransactionEnabled)
-    setIsAttendanceEnabled(eventObj.isAttendanceEnabled)
-    eventTypes && setEventTypeId(eventObj.eventTypeId)
-  },[eventTypes])
+
+  useEffect(() => {
+    const eventObj = JSON.parse(params.get("event") || "");
+    setTitle(eventObj.title);
+    setDescription(eventObj.description);
+    setEventDate(new Date(eventObj.eventDate));
+    setStartTime(to24HourFormat(eventObj.startTime));
+    setEndTime(to24HourFormat(eventObj.endTime));
+    setLocation(eventObj.location);
+    setEventId(eventObj.eventId);
+    setIsTransactionEnabled(eventObj.isTransactionEnabled);
+    setIsAttendanceEnabled(eventObj.isAttendanceEnabled);
+    eventTypes && setEventTypeId(eventObj.eventTypeId);
+  }, [eventTypes]);
 
   const [updateEvent, { isLoading: isUpdating }] = useUpdateEventMutation();
   const handleSubmit = async () => {
@@ -65,7 +66,7 @@ const AddEvent = () => {
       isTransactionEnabled,
       isAttendanceEnabled,
       createdBy: userInfo.email,
-      eventId
+      eventId,
     };
     try {
       await updateEvent(payload).unwrap();
@@ -77,62 +78,60 @@ const AddEvent = () => {
 
   return (
     <ThemedView style={styles.container}>
-      <Spacer space={ Platform.OS == 'web' ? 10 : 5} />
-      {isLoadingEventTypes ? (
-        <LoadingSpinner />
-      ) : (
-        <Picker
-          style={{ width: "80%", alignSelf: "center" }}
-          selectedValue={eventTypeId}
-          onValueChange={(value) => setEventTypeId(value)}
-        >
-          {eventTypes?.map((type: any) => (
-            <Picker.Item
-              key={type.eventTypeId}
-              label={type.name}
-              value={type.eventTypeId}
-            />
-          ))}
-        </Picker>
-      )}
-      <Spacer space={5} />
-      <InputText
-        label={"Title"}
-        value={title}
-        onChangeText={setTitle}
-        placeholder="Event Title"
-      />
+      <Spacer space={Platform.OS == "web" ? 10 : 5} />
+      <GestureHandlerRootView>
+        <ScrollView>
+          {isLoadingEventTypes ? (
+            <LoadingSpinner />
+          ) : (
+            <Picker
+              style={{ width: "80%", alignSelf: "center" }}
+              selectedValue={eventTypeId}
+              onValueChange={(value) => setEventTypeId(value)}
+            >
+              {eventTypes?.map((type: any) => (
+                <Picker.Item key={type.eventTypeId} label={type.name} value={type.eventTypeId} />
+              ))}
+            </Picker>
+          )}
+          <Spacer space={5} />
+          <InputText label={"Title"} value={title} onChangeText={setTitle} placeholder="Event Title" />
 
-      <InputText
-        label={"Description"}
-        value={description}
-        onChangeText={setDescription}
-        placeholder="Description"
-      />
-      <DatePicker date={eventDate} setDate={setEventDate} label="Event Date" />
-      <InputText
-        value={startTime}
-        label="Start Time (24-hr HH:MM)"
-        onChangeText={(text: string) => handleTimeChange(text, setStartTime)}
-        placeholder="00:00"
-      />
-      <InputText
-        value={endTime}
-        label="End Time (24-hr HH:MM)"
-        onChangeText={(text: string) => handleTimeChange(text, setEndTime)}
-        placeholder="00:00"
-      />
-      <InputText
-        label={"Location"}
-        value={location}
-        onChangeText={setLocation}
-        placeholder=""
-      />
-      <FormSwitch label={"Do you want to track transactions separatly for this event?"} onValueChange={() => setIsTransactionEnabled(prev => !prev)} value={isTransactionEnabled} />
-      <FormSwitch label={"Do you want to track attendance?"}onValueChange={() => setIsAttendanceEnabled(prev => !prev)} value={isAttendanceEnabled} />
-      <Spacer space={8} />
-      {isUpdating ? <LoadingSpinner/> :
-      <ThemedButton title="Save Event" onPress={handleSubmit} />}
+          <InputText
+            label={"Description"}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Description"
+          />
+          <DatePicker date={eventDate} setDate={setEventDate} label="Event Date" />
+          <InputText
+            value={startTime}
+            label="Start Time (24-hr HH:MM)"
+            onChangeText={(text: string) => handleTimeChange(text, setStartTime)}
+            placeholder="00:00"
+          />
+          <InputText
+            value={endTime}
+            label="End Time (24-hr HH:MM)"
+            onChangeText={(text: string) => handleTimeChange(text, setEndTime)}
+            placeholder="00:00"
+          />
+          <InputText label={"Location"} value={location} onChangeText={setLocation} placeholder="" />
+          <FormSwitch
+            label={"Do you want to track transactions separatly for this event?"}
+            onValueChange={() => setIsTransactionEnabled((prev) => !prev)}
+            value={isTransactionEnabled}
+          />
+          <FormSwitch
+            label={"Do you want to track attendance?"}
+            onValueChange={() => setIsAttendanceEnabled((prev) => !prev)}
+            value={isAttendanceEnabled}
+          />
+          <Spacer space={8} />
+          {isUpdating ? <LoadingSpinner /> : <ThemedButton title="Save Event" onPress={handleSubmit} />}
+          <Spacer space={8}/>
+        </ScrollView>
+      </GestureHandlerRootView>
     </ThemedView>
   );
 };

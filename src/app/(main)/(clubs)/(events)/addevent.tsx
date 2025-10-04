@@ -10,10 +10,11 @@ import { isValidDate, isValidLength } from "@/src/utils/validators";
 import { Picker } from "@react-native-picker/picker";
 import { router } from "expo-router";
 import React, { useContext, useEffect, useState } from "react";
-import { Platform, StyleSheet, Switch } from "react-native";
+import { Platform, ScrollView, StyleSheet, Switch } from "react-native";
 import { useAddEventMutation, useGetClubEventTypesQuery } from "@/src/services/clubApi";
 import { handleTimeChange } from "@/src/utils/common";
 import FormSwitch from "@/src/components/FormSwitch";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const AddEvent = () => {
   const [title, setTitle] = useState("");
@@ -62,44 +63,62 @@ const AddEvent = () => {
 
   return (
     <ThemedView style={styles.container}>
-      <Spacer space={ Platform.OS == 'web' ? 10 : 5} />
-      {isLoadingEventTypes ? (
-        <LoadingSpinner />
-      ) : (
-        <Picker
-          style={{ width: "80%", alignSelf: "center" }}
-          selectedValue={eventTypeId}
-          onValueChange={(value) => setEventTypeId(value)}
-        >
-          {eventTypes?.map((type: any) => (
-            <Picker.Item key={type.eventTypeId} label={type.name} value={type.eventTypeId} />
-          ))}
-        </Picker>
-      )}
-      <Spacer space={5} />
-      <InputText label={"Title"} value={title} onChangeText={setTitle} placeholder="Event Title" />
+      <Spacer space={Platform.OS == "web" ? 10 : 5} />
+      <GestureHandlerRootView>
+        <ScrollView>
+          {isLoadingEventTypes ? (
+            <LoadingSpinner />
+          ) : (
+            <Picker
+              style={{ width: "80%", alignSelf: "center" }}
+              selectedValue={eventTypeId}
+              onValueChange={(value) => setEventTypeId(value)}
+            >
+              {eventTypes?.map((type: any) => (
+                <Picker.Item key={type.eventTypeId} label={type.name} value={type.eventTypeId} />
+              ))}
+            </Picker>
+          )}
+          <Spacer space={5} />
+          <InputText label={"Title"} value={title} onChangeText={setTitle} placeholder="Event Title" />
 
-      <InputText label={"Description"} value={description} onChangeText={setDescription} placeholder="Description" />
-      <DatePicker date={eventDate} setDate={setEventDate} label="Event Date" />
-      <InputText
-        value={startTime}
-        label="Start Time (24-hr HH:MM)"
-        onChangeText={(text: string) => handleTimeChange(text, setStartTime)}
-        placeholder="00:00"
-        keyboardType="numeric"
-      />
-      <InputText
-        value={endTime}
-        label="End Time (24-hr HH:MM)"
-        onChangeText={(text: string) => handleTimeChange(text, setEndTime)}
-        placeholder="00:00"
-        keyboardType="numeric"
-      />
-      <InputText label={"Location"} value={location} onChangeText={setLocation} placeholder="" />
-      <FormSwitch label={"Do you want to track transactions separatly for this event?"} onValueChange={() => setIsTransactionEnabled(prev => !prev)} value={isTransactionEnabled} />
-      <FormSwitch label={"Do you want to track attendance?"}onValueChange={() => setIsAttendanceEnabled(prev => !prev)} value={isAttendanceEnabled} />
-      <Spacer space={8} />
-      {isAdding ? <LoadingSpinner /> : <ThemedButton title="Create Event" onPress={handleSubmit} />}
+          <InputText
+            label={"Description"}
+            value={description}
+            onChangeText={setDescription}
+            placeholder="Description"
+          />
+          <DatePicker date={eventDate} setDate={setEventDate} label="Event Date" />
+          <InputText
+            value={startTime}
+            label="Start Time (24-hr HH:MM)"
+            onChangeText={(text: string) => handleTimeChange(text, setStartTime)}
+            placeholder="00:00"
+            keyboardType="numeric"
+          />
+          <InputText
+            value={endTime}
+            label="End Time (24-hr HH:MM)"
+            onChangeText={(text: string) => handleTimeChange(text, setEndTime)}
+            placeholder="00:00"
+            keyboardType="numeric"
+          />
+          <InputText label={"Location"} value={location} onChangeText={setLocation} placeholder="" />
+          <FormSwitch
+            label={"Do you want to track transactions separatly for this event?"}
+            onValueChange={() => setIsTransactionEnabled((prev) => !prev)}
+            value={isTransactionEnabled}
+          />
+          <FormSwitch
+            label={"Do you want to track attendance?"}
+            onValueChange={() => setIsAttendanceEnabled((prev) => !prev)}
+            value={isAttendanceEnabled}
+          />
+          <Spacer space={8} />
+          {isAdding ? <LoadingSpinner /> : <ThemedButton title="Create Event" onPress={handleSubmit} />}
+          <Spacer space={8}/>
+        </ScrollView>
+      </GestureHandlerRootView>
     </ThemedView>
   );
 };
