@@ -115,10 +115,7 @@ const CreateClub = () => {
               <Spacer space={10} />
               <ThemedView
                 style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
                   alignSelf: "center",
-                  alignItems: "center",
                   width: "60%",
                 }}
               >
@@ -128,7 +125,7 @@ const CreateClub = () => {
                   value={newEventType}
                   onChangeText={(text: string) => setNewEventType(text)}
                 />
-                <ThemedIcon name="MaterialIcons:add-circle" size={20} onPress={() => handleAddNewEventType()} />
+                <ThemedIcon style={{ alignSelf: "center" }} name="MaterialIcons:add-circle" size={20} onPress={() => handleAddNewEventType()} />
               </ThemedView>
               <InputText
                 placeholder="Fee Collection UPI id"

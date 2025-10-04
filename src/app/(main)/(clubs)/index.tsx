@@ -122,7 +122,7 @@ const ClubHome = () => {
             />
           }
         >          
-        <Banner backgroundColor={fbr?.fundBalance < 1 ? colors.error : colors.success}>
+        <Banner backgroundColor={fbr?.fundBalance < 1 ? colors.error : colors.success} onPress={() => router.push(`/(main)/(clubs)/(transactions)`)}>
           <View>
             <ThemedText style={{ color: colors.background }}>Fund Balance</ThemedText>
             <NumberTicker

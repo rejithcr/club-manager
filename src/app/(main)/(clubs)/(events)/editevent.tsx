@@ -118,12 +118,12 @@ const AddEvent = () => {
           />
           <InputText label={"Location"} value={location} onChangeText={setLocation} placeholder="" />
           <FormSwitch
-            label={"Do you want to track transactions separatly for this event?"}
+            label={"Track transactions separatly for this event?"}
             onValueChange={() => setIsTransactionEnabled((prev) => !prev)}
             value={isTransactionEnabled}
           />
           <FormSwitch
-            label={"Do you want to track attendance?"}
+            label={"Track attendance for this event?"}
             onValueChange={() => setIsAttendanceEnabled((prev) => !prev)}
             value={isAttendanceEnabled}
           />
