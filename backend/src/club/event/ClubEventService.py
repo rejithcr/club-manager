@@ -83,6 +83,15 @@ class ClubEventService():
         conn.commit()
         return jsonify({'message': 'Event deleted'})
 
+    def add_event_type(self, conn, params):
+        club_id = params.get('clubId')
+        name = params.get('name')
+        if not name or len(name.strip()) < 2:
+            return ({'error': 'Invalid name'}, 400)
+        db.execute(conn, queries_events.INSERT_EVENT_TYPES, (club_id, name.strip()))
+        conn.commit()
+        return {'message': 'Event type added', 'name': name.strip()}
+
 
     def filtered_events(self, conn, params):
         status = params.get('status')

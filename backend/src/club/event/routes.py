@@ -19,6 +19,18 @@ def get_event_types():
     finally:
         db.close_connection(conn)
 
+
+@club_event_bp.route('/types', methods=['POST'], strict_slashes=False)
+@role_required([constants.ROLE_MAINTAINER])
+def post_event_type():
+    service = ClubEventService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.add_event_type(conn, params), 200
+    finally:
+        db.close_connection(conn)
+
 @club_event_bp.route('/', methods=['GET'], strict_slashes=False)
 @role_required([constants.ROLE_MEMBER])
 def get_club_event():

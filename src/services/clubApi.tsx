@@ -4,7 +4,7 @@ import { baseQueryWithReauth } from "./baseQuery";
 export const clubApi = createApi({
   reducerPath: "clubApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["club", "member", "event", "attendance", "memberAttribute"],
+  tagTypes: ["club", "member", "event", "attendance", "memberAttribute", "eventType"],
   endpoints: (builder) => ({
     getClub: builder.query({
       query: (params) => `/club?${new URLSearchParams(params).toString()}`,
@@ -20,6 +20,7 @@ export const clubApi = createApi({
     }),
     getClubEventTypes: builder.query({
       query: (params) => `/club/event/types?${new URLSearchParams(params).toString()}`,
+      providesTags: ["eventType"],
     }),
     getAttendanceReport: builder.query({
       query: (params) => `/club/event/attendance?${new URLSearchParams(params).toString()}`,
@@ -44,6 +45,14 @@ export const clubApi = createApi({
         body,
       }),
       invalidatesTags: ["memberAttribute"]
+    }),    
+    addClubEventType: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/types",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["eventType"],
     }),
     deleteClubMemberAttribute: builder.mutation({
       query: (body) => ({
@@ -183,5 +192,6 @@ export const {
   useDeleteClubMutation,
   useGetEventMembersQuery,
   useLazyGetEventMembersQuery,
-  useLazyGetClubMembersQuery
+  useLazyGetClubMembersQuery,
+  useAddClubEventTypeMutation
 } = clubApi;
