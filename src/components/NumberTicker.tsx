@@ -31,7 +31,7 @@ export default function NumberTicker({ value, isLoading = false, style, containe
     listenerId = animated.addListener(({ value: v }) => {
       // round to nearest integer for display
       const rounded = Math.round(v);
-      setDisplay(Math.max(0, rounded));
+      setDisplay(rounded);
     });
 
     if (isLoading) {
@@ -51,7 +51,7 @@ export default function NumberTicker({ value, isLoading = false, style, containe
       }
 
       // set animated start point to current display, then animate to rounded target value
-      const target = Math.max(0, Math.round(Number(value || 0)));
+      const target = Math.round(Number(value || 0));
       animated.setValue(display);
       Animated.timing(animated, {
         toValue: target,
