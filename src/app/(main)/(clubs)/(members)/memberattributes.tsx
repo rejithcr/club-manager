@@ -27,7 +27,7 @@ export default function MemberAttributes() {
           <TouchableOpacity style={{ width: "90%", alignSelf: "center", flexDirection: "row", justifyContent:"space-between", alignItems: "center"}}>
               <ThemedHeading style={{width: 200}}>Select Attributes</ThemedHeading>
               {!isEdit ?<ThemedIcon name='MaterialCommunityIcons:square-edit-outline' size={25} onPress={() => setIsEdit(true)}/> : 
-                <ThemedIcon name='AntDesign:back' size={25} onPress={() => setIsEdit(false)}/>}
+                <ThemedIcon name='Ionicons:return-up-back' size={25} onPress={() => setIsEdit(false)}/>}
           </TouchableOpacity>   
           {isEdit ? <MemberAttributesEdit /> : <MemberAttributesExport />}
         </ScrollView>
