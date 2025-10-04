@@ -11,6 +11,7 @@ export default function TransactionLayout() {
   return (
     <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background }, headerTintColor: colors.text }}>
       <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Transactions"} rightText={clubInfo?.clubName} />, headerShown: true }} />
+      <Stack.Screen name="categories" options={{ headerTitle: () => <StackHeader header={"Categories"} rightText={clubInfo?.clubName} />, headerShown: true }} />
     </Stack>
   )
 }

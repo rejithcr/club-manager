@@ -24,6 +24,7 @@ import usePaginatedQuery from '@/src/hooks/usePaginatedQuery'
 import Spacer from '@/src/components/Spacer'
 import Divider from '@/src/components/Divider'
 import RoundedContainer from '@/src/components/RoundedContainer'
+import { router } from 'expo-router'
 
 const limit = 50;
 
@@ -154,11 +155,19 @@ const Transactions = () => {
               <Picker.Item value={'DEBIT'} label='DEBIT' />
               <Picker.Item value={'CREDIT'} label='CREDIT' />
             </Picker>
-            <Picker style={{ width: 125 }} enabled={!showFees} onValueChange={setTxnCategoryFilter} selectedValue={txnCategoryFilter}>
+            <Picker style={{ width: 180 }} enabled={!showFees} onValueChange={(val)=>{
+              if (val === "__EDIT_CATEGORIES__") {
+                // navigate to categories management page
+                (router as any).push?.(`/(main)/(clubs)/(transactions)/categories`);
+              } else {
+                setTxnCategoryFilter(val);
+              }
+            }} selectedValue={txnCategoryFilter}>
               <Picker.Item value={"-1"} label={'ALL'} />
               {categories.map((c: any) => (
                 <Picker.Item key={c.categoryId} value={c.categoryId} label={c.categoryName.toUpperCase()} />
               ))}
+              <Picker.Item value={'__EDIT_CATEGORIES__'} label={'+/- Edit Categories'} />
             </Picker>   
           </View></RoundedContainer>}
           <Spacer space={10} />

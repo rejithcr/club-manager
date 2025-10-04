@@ -45,9 +45,24 @@ def get_club_transaction_category():
     params = util.get_params(request)
     return service.get_categories(get_connection(), params), 200
 
+
 @club_transaction_bp.route('/category', methods=['POST'], strict_slashes=False)
 @role_required([constants.ROLE_MAINTAINER])
 def add_category():
     service = ClubTransactionService()
     params = util.get_params(request)
     return service.add_category(get_connection(), params), 200
+
+@club_transaction_bp.route('/category', methods=['PUT'], strict_slashes=False)
+@role_required([constants.ROLE_MAINTAINER])
+def update_category():
+    service = ClubTransactionService()
+    params = util.get_params(request)
+    return service.update_category(get_connection(), params), 200
+
+@club_transaction_bp.route('/category', methods=['DELETE'], strict_slashes=False)
+@role_required([constants.ROLE_MAINTAINER])
+def delete_category():
+    service = ClubTransactionService()
+    params = util.get_params(request)
+    return service.delete_category(get_connection(), params), 200

@@ -68,3 +68,16 @@ class ClubTransactionService():
         db.execute(conn, queries_club.ADD_TRANSACTIONS_CATEGORY_WITH_ID,(categoryId, clubId, categoryName, email))
         conn.commit()
         return {"categoryId": categoryId, "categoryName": categoryName}
+
+    def update_category(self, conn, params):
+        categoryId = params.get("categoryId")
+        categoryName = params.get("categoryName").upper().strip()
+        db.execute(conn, queries_club.UPDATE_TRANSACTIONS_CATEGORY, (categoryName, categoryId))
+        conn.commit()
+        return {"categoryId": categoryId, "categoryName": categoryName, "message": "Category updated"}
+
+    def delete_category(self, conn, params):
+        categoryId = params.get("categoryId")
+        db.execute(conn, queries_club.DELETE_TRANSACTIONS_CATEGORY, (categoryId,))
+        conn.commit()
+        return {"categoryId": categoryId, "message": "Category deleted"}

@@ -238,3 +238,13 @@ ADD_TRANSACTIONS_CATEGORY = """
 ADD_TRANSACTIONS_CATEGORY_WITH_ID = """
     INSERT INTO transaction_category_types (category_type_id, club_id, category_name, created_by) VALUES  (%s, %s, %s, %s);
 """
+
+UPDATE_TRANSACTIONS_CATEGORY = """
+    UPDATE transaction_category_types
+    SET category_name = %s
+    WHERE category_type_id = %s;
+"""
+
+DELETE_TRANSACTIONS_CATEGORY = """
+    DELETE FROM transaction_category_types WHERE category_type_id = %s;
+"""

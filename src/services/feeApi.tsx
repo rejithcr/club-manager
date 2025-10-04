@@ -40,6 +40,21 @@ export const feeApi = createApi({
       }),
       invalidatesTags: ["transactionCategory"],
     }),
+    updateTransactionCategory: builder.mutation({
+      query: (body) => ({
+        url: "/club/transaction/category",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["transactionCategory"],
+    }),
+    deleteTransactionCategory: builder.mutation({
+      query: (params) => ({
+        url: `/club/transaction/category?${new URLSearchParams(params).toString()}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["transactionCategory"],
+    }),
     // event transactions
     getEventTransactions: builder.query({
       query: (params) => `/club/event/transaction?${new URLSearchParams(params).toString()}`,
@@ -219,6 +234,8 @@ export const {
   useGetTransactionsQuery,
   useGetTransactionCategoriesQuery,
   useAddTransactionCategoryMutation,
+  useUpdateTransactionCategoryMutation,
+  useDeleteTransactionCategoryMutation,
   useAddTransactionMutation,
   useUpdateTransactionMutation,
   useDeleteTransactionMutation,
