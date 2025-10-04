@@ -141,7 +141,7 @@ const EventTransactions = () => {
             style={{ width: 125 }}
             onValueChange={(val) => {
               if (val === '__edit__') {
-                router.push({ pathname: '/(main)/(clubs)/(events)/categories', params: { eventId } });
+                router.push({ pathname: '/(main)/(clubs)/(events)/transactioncategories', params: { eventId } });
                 return;
               }
               setTxnCategoryFilter(val);
