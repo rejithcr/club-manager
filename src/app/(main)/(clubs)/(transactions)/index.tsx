@@ -155,7 +155,7 @@ const Transactions = () => {
               <Picker.Item value={'DEBIT'} label='DEBIT' />
               <Picker.Item value={'CREDIT'} label='CREDIT' />
             </Picker>
-            <Picker style={{ width: 180 }} enabled={!showFees} onValueChange={(val)=>{
+            <Picker style={{ width: 125 }} enabled={!showFees} onValueChange={(val)=>{
               if (val === "__EDIT_CATEGORIES__") {
                 // navigate to categories management page
                 (router as any).push?.(`/(main)/(clubs)/(transactions)/categories`);
