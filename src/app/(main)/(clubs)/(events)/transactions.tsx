@@ -195,6 +195,7 @@ const EventTransactions = () => {
                   txnCategoryId: item.eventTransactionCategoryTypeId,
                   txnComment: item.eventTransactionComment,
                   txnAmount: item.eventTransactionAmount,
+                  lastUpdatedBy: item.updatedBy
                 });
                 setIsAddTxnVisible(true);
               }}
@@ -269,6 +270,7 @@ const EventTransactions = () => {
             keyboardType="numeric"
             onChangeText={(t:any) => setTxnValues((p: any) => ({ ...p, txnAmount: t }))}
           />
+          {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center", fontSize: 12, color: colors.subText }}>Updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 16 }}>
             {isAdding || isUpdating || isDeleting ? (
               <LoadingSpinner />

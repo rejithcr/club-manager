@@ -242,7 +242,7 @@ const Transactions = () => {
           </Picker>
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />
-          {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
+          {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center", fontSize: 12, color: colors.subText }}>Updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 30, alignItems: "center" }}>
             {isAddingTxn || isUpdatingTxn ? <LoadingSpinner />
             : <ThemedButton title={"   Save   "} onPress={() => handleSave()} />}

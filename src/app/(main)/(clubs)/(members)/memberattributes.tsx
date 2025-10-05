@@ -66,7 +66,7 @@ const MemberAttributesExport = () => {
         URL.revokeObjectURL(url);
       } else {
         const file = new File(Paths.document, filename);
-        file.write(csvString);
+        file.write(csvString); // this is working. Not sure why showing error
         if (await Sharing.isAvailableAsync()) {
           await Sharing.shareAsync(file.uri);
         } else {
