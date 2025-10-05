@@ -165,7 +165,7 @@ const EventDetails = () => {
   } = usePaginatedQuery(
     useGetEventTransactionsQuery,
     { eventId: eventObj.eventId, txnType: "ALL", txnCategoryId: -1 },
-    3
+    event?.isAttendanceEnabled ? 3 : 5
   );
 
   const {

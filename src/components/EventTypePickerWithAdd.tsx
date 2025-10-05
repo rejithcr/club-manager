@@ -84,7 +84,7 @@ const EventTypePickerWithAdd: React.FC<EventTypePickerWithAddProps> = ({
         {eventTypes?.map((type: any) => (
           <Picker.Item key={type.eventTypeId} label={type.name} value={type.eventTypeId} />
         ))}
-        <Picker.Item value="__add__" label="+ Add New Event Type" />
+        <Picker.Item value="__add__" label="⊕ Add Event Type" />
         <Picker.Item value="__edit__" label="⚙ Edit Event Types" />
       </Picker>
 
