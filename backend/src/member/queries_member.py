@@ -71,6 +71,12 @@ GET_DUES_BY_MEMBER = """
    group by  a.club_id, a.club_name, a.upi_id
 """
 
+CHECK_EXISTING_REQUEST = """
+   select count(*) as request_count
+   from membership_requests
+   where club_id = %s and member_id = %s and status = 'REQUESTED'
+"""
+
 REQUEST_MEMBERSHIP = """
    insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by) values
     (%s, %s, 'REQUESTED', 'Please approve', %s, %s)

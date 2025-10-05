@@ -88,6 +88,12 @@ class ClubMemberService():
         membership = db.fetch_one(conn, queries_member.GET_MEMBERSHIP_ID, (club_id, member_id))
         if membership:
             return {"message": f"You are already a member of the club"}
+        
+        # Check for existing membership request
+        existing_request = db.fetch_one(conn, queries_member.CHECK_EXISTING_REQUEST, (club_id, member_id))
+        if existing_request and existing_request['request_count'] > 0:
+            return {"message": f"You already have a pending membership request for this club"}
+            
         db.execute(conn, queries_member.REQUEST_MEMBERSHIP, (club_id, member_id, email, email))
         conn.commit()
         return {"message": f"Member with id {member_id} request to join club {club_id}"}
