@@ -103,7 +103,7 @@ const ClubDues = () => {
 
     const intro = `Dear Member,\n\nThis is a polite request to clear the following club dues. Timely payments help the functioning of the club and are much appreciated.\n\n`;
     const dueAmount =`*Total Due: ₹ ${totalDue?.toFixed(0)}* \n\n`
-    const outro = `\n\nPlease click on below link to see the your dues breakdown and pay.\nhttps://club-manager-33a8c.web.app?showClubDues=${clubInfo?.clubId}\n\nThank you for supporting\n${clubInfo?.clubName}.`;
+    const outro = `\n\nPlease click on below link to see the dues breakdown and pay.\nhttps://club-manager-33a8c.web.app?showClubDues=${clubInfo?.clubId}\n\nThank you for supporting\n${clubInfo?.clubName}.`;
 
     const message = intro + dueAmount + lines.join("\n") + outro;
 

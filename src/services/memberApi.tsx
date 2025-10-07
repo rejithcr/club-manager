@@ -10,6 +10,10 @@ export const memberApi = createApi({
       query: (params) => `/member?${new URLSearchParams(params).toString()}`,
       providesTags: ["member"],
     }),
+    getUpcomingBirthdays: builder.query({
+      query: (params) => `/member?${new URLSearchParams({...params, upcomingBirthdays: 'true'}).toString()}`,
+      providesTags: ["member"],
+    }),
     updateMember: builder.mutation({
       query: (body) => ({
         url: "/member",
@@ -32,6 +36,8 @@ export const memberApi = createApi({
 export const {
   useGetMembersQuery,
   useLazyGetMembersQuery,
+  useGetUpcomingBirthdaysQuery,
+  useLazyGetUpcomingBirthdaysQuery,
   useUpdateMemberMutation,
   useAddMemberMutation,
 } = memberApi;

@@ -13,13 +13,14 @@ import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
 import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import UpcomingEvents from "./upcoming_events";
+import UnifiedFeed from "./unified_feed";
 import { clearTokens } from "@/src/helpers/auth_helper";
 import {
   useGetClubMembersQuery,
   useGetClubQuery,
   useLazyGetClubEventsQuery,
 } from "@/src/services/clubApi";
+import { useGetUpcomingBirthdaysQuery } from "@/src/services/memberApi";
 
 const Main = () => {
   const router = useRouter();
@@ -41,16 +42,27 @@ const Main = () => {
     refetch: refetchMemberDues,
   } = useGetClubMembersQuery({ clubId: "-1", memberId: userInfo?.memberId, duesByMember: "true" });
 
+  const {
+    data: upcomingBirthdays,
+    isLoading: isBirthdaysLoading,
+    isFetching: isFetchingBirthdays,
+    refetch: refetchBirthdays,
+  } = useGetUpcomingBirthdaysQuery({ 
+    memberId: userInfo?.memberId, 
+    clubId: -1 // Get birthdays from all clubs
+  });
+
   const onRefresh = () => {
     refetchMemberDues();
     refetchClubs();
+    refetchBirthdays();
   };
   const handleLogout = async () => {
     await AsyncStorage.removeItem("userInfo");
     await clearTokens();
     router.replace("/(auth)");
   };
-
+  
   const [triggerGetEvents, { data: events, isLoading: isLoadingEvents }] = useLazyGetClubEventsQuery();
 
   useEffect(() => {
@@ -66,7 +78,7 @@ const Main = () => {
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
-        <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues} onRefresh={onRefresh} />}>
+        <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues || isFetchingBirthdays} onRefresh={onRefresh} />}>
           <ThemedHeading>My Clubs</ThemedHeading>
           {isLoadingMyClubs && <LoadingSpinner />}
           {!isLoadingMemberDues && <MyClubs clubs={clubs} />}
@@ -74,17 +86,23 @@ const Main = () => {
           {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
           {isLoadingMemberDues && <LoadingSpinner />}
           {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
-          {isLoadingEvents && (
+          
+          {/* Unified Events and Birthdays Feed */}
+          {(isLoadingEvents || isBirthdaysLoading) && (
             <>
               <Spacer space={10} />
               <LoadingSpinner />
             </>
           )}
           <Spacer space={10} />
-          {events?.length > 0 && (
+          {((events && events.length > 0) || (upcomingBirthdays && upcomingBirthdays.length > 0)) && (
             <>
               <ThemedHeading>Upcoming Events</ThemedHeading>
-              <UpcomingEvents events={events} clubs={clubs} />
+              <UnifiedFeed 
+                events={events || []} 
+                birthdays={upcomingBirthdays || []} 
+                clubs={clubs || []} 
+              />
             </>
           )}
           {/*<UpcomingMatches memberEmail={userInfo?.email} />*/}
