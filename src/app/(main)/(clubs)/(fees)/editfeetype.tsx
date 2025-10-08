@@ -12,6 +12,7 @@ import ThemedText from "@/src/components/themed-components/ThemedText";
 import { isCurrency, isValidLength } from "@/src/utils/validators";
 import Alert, { AlertProps } from "@/src/components/Alert";
 import { useDeleteFeeMutation, useEditFeeMutation } from "@/src/services/feeApi";
+import { useTheme } from "@/src/hooks/use-theme";
 
 const EditFeeType = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -22,7 +23,8 @@ const EditFeeType = () => {
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
   const { userInfo } = useContext(UserContext);
   const params = useSearchParams();
-
+  const { colors } = useTheme();
+  
   useEffect(() => {
     setClubFeeTypeInterval(params.get("clubFeeTypeInterval"));
     setClubFeeType(params.get("clubFeeType"));
@@ -121,7 +123,7 @@ const EditFeeType = () => {
       {!isLoading && (
         <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20 }}>
           <ThemedButton title="Update Fee" onPress={handleSaveFeeType} />
-          {isEditable && <ThemedButton title="Delete Fee" onPress={handleDeleteFeeType} />}
+          {isEditable && <ThemedButton title="Delete Fee" onPress={handleDeleteFeeType} style={{ backgroundColor: colors.error }} />}
         </View>
       )}
       {alertConfig?.visible && <Alert {...alertConfig} />}
