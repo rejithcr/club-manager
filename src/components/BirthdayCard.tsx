@@ -18,13 +18,19 @@ const BirthdayCard: React.FC<BirthdayCardProps> = ({ member, onPress, layout = '
   const getDaysText = (days: number) => {
     if (days === 0) return 'Today!';
     if (days === 1) return 'Tomorrow';
+    if (days < 0) {
+      const absDays = Math.abs(days);
+      return absDays === 1 ? 'Yesterday' : `${absDays} days ago`;
+    }
     return `${days} days`;
   };
 
   const getBirthdayColor = (days: number) => {
-    if (days === 0) return colors.success;
-    if (days <= 7) return colors.warning;
-    return colors.subText;
+    if (days === 0) return colors.success; // Today - green
+    if (days === 1) return '#90EE90'; // Tomorrow - light green (CSS light green)
+    if (days < 0) return colors.error; // Previous week - red
+    if (days <= 7) return colors.warning; // This week - warning color
+    return colors.subText; // Future - subtle color
   };
 
   if (layout === 'list') {

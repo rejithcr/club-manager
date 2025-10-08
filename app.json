@@ -9,7 +9,8 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "cr.dev.clubmanager"
+      "bundleIdentifier": "cr.dev.clubmanager",
+      "associatedDomains": ["applinks:club-manager-33a8c.web.app"]
     },
     "android": {
       "adaptiveIcon": {
@@ -17,6 +18,20 @@
         "backgroundColor": "#ffffff"
       },
       "package": "cr.dev.clubmanager"
+      ,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "club-manager-33a8c.web.app",
+              "pathPattern": ".*"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",

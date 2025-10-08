@@ -40,30 +40,44 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
       });
     });
 
-    // Add birthdays
+    // Add birthdays (including previous week)
     birthdays?.forEach((birthday) => {
       const today = new Date();
       const currentYear = today.getFullYear();
-      const birthdayThisYear = new Date(currentYear, 
-        parseInt(birthday.birthday.split('-')[0]) - 1, 
-        parseInt(birthday.birthday.split('-')[1])
-      );
       
-      // If birthday already passed this year, use next year
-      if (birthdayThisYear < today) {
-        birthdayThisYear.setFullYear(currentYear + 1);
+      // Parse birthday (format: MM-DD)
+      const [month, day] = birthday.birthday.split('-').map(Number);
+      const birthdayThisYear = new Date(currentYear, month - 1, day);
+      
+      // Calculate days until birthday
+      const diffTime = birthdayThisYear.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      // Include birthdays from previous week (-7 days) to future
+      if (diffDays >= -7) {
+        feedItems.push({
+          type: 'birthday',
+          date: birthdayThisYear,
+          sortKey: diffDays,
+          data: {
+            ...birthday,
+            daysUntilBirthday: diffDays
+          }
+        });
       }
-      
-      feedItems.push({
-        type: 'birthday',
-        date: birthdayThisYear,
-        sortKey: birthday.daysUntilBirthday,
-        data: birthday
-      });
     });
 
-    // Sort by sortKey (days until event/birthday)
-    return feedItems.sort((a, b) => a.sortKey - b.sortKey);
+    // Sort with special priority: today=0, tomorrow=1, then by absolute days (past negatives first)
+    return feedItems.sort((a, b) => {
+      // Priority for today and tomorrow
+      if (a.sortKey === 0) return -1;
+      if (b.sortKey === 0) return 1;
+      if (a.sortKey === 1) return -1;
+      if (b.sortKey === 1) return 1;
+      
+      // Then by days (past dates with negative values come after today/tomorrow)
+      return a.sortKey - b.sortKey;
+    });
   };
 
   const feedItems = createFeedItems();

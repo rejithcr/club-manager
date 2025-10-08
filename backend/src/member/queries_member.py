@@ -150,11 +150,7 @@ GET_UPCOMING_BIRTHDAYS = """
    select m.member_id, m.first_name, m.last_name, m.email, m.phone, m.photo,
           to_char(m.date_of_birth, 'YYYY-MM-DD') as date_of_birth,
           to_char(m.date_of_birth, 'MM-DD') as birthday,
-          CASE 
-            WHEN to_char(m.date_of_birth, 'MM-DD') >= to_char(CURRENT_DATE, 'MM-DD') 
-            THEN (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE)
-            ELSE (DATE((EXTRACT(YEAR FROM CURRENT_DATE) + 1) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE)
-          END as days_until_birthday,
+          (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) as days_until_birthday,
           STRING_AGG(c.club_name, ', ' ORDER BY c.club_name) as club_names,
           COUNT(DISTINCT c.club_id) as club_count,
           MIN(c.club_id) as primary_club_id
@@ -173,21 +169,26 @@ GET_UPCOMING_BIRTHDAYS = """
        )
      )
      and (
-       -- Birthdays in the next 30 days this year
-       CASE 
-         WHEN to_char(m.date_of_birth, 'MM-DD') >= to_char(CURRENT_DATE, 'MM-DD') 
-         THEN (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) <= 30
-         ELSE (DATE((EXTRACT(YEAR FROM CURRENT_DATE) + 1) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) <= 30
-       END
+       -- Birthdays from previous week (-7 days) to next 30 days
+       (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) >= -7
+       AND (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) <= 30
      )
    GROUP BY m.member_id, m.first_name, m.last_name, m.email, m.phone, m.photo, 
             m.date_of_birth, 
-            CASE 
-              WHEN to_char(m.date_of_birth, 'MM-DD') >= to_char(CURRENT_DATE, 'MM-DD') 
-              THEN (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE)
-              ELSE (DATE((EXTRACT(YEAR FROM CURRENT_DATE) + 1) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE)
-            END
-   order by days_until_birthday, m.first_name
+            (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE)
+   order by 
+     CASE 
+       -- Today first
+       WHEN (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) = 0 THEN 1
+       -- Tomorrow second  
+       WHEN (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) = 1 THEN 2
+       -- Future dates
+       WHEN (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) > 1 THEN 3
+       -- Past dates last
+       ELSE 4
+     END,
+     ABS(DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE),
+     m.first_name
 """
 
 ## Auto created for member attrts
