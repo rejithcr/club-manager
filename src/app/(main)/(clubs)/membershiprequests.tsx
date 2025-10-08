@@ -113,7 +113,7 @@ const MembershipRequests = () => {
       </ThemedView>
       {clubInfo.role === ROLE_ADMIN && (
         <Modal isVisible={isModalVisible}>
-          <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+          <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
             <ThemedText style={{ ...appStyles.heading }}>Approve Request?</ThemedText>
             <View style={{ width: "80%", alignSelf: "center" }}>
               <ThemedText>{statusChangeRequest.firstName} {statusChangeRequest.lastName}</ThemedText>

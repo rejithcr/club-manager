@@ -102,7 +102,7 @@ const EditClubLevelAttributes = () => {
                     }
                     <Spacer space={10} />
                     <Modal isVisible={isAttributeModalVisible}>
-                        <ThemedView style={{ borderRadius: 5, paddingHorizontal: 20 }}>
+                        <ThemedView style={{ borderRadius: 25, paddingHorizontal: 20 }}>
                             <Spacer space={5} />
                             <ThemedText style={appStyles.heading}>Confirm changes</ThemedText>
                             <Spacer space={5} />

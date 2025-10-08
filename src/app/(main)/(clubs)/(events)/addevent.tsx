@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   modalContainer: {
-    borderRadius: 5,
+    borderRadius: 25,
     padding: 20,
   },
   modalButtonContainer: {

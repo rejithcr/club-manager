@@ -145,7 +145,7 @@ const CategoriesManager = () => {
         </ScrollView>
       </GestureHandlerRootView>
       <Modal isVisible={isModalVisible}>
-        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+        <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
           <Spacer space={5} />
           <ThemedText style={appStyles.heading}>{isEdit ? "Edit" : "Add"} Category</ThemedText>
           <Spacer space={5} />

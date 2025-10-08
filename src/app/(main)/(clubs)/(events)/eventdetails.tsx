@@ -304,7 +304,7 @@ const EventDetails = () => {
           <Spacer space={40} />
           <Modal isVisible={isConfirmVisible}>
             <ScrollView>
-              <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+              <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
                 <ThemedHeading>Update Status</ThemedHeading>
                 {attendanceChanged ? (
                   <ThemedText style={{ textAlign: "center" }}>

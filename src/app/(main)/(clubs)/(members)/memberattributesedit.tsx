@@ -156,7 +156,7 @@ const MemberAttributesEdit = () => {
       )}
       <View style={{ marginBottom: 30 }} />
       <Modal isVisible={isAttributeModalVisible}>
-        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+        <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
           <Spacer space={5} />
           <ThemedText style={appStyles.heading}>{isEdit ? "Edit" : "Add"} Attribute</ThemedText>
           <Spacer space={5} />

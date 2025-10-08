@@ -118,7 +118,7 @@ const EventTypePickerWithAdd: React.FC<EventTypePickerWithAddProps> = ({
 
 const styles = {
   modalContainer: {
-    borderRadius: 5,
+    borderRadius: 25,
     padding: 20,
   },
   modalButtonContainer: {

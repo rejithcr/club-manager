@@ -229,7 +229,7 @@ const EventTransactions = () => {
       )}
 
       <Modal isVisible={isAddTxnVisible}>
-        <ThemedView style={{ borderRadius: 6, padding: 16 }}>
+        <ThemedView style={{ borderRadius: 25, padding: 16 }}>
           <ThemedText style={appStyles.heading}>{txnValues?.txnId ? "Edit" : "Add"} Event Transaction</ThemedText>
           <Picker
             style={{ width: "80%", alignSelf: "center" }}
@@ -286,7 +286,7 @@ const EventTransactions = () => {
       </Modal>
 
       <Modal isVisible={isAddCategoryVisible} onBackdropPress={() => setIsAddCategoryVisible(false)}>
-        <ThemedView style={{ borderRadius: 6, padding: 16 }}>
+        <ThemedView style={{ borderRadius: 25, padding: 16 }}>
           <ThemedText style={appStyles.heading}>Add category</ThemedText>
           <InputText label="Category name" defaultValue={newCategoryName} onChangeText={(t:any) => setNewCategoryName(t)} />
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 16 }}>

@@ -154,7 +154,7 @@ const Payments = () => {
         <Spacer space={50} />
         <Modal isVisible={isConfirmVisible}>
           <ScrollView>
-            <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+            <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
               <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
               <Spacer space={10} />
               <RoundedContainer>

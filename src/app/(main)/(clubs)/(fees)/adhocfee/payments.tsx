@@ -188,7 +188,7 @@ const Payments = () => {
             </ScrollView>
           </Modal>
           <Modal isVisible={isEditVisible}>
-            <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
+            <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
               <ThemedText style={appStyles.heading}>Update Split Details</ThemedText>
               <InputText onChangeText={(text: string) => setFeeName(text)} label={`Fee Name`} defaultValue={feeName} />
               <InputText

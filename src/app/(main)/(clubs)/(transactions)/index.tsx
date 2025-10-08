@@ -218,7 +218,7 @@ const Transactions = () => {
         }
       </ThemedView>
       <Modal isVisible={isAddTxnVisible}>
-        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}> 
+        <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}> 
           <ThemedText style={appStyles.heading}>{txnValues?.txnId ? "Edit" : "Add"} Tansaction</ThemedText>
           <InputSelect label={"Type"}
             onValueChange={handleTxnTypeChange} selectedValue={txnValues?.txnType}>
@@ -253,7 +253,7 @@ const Transactions = () => {
         </ThemedView>
       </Modal>
       <Modal isVisible={isAddCategoryVisible} onBackdropPress={() => setIsAddCategoryVisible(false)}>
-        <ThemedView style={{ borderRadius: 6, padding: 20 }}>
+        <ThemedView style={{ borderRadius: 25, padding: 20 }}>
           <ThemedText style={appStyles.heading}>Add category</ThemedText>
           <InputText label="Category name" onChangeText={(v: string) => setNewCategoryName(v)} defaultValue={newCategoryName} />
           <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 20 }}>
@@ -278,7 +278,7 @@ const Transactions = () => {
         </ThemedView>
       </Modal>
       <Modal isVisible={isFeeDetailsVisible}>
-        <ThemedView style={{ borderRadius: 5, padding: 20 }}>
+        <ThemedView style={{ borderRadius: 25, padding: 20 }}>
           <ThemedText style={{ width: "80%", alignSelf: "center" }}>Go to {txnValues?.feeType == 'FEE' ? 'fees' : 'expense splits'} page to update this transaction.</ThemedText>
           <Spacer space={10} />
           {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
