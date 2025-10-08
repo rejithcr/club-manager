@@ -42,6 +42,7 @@ const Editmember = () => {
         setPhone(memberDetails?.phone)
         setEmail(memberDetails?.email)
         setRole(memberDetails?.role)
+        setDateOfBirth(memberDetails?.dateOfBirth)
         setIsRegistered(memberDetails?.isRegistered)
         setUpdatedBy(memberDetails?.updatedBy)
     };

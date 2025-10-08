@@ -26,8 +26,7 @@ const BirthdayCard: React.FC<BirthdayCardProps> = ({ member, onPress, layout = '
   };
 
   const getBirthdayColor = (days: number) => {
-    if (days === 0) return colors.success; // Today - green
-    if (days === 1) return '#90EE90'; // Tomorrow - light green (CSS light green)
+    if (days === 0 || days === 1) return colors.success; // Today and Tomorrow - same green
     if (days < 0) return colors.error; // Previous week - red
     if (days <= 7) return colors.warning; // This week - warning color
     return colors.subText; // Future - subtle color
