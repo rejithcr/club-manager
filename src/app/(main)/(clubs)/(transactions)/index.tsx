@@ -25,6 +25,7 @@ import Spacer from '@/src/components/Spacer'
 import Divider from '@/src/components/Divider'
 import RoundedContainer from '@/src/components/RoundedContainer'
 import { router } from 'expo-router'
+import InputSelect from '@/src/components/InputSelect'
 
 const limit = 50;
 
@@ -219,15 +220,15 @@ const Transactions = () => {
       <Modal isVisible={isAddTxnVisible}>
         <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}> 
           <ThemedText style={appStyles.heading}>{txnValues?.txnId ? "Edit" : "Add"} Tansaction</ThemedText>
-          <Picker style={{ width: "80%", alignSelf: "center" }}
+          <InputSelect label={"Type"}
             onValueChange={handleTxnTypeChange} selectedValue={txnValues?.txnType}>
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
-          </Picker>
+          </InputSelect>
           <DatePicker date={txnValues?.txnDate || new Date()} setDate={(value: Date) => setTxnValues((prev: any) => ({ ...prev, txnDate: value }))} label='Date'/>
-          <Picker style={{ width: "80%", alignSelf: "center" }}
+          <InputSelect label={"Category"}
             selectedValue={txnValues?.txnCategoryId}
-            onValueChange={(val) => {
+            onValueChange={(val:any) => {
               if (val === "__ADD_NEW__") {
                 setIsAddCategoryVisible(true);
               } else {
@@ -239,7 +240,7 @@ const Transactions = () => {
               <Picker.Item key={c.categoryId} value={c.categoryId} label={c.categoryName} />
             ))}
             <Picker.Item value={"__ADD_NEW__"} label={"+ Add Category"} />
-          </Picker>
+          </InputSelect>
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />
           {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center", fontSize: 12, color: colors.subText }}>Updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
