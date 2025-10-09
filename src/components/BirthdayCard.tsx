@@ -59,13 +59,13 @@ const BirthdayCard: React.FC<BirthdayCardProps> = ({ member, onPress, layout = '
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: colors.primary,
+              backgroundColor: colors.secondary,
               justifyContent: 'center',
               alignItems: 'center',
               marginRight: 12
             }}>
               <ThemedText style={{ 
-                color: colors.background, 
+                color: colors.subText, 
                 fontWeight: 'bold',
                 fontSize: 16
               }}>
@@ -81,14 +81,13 @@ const BirthdayCard: React.FC<BirthdayCardProps> = ({ member, onPress, layout = '
               </ThemedText>
               {member.clubCount > 1 && (
                 <View style={{
-                  backgroundColor: colors.primary,
+                  backgroundColor: colors.primary, //hidden as this creates confusion
                   borderRadius: 8,
                   paddingHorizontal: 4,
-                  paddingVertical: 1,
                   marginLeft: 4
                 }}>
                   <ThemedText style={{ 
-                    color: colors.background, 
+                    color: colors.primary, 
                     fontSize: 9,
                     fontWeight: 'bold'
                   }}>
@@ -97,7 +96,7 @@ const BirthdayCard: React.FC<BirthdayCardProps> = ({ member, onPress, layout = '
                 </View>
               )}
             </View>
-            <ThemedText style={{ fontSize: 11, color: colors.subText }} numberOfLines={1}>
+            <ThemedText style={{ fontSize: 11, color: colors.subText }} numberOfLines={2}>
               {member.clubNames}
             </ThemedText>
           </View>

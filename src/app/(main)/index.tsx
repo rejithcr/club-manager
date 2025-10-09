@@ -16,9 +16,9 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import UnifiedFeed from "./unified_feed";
 import { clearTokens } from "@/src/helpers/auth_helper";
 import {
+  useGetClubEventsQuery,
   useGetClubMembersQuery,
   useGetClubQuery,
-  useLazyGetClubEventsQuery,
 } from "@/src/services/clubApi";
 import { useGetUpcomingBirthdaysQuery } from "@/src/services/memberApi";
 
@@ -52,10 +52,17 @@ const Main = () => {
     clubId: -1 // Get birthdays from all clubs
   });
 
+  const {data: events, isLoading: isLoadingEvents, isFetching: isFetchingEvents, refetch: refetchEvents
+  } = useGetClubEventsQuery({ 
+    memberId: userInfo?.memberId, 
+    clubId: -1 
+  });
+
   const onRefresh = () => {
     refetchMemberDues();
     refetchClubs();
     refetchBirthdays();
+    refetchEvents();
   };
   const handleLogout = async () => {
     await AsyncStorage.removeItem("userInfo");
@@ -63,22 +70,17 @@ const Main = () => {
     router.replace("/(auth)");
   };
   
-  const [triggerGetEvents, { data: events, isLoading: isLoadingEvents }] = useLazyGetClubEventsQuery();
 
   useEffect(() => {
     if (searchParams.showClubDues) {
       router.push(`/(main)/(profile)/duesbyclub?clubId=${searchParams.showClubDues}&memberId=${userInfo?.memberId}`);
     }
-    if (clubs) {
-      const clubIds = clubs.map((c: { clubId: any }) => c.clubId);
-      triggerGetEvents({ clubIds, limit: 10, offset: 0 });
-    }
-  }, [clubs, isFetchingClubs]);
+  }, [searchParams.showClubDues, userInfo?.memberId]);
 
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
-        <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues || isFetchingBirthdays} onRefresh={onRefresh} />}>
+        <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues || isFetchingBirthdays || isFetchingEvents} onRefresh={onRefresh} />}>
           <ThemedHeading>My Clubs</ThemedHeading>
           {isLoadingMyClubs && <LoadingSpinner />}
           {!isLoadingMemberDues && <MyClubs clubs={clubs} />}

@@ -170,7 +170,7 @@ GET_UPCOMING_BIRTHDAYS = """
      )
      and (
        -- Birthdays from previous week (-7 days) to next 30 days
-       (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) >= -7
+       (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) >= -3
        AND (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) <= 30
      )
    GROUP BY m.member_id, m.first_name, m.last_name, m.email, m.phone, m.photo, 

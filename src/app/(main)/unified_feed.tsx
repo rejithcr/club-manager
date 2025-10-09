@@ -120,7 +120,7 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
               <View style={{ paddingHorizontal: 25, paddingVertical: 10 }}>
                 <BirthdayCard 
                   member={item.data as BirthdayMember}
-                  onPress={() => handleBirthdayPress(item.data as BirthdayMember)}
+                  //onPress={() => handleBirthdayPress(item.data as BirthdayMember)}
                   layout="list"
                 />
               </View></RoundedContainer>

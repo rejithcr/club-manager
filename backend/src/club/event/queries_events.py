@@ -32,7 +32,11 @@ GET_EVENTS_BY_MEMBER = """
     FROM events e
         join event_types et on et.event_type_id = e.event_type_id
         join club c on c.club_id = et.club_id
-    WHERE c.club_id = ANY(%s) and e.status = 'Scheduled'
+        join membership ms on ms.club_id = c.club_id and ms.is_active = 1
+        join member m on m.member_id = ms.member_id
+    WHERE (c.club_id = %s OR %s = -1) and c.is_active = 1
+    	and m.member_id = %s
+        and e.status = 'Scheduled'
     order by event_date desc
     limit %s offset %s
 """
