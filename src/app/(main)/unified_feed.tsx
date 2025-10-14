@@ -112,10 +112,9 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
             style={{ overflow: "hidden" }}
           >
             {item.type === 'event' ? (
-                <RoundedContainer>
               <TouchableOpacity onPress={() => gotoEventDetails(item.data as Event)}>
                 <EventCard event={item.data as Event} />
-              </TouchableOpacity></RoundedContainer>
+              </TouchableOpacity>
             ) : ( <RoundedContainer>
               <View style={{ paddingHorizontal: 25, paddingVertical: 10 }}>
                 <BirthdayCard 

@@ -78,9 +78,9 @@ const Profile = () => {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           {isMemberLoading && <LoadingSpinner />}
           {!isMemberLoading && memberDetails && (
-            <Card style={styles.mainCard}>
+            <View style={styles.mainCard}>
               {/* Profile Section */}
-              <View style={styles.profileSection}>
+              <Card style={styles.profileSection}>
                 {memberDetails?.photo ? (
                   <Image
                     source={{ uri: memberDetails?.photo }}
@@ -99,15 +99,14 @@ const Profile = () => {
 
                   <View style={{ ...styles.statusBadge, backgroundColor: memberDetails?.isRegistered ? colors.success : colors.warning }}>
                     <ThemedText style={styles.statusText}>
-                      {memberDetails?.isRegistered ? 'REGISTERED' : 'PENDING'}
+                      {memberDetails?.isRegistered ? 'REGISTERED' : 'REGISTRATION PENDING'}
                     </ThemedText>
                   </View>
                 </View>
-              </View>
-
-              <Divider style={styles.sectionDivider} />
+              </Card>
 
               {/* Member Information */}
+              <Card>
               <KeyValueUI 
                 data={memberDetails} 
                 hideKeys={["photo", "firstName", "lastName", "isRegistered", "isActive"]} 
@@ -133,11 +132,11 @@ const Profile = () => {
                   ))}
                 </>
               )}
-
+              </Card>
               {/* Admin Actions */}
               {clubInfo.role === ROLE_ADMIN && (
                 <>
-                  <Divider style={styles.sectionDivider} />
+                <Spacer space={5} />
                   {isRemoving ? (
                     <LoadingSpinner />
                   ) : (
@@ -145,19 +144,19 @@ const Profile = () => {
                       <ThemedButton
                         title="Edit"
                         onPress={() => router.push(`/(main)/(members)/editmember?memberId=${params.get("memberId")}`)}
-                        style={{ ...styles.actionButton, backgroundColor: colors.button }}
+                        style={{ backgroundColor: colors.button }}
                       />
                       
                       <ThemedButton 
                         title="Remove" 
                         onPress={() => handleRemove()} 
-                        style={{ ...styles.actionButton, backgroundColor: colors.error }}
+                        style={{ backgroundColor: colors.error }}
                       />
                     </View>
                   )}
                 </>
               )}
-            </Card>
+            </View>
           )}
 
           {isLoadingCMA && <LoadingSpinner />}
@@ -173,7 +172,6 @@ export default Profile;
 
 const styles = StyleSheet.create({
   scrollContainer: {
-    padding: 16,
     paddingBottom: 40,
   },
   mainCard: {
@@ -241,12 +239,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     marginTop: 8,
-  },
-  actionButton: {
-    flex: 1,
-    marginHorizontal: 6,
-    paddingVertical: 10,
-    borderRadius: 8,
   },
   // Legacy styles for compatibility
   detailsTable: {

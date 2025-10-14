@@ -1,3 +1,4 @@
+import React, { useContext } from "react";
 import { TouchableOpacity, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { Event } from "@/src/types/event";
@@ -6,7 +7,6 @@ import ThemedText from "@/src/components/themed-components/ThemedText";
 import Spacer from "@/src/components/Spacer";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { router } from "expo-router";
-import { useContext } from "react";
 import { ClubContext } from "@/src/context/ClubContext";
 import RoundedContainer from "@/src/components/RoundedContainer";
 import Divider from "@/src/components/Divider";
@@ -57,71 +57,206 @@ export default UpcomingEvents;
 
 export const EventCard = ({ event, cardSize }: { event: Event | undefined; cardSize?: string }) => {
   const { colors } = useTheme();
+  
+  const getEventColor = (eventName: string | undefined) => {
+    const name = eventName?.toLowerCase() || '';
+    if (name.includes('birthday')) return colors.warning;
+    if (name.includes('meeting')) return colors.info;
+    if (name.includes('anniversary')) return colors.success;
+    if (name.includes('practice') || name.includes('match')) return '#FF6B35';
+    return colors.button;
+  };
+
+  const eventColor = getEventColor(event?.name);
+
   return (
-    <View style={{ paddingHorizontal: 25, paddingVertical: 15 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          flexWrap: "wrap",
+    <View style={{ 
+      margin: 8, width: "85%",
+      alignSelf: "center",
+      borderRadius: 16,
+      backgroundColor: colors.primary,
+      // Shadow for iOS
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      // Shadow for Android
+      elevation: 4,
+      overflow: 'hidden'
+    }}>
+      {/* Color accent bar */}
+      <View style={{ 
+        height: 4, 
+        backgroundColor: eventColor,
+        width: '100%'
+      }} />
+      
+      <View style={{ padding: 20 }}>
+        {/* Header section */}
+        <View style={{ 
+          flexDirection: "row", 
           justifyContent: "space-between",
-        }}
-      >
-        <View style={{ flexDirection: "row" }}>
-          <View>
-            <ThemedText style={{ fontWeight: "bold", fontSize: 15 }}>{event?.title}</ThemedText>
-            <ThemedText style={{ fontSize: 10, color: colors.subText }}>{event?.description}</ThemedText>
-          </View>
-        </View>
-        <Spacer hspace={10} />
-        {getEventIcon(event)}
-      </View>
-      <View>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginTop: 5,
-            justifyContent: "space-between",
-          }}
-        >
-          <View style={{ flexDirection: "row" }}>
-            <ThemedIcon name={"MaterialIcons:calendar-today"} size={15} />
-            <Spacer hspace={2} />
-            <ThemedText style={{ fontSize: 12 }}>{event?.eventDate}</ThemedText>
-            <Spacer hspace={10} />
-            {cardSize === "long" && event?.startTime && (
-              <>
-                <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
-                <Spacer hspace={2} />
-                <ThemedText style={{ fontSize: 12 }}>
-                  {event?.startTime}
-                  {event?.endTime && " - "}
-                  {event?.endTime}
-                </ThemedText>
-              </>
+          alignItems: "flex-start",
+          marginBottom: 16
+        }}>
+          <View style={{ flex: 1, marginRight: 16 }}>
+            <ThemedText style={{ 
+              fontWeight: "bold", 
+              fontSize: 18,
+              color: colors.heading,
+              marginBottom: 4
+            }}>
+              {event?.title}
+            </ThemedText>
+            {event?.description && (
+              <ThemedText style={{ 
+                fontSize: 14, 
+                color: colors.subText,
+                lineHeight: 20
+              }}>
+                {event?.description}
+              </ThemedText>
             )}
           </View>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            {event?.location ? <ThemedIcon name={"MaterialIcons:location-pin"} size={15} /> : <></>}
-            <ThemedText style={{ fontSize: 12 }}>{event?.location}</ThemedText>
+          
+          {/* Event icon with background */}
+          <View style={{
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor: eventColor + '20', // 20% opacity
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            {React.cloneElement(getEventIcon(event), { 
+              size: 24, 
+              color: eventColor 
+            })}
           </View>
         </View>
 
-        <View style={{ flexDirection: "row", alignItems: "center", marginTop: 5, justifyContent: "space-between" }}>
-          <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-            {cardSize !== "long" && event?.startTime && (
-              <>
-                <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
-                <Spacer hspace={2} />
-                <ThemedText style={{ fontSize: 12 }}>
+        {/* Details section */}
+        <View style={{ gap: 12 }}>
+          {/* Date and Time row */}
+          <View style={{ 
+            flexDirection: "row", 
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: 'wrap'
+          }}>
+            <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+              <View style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: colors.secondary + '30',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 8
+              }}>
+                <ThemedIcon name={"MaterialIcons:calendar-today"} size={16} color={colors.text} />
+              </View>
+              <ThemedText style={{ 
+                fontSize: 12,
+                fontWeight: '500',
+                color: colors.text
+              }}>
+                {event?.eventDate}
+              </ThemedText>
+            </View>
+            
+            {event?.startTime && (
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <View style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 16,
+                  backgroundColor: colors.secondary + '30',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginRight: 8
+                }}>
+                  <ThemedIcon name={"MaterialIcons:access-time"} size={16} color={colors.text} />
+                </View>
+                <ThemedText style={{ 
+                  fontSize: 12,
+                  fontWeight: '500',
+                  color: colors.text
+                }}>
                   {event?.startTime}
-                  {event?.endTime && " - "}
-                  {event?.endTime}
+                  {event?.endTime && ` - ${event?.endTime}`}
                 </ThemedText>
-              </>
+              </View>
             )}
           </View>
-          <ThemedText style={{ textAlign: "right", fontSize: 10, color: colors.subText }}>{event?.clubName}</ThemedText>
+
+          {/* Location row */}
+          {event?.location && (
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: colors.secondary + '30',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 8
+              }}>
+                <ThemedIcon name={"MaterialIcons:location-pin"} size={16} color={colors.text} />
+              </View>
+              <ThemedText style={{ 
+                fontSize: 14,
+                color: colors.text,
+                flex: 1
+              }}>
+                {event?.location}
+              </ThemedText>
+            </View>
+          )}
+        </View>
+
+        {/* Footer - Club name */}
+        <View style={{ 
+          marginTop: 16,
+          paddingTop: 12,
+          borderTopWidth: 1,
+          borderTopColor: colors.border
+        }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View style={{
+              backgroundColor: eventColor + '15',
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 20,
+              flexDirection: 'row',
+              alignItems: 'center'
+            }}>
+              <View style={{
+                width: 8,
+                height: 8,
+                borderRadius: 4,
+                backgroundColor: eventColor,
+                marginRight: 6
+              }} />
+              <ThemedText style={{ 
+                fontSize: 12,
+                fontWeight: '600',
+                color: eventColor
+              }}>
+                {event?.clubName}
+              </ThemedText>
+            </View>
+            
+            {event?.name && (
+              <ThemedText style={{ 
+                fontSize: 11,
+                color: colors.subText,
+                fontStyle: 'italic'
+              }}>
+                {event?.name}
+              </ThemedText>
+            )}
+          </View>
         </View>
       </View>
     </View>

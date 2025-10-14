@@ -16,7 +16,7 @@ export const colors = {
     info: "#007acc",
     nav: "#000000",
     add: "#5ac983",
-    heading: "#5ac983",
+    heading: "#3534a39d",
     border: "#rgba(136, 136, 136, 0.2)",
     subText: "#869c98",
   },
