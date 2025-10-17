@@ -107,15 +107,9 @@ const ClubDues = () => {
 
     const message = intro + dueAmount + lines.join("\n") + outro;
 
-    const appUrl = `whatsapp://send?text=${encodeURIComponent(message)}`;
     const webUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     try {
-      const canOpen = await Linking.canOpenURL(appUrl);
-      if (canOpen) {
-        await Linking.openURL(appUrl);
-      } else {
-        await Linking.openURL(webUrl);
-      }
+      await Linking.openURL(webUrl);
     } catch (err) {
       console.error("WhatsApp share failed", err);
       showSnackbar("Unable to open WhatsApp. Try copying the message.", "error");

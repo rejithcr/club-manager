@@ -77,19 +77,8 @@ MARK_CLUB_FOR_DELETION = """
 GET_TRANSACTIONS = """
     select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, t.club_transaction_category_type_id,
         t.club_transaction_category, t.club_transaction_comment, t.created_by, to_char(t.club_transaction_date, 'YYYY-mm-dd') club_transaction_date,
-        coalesce(caf.club_adhoc_fee_name, coalesce(cft.club_fee_type, t.club_transaction_category, concat(cft.club_fee_type, '(', cfc.club_fee_type_period, ')'))) fee_name,
-        coalesce(m.first_name || ' ' || m.last_name, am.first_name || ' ' || am.last_name) member_name,
-        t.updated_by
+        t.club_transaction_category fee_name, t.updated_by
     from club_transaction t
-        left join club_fee_payment cfp on cfp.club_fee_payment_id = t.club_fee_payment_id
-        left join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id 
-        left join club_fee_type cft on cft.club_fee_type_id = cfc.club_fee_type_id 
-        left join membership ms on ms.membership_id = cfp.membership_id
-        left join "member" m on m.member_id = ms.member_id
-        left join club_adhoc_fee_payment cafp on cafp.club_adhoc_fee_payment_id = t.club_adhoc_fee_payment_id
-        left join club_adhoc_fee caf on caf.club_adhoc_fee_id = cafp.club_adhoc_fee_id
-        left join membership ams on ams.membership_id = cafp.membership_id 
-        left join member am on am.member_id = ams.member_id
     where t.club_id = %s
 	    and t.club_fee_payment_id is null and t.club_adhoc_fee_payment_id is null
         and (%s = 'ALL' OR t.club_transcation_type = %s)
