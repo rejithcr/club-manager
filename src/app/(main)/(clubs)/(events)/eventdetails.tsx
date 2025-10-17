@@ -174,33 +174,11 @@ const EventDetails = () => {
   } = useGetEventTransactionsQuery({ eventId: eventObj.eventId, fundBalance: true});
 
   return (
-    <ThemedView style={{ flex: 1 }}>
-      <ThemedView
-        style={{
-          width: "90%",
-          alignSelf: "center",
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <ThemedHeading style={{ width: 200 }}>{event?.title}</ThemedHeading>
-        {clubInfo.role === ROLE_ADMIN ? (
-          <ThemedIcon
-            name="MaterialCommunityIcons:square-edit-outline"
-            size={25}
-            onPress={() => router.push(`/(main)/(clubs)/(events)/editevent?event=${JSON.stringify(event)}`)}
-          />
-        ) : (
-          <ThemedText></ThemedText>
-        )}
-      </ThemedView>
-
-      {event && <EventItemDetails event={event} />}
-      <Spacer space={8} />
-
+    <ThemedView style={{ flex: 1, backgroundColor: colors.background }}>      
       <GestureHandlerRootView>
         <ScrollView>
+      {event && <EventItemDetails event={event} clubRole={clubInfo.role} />}
+      <Spacer space={8} />
           {event?.isTransactionEnabled && (
             <>
               <Banner 
@@ -395,52 +373,249 @@ const EventDetails = () => {
 
 export default EventDetails;
 
-export const EventItemDetails = ({ event }: { event: any }) => {
+export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: string }) => {
   const { colors } = useTheme();
+  
+  const getStatusColor = (status: string) => {
+    if (status === "Completed") return colors.success;
+    if (status === "Scheduled") return colors.warning;
+    return colors.error;
+  };
+
+  const statusColor = getStatusColor(event.status);
+
   return (
-    <RoundedContainer>
-      <View style={{ paddingVertical: 10, paddingHorizontal: 15 }}>
-        <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
-          <ThemedText style={{ fontWeight: "bold" }}>{event.name}</ThemedText>
-          <ThemedText
-            style={{
-              textAlign: "right",
-              fontSize: 12,
-              fontWeight: "bold",
-              color:
-                event.status === "Completed"
-                  ? colors.success
-                  : event.status === "Scheduled"
-                  ? colors.warning
-                  : colors.error,
-            }}
-          >
-            {event.status}
+    <View style={{ 
+      borderRadius: 20,
+      overflow: 'hidden',
+      width: '100%', 
+      alignSelf: 'center'
+    }}>
+      
+      {/* Header Section */}
+      <View style={{ 
+        paddingHorizontal: 20, 
+        paddingTop: 20,
+        paddingBottom: 12 
+      }}>
+        {/* Title and Edit Icon Row */}
+        <View style={{ 
+          flexDirection: "row", 
+          justifyContent: "space-between", 
+          alignItems: "center",
+          marginBottom: 16
+        }}>
+          <ThemedText style={{ 
+            fontSize: 22, 
+            fontWeight: "bold",
+            color: colors.heading,
+            flex: 1,
+            marginRight: 12
+          }}>
+            {event.title}
           </ThemedText>
+
+          {/* Edit Icon */}
+          {clubRole === ROLE_ADMIN && (
+            <View style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: colors.button + '20',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+              <ThemedIcon
+                name="MaterialCommunityIcons:square-edit-outline"
+                size={20}
+                color={colors.button}
+                onPress={() => router.push(`/(main)/(clubs)/(events)/editevent?event=${JSON.stringify(event)}`)}
+              />
+            </View>
+          )}
         </View>
-        <Spacer space={3} />
-        <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", alignItems: "center" }}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <ThemedIcon name={"MaterialIcons:calendar-today"} size={15} />
-            <Spacer hspace={2} />
-            <ThemedText style={{ textAlign: "right", fontSize: 12 }}>{event.eventDate}</ThemedText>
+
+        {/* Event Type and Status Row */}
+        <View style={{
+          flexDirection: 'row',
+          gap: 12,
+          marginBottom: 16
+        }}>
+          {/* Event Type Badge */}
+          <View style={{
+            flex: 1,
+            backgroundColor: statusColor + '20',
+            paddingHorizontal: 8,
+            paddingVertical: 5,
+            borderRadius: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <View style={{
+              width: 8,
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: statusColor,
+              marginRight: 6
+            }} />
+            <ThemedText style={{ 
+              fontSize: 13,
+              fontWeight: '600',
+              color: statusColor
+            }}>
+              {event.name}
+            </ThemedText>
           </View>
-          <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
-            {event.startTime && (
-              <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
-                <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
-                <Spacer hspace={2} />
-                <ThemedText style={{ fontSize: 12 }}>
-                  {event.startTime} {event.endTime && " - " + event.endTime}
+
+          {/* Status Badge */}
+          <View style={{
+            flex: 1,
+            backgroundColor: statusColor,
+            paddingHorizontal: 8,
+            paddingVertical: 5,
+            borderRadius: 16,
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <ThemedText style={{
+              fontSize: 13,
+              fontWeight: "600",
+              color: '#ffffff'
+            }}>
+              {event.status}
+            </ThemedText>
+          </View>
+        </View>
+
+        {/* Description */}
+        {event.description && (
+          <View style={{
+            backgroundColor: colors.background,
+            padding: 12,
+            borderRadius: 12,
+            marginBottom: 16
+          }}>
+            <ThemedText style={{ 
+              fontSize: 14, 
+              color: colors.text,
+              lineHeight: 20
+            }}>
+              {event.description}
+            </ThemedText>
+          </View>
+        )}
+
+        {/* Details Grid */}
+        <View style={{ gap: 12 }}>
+          {/* Date Row */}
+          <View style={{ 
+            flexDirection: "row", 
+            alignItems: "center"
+          }}>
+            <View style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: colors.info + '20',
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginRight: 12
+            }}>
+              <ThemedIcon name="MaterialIcons:calendar-today" size={20} color={colors.info} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <ThemedText style={{ 
+                fontSize: 12, 
+                color: colors.subText,
+                marginBottom: 2
+              }}>
+                Event Date
+              </ThemedText>
+              <ThemedText style={{ 
+                fontSize: 15,
+                fontWeight: '600',
+                color: colors.text
+              }}>
+                {event.eventDate}
+              </ThemedText>
+            </View>
+          </View>
+
+          {/* Time Row */}
+          {event.startTime && (
+            <View style={{ 
+              flexDirection: "row", 
+              alignItems: "center"
+            }}>
+              <View style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: colors.success + '20',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 12
+              }}>
+                <ThemedIcon name="MaterialIcons:access-time" size={20} color={colors.success} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <ThemedText style={{ 
+                  fontSize: 12, 
+                  color: colors.subText,
+                  marginBottom: 2
+                }}>
+                  Time
+                </ThemedText>
+                <ThemedText style={{ 
+                  fontSize: 15,
+                  fontWeight: '600',
+                  color: colors.text
+                }}>
+                  {event.startTime}
+                  {event.endTime && ` - ${event.endTime}`}
                 </ThemedText>
               </View>
-            )}
-          </View>
+            </View>
+          )}
+
+          {/* Location Row */}
+          {event.location && (
+            <View style={{ 
+              flexDirection: "row", 
+              alignItems: "center"
+            }}>
+              <View style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: colors.warning + '20',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 12
+              }}>
+                <ThemedIcon name="MaterialIcons:location-pin" size={20} color={colors.warning} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <ThemedText style={{ 
+                  fontSize: 12, 
+                  color: colors.subText,
+                  marginBottom: 2
+                }}>
+                  Location
+                </ThemedText>
+                <ThemedText style={{ 
+                  fontSize: 15,
+                  fontWeight: '600',
+                  color: colors.text
+                }}>
+                  {event.location}
+                </ThemedText>
+              </View>
+            </View>
+          )}
         </View>
       </View>
-      <ThemedText style={{ paddingHorizontal: 15, paddingBottom: 5, fontSize: 12, color: colors.subText }}>
-        {event.description}
-      </ThemedText>
-    </RoundedContainer>
+    </View>
   );
 };

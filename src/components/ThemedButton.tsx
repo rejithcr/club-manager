@@ -23,8 +23,14 @@ const styles = StyleSheet.create({
         alignItems: "center",
         paddingHorizontal: 25,
         paddingVertical: 10,
-        borderRadius: 25,
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+        borderRadius: 25,        
+        // Shadow for iOS
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        // Shadow for Android
+        elevation: 6,
     },
     text: {
         color: "white",

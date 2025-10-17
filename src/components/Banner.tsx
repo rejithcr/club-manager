@@ -18,7 +18,13 @@ const Banner = (props: { backgroundColor?: string | undefined; children: React.R
         justifyContent: "space-between",
         alignItems: "center",
         borderRadius: sizes.borderRadius,
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+        // Shadow for iOS
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        // Shadow for Android
+        elevation: 6,
       }}
     >
       {props.children}
