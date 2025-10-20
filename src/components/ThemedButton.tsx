@@ -1,14 +1,18 @@
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { useTheme } from '../hooks/use-theme';
+import ThemedIcon from './themed-components/ThemedIcon';
 
-const ThemedButton = (props: { title: string; onPress: any; disabled?: boolean; style?: any}) => {
+const ThemedButton = (props: { title: string; onPress: any; disabled?: boolean; style?: any; icon?: string }) => {
     const { colors } = useTheme();
     return (
-        <TouchableOpacity disabled={props?.disabled} 
-            style={{...styles.button, backgroundColor: props?.disabled ? colors.disabled : colors.button, ...props.style}}
+        <TouchableOpacity disabled={props?.disabled}
+            style={{...styles.button, backgroundColor: props?.disabled ? colors.disabled : colors.button, ...(props.icon && { paddingLeft: 18 }), ...props.style}}
             onPress={!props?.disabled ? props?.onPress : undefined}>
-            <Text style={{...styles.text}}>{props.title}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                {props.icon && <ThemedIcon name={props.icon} size={20} color="white" />}
+                <Text style={{...styles.text}}>{props.title}</Text>
+            </View>
         </TouchableOpacity>
     )
 }

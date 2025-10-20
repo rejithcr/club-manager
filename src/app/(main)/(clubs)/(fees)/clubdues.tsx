@@ -1,4 +1,4 @@
-import { TouchableOpacity, View, StyleSheet, ScrollView, RefreshControl, Image, Linking } from "react-native";
+import { TouchableOpacity, View, StyleSheet, ScrollView, RefreshControl, Image, Linking, TextInput, Share, Platform } from "react-native";
 import React, { useContext, useState } from "react";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
@@ -43,6 +43,7 @@ const ClubDues = () => {
   const [markDuesPaid, { isLoading: isMarking }] = useMarkDuesPaidMutation();
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [paymentsPreview, setPaymentsPreview] = useState<{ paymentId: number; feeType: string; amount?: number }[]>([]);
+  const [isShareModalVisible, setIsShareModalVisible] = useState(false);
 
   const toggleSelected = (id: number, feeType: string, amount?: number) => {
     setSelectedItems((prev) => {
@@ -91,29 +92,8 @@ const ClubDues = () => {
       showSnackbar("No dues to share");
       return;
     }
-    const lines: string[] = [];
-    (duesByMembers || []).forEach((member: any) => {
-      const name = [member.firstName, member.lastName].filter(Boolean).join(" ") || member.email || "Member";
-      const amount = member.totalDue ?? (member.dues || []).reduce((s: number, d: any) => s + (d.amount || 0), 0);
-      const upi = clubInfo?.upiId || "";
-      const tn = `${clubInfo?.clubName || "Club"} fee payment`;
-      const link = `upi://pay?pa=${upi}&tn=${encodeURIComponent(tn)}&am=${amount?.toFixed(2)}&cu=INR`;
-      lines.push(`- ${name}: *₹ ${amount}*`);
-    });
-
-    const intro = `Dear Member,\n\nThis is a polite request to clear the following club dues. Timely payments help the functioning of the club and are much appreciated.\n\n`;
-    const dueAmount =`*Total Due: ₹ ${totalDue?.toFixed(0)}* \n\n`
-    const outro = `\n\nPlease click on below link to see the dues breakdown and pay.\nhttps://club-manager-33a8c.web.app?showClubDues=${clubInfo?.clubId}\n\nThank you for supporting\n${clubInfo?.clubName}.`;
-
-    const message = intro + dueAmount + lines.join("\n") + outro;
-
-    const webUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    try {
-      await Linking.openURL(webUrl);
-    } catch (err) {
-      console.error("WhatsApp share failed", err);
-      showSnackbar("Unable to open WhatsApp. Try copying the message.", "error");
-    }
+    // Open the share preview modal instead of directly sharing
+    setIsShareModalVisible(true);
   };
 
   return (
@@ -192,9 +172,173 @@ const ClubDues = () => {
             onConfirm={confirmMarkAsPaid}
             onCancel={() => setIsConfirmVisible(false)}
           />
+
+          <SharePreviewModal
+            visible={isShareModalVisible}
+            duesByMembers={duesByMembers}
+            totalDue={totalDue}
+            clubInfo={clubInfo}
+            onClose={() => setIsShareModalVisible(false)}
+          />
         </>
       )}
     </ThemedView>
+  );
+};
+
+const SharePreviewModal = (props: {
+  visible: boolean;
+  duesByMembers: any[];
+  totalDue: number;
+  clubInfo: any;
+  onClose: () => void;
+}) => {
+  const { visible, duesByMembers, totalDue, clubInfo, onClose } = props;
+  const { colors } = useTheme();
+  const [includeMemberDues, setIncludeMemberDues] = useState(true);
+  const [editableMessage, setEditableMessage] = useState("");
+
+  // Generate the message whenever the modal opens or checkbox changes
+  React.useEffect(() => {
+    if (visible) {
+      const lines: string[] = [];
+      
+      if (includeMemberDues) {
+        (duesByMembers || []).forEach((member: any) => {
+          const name = [member.firstName, member.lastName].filter(Boolean).join(" ") || member.email || "Member";
+          const amount = member.totalDue ?? (member.dues || []).reduce((s: number, d: any) => s + (d.amount || 0), 0);
+          lines.push(`- ${name}: *₹ ${amount}*`);
+        });
+      }
+
+      const intro = `Dear Member,\n\nThis is a polite request to clear the following club dues. Timely payments help the functioning of the club and are much appreciated.\n\n`;
+      const dueAmount = `*Total Due: ₹ ${totalDue?.toFixed(0)}*\n\n`;
+      const membersList = includeMemberDues ? lines.join("\n") + "\n\n" : "";
+      const outro = `Please click on below link to see your dues breakdown and pay.\nhttps://club-manager-33a8c.web.app?showClubDues=${clubInfo?.clubId}\n\nThank you for supporting\n${clubInfo?.clubName}.`;
+
+      const message = intro + dueAmount + membersList + outro;
+      setEditableMessage(message);
+    }
+  }, [visible, includeMemberDues, duesByMembers, totalDue, clubInfo]);
+
+  const handleShareToWhatsApp = async () => {
+    if (!editableMessage.trim()) {
+      showSnackbar("Message is empty");
+      return;
+    }
+
+    const webUrl = `https://wa.me/?text=${encodeURIComponent(editableMessage)}`;
+    
+    try {
+      // Try native Share API first (better for iOS)
+      if (Platform.OS === 'ios') {
+        try {
+          await Share.share({
+            message: editableMessage,
+          });
+          onClose();
+          return;
+        } catch (shareErr) {
+          console.log("Native share failed, trying WhatsApp URL");
+        }
+      }
+
+      // Try WhatsApp URL
+      const canOpen = await Linking.canOpenURL(webUrl);
+      if (canOpen) {
+        await Linking.openURL(webUrl);
+        onClose();
+      } else {
+        // Fallback to native share
+        await Share.share({
+          message: editableMessage,
+        });
+        onClose();
+      }
+    } catch (err) {
+      console.error("Share failed", err);
+      showSnackbar("Unable to share. Please copy the message manually.", "error");
+    }
+  };
+
+  return (
+    <Modal 
+      isVisible={visible} 
+      onBackdropPress={onClose} 
+      onBackButtonPress={onClose}
+      style={{ margin: 0, justifyContent: 'flex-end' }}
+    >
+      <ThemedView style={{ 
+        borderTopLeftRadius: 20, 
+        borderTopRightRadius: 20, 
+        paddingTop: 20,
+        paddingHorizontal: 16,
+        paddingBottom: 30,
+        maxHeight: '90%'
+      }}>
+        {/* Header */}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <ThemedText style={{ fontWeight: "bold", fontSize: 20 }}>Share Dues</ThemedText>
+          <TouchableOpacity onPress={onClose}>
+            <ThemedIcon name="MaterialIcons:close" size={24} color={colors.text} />
+          </TouchableOpacity>
+        </View>
+
+        {/* Checkbox for including member dues */}
+        <TouchableOpacity 
+          onPress={() => setIncludeMemberDues(!includeMemberDues)}
+          style={{ 
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            marginBottom: 16,
+            paddingVertical: 8
+          }}
+        >
+          <ThemedCheckBox checked={includeMemberDues} />
+          <ThemedText style={{ marginLeft: 8 }}>Include dues by members</ThemedText>
+        </TouchableOpacity>
+
+        {/* Editable message preview */}
+        <ThemedText style={{ fontSize: 12, color: colors.subText, marginBottom: 8 }}>
+          Preview & Edit Message:
+        </ThemedText>
+        <ScrollView style={{ 
+          borderWidth: 1, 
+          borderColor: colors.border, 
+          borderRadius: 8, 
+          padding: 12,
+          backgroundColor: colors.background,
+          maxHeight: 350,
+          marginBottom: 16
+        }}>
+          <TextInput
+            value={editableMessage}
+            onChangeText={setEditableMessage}
+            multiline
+            style={{
+              color: colors.text,
+              fontSize: 14,
+              lineHeight: 20,
+              minHeight: 300,
+              textAlignVertical: 'top'
+            }}
+            placeholderTextColor={colors.subText}
+            placeholder="Enter message to share..."
+          />
+        </ScrollView>
+
+        {/* Share button */}
+        <View style={{ flexDirection: 'row', gap: 12 }}>
+          <View style={{ flex: 1 }}>
+            <ThemedButton 
+              title="Share to whatsapp"
+              onPress={handleShareToWhatsApp}
+              icon="MaterialCommunityIcons:whatsapp"
+            />
+          </View>
+        </View>
+      </ThemedView>
+    </Modal>
   );
 };
 
