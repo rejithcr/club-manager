@@ -252,9 +252,9 @@ const MemberFeeItem = (props: {
             return prev
         })
     }
-
+    const { clubInfo } = useContext(ClubContext);
     return (
-        <TouchableOpacity onPress={selectItem}>
+        <TouchableOpacity onPress={selectItem} disabled={clubInfo.role !== ROLE_ADMIN}>
             <ShadowBox style={{ justifyContent:"space-between" }}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
                     {props?.photo ? (

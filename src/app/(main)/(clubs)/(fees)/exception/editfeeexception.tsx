@@ -19,6 +19,7 @@ import Spacer from '@/src/components/Spacer'
 import { useLazyGetExceptionQuery, useUpdateFeesExceptionMutation } from '@/src/services/feeApi'
 import { useLazyGetClubMembersQuery } from '@/src/services/clubApi'
 import RoundedContainer from '@/src/components/RoundedContainer'
+import Divider from '@/src/components/Divider'
 
 const EditFeeException = () => {
     const [isLoadingMembers, setIsLoadingMembers] = useState(false)
@@ -117,12 +118,13 @@ const EditFeeException = () => {
                     <InputText label='Amount' keyboardType={"number-pad"} onChangeText={setExceptionAmount} value={exceptionAmount} />
                 </View>
 
+                <RoundedContainer>
                 {isLoadingMembers && <LoadingSpinner />}
                 {!isLoadingMembers && exceptionMembers && exceptionMembers.length > 0 && exceptionMembers[0].memberId &&
                     exceptionMembers?.map((member: {
                         memberId: number, lastName: string, firstName: string | undefined, startDate: string,
                         clubFeeTypeExceptionMemberId: number, endDate: string | undefined, endDateAdded: string | undefined
-                    }) => <><RoundedContainer><View key={member?.memberId?.toString() + member?.endDate}>
+                    }, idx: number) => <><View key={member?.memberId?.toString() + member?.endDate}>{idx > 0 && <Divider />}
                             <ShadowBox style={{
                                 flexDirection: "row", justifyContent: "space-between",
                             }}>
@@ -130,30 +132,30 @@ const EditFeeException = () => {
                                     <ThemedText style={{ fontSize: 15, textDecorationLine: getStrikeOut(member.endDate || member.endDateAdded) }}>{member.firstName} {member.lastName}</ThemedText>
                                     <ThemedText style={{ fontSize: 12, marginTop: 5, color: colors.subText }}>{member.startDate} {(member.endDate || member.endDateAdded) && " to "} {member.endDate || member.endDateAdded}</ThemedText>
                                 </View>
-                                {!member.endDate && (member.endDateAdded ? <ThemedIcon name="MaterialIcons:undo" size={20} onPress={() => endException(member)} />
-                                    : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} color={colors.error}/>)}
+                                {clubInfo.role === ROLE_ADMIN &&
+                                !member.endDate && (member.endDateAdded ? <ThemedIcon name="MaterialIcons:undo" size={20} onPress={() => endException(member)} />
+                                    : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} color={colors.error}/>)
+                                }
                             </ShadowBox>
-                        </View>
-                        </RoundedContainer>
-                            <Spacer space={4}/></>
+                        </View></>
                     )
-                }
-
+                }</RoundedContainer>
+                {clubInfo.role === ROLE_ADMIN && <>
                 <ThemedText style={{ ...appStyles.heading }}>Add Members</ThemedText>
+                <RoundedContainer>
                 {isLoadingMembers && <LoadingSpinner />}
                 {!isLoadingMembers &&
-                    members.map((item: any) =><View key={item.memberId}><RoundedContainer>
-                        <TouchableOpacity onPress={() => addToException(item)}>
+                    members.map((item: any, idx: number) =><View key={item.memberId}>
+                        {idx > 0 && <Divider />}
+                        <TouchableOpacity onPress={() => addToException(item)} disabled={clubInfo.role !== ROLE_ADMIN}>
                             <ShadowBox>
                                 <ThemedIcon name="MaterialIcons:add-circle" size={20} color={colors.add}/>
                                 <ThemedText style={{ fontSize: 15, paddingLeft: 10}}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
-                        </TouchableOpacity>
-                        </RoundedContainer>
-                        <Spacer space={4} /></View>                        
+                        </TouchableOpacity></View>                        
                     )
-                }
-            <View style={{marginVertical:40}} />
+                }</RoundedContainer>
+            <View style={{marginVertical:40}} /></>}
             </ScrollView>
             
             {clubInfo.role === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 40, alignSelf: "center" }} >

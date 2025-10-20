@@ -152,7 +152,7 @@ const FeeTypeDetails = () => {
                     <View key={et.clubFeeTypeExceptionId}>
                       {idx > 0 && <Divider />}
                       <KeyValueTouchableBox
-                        edit
+                        edit={clubInfo.role === ROLE_ADMIN}
                         onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
                         keyName={et.clubFeeTypeExceptionReason}
                         keyValue={`₹ ${et.clubFeeExceptionAmount}`}

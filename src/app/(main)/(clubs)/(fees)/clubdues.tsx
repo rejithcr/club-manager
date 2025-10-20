@@ -449,16 +449,18 @@ const MemberFeeItem = (props: {
   checked?: boolean;
   onToggle?: () => void;
 }) => {
+  const { clubInfo } = useContext(ClubContext);
   const { paymentId, fee, feeDesc, amount, checked = false, onToggle } = props;
   const { colors } = useTheme();
   return (
     <TouchableOpacity
+      disabled={clubInfo.role !== ROLE_ADMIN}
       key={paymentId.toString() + props.feeType}
       style={styles.item}
       onPress={() => onToggle && onToggle()}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <ThemedCheckBox checked={checked} />
+        {clubInfo.role === ROLE_ADMIN && <ThemedCheckBox checked={checked} />}
         <View style={{ paddingVertical: 5, maxWidth: 150 }}>
           <ThemedText style={styles.label}>{fee} </ThemedText>
           <ThemedText style={{ ...styles.subLabel, color: colors.disabled }}>{feeDesc} </ThemedText>

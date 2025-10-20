@@ -195,7 +195,7 @@ const Transactions = () => {
             onRefresh={onRefresh}
             refreshing={refreshing}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => handleEdit(item)} style={{
+              <TouchableOpacity disabled={clubInfo.role !== ROLE_ADMIN} onPress={() => handleEdit(item)} style={{
                 width: "85%", alignSelf: "center", alignItems: "center",
                 flexDirection: "row", justifyContent: "space-between"
               }}>
