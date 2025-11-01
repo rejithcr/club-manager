@@ -5,7 +5,7 @@ import { sizes } from "../utils/styles";
 
 const RoundedContainer = (props: any) => {
   const { colors } = useTheme();
-  if (!props.visible) {
+  if (props.visible === false) {
     return <>{props.children}</>;
   }  
   return (

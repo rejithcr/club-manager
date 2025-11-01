@@ -119,7 +119,7 @@ const AuthHome = () => {
           source={require("../../assets/images/app-icon.png")}
           style={{ height: 300, width: 300, marginBottom: 50 }}
         />
-        {isLoading ? <LoadingSpinner /> : <ThemedButton title="Sign in with Google" onPress={() => promptAsync()} />}
+        {isLoading ? <LoadingSpinner /> : <ThemedButton icon="AntDesign:google" title="Sign in with Google" onPress={() => promptAsync()} />}
       </View>
     </ThemedView>
   );
