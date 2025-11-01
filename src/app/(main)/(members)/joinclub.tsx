@@ -20,7 +20,7 @@ const JoinClub = () => {
 
     const { userInfo } = useContext(UserContext)
 
-    const [searchClubsByName, {data: filteredClubs, isLoading: isClubsLoading}] = useLazyGetClubQuery();
+    const [searchClubsByName, {data: filteredClubs, isFetching: isClubsLoading}] = useLazyGetClubQuery();
 
     const handleSearch = (query: string) => {
         setQueryLength(query.length);

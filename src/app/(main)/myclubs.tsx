@@ -41,7 +41,7 @@ const MyClubs = (props: { clubs: [] }) => {
           <ThemedIcon name="MaterialIcons:add-circle" size={50} onPress={() => router.push(`/(main)/createclub`)} />
         </ThemedView>
       )}
-      <RoundedContainer>
+      <RoundedContainer visible={props.clubs?.length !== 0}>
         {props.clubs?.map((item: any, idx: number) => (
           <View key={item.clubId}>
             <View style={{ marginVertical: 5 }}>

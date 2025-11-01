@@ -5,6 +5,9 @@ import { sizes } from "../utils/styles";
 
 const RoundedContainer = (props: any) => {
   const { colors } = useTheme();
+  if (!props.visible) {
+    return <>{props.children}</>;
+  }  
   return (
     <ThemedView
       style={{

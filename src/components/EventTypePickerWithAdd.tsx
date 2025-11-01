@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import Modal from "react-native-modal";
@@ -31,6 +31,13 @@ const EventTypePickerWithAdd: React.FC<EventTypePickerWithAddProps> = ({
   const { data: eventTypes, isLoading: isLoadingEventTypes, refetch: refetchEventTypes } = 
     useGetClubEventTypesQuery({ clubId: clubInfo.clubId });
   const [addClubEventType, { isLoading: isAddingType }] = useAddClubEventTypeMutation();
+
+  // Set default value to first event type if no value is selected
+  useEffect(() => {
+    if (eventTypes && eventTypes.length > 0 && (!selectedValue || selectedValue === "")) {
+      onValueChange(eventTypes[0].eventTypeId.toString());
+    }
+  }, [eventTypes, selectedValue]);
 
   const handleValueChange = (value: string) => {
     if (value === "__add__") {
