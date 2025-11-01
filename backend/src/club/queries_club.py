@@ -194,7 +194,8 @@ GET_MEMBERSHIP_REQUESTS = """
     from membership_requests mr
     	join member m on mr.member_id = m.member_id
     where club_id = %s
-    order by 7
+    order by 9, 4, 5
+    LIMIT %s OFFSET %s
 """
 
 UPDATE_MEMBERSHIP_REQUEST_STATUS = """
@@ -205,7 +206,7 @@ UPDATE_MEMBERSHIP_REQUEST_STATUS = """
 """
 
 DELETE_MEMBERSHIP = """
-    delete from membership where club_id = %s and member_id = %s
+    update membership set is_active = 0 where club_id = %s and member_id = %s
 """
 
 GET_CLUB_COUNTS = """

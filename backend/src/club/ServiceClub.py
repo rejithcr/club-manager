@@ -34,7 +34,10 @@ class ClubService():
             clubs = db.fetch(conn, queries_club.SEARCH_CLUB, (f"%{clubName.upper()}%",))
             return [helper.convert_to_camel_case(club) for club in clubs]
         elif membershipRequests:
-            requests = db.fetch(conn, queries_club.GET_MEMBERSHIP_REQUESTS, (clubId,))
+            # Support pagination for membership requests
+            req_limit = limit if limit else 20  # Default to 20 if not specified
+            req_offset = offset if offset else 0  # Default to 0 if not specified
+            requests = db.fetch(conn, queries_club.GET_MEMBERSHIP_REQUESTS, (clubId, req_limit, req_offset))
             return [helper.convert_to_camel_case(request) for request in requests]
         elif counts:
             counts = db.fetch(conn, queries_club.GET_CLUB_COUNTS, (clubId,))
@@ -87,7 +90,9 @@ class ClubService():
 
         if status == "APPROVED":
             db.execute(conn, queries_club.UPDATE_MEMBERSHIP_REQUEST_STATUS, (status, comments, email, clubId, memberId))
-            db.execute(conn, queries_member.SAVE_MEMBERSHIP, (clubId, memberId, constants.ROLE_MEMBER, email, email))
+            # Use UPSERT to insert new membership or reactivate existing one
+            db.execute(conn, queries_member.UPSERT_MEMBERSHIP, (clubId, memberId, constants.ROLE_MEMBER, email, email))
+            
             conn.commit()
             return {"message": "Membership " + status}
         elif status == "REJECTED":

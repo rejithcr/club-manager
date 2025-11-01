@@ -152,7 +152,7 @@ export const clubApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["member"],
+      invalidatesTags: ["member", "club"],
     }),
     addClub: builder.mutation({
       query: (body) => ({
@@ -168,7 +168,7 @@ export const clubApi = createApi({
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["club"],
+      invalidatesTags: ["club", "member"],
     }),
     deleteClub: builder.mutation({
       query: (body) => ({

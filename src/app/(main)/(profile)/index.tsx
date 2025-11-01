@@ -55,8 +55,8 @@ const Profile = () => {
           </TouchableCard>
         </RoundedContainer>
         <Spacer space={4} />
-        <View>
-          <View
+        <ThemedView>
+          <ThemedView
             style={{
               flexDirection: "row",
               width: "90%",
@@ -86,19 +86,18 @@ const Profile = () => {
             >
               <ThemedIcon size={25} name={"MaterialCommunityIcons:plus-circle"} color={colors.add} />
             </TouchableOpacity>
-          </View>
-          <View>
+          </ThemedView>
+          <ThemedView>
             {isLoadingMyRequests && isMembershipRequestShown && <LoadingSpinner />}
             {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length > 0 && (
               <FlatList
                 data={myRequests}
                 keyExtractor={(item) => item.clubId}
-                ItemSeparatorComponent={() => <Spacer space={4} />}
+                ItemSeparatorComponent={() => <Divider style={{ width: "80%", alignSelf: "center", marginVertical: 10 }} />}
                 ListEmptyComponent={<ThemedText>No Requests found</ThemedText>}
                 renderItem={({ item }) => (
-                  <TouchableCard>
-                    <View style={{ flexDirection: "row", alignItems: "center", width: "80%" }}>
-                      <View style={{ marginRight: 10 }}>
+                    <ThemedView style={{ flexDirection: "row", alignItems: "center", width: "80%", alignSelf: "center" }}>
+                      <ThemedView style={{ marginRight: 10 }}>
                         <ThemedIcon
                           size={25}
                           name={
@@ -116,21 +115,20 @@ const Profile = () => {
                               : colors.warning
                           }
                         />
-                      </View>
-                      <View>
+                      </ThemedView>
+                      <ThemedView style={{ flex: 1 }}>
                         <ThemedText>{item.clubName}</ThemedText>
                         <ThemedText style={{ fontSize: 10 }}>{item.comments}</ThemedText>
-                      </View>
-                    </View>
-                  </TouchableCard>
+                      </ThemedView>
+                    </ThemedView>
                 )}
               />
             )}
             {!isLoadingMyRequests && isMembershipRequestShown && myRequests?.length === 0 && (
               <ThemedText style={{ alignSelf: "center" }}>No requests found</ThemedText>
             )}
-          </View>
-        </View>
+          </ThemedView>
+        </ThemedView>
         {userInfo?.isSuperUser == 1 && (
           <>
             <ThemedHeading>Super User Options</ThemedHeading>

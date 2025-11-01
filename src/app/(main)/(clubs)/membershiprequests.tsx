@@ -1,4 +1,4 @@
-import { FlatList, TouchableOpacity, View } from "react-native";
+import { FlatList, TouchableOpacity, View, RefreshControl } from "react-native";
 import React, { useContext, useState } from "react";
 import { ClubContext } from "@/src/context/ClubContext";
 import ThemedText from "@/src/components/themed-components/ThemedText";
@@ -17,6 +17,9 @@ import { isValidLength } from "@/src/utils/validators";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import { useGetClubQuery, useUpdateClubMutation } from "@/src/services/clubApi";
 import Divider from "@/src/components/Divider";
+import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
+
+const limit = 50;
 
 const MembershipRequests = () => {
   const { colors } = useTheme();
@@ -34,7 +37,11 @@ const MembershipRequests = () => {
     lastName: "",
   });
 
-  const { data, isLoading, refetch } = useGetClubQuery({ clubId: clubInfo.clubId, membershipRequests: "true" });
+  const { items, isLoading: isPaginationLoading, loadMore, isFetching, refreshing, onRefresh } = usePaginatedQuery(
+    useGetClubQuery,
+    { clubId: clubInfo.clubId, membershipRequests: "true" },
+    limit
+  );
   const [updateMembershipRequest] = useUpdateClubMutation();
 
   const handleStatusChange = async (status: string) => {
@@ -48,7 +55,7 @@ const MembershipRequests = () => {
         comments,
         email: userInfo.email,
       }).unwrap();
-      refetch();
+      onRefresh();
       setIsUpdating(false);
     }
   };
@@ -61,25 +68,38 @@ const MembershipRequests = () => {
     <GestureHandlerRootView>
       <ThemedView style={{ flex: 1 }}>
         <Spacer space={5} />
-        <ThemedText style={{ ...appStyles.heading, marginBottom: 2 }}>Requests</ThemedText>
         <ThemedText style={{ fontSize: 12, width: "80%", alignSelf: "center" , color: colors.subText}}>
           Press the item to approve or reject
         </ThemedText>
         <Spacer space={10} />
-        {(isLoading || isUpdating) && <LoadingSpinner />}
-        {!(isLoading || isUpdating) && (
+        {(isPaginationLoading || isUpdating) && <LoadingSpinner />}
+        {!(isPaginationLoading || isUpdating) && (
           <FlatList
-            data={data}
-            keyExtractor={(item) => item.memberId}
+            data={items}
+            keyExtractor={(item) => item.clubId + "_" + item.memberId}
             ListEmptyComponent={() => <ThemedText style={{ alignSelf: "center" }}>No requests found.</ThemedText>}
             ItemSeparatorComponent={() => <><Spacer hspace={2} /><Divider style={{ width: "80%" }} /><Spacer hspace={2} /></>}
-            ListFooterComponent={() => <Spacer space={20} />}
+            ListFooterComponent={() => (
+              (isFetching && (
+                <>
+                  <Spacer space={10} />
+                  <LoadingSpinner />
+                </>
+              )) || (
+                <ThemedText style={{ alignSelf: "center", paddingBottom: 20, paddingTop: 10, fontSize: 12, color: colors.subText }}>
+                  {items.length > 0 ? "No more requests" : ""}
+                </ThemedText>
+              )
+            )}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
             renderItem={({ item }) => (
               <TouchableOpacity
                 style={{ alignSelf: "center", width: "80%" }}
                 onPress={() => showApproveModal(item.memberId, item.clubId, item.phone, item.email, item.firstName, item.lastName)}
               >
-                <View style={{ flexDirection: "row", alignItems: "center", width: "80%" }}>
+                <View style={{ flexDirection: "row", alignItems: "center", width: "100%"}}>
                   <View style={{ marginRight: 10 }}>
                     <ThemedIcon
                       size={25}
@@ -99,7 +119,7 @@ const MembershipRequests = () => {
                       }
                     />
                   </View>
-                  <View>
+                  <View style={{ flex: 1 }}>
                     <ThemedText>
                       {item.firstName} {item.lastName}
                     </ThemedText>
@@ -116,9 +136,9 @@ const MembershipRequests = () => {
           <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
             <ThemedText style={{ ...appStyles.heading }}>Approve Request?</ThemedText>
             <View style={{ width: "80%", alignSelf: "center" }}>
-              <ThemedText>{statusChangeRequest.firstName} {statusChangeRequest.lastName}</ThemedText>
+              <ThemedIcon name="AntDesign:user" size={20} text={`${statusChangeRequest.firstName} ${statusChangeRequest.lastName}`} />
               <ThemedIcon name="MaterialIcons:email" size={20} text={statusChangeRequest.email} />
-              <ThemedIcon name="FontAwesome:phone" size={20} text={statusChangeRequest.phone} />
+              <ThemedIcon name="AntDesign:phone" size={20} text={statusChangeRequest.phone} />
             </View>
             <InputText label="Comments" onChangeText={(value: string) => setComments(value)} />
             <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 20, alignItems: "center" }}>

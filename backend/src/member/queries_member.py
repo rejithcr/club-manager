@@ -35,6 +35,18 @@ SAVE_MEMBERSHIP = """
     (nextval('membership_id_seq'), %s, %s, %s, now(), %s, %s)
 """
 
+UPSERT_MEMBERSHIP = """
+   insert into membership (membership_id, club_id, member_id, role_id, start_date, is_active, created_by, updated_by)
+   values (nextval('membership_id_seq'), %s, %s, %s, now(), 1, %s, %s)
+   ON CONFLICT (club_id, member_id)
+   DO UPDATE SET
+      is_active = 1,
+      role_id = EXCLUDED.role_id,
+      start_date = now(),
+      updated_by = EXCLUDED.updated_by,
+      updated_ts = now()
+"""
+
 GET_MEMBERSHIP_ID = """
    select membership_id
    from membership
@@ -80,6 +92,17 @@ CHECK_EXISTING_REQUEST = """
 REQUEST_MEMBERSHIP = """
    insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by) values
     (%s, %s, 'REQUESTED', 'Please approve', %s, %s)
+"""
+
+UPSERT_MEMBERSHIP_REQUEST = """
+   insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by, created_ts, updated_ts)
+   values (%s, %s, 'REQUESTED', 'Please approve', %s, %s, now(), now())
+   ON CONFLICT (club_id, member_id)
+   DO UPDATE SET
+      status = 'REQUESTED',
+      comments = membership_requests.comments || ' | Re-requested on ' || to_char(now(), 'YYYY-MM-DD HH24:MI:SS'),
+      updated_by = EXCLUDED.updated_by,
+      updated_ts = now()
 """
 
 GET_REQUESTS = """
