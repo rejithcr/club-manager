@@ -507,7 +507,7 @@ export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: s
         )}
 
         {/* Details Grid */}
-        <View style={{ gap: 12 }}>
+        <View style={{ gap: 12, display: 'flex', flexDirection: 'row' , flexWrap: 'wrap' }}>
           {/* Date Row */}
           <View style={{ 
             flexDirection: "row", 
@@ -524,7 +524,7 @@ export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: s
             }}>
               <ThemedIcon name="MaterialIcons:calendar-today" size={20} color={colors.info} />
             </View>
-            <View style={{ flex: 1 }}>
+            <View>
               <ThemedText style={{ 
                 fontSize: 12, 
                 color: colors.subText,
@@ -533,7 +533,7 @@ export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: s
                 Event Date
               </ThemedText>
               <ThemedText style={{ 
-                fontSize: 15,
+                fontSize: 12,
                 fontWeight: '600',
                 color: colors.text
               }}>
@@ -559,7 +559,7 @@ export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: s
               }}>
                 <ThemedIcon name="MaterialIcons:access-time" size={20} color={colors.success} />
               </View>
-              <View style={{ flex: 1 }}>
+              <View>
                 <ThemedText style={{ 
                   fontSize: 12, 
                   color: colors.subText,
@@ -568,7 +568,7 @@ export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: s
                   Time
                 </ThemedText>
                 <ThemedText style={{ 
-                  fontSize: 15,
+                  fontSize: 12,
                   fontWeight: '600',
                   color: colors.text
                 }}>
@@ -596,7 +596,7 @@ export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: s
               }}>
                 <ThemedIcon name="MaterialIcons:location-pin" size={20} color={colors.warning} />
               </View>
-              <View style={{ flex: 1 }}>
+              <View>
                 <ThemedText style={{ 
                   fontSize: 12, 
                   color: colors.subText,
@@ -605,7 +605,7 @@ export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: s
                   Location
                 </ThemedText>
                 <ThemedText style={{ 
-                  fontSize: 15,
+                  fontSize: 12,
                   fontWeight: '600',
                   color: colors.text
                 }}>
