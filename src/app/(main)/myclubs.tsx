@@ -1,30 +1,26 @@
-import { TouchableOpacity, View } from "react-native";
+import { View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router/build/hooks";
 import TouchableCard from "@/src/components/TouchableCard";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedView from "@/src/components/themed-components/ThemedView";
-import Spacer from "@/src/components/Spacer";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import Divider from "@/src/components/Divider";
-import { useTheme } from "@/src/hooks/use-theme";
 import RoundedContainer from "@/src/components/RoundedContainer";
+import { useContext } from "react";
+import { ClubContext } from "@/src/context/ClubContext";
 
 const MyClubs = (props: { clubs: [] }) => {
   const router = useRouter();
-  const { colors } = useTheme();
+  const { setClubInfo } = useContext(ClubContext);
 
-  const showDetails = (
+  const showDetails = async (
     clubId: number,
     clubName: string,
-    clubDesc: string,
-    clubLocation: string,
-    role: string,
-    upiId: string
+    role: string
   ) => {
-    router.push(
-      `/(main)/(clubs)?clubId=${clubId}&clubName=${clubName}&clubDesc=${clubDesc}&clubLocation=${clubLocation}&role=${role}&upiId=${upiId}`
-    );
+    await setClubInfo({ clubId, clubName, role });
+    router.push('/(main)/(clubs)');
   };
 
   return (
@@ -48,7 +44,7 @@ const MyClubs = (props: { clubs: [] }) => {
               <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
                 <TouchableCard
                   onPress={() =>
-                    showDetails(item.clubId, item.clubName, item.description, item.location, item.roleName, item.upiId)
+                    showDetails(item.clubId, item.clubName, item.roleName)
                   }
                   id={item.clubId}
                 >

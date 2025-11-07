@@ -1,8 +1,8 @@
-import { RefreshControl, ScrollView } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router/build/hooks";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import FeeSummary from "./dues";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { UserContext } from "../../context/UserContext";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -21,11 +21,18 @@ import {
   useGetClubQuery,
 } from "@/src/services/clubApi";
 import { useGetUpcomingBirthdaysQuery } from "@/src/services/memberApi";
+import { useTheme } from "@/src/hooks/use-theme";
+import { ClubContext } from "@/src/context/ClubContext";
+import MultiButton from "@/src/components/MultiButton";
+import { useAsyncStorage } from "@/src/hooks/use-async-storage";
 
 const Main = () => {
   const router = useRouter();
   const searchParams = useGlobalSearchParams();
   const { userInfo } = useContext(UserContext);
+  const { colors } = useTheme();
+  const { setClubInfo } = useContext(ClubContext);
+  const [selectedClubId, setSelectedClubId] = useAsyncStorage<number>("selectedClubId", -1); // -1 means "All"
 
   const {
     data: clubs,
@@ -49,13 +56,13 @@ const Main = () => {
     refetch: refetchBirthdays,
   } = useGetUpcomingBirthdaysQuery({ 
     memberId: userInfo?.memberId, 
-    clubId: -1 // Get birthdays from all clubs
+    clubId: selectedClubId // Filter by selected club
   });
 
   const {data: events, isLoading: isLoadingEvents, isFetching: isFetchingEvents, refetch: refetchEvents
   } = useGetClubEventsQuery({ 
     memberId: userInfo?.memberId, 
-    clubId: -1 
+    clubId: selectedClubId // Filter by selected club
   });
 
   const onRefresh = () => {
@@ -69,7 +76,6 @@ const Main = () => {
     await clearTokens();
     router.replace("/(auth)");
   };
-  
 
   useEffect(() => {
     if (searchParams.showClubDues) {
@@ -77,17 +83,63 @@ const Main = () => {
     }
   }, [searchParams.showClubDues, userInfo?.memberId]);
 
+  const handleClubSelect = (clubId: number) => {
+    setSelectedClubId(clubId);
+  };
+
+  const handleGoToClubHome = async (club: any) => {
+    await setClubInfo({ clubId: club.clubId, clubName: club.clubName, role: club.roleName });
+    router.push(`/(main)/(clubs)`);
+  };
+
+  // Filter dues based on selected club
+  const filteredDues = selectedClubId === -1 
+    ? duesByMember 
+    : duesByMember?.filter((due: any) => due.clubId === selectedClubId);
+
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
         <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues || isFetchingBirthdays || isFetchingEvents} onRefresh={onRefresh} />}>
-          <ThemedHeading>My Clubs</ThemedHeading>
-          {isLoadingMyClubs && <LoadingSpinner />}
-          {!isLoadingMemberDues && <MyClubs clubs={clubs} />}
+           {isLoadingMyClubs && <LoadingSpinner />}
+          {/* Club Filter Selector */}
+          {clubs && clubs.length > 0 && (
+            <>
+              <ThemedHeading>My Clubs</ThemedHeading>
+              <View 
+                style={{ width: '85%', alignSelf: 'center' }}
+              >
+                <View style={{ flexDirection: 'row', gap: 15, flexWrap: 'wrap', }}>
+                  {/* All Clubs Option */}
+                  <MultiButton
+                    label="All"
+                    icon="MaterialIcons:select-all"
+                    isSelected={selectedClubId === -1}
+                    onSelect={() => handleClubSelect(-1)}
+                    colors={colors}
+                  />
+
+                  {/* Individual Club Options */}
+                  {clubs.map((club: any) => (
+                    <MultiButton
+                      key={club.clubId}
+                      club={club}
+                      isSelected={selectedClubId === club.clubId}
+                      onSelect={() => handleClubSelect(club.clubId)}
+                      onGoToHome={() => handleGoToClubHome(club)}
+                      colors={colors}
+                    />
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
+
+          {/* {!isLoadingMyClubs && <MyClubs clubs={clubs} />} */}
           <Spacer space={10} />
           {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
           {isLoadingMemberDues && <LoadingSpinner />}
-          {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
+          {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={filteredDues} />}
           
           {/* Unified Events and Birthdays Feed */}
           {(isLoadingEvents || isBirthdaysLoading) && (

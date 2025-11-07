@@ -33,7 +33,7 @@ import NumberTicker from "@/src/components/NumberTicker";
 const ClubHome = () => {
   const router = useRouter();
   const params = useSearchParams();
-  const { setClubInfo } = useContext(ClubContext);
+  const { clubInfo, setClubInfo } = useContext(ClubContext);
 
   const { colors } = useTheme();
 
@@ -42,35 +42,35 @@ const ClubHome = () => {
     isLoading: isLoadingEvents,
     isFetching: isFetchingEvents,
     refetch: fetchEvents,
-  } = useGetClubEventsQuery({ clubId: params.get("clubId"), limit: 5, offset: 0 });
+  } = useGetClubEventsQuery({ clubId:  clubInfo.clubId, limit: 5, offset: 0 });
 
   const {
     data: fbr,
     isLoading: isFundBalanceLoading,
     isFetching: isFetchingFundBalance,
     refetch: fetchFundBalance,
-  } = useGetFundBalanceQuery({ clubId: params.get("clubId"), fundBalance: "true" });
+  } = useGetFundBalanceQuery({ clubId: clubInfo.clubId, fundBalance: "true" });
 
   const {
     data: expenseSplits,
     isLoading: isLoadingSplits,
     isFetching: isFetchingSplits,
     refetch: fetchSplits,
-  } = useGetFeesAdhocQuery({ clubId: Number(params.get("clubId")), limit: 5, offset: 0 });
+  } = useGetFeesAdhocQuery({ clubId: Number(clubInfo.clubId), limit: 5, offset: 0 });
 
   const {
     data: clubDue,
     isLoading: isTotalDueLoading,
     isFetching: isFetchingTotalDue,
     refetch: fetchTotalDue,
-  } = useGetTotalDueQuery({ clubId: params.get("clubId"), totalDue: "true" });
+  } = useGetTotalDueQuery({ clubId:  clubInfo.clubId, totalDue: "true" });
 
   const {
     data: currentFeeStructure,
     isLoading: isLoadingCurrent,
     isFetching: isFetchingCurrent,
     refetch: fetchFees,
-  } = useGetFeesQuery({ clubId: params.get("clubId") });
+  } = useGetFeesQuery({ clubId: clubInfo.clubId });
 
   const showFeeTypeDetails = (fee: any) => {
     router.push({
@@ -78,15 +78,6 @@ const ClubHome = () => {
       params: { fee: JSON.stringify(fee) },
     });
   };
-
-  useEffect(() => {
-    setClubInfo({
-      clubId: params.get("clubId"),
-      clubName: params.get("clubName"),
-      role: params.get("role"),
-      upiId: params.get("upiId"),
-    });
-  }, []);
 
   const showClubDues = (_: GestureResponderEvent): void => {
     router.push(`/(main)/(clubs)/(fees)/clubdues`);
@@ -166,7 +157,7 @@ const ClubHome = () => {
           >
             <ThemedHeading style={{ width: 200 }}>Fees</ThemedHeading>
             <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
-              {params.get("role") == ROLE_ADMIN && (
+              {clubInfo.role == ROLE_ADMIN && (
                 <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
                   <ThemedIcon size={25} name={"MaterialCommunityIcons:plus-circle"} color={colors.add} />
                 </TouchableOpacity>
@@ -271,7 +262,7 @@ const ClubHome = () => {
           >
             <ThemedHeading style={{ width: 200 }}>Expense Splits</ThemedHeading>
             <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
-              {params.get("role") == ROLE_ADMIN && (
+              { clubInfo.role == ROLE_ADMIN && (
                 <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
                   <ThemedIcon size={25} name={"MaterialCommunityIcons:plus-circle"} color={colors.add} />
                 </TouchableOpacity>
@@ -330,11 +321,11 @@ const ClubHome = () => {
         </ScrollView>
       </GestureHandlerRootView>
       <FloatingMenu
-        actions={actions.filter((action) => (params.get("role") != ROLE_ADMIN ? action.role != ROLE_ADMIN : true))}
+        actions={actions.filter((action) => (clubInfo.role != ROLE_ADMIN ? action.role != ROLE_ADMIN : true))}
         position={"left"}
         color="black"
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-        onPressItem={(name: string | undefined) => handleMenuPress(name, params.get("clubId") || "")}
+        onPressItem={(name: string | undefined) => handleMenuPress(name, clubInfo.clubId || "")}
       />
     </ThemedView>
   );
