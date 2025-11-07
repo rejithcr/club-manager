@@ -139,7 +139,12 @@ const Main = () => {
           <Spacer space={10} />
           {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
           {isLoadingMemberDues && <LoadingSpinner />}
-          {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={filteredDues} />}
+          {!isLoadingMemberDues && clubs?.length > 0 && (
+            <FeeSummary 
+              duesByMember={filteredDues} 
+              isAllSelected={selectedClubId === -1} 
+            />
+          )}
           
           {/* Unified Events and Birthdays Feed */}
           {(isLoadingEvents || isBirthdaysLoading) && (
