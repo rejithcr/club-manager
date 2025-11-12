@@ -25,6 +25,8 @@ import { useTheme } from "@/src/hooks/use-theme";
 import { ClubContext } from "@/src/context/ClubContext";
 import MultiButton from "@/src/components/MultiButton";
 import { useAsyncStorage } from "@/src/hooks/use-async-storage";
+import ThemedText from "@/src/components/themed-components/ThemedText";
+import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 
 const Main = () => {
   const router = useRouter();
@@ -102,6 +104,18 @@ const Main = () => {
       <GestureHandlerRootView>
         <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues || isFetchingBirthdays || isFetchingEvents} onRefresh={onRefresh} />}>
            {isLoadingMyClubs && <LoadingSpinner />}
+           {clubs?.length == 0 && (
+            <ThemedView style={{ alignSelf: "center", width: "80%", justifyContent: "center", alignItems: "center" }}>
+              <ThemedText style={{ marginTop: 20 }}>Request to join a club</ThemedText>
+              <ThemedIcon
+                name="MaterialIcons:add-home"
+                size={50}
+                onPress={() => router.push(`/(main)/(members)/joinclub`)}
+              />
+              <ThemedText style={{ marginTop: 20 }}>Create a new club</ThemedText>
+              <ThemedIcon name="MaterialIcons:add-circle" size={50} onPress={() => router.push(`/(main)/createclub`)} />
+            </ThemedView>
+          )}
           {/* Club Filter Selector */}
           {clubs && clubs.length > 0 && (
             <>
