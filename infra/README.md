@@ -1,11 +1,38 @@
-# Cricket Club Manager - Infrastructure as Code (Minimal Setup)
+# Cricket Club Manager - Infrastructure as Code
 
-This directory contains Terraform configuration to deploy a single EC2 instance for the Cricket Club Manager backend. This is a minimal setup using the default VPC with an external database.
+This directory contains Terraform configuration to deploy the Cricket Club Manager backend to either **AWS Lambda** (default) or **EC2**.
+
+**Supports two deployment types:**
+- **Lambda** - Serverless deployment (default, cost-effective for low-moderate traffic)
+- **EC2** - Traditional server deployment (better for high traffic, long-running processes)
 
 **Uses Terraform Workspaces for environment management (dev/prod)**
 
 ## 🏗️ Architecture
 
+### Lambda Deployment (Default)
+```
+┌─────────────────────────────────────────────┐
+│              Internet                        │
+└──────────────────┬──────────────────────────┘
+                   │
+                   │
+            ┌──────▼──────┐
+            │   Lambda    │
+            │  Function   │
+            │  (Backend)  │
+            │   Python    │
+            └──────┬──────┘
+                   │
+                   │
+            ┌──────▼──────┐
+            │  External   │
+            │  Database   │
+            │ (PostgreSQL)│
+            └─────────────┘
+```
+
+### EC2 Deployment
 ```
 ┌─────────────────────────────────────────────┐
 │              Internet                        │
@@ -16,7 +43,7 @@ This directory contains Terraform configuration to deploy a single EC2 instance 
             │   EC2       │
             │  Instance   │
             │  (Backend)  │
-            │  Port 8000  │
+            │  Port 5000  │
             └──────┬──────┘
                    │
                    │
@@ -30,10 +57,11 @@ This directory contains Terraform configuration to deploy a single EC2 instance 
 ## 📁 Files
 
 - **main.tf** - Main Terraform configuration with AWS provider and data sources
-- **variables.tf** - Input variables definition
+- **variables.tf** - Input variables definition (includes deployment_type)
+- **lambda.tf** - Lambda function configuration (created when deployment_type = "lambda")
+- **ec2.tf** - EC2 instance configuration (created when deployment_type = "ec2")
 - **security_groups.tf** - Security group for EC2 instance
-- **ec2.tf** - Single EC2 instance with IAM role
-- **outputs.tf** - Output values after deployment (IP, DNS, connection info)
+- **outputs.tf** - Output values after deployment (shows relevant info based on deployment type)
 - **terraform.tfvars.example** - Example configuration file
 
 ## 🚀 Quick Start
@@ -43,30 +71,6 @@ This directory contains Terraform configuration to deploy a single EC2 instance 
 1. **AWS Account** with appropriate permissions
 2. **AWS CLI** configured with credentials
 3. **Terraform** v1.0+ installed
-4. **S3 Bucket** `ccm-common-storage` with application package
-
-### Upload Application to S3
-
-Before deploying infrastructure, package and upload your backend application:
-
-```powershell
-# Package and upload backend application
-backend\package-app.ps1
-
-# This will:
-# 1. Create app.zip with src/ and requirements.txt
-# 2. Upload to s3://ccm-common-storage/deploy/app.zip
-```
-
-Or manually:
-```bash
-# Create package
-cd backend
-zip -r app.zip src/ requirements.txt
-
-# Upload to S3
-aws s3 cp app.zip s3://ccm-common-storage/deploy/app.zip
-```
 
 ### Installation
 
@@ -86,10 +90,75 @@ aws configure
 # Or set environment variables
 $env:AWS_ACCESS_KEY_ID="your-access-key"
 $env:AWS_SECRET_ACCESS_KEY="your-secret-key"
-$env:AWS_DEFAULT_REGION="us-east-1"
+$env:AWS_DEFAULT_REGION="ap-south-1"
 ```
 
-### Deploy Infrastructure
+## 🎯 Choose Your Deployment Type
+
+### Option 1: Lambda Deployment (Default - Recommended for most use cases)
+
+**Advantages:**
+- ✅ No server management
+- ✅ Auto-scaling
+- ✅ Pay only for actual usage
+- ✅ High availability built-in
+- ✅ Lower cost for moderate traffic
+
+**When to use:**
+- Low to moderate traffic
+- Unpredictable traffic patterns
+- Want minimal operational overhead
+- Cost optimization priority
+
+**Deploy:**
+
+```bash
+# Navigate to infra directory
+cd infra
+
+# Initialize Terraform
+terraform init
+
+# Create workspace
+terraform workspace new dev
+
+# Configure terraform.tfvars
+# Set: deployment_type = "lambda"
+
+# Deploy
+terraform apply
+```
+
+### Option 2: EC2 Deployment
+
+**Advantages:**
+- ✅ Full control over server
+- ✅ Better for long-running processes
+- ✅ SSH access for debugging
+- ✅ No cold start delays
+- ✅ Predictable performance
+
+**When to use:**
+- High sustained traffic
+- Need SSH access for debugging
+- Long-running background tasks
+- Custom system-level configurations
+
+**Prerequisites for EC2:**
+- S3 bucket `ccm-common-storage` with application package
+
+**Package and upload application:**
+
+```powershell
+# Package and upload backend application
+backend\package-app.ps1
+
+# This will:
+# 1. Create app.zip with src/ and requirements.txt
+# 2. Upload to s3://ccm-common-storage/deploy/app.zip
+```
+
+**Deploy:**
 
 ```bash
 # Navigate to infra directory

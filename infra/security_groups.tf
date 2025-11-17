@@ -2,6 +2,7 @@
 
 # EC2 Instance Security Group
 resource "aws_security_group" "ec2" {
+  count       = var.deployment_type == "ec2" ? 1 : 0
   name        = "${var.project_name}-ec2-sg-${local.environment}"
   description = "Security group for EC2 backend instance"
   vpc_id      = data.aws_vpc.default.id
@@ -9,8 +10,8 @@ resource "aws_security_group" "ec2" {
   # HTTP access from anywhere
   ingress {
     description = "HTTP from anywhere"
-    from_port   = 8000
-    to_port     = 8000
+    from_port   = 5000
+    to_port     = 5000
     protocol    = "tcp"
     cidr_blocks = var.allowed_cidr_blocks
   }

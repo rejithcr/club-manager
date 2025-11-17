@@ -1,7 +1,9 @@
 # EC2 Configuration for Backend Application
+# Only created when deployment_type = "ec2"
 
 # IAM Role for EC2
 resource "aws_iam_role" "ec2" {
+  count = var.deployment_type == "ec2" ? 1 : 0
   name = "${var.project_name}-ec2-role-${local.environment}"
 
   assume_role_policy = jsonencode({
@@ -24,8 +26,9 @@ resource "aws_iam_role" "ec2" {
 
 # IAM Policy for EC2 (S3, CloudWatch, SSM, Secrets Manager access)
 resource "aws_iam_role_policy" "ec2_policy" {
+  count = var.deployment_type == "ec2" ? 1 : 0
   name = "${var.project_name}-ec2-policy-${local.environment}"
-  role = aws_iam_role.ec2.id
+  role = aws_iam_role.ec2[0].id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -74,14 +77,16 @@ resource "aws_iam_role_policy" "ec2_policy" {
 
 # Attach SSM Policy for Session Manager
 resource "aws_iam_role_policy_attachment" "ec2_ssm" {
-  role       = aws_iam_role.ec2.name
+  count      = var.deployment_type == "ec2" ? 1 : 0
+  role       = aws_iam_role.ec2[0].name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 # IAM Instance Profile
 resource "aws_iam_instance_profile" "ec2" {
+  count = var.deployment_type == "ec2" ? 1 : 0
   name = "${var.project_name}-ec2-profile-${local.environment}"
-  role = aws_iam_role.ec2.name
+  role = aws_iam_role.ec2[0].name
 
   tags = {
     Name = "${var.project_name}-ec2-profile-${local.environment}"
@@ -147,14 +152,15 @@ EOF
 
 # Single EC2 Instance
 resource "aws_instance" "web_server" {
+  count         = var.deployment_type == "ec2" ? 1 : 0
   ami           = data.aws_ami.amazon_linux_2023.id
   instance_type = var.instance_type != "" ? var.instance_type : local.env_config.instance_type
   key_name      = var.key_pair_name != "" ? var.key_pair_name : null
   
   subnet_id              = data.aws_subnet.default.id
-  vpc_security_group_ids = [aws_security_group.ec2.id]
+  vpc_security_group_ids = [aws_security_group.ec2[0].id]
   
-  iam_instance_profile = aws_iam_instance_profile.ec2.name
+  iam_instance_profile = aws_iam_instance_profile.ec2[0].name
   
   user_data = local.user_data
 

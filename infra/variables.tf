@@ -13,6 +13,17 @@ variable "project_name" {
   default     = "club-manager"
 }
 
+variable "deployment_type" {
+  description = "Deployment type: 'lambda' or 'ec2'"
+  type        = string
+  default     = "lambda"
+  
+  validation {
+    condition     = contains(["lambda", "ec2"], var.deployment_type)
+    error_message = "deployment_type must be either 'lambda' or 'ec2'"
+  }
+}
+
 # EC2 Configuration (can override workspace defaults)
 variable "instance_type" {
   description = "EC2 instance type for backend (overrides workspace default if set)"
