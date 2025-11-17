@@ -1,4 +1,4 @@
-# Database Connection Pooling - Deployment Guide
+# Deployment Guide
 
 This backend supports connection pooling for both **AWS Lambda** and **EC2** deployments.
 

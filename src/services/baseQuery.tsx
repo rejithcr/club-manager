@@ -2,6 +2,7 @@ import { fetchBaseQuery, BaseQueryFn } from '@reduxjs/toolkit/query/react';
 import { getAccessToken, getRefreshToken, clearTokens, saveAccessToken } from '../helpers/auth_helper';
 import { showSnackbar } from "../components/snackbar/snackbarService";
 import { BASE_URL } from '../utils/constants'
+import { router } from 'expo-router';
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: BASE_URL,
@@ -13,6 +14,13 @@ const rawBaseQuery = fetchBaseQuery({
     return headers;
   },
 });
+
+const handleTokenError = async (result: any) => {
+  await clearTokens();
+  showSnackbar("Your session is invalid. Please relogin.", "error");
+  setTimeout(() => router.replace('/(auth)'), 1000);
+  return result;
+}
 
 export const baseQueryWithReauth: BaseQueryFn<any, unknown, unknown> = async (
   args,
@@ -57,8 +65,13 @@ export const baseQueryWithReauth: BaseQueryFn<any, unknown, unknown> = async (
       // Retry the original request with new access token
       result = await rawBaseQuery(args, api, extraOptions);
     } else {
-      await clearTokens();
+      return handleTokenError(refreshResult);
     }
+  }
+
+  // Handle 422 error - Invalid token (JWT secret changed)
+  if (result.error && (result.error as any).status === 422) {
+    return handleTokenError(result);
   }
 
   /* show messages in snackbar */
