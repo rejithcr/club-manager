@@ -65,10 +65,9 @@ const DuesByClub = () => {
           <View>
             <RoundedContainer>
               {clubDues.dues.map((d: any, idx: number) => (
-                <>
+                <View key={d.paymentId?.toString() + d.feeType}>
                   {idx > 0 && <Divider />}
                   <View
-                    key={d.paymentId?.toString() + d.feeType}
                     style={{
                       flexDirection: "row",
                       justifyContent: "space-between",
@@ -83,7 +82,7 @@ const DuesByClub = () => {
                     </View>
                     <ThemedText>₹ {d.amount}</ThemedText>
                   </View>
-                </>
+                </View>
               ))}
             </RoundedContainer>            
             {clubDues?.upiId && <><Spacer space={5} /><ThemedText style={{ textAlign: "center", marginTop: 12, width: "80%", alignSelf: "center" }}>Payments should be done to the vpa: {clubDues.upiId}</ThemedText></>}
@@ -103,7 +102,7 @@ const DuesByClub = () => {
         /> :
         <ThemedButton style={{bottom: 40, position: "absolute"}}
             title={"Home"}
-            onPress={() => router.back()}
+            onPress={() => router.replace('/(main)')}
         />}
     </ThemedView>
   );
