@@ -17,6 +17,7 @@ const InputText = (props: {
   blurOnSubmit?: any;
   multiline?: boolean;
   error?: string;
+  secureTextEntry?: boolean;
 }) => {
     
   const { colors } = useTheme();
@@ -73,6 +74,7 @@ const InputText = (props: {
           placeholderTextColor={colors.disabled}
           multiline={props.multiline}
           textAlignVertical={props.multiline ? 'top' : 'center'}
+          secureTextEntry={props.secureTextEntry}
         />
       </Animated.View>
       
