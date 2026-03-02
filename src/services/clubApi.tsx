@@ -200,6 +200,7 @@ export const {
   useUpdateMemberMutation,
   useRequestMembershipMutation,
   useGetClubMemberReportableAttributesQuery,
+  useLazyGetClubMemberAttributesQuery,
   useLazyGetClubMemberAttributesReportQuery,
   useAddClubMemberAttributeMutation,
   useDeleteClubMemberAttributeMutation,

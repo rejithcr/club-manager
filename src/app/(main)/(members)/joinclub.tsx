@@ -7,13 +7,15 @@ import TouchableCard from '@/src/components/TouchableCard';
 import { UserContext } from '@/src/context/UserContext';
 import { router } from 'expo-router';
 import React, { useContext, useState } from 'react';
-import { FlatList, StyleSheet, View, TouchableOpacity } from 'react-native';
+import { FlatList, StyleSheet, View, TouchableOpacity, Modal, ScrollView } from 'react-native';
 import Alert, { AlertProps } from '@/src/components/Alert'
-import { useLazyGetClubQuery, useRequestMembershipMutation } from '@/src/services/clubApi';
+import { useLazyGetClubQuery, useRequestMembershipMutation, useLazyGetClubMemberAttributesQuery } from '@/src/services/clubApi';
 import RoundedContainer from '@/src/components/RoundedContainer';
 import Divider from '@/src/components/Divider';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import { useTheme } from '@/src/hooks/use-theme';
+import { appStyles } from '@/src/utils/styles';
+import ThemedButton from '@/src/components/ThemedButton';
 
 const JoinClub = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -22,9 +24,17 @@ const JoinClub = () => {
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
     const { colors } = useTheme();
 
+    // Attribute Modal State
+    const [isAttrModalVisible, setIsAttrModalVisible] = useState(false);
+    const [selectedClub, setSelectedClub] = useState<any>(null);
+    const [attributeValues, setAttributeValues] = useState<Record<number, string>>({});
+    const [attrErrors, setAttrErrors] = useState<Record<number, string>>({});
+
     const { userInfo } = useContext(UserContext)
 
     const [searchClubsByName, { data: filteredClubs, isFetching: isClubsLoading }] = useLazyGetClubQuery();
+    const [getClubAttributes, { isFetching: isAttrLoading }] = useLazyGetClubMemberAttributesQuery();
+    const [requestMembership] = useRequestMembershipMutation();
 
     const handleSearch = (query: string) => {
         setQueryLength(query.length);
@@ -42,30 +52,104 @@ const JoinClub = () => {
 
         setDebounceTimeout(timeout);
     };
-    const [requestMembership] = useRequestMembershipMutation();
-    const handleSelectClub = (club: { clubId: number; clubName: string }) => {
+    const handleSelectClub = async (club: { clubId: number; clubName: string }) => {
+        setIsLoading(true);
+        try {
+            // Fetch club member attributes
+            const response = await getClubAttributes({ clubId: club.clubId, getClubMemberAttribute: true }).unwrap();
+            console.log(response);
+            if (response && response.length > 0) {
+                // Show modal if attributes exist
+                setSelectedClub(club);
+                setClubAttributes(response);
+                setAttributeValues({});
+                setAttrErrors({});
+                setIsAttrModalVisible(true);
+            } else {
+                // No attributes, show confirmation alert
+                confirmJoin(club);
+            }
+        } catch (error) {
+            console.error("Error fetching attributes:", error);
+            confirmJoin(club); // Fallback to standard join if attribute fetch fails
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const [clubAttributes, setClubAttributes] = useState<any[]>([]);
+
+    const confirmJoin = (club: any) => {
         setAlertConfig({
             visible: true,
             title: 'Are you sure!',
             message: `This will send your membership request for ${club.clubName} to the club admin`,
             buttons: [
                 {
-                    text: 'OK', onPress: async () => {
-                        setAlertConfig({ visible: false });
-                        setIsLoading(true);
-                        try {
-                            await requestMembership({ memberId: userInfo.memberId, clubId: club.clubId, membershipRequest: true, email: userInfo.email }).unwrap();
-                            router.back();
-                        } catch (error) {
-                            console.log(error);
-                        } finally {
-                            setIsLoading(false);
-                        }
-                    }
+                    text: 'OK', onPress: () => submitJoinRequest(club, {})
                 },
                 { text: 'Cancel', style: 'cancel', onPress: () => setAlertConfig({ visible: false }) },
             ]
         })
+    }
+
+    const submitJoinRequest = async (club: any, attrs: any) => {
+        setAlertConfig({ visible: false });
+        setIsLoading(true);
+        try {
+            await requestMembership({
+                memberId: userInfo.memberId,
+                clubId: club.clubId,
+                membershipRequest: true,
+                email: userInfo.email,
+                attributes: attrs
+            }).unwrap();
+
+            setAlertConfig({
+                visible: true,
+                title: 'Success',
+                message: 'Membership request submitted successfully',
+                buttons: [{ text: 'OK', onPress: () => router.back() }]
+            });
+        } catch (error) {
+            console.log(error);
+            setAlertConfig({
+                visible: true,
+                title: 'Error',
+                message: 'Failed to submit request. Please try again.',
+                buttons: [{ text: 'OK', onPress: () => setAlertConfig({ visible: false }) }]
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const handleAttrChange = (id: number, value: string) => {
+        setAttributeValues(prev => ({ ...prev, [id]: value }));
+        if (value.trim()) {
+            setAttrErrors(prev => {
+                const newErrors = { ...prev };
+                delete newErrors[id];
+                return newErrors;
+            });
+        }
+    }
+
+    const handleSubmitAttributes = () => {
+        const errors: Record<number, string> = {};
+        clubAttributes.forEach(attr => {
+            if (attr.required === 1 && (!attributeValues[attr.clubMemberAttributeId] || !attributeValues[attr.clubMemberAttributeId].trim())) {
+                errors[attr.clubMemberAttributeId] = `${attr.attribute} is required`;
+            }
+        });
+
+        if (Object.keys(errors).length > 0) {
+            setAttrErrors(errors);
+            return;
+        }
+
+        setIsAttrModalVisible(false);
+        submitJoinRequest(selectedClub, attributeValues);
     }
 
     return (
@@ -116,6 +200,52 @@ const JoinClub = () => {
                 </View>
             )}
             {alertConfig?.visible && <Alert {...alertConfig} />}
+
+            <Modal
+                visible={isAttrModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setIsAttrModalVisible(false)}
+            >
+                <ThemedView style={styles.modalContent}>
+                    <View style={styles.modalHeader}>
+                        <ThemedText style={appStyles.heading}>Complete details</ThemedText>
+                        <TouchableOpacity onPress={() => setIsAttrModalVisible(false)}>
+                            <ThemedIcon name="MaterialIcons:close" size={24} color={colors.subText} />
+                        </TouchableOpacity>
+                    </View>
+
+                    <ThemedText style={styles.modalSubheading}>
+                        In order to join club fill up your details
+                    </ThemedText>
+
+                    <ScrollView>
+                        {clubAttributes.map((attr) => (
+                            <InputText
+                                key={attr.clubMemberAttributeId}
+                                label={attr.attribute + (attr.required === 1 ? " *" : "")}
+                                placeholder={`Enter ${attr.attribute}`}
+                                onChangeText={(val: string) => handleAttrChange(attr.clubMemberAttributeId, val)}
+                                error={attrErrors[attr.clubMemberAttributeId]}
+                                containerStyle={{ marginBottom: 15 }}
+                            />
+                        ))}
+                    </ScrollView>
+
+                    <View style={styles.modalFooter}>
+                        <ThemedButton
+                            title="Cancel"
+                            onPress={() => setIsAttrModalVisible(false)}
+                            style={{ flex: 1, backgroundColor: colors.disabled }}
+                        />
+                        <Spacer hspace={15} />
+                        <ThemedButton
+                            title="Submit Request"
+                            onPress={handleSubmitAttributes}
+                        />
+                    </View>
+                </ThemedView>
+            </Modal>
         </ThemedView>
     );
 };
@@ -195,6 +325,30 @@ const styles = StyleSheet.create({
     emptyText: {
         fontSize: 16,
         color: '#9e9e9e',
+    },
+    modalOverlay: {
+        margin: 0,
+        justifyContent: 'flex-end'
+    },
+    modalContent: {
+        padding: 20,
+        maxHeight: '100%',
+        elevation: 5,
+    },
+    modalHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    modalSubheading: {
+        fontSize: 14,
+        color: '#757575',
+        marginBottom: 20,
+    },
+    modalFooter: {
+        flexDirection: 'row',
+        marginTop: 20,
     },
 });
 

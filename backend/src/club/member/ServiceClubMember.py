@@ -84,13 +84,14 @@ class ClubMemberService():
         club_id = params.get('clubId')
         email = params.get('email')
         member_id = params.get('memberId')
+        attributes = params.get('attributes')  # JSON object or string
 
         membership = db.fetch_one(conn, queries_member.GET_MEMBERSHIP_ID, (club_id, member_id))
         if membership:
             return {"message": f"You are already a member of the club"}
         
         # Use UPSERT to insert new request or update rejected request to REQUESTED
-        db.execute(conn, queries_member.UPSERT_MEMBERSHIP_REQUEST, (club_id, member_id, email, email))
+        db.execute(conn, queries_member.UPSERT_MEMBERSHIP_REQUEST, (club_id, member_id, email, email, helper.to_json(attributes) if attributes else None))
         conn.commit()
         return {"message": f"Membership request submitted successfully"}
 

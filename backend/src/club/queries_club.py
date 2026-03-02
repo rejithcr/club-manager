@@ -205,6 +205,11 @@ UPDATE_MEMBERSHIP_REQUEST_STATUS = """
         and member_id = %s
 """
 
+GET_MEMBERSHIP_REQUEST_ATTRIBUTES = """
+    select attributes from membership_requests
+    where club_id = %s and member_id = %s
+"""
+
 DELETE_MEMBERSHIP = """
     update membership set is_active = 0 where club_id = %s and member_id = %s
 """

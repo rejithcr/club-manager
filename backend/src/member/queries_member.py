@@ -90,17 +90,18 @@ CHECK_EXISTING_REQUEST = """
 """
 
 REQUEST_MEMBERSHIP = """
-   insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by) values
-    (%s, %s, 'REQUESTED', 'Please approve', %s, %s)
+   insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by, attributes) values
+    (%s, %s, 'REQUESTED', 'Please approve', %s, %s, %s)
 """
 
 UPSERT_MEMBERSHIP_REQUEST = """
-   insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by, created_ts, updated_ts)
-   values (%s, %s, 'REQUESTED', 'Please approve', %s, %s, now(), now())
+   insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by, attributes, created_ts, updated_ts)
+   values (%s, %s, 'REQUESTED', 'Please approve', %s, %s, %s, now(), now())
    ON CONFLICT (club_id, member_id)
    DO UPDATE SET
       status = 'REQUESTED',
       comments = membership_requests.comments || ' | Re-requested on ' || to_char(now(), 'YYYY-MM-DD HH24:MI:SS'),
+      attributes = EXCLUDED.attributes,
       updated_by = EXCLUDED.updated_by,
       updated_ts = now()
 """
@@ -160,6 +161,11 @@ DELETE_MEMBER_ATTRIBUTE_VALUES = """
 ADD_MEMBER_ATTRIBUTE_VALUE = """
    insert into club_member_attribute_value (club_member_attribute_value_id, club_member_attribute_id, membership_id, attribute_value, created_by, created_ts, updated_by, updated_ts)
    values (nextval('club_member_attribute_value_id_seq'), %s, (select membership_id from membership where club_id=%s and member_id=%s), %s, %s, now(), %s, now())
+   ON CONFLICT (club_member_attribute_id, membership_id)
+   DO UPDATE SET
+      attribute_value = EXCLUDED.attribute_value,
+      updated_by = EXCLUDED.updated_by,
+      updated_ts = now()
 """
 
 DELETE_MEMBER_ATTRIBUTE = """ 

@@ -89,10 +89,21 @@ class ClubService():
             return {"message": "Club details updated"}
 
         if status == "APPROVED":
+            # Fetch attributes from membership_requests
+            request_attrs = db.fetch_one(conn, queries_club.GET_MEMBERSHIP_REQUEST_ATTRIBUTES, (clubId, memberId))
+            attributes = request_attrs['attributes'] if request_attrs and request_attrs['attributes'] else {}
+
             db.execute(conn, queries_club.UPDATE_MEMBERSHIP_REQUEST_STATUS, (status, comments, email, clubId, memberId))
             # Use UPSERT to insert new membership or reactivate existing one
             db.execute(conn, queries_member.UPSERT_MEMBERSHIP, (clubId, memberId, constants.ROLE_MEMBER, email, email))
-            
+
+            # Save attributes to club_member_attribute_value
+            if attributes:
+                for attr_id, attr_value in attributes.items():
+                    if attr_value and str(attr_value).strip() != "":
+                        db.execute(conn, queries_member.ADD_MEMBER_ATTRIBUTE_VALUE,
+                                   (attr_id, clubId, memberId, attr_value, email, email))
+
             conn.commit()
             return {"message": "Membership " + status}
         elif status == "REJECTED":
