@@ -90,7 +90,7 @@ const Main = () => {
   };
 
   const handleGoToClubHome = async (club: any) => {
-    await setClubInfo({ clubId: club.clubId, clubName: club.clubName, role: club.roleName });
+    await setClubInfo({ clubId: club.clubId, clubName: club.clubName, role: club.roleName, logo: club.logo });
     router.push(`/(main)/(clubs)`);
   };
 

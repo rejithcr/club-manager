@@ -8,9 +8,9 @@ const ProfileStack = () => {
   return (
     <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text }}>
       <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Profile"} />, headerShown: true }} />
-      <Stack.Screen name="(superuser)" options={{ title: "Super User", headerShown: false }} />                 
-      <Stack.Screen name="duesbyclub" options={{ title: "Pay Dues", headerShown: true }} />                   
-      <Stack.Screen name="editmember" options={{ title: "Edit Your Details", headerShown: true }} />        
+      <Stack.Screen name="(superuser)" options={{ title: "Super User", headerShown: false }} />
+      <Stack.Screen name="duesbyclub" options={{ title: "Pay Dues", headerShown: true }} />
+      <Stack.Screen name="editmember" options={{ title: "Edit Your Details", headerShown: true }} />
     </Stack>
   )
 }

@@ -8,28 +8,28 @@ export default function RootLayout() {
   const { clubInfo } = useContext(ClubContext)
   const { colors } = useTheme();
   return (
-        <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text }}>
-        <Stack.Screen
-          name="addmember" // This is the name of the page and must match the url from root
-          options={{
-            headerTitle: () => <StackHeader header={"Add Member"} rightText={clubInfo?.clubName} />,
-            headerShown: true
-          }}
-        />   
-        <Stack.Screen
-          name="joinclub" // This is the name of the page and must match the url from root
-          options={{
-            headerTitle: () => <StackHeader header={"Join Club"} />,
-            headerShown:true
-          }}
-        />         
-        <Stack.Screen
-          name="editmember" // This is the name of the page and must match the url from root
-          options={{
-            headerTitle: () => <StackHeader header={"Edit Member"} rightText={clubInfo?.clubName} />,
-            headerShown:true
-          }}
-        />       
-      </Stack>
+    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background }, headerTintColor: colors.text }}>
+      <Stack.Screen
+        name="addmember" // This is the name of the page and must match the url from root
+        options={{
+          headerTitle: () => <StackHeader header={"Add Member"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />,
+          headerShown: true
+        }}
+      />
+      <Stack.Screen
+        name="joinclub" // This is the name of the page and must match the url from root
+        options={{
+          headerTitle: () => <StackHeader header={"Join Club"} logo={clubInfo?.logo} />,
+          headerShown: true
+        }}
+      />
+      <Stack.Screen
+        name="editmember" // This is the name of the page and must match the url from root
+        options={{
+          headerTitle: () => <StackHeader header={"Edit Member"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />,
+          headerShown: true
+        }}
+      />
+    </Stack>
   )
 }

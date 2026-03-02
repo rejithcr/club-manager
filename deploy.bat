@@ -25,7 +25,7 @@ if %errorlevel% neq 0 (
 :: Variables (These should be set in environment or CI/CD runner)
 set AWS_REGION=ap-south-1
 set S3_BUCKET=s3://sportsclubsmanager.com
-:: set CLOUDFRONT_DIST_ID="EXXXXXXXXXXXXX" 
+set CLOUDFRONT_DIST_ID="EFOOV3JU3MD4X" 
 
 :: 1. Database Migrations
 echo 📦 Running Flyway Database Migrations...

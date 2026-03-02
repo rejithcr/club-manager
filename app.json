@@ -10,15 +10,19 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "cr.dev.clubmanager",
-      "associatedDomains": ["applinks:club-manager-33a8c.web.app"]
+      "associatedDomains": [
+        "applinks:club-manager-33a8c.web.app"
+      ]
     },
     "android": {
+      "blockedPermissions": [
+        "android.permission.CAMERA"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/app-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "cr.dev.clubmanager"
-      ,
+      "package": "cr.dev.clubmanager",
       "intentFilters": [
         {
           "action": "VIEW",
@@ -29,7 +33,10 @@
               "pathPattern": ".*"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ]
     },
@@ -39,6 +46,13 @@
       "favicon": "./src/assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
       "expo-router",
       [
         "expo-splash-screen",
