@@ -56,11 +56,12 @@ class ClubService():
         email = params.get('email')
         member_id = params.get('memberId')
         upi_id = params.get('upiId')
+        logo = params.get('logo')
         event_types = params.get('eventTypes', [])
         txn_category_types = constants.TXN_CATEGORY_TYPES
 
         club_id = db.fetch_one(conn, queries_club.GET_CLUB_SEQ_NEXT_VAL, None)['nextval']
-        db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, club_description, location, upi_id, email, email))
+        db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, logo, club_description, location, upi_id, email, email))
         db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id, '1', email, email))
         for event in event_types:
             if event["isSelected"]:
@@ -83,8 +84,9 @@ class ClubService():
         club_description = params.get('clubDescription')
         location = params.get('location')
         upi_id = params.get('upiId')
+        logo = params.get('logo')
         if club_name:
-            db.execute(conn, queries_club.UPDATE_CLUB, (club_name, club_description, location, upi_id, email,clubId))
+            db.execute(conn, queries_club.UPDATE_CLUB, (club_name, logo, club_description, location, upi_id, email,clubId))
             conn.commit()
             return {"message": "Club details updated"}
 

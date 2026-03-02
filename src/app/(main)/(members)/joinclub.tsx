@@ -7,7 +7,7 @@ import TouchableCard from '@/src/components/TouchableCard';
 import { UserContext } from '@/src/context/UserContext';
 import { router } from 'expo-router';
 import React, { useContext, useState } from 'react';
-import { FlatList, StyleSheet, View, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import { FlatList, StyleSheet, View, TouchableOpacity, Modal, ScrollView, Image as RNImage } from 'react-native';
 import Alert, { AlertProps } from '@/src/components/Alert'
 import { useLazyGetClubQuery, useRequestMembershipMutation, useLazyGetClubMemberAttributesQuery } from '@/src/services/clubApi';
 import RoundedContainer from '@/src/components/RoundedContainer';
@@ -184,7 +184,11 @@ const JoinClub = () => {
                             >
                                 <View style={styles.resultContent}>
                                     <View style={styles.clubIconContainer}>
-                                        <ThemedIcon name="MaterialIcons:group" size={20} color={colors.primary} />
+                                        {item.logo ? (
+                                            <RNImage source={{ uri: item.logo }} style={{ width: 30, height: 30, borderRadius: 15 }} />
+                                        ) : (
+                                            <ThemedIcon name="MaterialIcons:group" size={20} color={colors.primary} />
+                                        )}
                                     </View>
                                     <View style={{ flex: 1 }}>
                                         <ThemedText style={styles.clubNameText}>{item.clubName}</ThemedText>

@@ -1,5 +1,5 @@
 GET_CLUBS = """    
-    select club_id, club_name, is_active, created_ts, created_by from club 
+    select club_id, club_name, logo, is_active, created_ts, created_by from club 
     order by created_ts desc
     limit %s offset %s
 """
@@ -9,13 +9,13 @@ GET_CLUB = """
 """
 
 SEARCH_CLUB = """
-    select club_id, club_name from club 
+    select club_id, club_name, logo from club 
     where upper(club_name) like %s and is_active = 1
     limit 10
 """
 
 GET_CLUBS_BY_MEMBER = """ 
-    select c.club_id, c.club_name, c.description, c.location, c.upi_id, r.role_id, c.upi_id, r.role_name
+    select c.club_id, c.club_name, c.logo, c.description, c.location, c.upi_id, r.role_id, c.upi_id, r.role_name
     from club c
         join membership ms on c.club_id=ms.club_id     
         join role r on ms.role_id = r.role_id      
@@ -58,13 +58,13 @@ UPDATE_MEMBERSHIP = """
 GET_CLUB_SEQ_NEXT_VAL="select nextval('club_id_seq')"
 
 SAVE_CLUB = """
-   insert into club (club_id, club_name, description, location, upi_id, created_by, updated_by) values
-    (%s, %s, %s, %s, %s, %s, %s)
+   insert into club (club_id, club_name, logo, description, location, upi_id, created_by, updated_by) values
+    (%s, %s, %s, %s, %s, %s, %s, %s)
 """
 
 UPDATE_CLUB = """
     update club 
-    set club_name = %s, description=%s, location=%s, upi_id=%s, updated_by=%s
+    set club_name = %s, logo = %s, description=%s, location=%s, upi_id=%s, updated_by=%s
     where club_id = %s
 """
 
