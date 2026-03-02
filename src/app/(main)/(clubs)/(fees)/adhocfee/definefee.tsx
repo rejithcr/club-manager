@@ -9,17 +9,17 @@ import { router } from 'expo-router'
 import { isCurrency, isValidLength } from '@/src/utils/validators'
 import { UserContext } from '@/src/context/UserContext'
 import { ClubContext } from '@/src/context/ClubContext'
-import { getClubMembers } from '@/src/helpers/club_helper'
 import { appStyles } from '@/src/utils/styles'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ShadowBox from '@/src/components/ShadowBox'
 import { useTheme } from '@/src/hooks/use-theme'
-import Alert, { AlertProps } from '@/src/components/Alert'
 import DatePicker from '@/src/components/DatePicker'
 import { useAddFeesAdhocMutation } from '@/src/services/feeApi'
-import { snackbarRef } from '@/src/components/snackbar/SnackbarRef'
 import { useGetClubMembersQuery } from '@/src/services/clubApi'
+import RoundedContainer from '@/src/components/RoundedContainer'
+import Divider from '@/src/components/Divider'
+import Spacer from '@/src/components/Spacer'
 
 const DefineFee = () => {
     const [addedMembers, setAddedMembers] = useState<any[]>([])
@@ -105,33 +105,42 @@ const DefineFee = () => {
                             keyboardType={'numeric'}
                             defaultValue={feeAmount}
                         />
-                        <ThemedText>Rs. {amountPerMember}/member</ThemedText>
+                        <ThemedText>₹ {amountPerMember}/member</ThemedText>
                     </View>
                 }
-                <View style={{ marginBottom: 10 }} />
+                <Spacer space={10} />
+                 <RoundedContainer visible={addedMembers?.length > 0}>
                 {!isLoading && addedMembers && addedMembers.length > 0 && addedMembers.map((item: any, index) => 
+                    <React.Fragment key={item.memberId}>
+                    {index > 0 && <Divider />}
                     <TouchableOpacity key={item.memberId} onPress={() => removeMember(item)}>
-                        <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 5, width: "70%", justifyContent:"space-between", flexWrap: "wrap" }}>
-                            <ThemedText style={{ fontSize: 15}}>{index+1}. {item?.firstName} {item?.lastName}</ThemedText>
+                        <ShadowBox style={{ width: "80%", justifyContent:"space-between", flexWrap: "wrap" }}>
+                            <ThemedText style={{ fontSize: 15, maxWidth: 200 }}>{index+1}. {item?.firstName} {item?.lastName}</ThemedText>
                             <MaterialIcons name="remove-circle" size={20} color={colors.error}/>
                         </ShadowBox>
                     </TouchableOpacity>
+                    </React.Fragment>
                 )}
+                </RoundedContainer>
                 <ThemedText style={appStyles.heading}>Select Members</ThemedText>
-                <View style={{ marginBottom: 80 }}>
+                <RoundedContainer visible={remainingMembers?.length > 0}>
                     {isLoadingMembers && <LoadingSpinner/>}
-                    {!isLoading && !isLoadingMembers && remainingMembers.map((item: any) => (
-                        <TouchableOpacity key={item.memberId} onPress={() => addMember(item)}>
-                            <ShadowBox style={{ ...appStyles.shadowBox, marginBottom: 5, width: "80%", flexWrap: "wrap" }}>
+                    {!isLoading && !isLoadingMembers && remainingMembers.map((item: any, idx: number) => (
+                        <React.Fragment key={item.memberId}>
+                        {idx > 0 && <Divider />}
+                        <TouchableOpacity onPress={() => addMember(item)}>
+                            <ShadowBox style={{ width: "80%", flexWrap: "wrap" }}>
                                 <MaterialIcons name="add-circle" size={20} color={colors.add}/>
                                 <ThemedText style={{ width: "90%", fontSize: 15, paddingLeft: 15 }}>{item?.firstName} {item?.lastName}</ThemedText>
                             </ShadowBox>
                         </TouchableOpacity>
+                        </React.Fragment>
                     ))
                     }
-                </View>
+                </RoundedContainer>
+                <Spacer space={50} />
             </ScrollView>
-            <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 30 }} title='Start Collection' onPress={handleAddFeeAdhoc} />
+            <ThemedButton style={{ position: "absolute", alginSelf: "center", bottom: 40 }} title='Start Collection' onPress={handleAddFeeAdhoc} />
         </GestureHandlerRootView>
         </ThemedView>
     )

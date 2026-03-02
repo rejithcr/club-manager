@@ -8,3 +8,4 @@ flask-cors==6.0.1
 requests==2.32.4
 flask_compress==1.17
 python-dateutil==2.9.0
+gunicorn==21.2.0

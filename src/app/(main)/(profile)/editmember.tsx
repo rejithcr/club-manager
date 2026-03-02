@@ -17,6 +17,8 @@ import { ClubContext } from "@/src/context/ClubContext";
 import DatePicker from "@/src/components/DatePicker";
 import { useGetMembersQuery, useUpdateMemberMutation } from "@/src/services/memberApi";
 import { useGetClubQuery } from "@/src/services/clubApi";
+import RoundedContainer from "@/src/components/RoundedContainer";
+import Divider from "@/src/components/Divider";
 
 const Editmember = () => {
   const params = useSearchParams();
@@ -91,7 +93,7 @@ const Editmember = () => {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      {(isMemberLoading || isMemberUpdating)&& <LoadingSpinner />}
+      {(isMemberLoading || isMemberUpdating) && <LoadingSpinner />}
       {!(isMemberLoading || isMemberUpdating) && (
         <ScrollView>
           <InputText label="First Name" onChangeText={setFirstName} defaultValue={firstName} />
@@ -117,15 +119,18 @@ const Editmember = () => {
           <Spacer space={10} />
           <ThemedText style={appStyles.heading}>Club level attributes</ThemedText>
           {isLoadingMyClubs && <LoadingSpinner />}
-          {!isLoadingMyClubs &&
-            clubs?.map((item: any) => (
-              <View key={item.clubId}>
-                <TouchableCard onPress={() => showDetails(item)} id={item.clubId}>
-                  <ThemedText>{item.clubName}</ThemedText>
-                </TouchableCard>
-                <Spacer space={4} />
-              </View>
-            ))}
+          
+          <RoundedContainer>
+            {!isLoadingMyClubs &&
+              clubs?.map((item: any, idx: number) => (
+                <View key={item.clubId}>              
+                {idx > 0 && <Divider />}
+                    <TouchableCard onPress={() => showDetails(item)} id={item.clubId}>
+                      <ThemedText>{item.clubName}</ThemedText>
+                    </TouchableCard>
+                </View>
+              ))}
+            </RoundedContainer>
           <Spacer space={10} />
         </ScrollView>
       )}

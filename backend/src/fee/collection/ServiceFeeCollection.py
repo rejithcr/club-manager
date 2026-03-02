@@ -64,15 +64,17 @@ class FeeCollectionService():
             for item in paymentStatusUpdates:
                 if item["paid"]:
                     # club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_SEQ_NEXT_VAL, None)['nextval']
-                    db.execute(conn, queries_fee.ADD_FEE_TRANSACTION,
-                               (clubId, item["amount"], "CREDIT", "FEE",
-                                f"Fee collection for paymentId {item['clubFeePaymentId']}",
-                                item["clubFeePaymentId"], item["paymentDate"], email, email))
+                    if item["amount"] != 0:
+                        db.execute(conn, queries_fee.ADD_FEE_TRANSACTION,
+                                   (clubId, item["amount"], "CREDIT", "FEE",
+                                    f"Fee collection for paymentId {item['clubFeePaymentId']}",
+                                    item["clubFeePaymentId"], item["paymentDate"], email, email))
                     db.execute(conn, queries_fee.UPDATE_FEE_PAYMENT_STATUS, (1, email, item["clubFeePaymentId"]))
                 else:
                     # club_transaction_id = db.fetch_one(conn, queries_fee.GET_TRANSACTION_ID_FROM_PAYMENT, (item["clubFeePaymentId"],))['club_transaction_id']
                     db.execute(conn, queries_fee.UPDATE_FEE_PAYMENT_STATUS, (0, email, item["clubFeePaymentId"]))
-                    db.execute(conn, queries_fee.DELETE_FEE_TRANSACTION, (item["clubFeePaymentId"],))
+                    if item["amount"] != 0:
+                        db.execute(conn, queries_fee.DELETE_FEE_TRANSACTION, (item["clubFeePaymentId"],))
             conn.commit()
             return {"message": f"Updated payment status for {str(paymentStatusUpdates)}"}
 
@@ -84,9 +86,10 @@ class FeeCollectionService():
                        (club_fee_collection_id, feeTypeId, nextPeriodLabel, nextPeriodDate, email, email))
 
             for nxtFee in nextPeriodFees:
+                paid = 1 if nxtFee["clubFeeAmount"] == 0 else 0
                 db.execute(conn, queries_fee.ADD_FEE_TYPE_PAYMENT,
                            (club_fee_collection_id, nxtFee["membershipId"], nxtFee["clubFeeAmount"],
-                            nxtFee["clubFeeTypeExceptionMemberId"], email, email))
+                            nxtFee["clubFeeTypeExceptionMemberId"], paid, email, email))
 
             conn.commit()
 

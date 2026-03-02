@@ -35,6 +35,18 @@ SAVE_MEMBERSHIP = """
     (nextval('membership_id_seq'), %s, %s, %s, now(), %s, %s)
 """
 
+UPSERT_MEMBERSHIP = """
+   insert into membership (membership_id, club_id, member_id, role_id, start_date, is_active, created_by, updated_by)
+   values (nextval('membership_id_seq'), %s, %s, %s, now(), 1, %s, %s)
+   ON CONFLICT (club_id, member_id)
+   DO UPDATE SET
+      is_active = 1,
+      role_id = EXCLUDED.role_id,
+      start_date = now(),
+      updated_by = EXCLUDED.updated_by,
+      updated_ts = now()
+"""
+
 GET_MEMBERSHIP_ID = """
    select membership_id
    from membership
@@ -57,7 +69,7 @@ GET_DUES_BY_MEMBER = """
          join membership ms on ms.membership_id = cafp.membership_id
          join "member" m on m.member_id = ms.member_id
          join club c on c.club_id = ms.club_id
-      where cafp.paid = 0  and m.member_id = %s     
+      where cafp.paid = 0  and m.member_id = %s and ms.is_active = 1 and (%s = -1 or c.club_id = %s)  
       union 
       select c.club_id, c.club_name, c.upi_id, m.member_id, m.first_name, m.last_name , cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount::REAL amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type
       from club_fee_payment cfp 
@@ -66,14 +78,32 @@ GET_DUES_BY_MEMBER = """
          join membership ms on ms.membership_id = cfp.membership_id
          join "member" m on m.member_id = ms.member_id
          join club c on c.club_id = ms.club_id
-      where cfp.paid = 0 and m.member_id = %s
+      where cfp.paid = 0 and m.member_id = %s and ms.is_active = 1 and (%s = -1 or c.club_id = %s)  
    ) a
    group by  a.club_id, a.club_name, a.upi_id
 """
 
+CHECK_EXISTING_REQUEST = """
+   select count(*) as request_count
+   from membership_requests
+   where club_id = %s and member_id = %s and status = 'REQUESTED'
+"""
+
 REQUEST_MEMBERSHIP = """
-   insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by) values
-    (%s, %s, 'REQUESTED', 'Please approve', %s, %s)
+   insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by, attributes) values
+    (%s, %s, 'REQUESTED', 'Please approve', %s, %s, %s)
+"""
+
+UPSERT_MEMBERSHIP_REQUEST = """
+   insert into membership_requests (club_id, member_id, status, comments, created_by, updated_by, attributes, created_ts, updated_ts)
+   values (%s, %s, 'REQUESTED', 'Please approve', %s, %s, %s, now(), now())
+   ON CONFLICT (club_id, member_id)
+   DO UPDATE SET
+      status = 'REQUESTED',
+      comments = membership_requests.comments || ' | Re-requested on ' || to_char(now(), 'YYYY-MM-DD HH24:MI:SS'),
+      attributes = EXCLUDED.attributes,
+      updated_by = EXCLUDED.updated_by,
+      updated_ts = now()
 """
 
 GET_REQUESTS = """
@@ -131,6 +161,11 @@ DELETE_MEMBER_ATTRIBUTE_VALUES = """
 ADD_MEMBER_ATTRIBUTE_VALUE = """
    insert into club_member_attribute_value (club_member_attribute_value_id, club_member_attribute_id, membership_id, attribute_value, created_by, created_ts, updated_by, updated_ts)
    values (nextval('club_member_attribute_value_id_seq'), %s, (select membership_id from membership where club_id=%s and member_id=%s), %s, %s, now(), %s, now())
+   ON CONFLICT (club_member_attribute_id, membership_id)
+   DO UPDATE SET
+      attribute_value = EXCLUDED.attribute_value,
+      updated_by = EXCLUDED.updated_by,
+      updated_ts = now()
 """
 
 DELETE_MEMBER_ATTRIBUTE = """ 
@@ -138,6 +173,51 @@ DELETE_MEMBER_ATTRIBUTE = """
    where club_member_attribute_id = %s;
    delete from club_member_attributes
    where club_member_attribute_id = %s;
+"""
+
+GET_UPCOMING_BIRTHDAYS = """
+   select m.member_id, m.first_name, m.last_name, m.email, m.phone, m.photo,
+          to_char(m.date_of_birth, 'YYYY-MM-DD') as date_of_birth,
+          to_char(m.date_of_birth, 'MM-DD') as birthday,
+          (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) as days_until_birthday,
+          STRING_AGG(c.club_name, ', ' ORDER BY c.club_name) as club_names,
+          COUNT(DISTINCT c.club_id) as club_count,
+          MIN(c.club_id) as primary_club_id
+   from member m
+   join membership ms on m.member_id = ms.member_id and ms.is_active = 1
+   join club c on ms.club_id = c.club_id
+   where m.date_of_birth is not null 
+     and (c.club_id = %s OR %s = -1) and c.is_active = 1
+     and (
+       -- For all clubs user is member of when memberId is provided
+       %s IS NULL OR EXISTS (
+         SELECT 1 FROM membership ms2 
+         WHERE ms2.member_id = %s 
+         AND ms2.club_id = c.club_id 
+         AND ms2.is_active = 1
+       )
+     )
+     and (
+       -- Birthdays from previous week (-7 days) to next 30 days
+       (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) >= -3
+       AND (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) <= 30
+     )
+   GROUP BY m.member_id, m.first_name, m.last_name, m.email, m.phone, m.photo, 
+            m.date_of_birth, 
+            (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE)
+   order by 
+     CASE 
+       -- Today first
+       WHEN (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) = 0 THEN 1
+       -- Tomorrow second  
+       WHEN (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) = 1 THEN 2
+       -- Future dates
+       WHEN (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) > 1 THEN 3
+       -- Past dates last
+       ELSE 4
+     END,
+     ABS(DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE),
+     m.first_name
 """
 
 ## Auto created for member attrts

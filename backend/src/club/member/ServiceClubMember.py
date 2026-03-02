@@ -29,7 +29,7 @@ class ClubMemberService():
             club_dues = db.fetch(conn, queries_club.GET_DUES, (club_id, club_id))
             return [helper.convert_to_camel_case(member) for member in club_dues]
         if duesByMember:
-            member_dues = db.fetch(conn, queries_member.GET_DUES_BY_MEMBER, (memberId, memberId))
+            member_dues = db.fetch(conn, queries_member.GET_DUES_BY_MEMBER, (memberId, club_id, club_id, memberId, club_id, club_id))
             return [helper.convert_to_camel_case(fee_due) for fee_due in member_dues]
         if club_id and memberId:
             member = db.fetch_one(conn, queries_club.GET_CLUB_MEMBER, (memberId, club_id))
@@ -54,8 +54,14 @@ class ClubMemberService():
             return {"message": f"Attribute added."}
 
         if addToClub and club_id and member_id:
-            db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id,
-                                                              constants.ROLE_MEMBER, email, email))
+            member = db.fetch_one(conn, queries_club.GET_CLUB_MEMBER, (member_id, club_id))
+            if member:
+                if member['is_active'] == 1:
+                    return {"message": f"{member['first_name']} is already a member of the club"}
+                else:
+                    db.execute(conn, queries_club.UPDATE_MEMBERSHIP, (1, email, club_id, member_id))
+            else:
+                db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id, constants.ROLE_MEMBER, email, email))
             conn.commit()
             return {"message": f"Member with id {member_id} added to the club {club_id}"}
 
@@ -64,8 +70,9 @@ class ClubMemberService():
             last_name = params.get('lastName')
             createdBy = params.get('createdBy')
             phone = params.get('phone')
+            dateOfBirth = params.get('dateOfBirth')
             db.execute(conn, queries_member.SAVE_MEMBER,
-                       (first_name, last_name, email, phone, None, None, 0, createdBy, createdBy))
+                       (first_name, last_name, email, phone, None, dateOfBirth, 0, createdBy, createdBy))
             member_id = db.fetch_one(conn, queries_member.GET_MEMBER_BY_EMAIL, (email,))["member_id"]
             db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id,
                                                               constants.ROLE_MEMBER, email, email))
@@ -78,13 +85,16 @@ class ClubMemberService():
         club_id = params.get('clubId')
         email = params.get('email')
         member_id = params.get('memberId')
+        attributes = params.get('attributes')  # JSON object or string
 
         membership = db.fetch_one(conn, queries_member.GET_MEMBERSHIP_ID, (club_id, member_id))
         if membership:
             return {"message": f"You are already a member of the club"}
-        db.execute(conn, queries_member.REQUEST_MEMBERSHIP, (club_id, member_id, email, email))
+        
+        # Use UPSERT to insert new request or update rejected request to REQUESTED
+        db.execute(conn, queries_member.UPSERT_MEMBERSHIP_REQUEST, (club_id, member_id, email, email, helper.to_json(attributes) if attributes else None))
         conn.commit()
-        return {"message": f"Member with id {member_id} request to join club {club_id}"}
+        return {"message": f"Membership request submitted successfully"}
 
 
     def put(self, conn, params):
@@ -139,7 +149,7 @@ class ClubMemberService():
             conn.commit()
             return {"message": f"Member attribute deleted successfully"}
         # TBD: delete member if not part onf any other club
-        db.execute(conn, queries_club.REMOVE_MEMBERSHIP, (email, club_id, member_id))
+        db.execute(conn, queries_club.UPDATE_MEMBERSHIP, (0, email, club_id, member_id))
         conn.commit()
 
         return {"message": f"Membership revoked"}

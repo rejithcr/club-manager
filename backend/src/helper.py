@@ -1,4 +1,5 @@
 import re
+import json
 from src import constants
 
 from datetime import datetime
@@ -7,6 +8,14 @@ from dateutil.relativedelta import relativedelta
 
 def snake_to_camel(name):
     return re.sub(r"_([a-zA-Z0-9])", lambda match: match.group(1).upper(), name)
+
+
+def to_json(data):
+    if data is None:
+        return None
+    if isinstance(data, str):
+        return data
+    return json.dumps(data)
 
 
 def convert_to_camel_case(data: dict):

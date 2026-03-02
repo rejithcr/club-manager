@@ -1,5 +1,7 @@
-GET_CLUBS = """
-    select club_id, club_name from club
+GET_CLUBS = """    
+    select club_id, club_name, logo, is_active, created_ts, created_by from club 
+    order by created_ts desc
+    limit %s offset %s
 """
 
 GET_CLUB = """
@@ -7,20 +9,21 @@ GET_CLUB = """
 """
 
 SEARCH_CLUB = """
-    select club_id, club_name from club 
+    select club_id, club_name, logo from club 
     where upper(club_name) like %s and is_active = 1
     limit 10
 """
 
 GET_CLUBS_BY_MEMBER = """ 
-    select c.club_id, c.club_name, c.description, c.location, c.upi_id, r.role_id, c.upi_id, r.role_name
+    select c.club_id, c.club_name, c.logo, c.description, c.location, c.upi_id, r.role_id, c.upi_id, r.role_name
     from club c
         join membership ms on c.club_id=ms.club_id     
         join role r on ms.role_id = r.role_id      
     where ms.member_id = %s and ms.is_active = 1 and c.is_active = 1
 """
 GET_CLUB_MEMBER = """
-    select m.first_name, m.last_name, m.email, m.phone, m.photo, m.is_registered, r.role_name role, m.updated_by, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth
+    select m.first_name, m.last_name, m.email, m.phone, m.photo, m.is_registered, r.role_name role, m2.is_active, 
+        m.updated_by, to_char(date_of_birth, 'YYYY-mm-dd') date_of_birth
     from "member" m 
         join membership m2 on m.member_id = m2.member_id
         join club c on c.club_id = m2.club_id
@@ -46,16 +49,22 @@ UPDATE_CLUB_MEMBER_ROLE = """
     where club_id = %s and member_id = %s
 """
 
+UPDATE_MEMBERSHIP = """
+    update membership
+    set is_active = %s, updated_by = %s, updated_ts = now()
+    where club_id = %s and member_id = %s
+"""
+
 GET_CLUB_SEQ_NEXT_VAL="select nextval('club_id_seq')"
 
 SAVE_CLUB = """
-   insert into club (club_id, club_name, description, location, upi_id, created_by, updated_by) values
-    (%s, %s, %s, %s, %s, %s, %s)
+   insert into club (club_id, club_name, logo, description, location, upi_id, created_by, updated_by) values
+    (%s, %s, %s, %s, %s, %s, %s, %s)
 """
 
 UPDATE_CLUB = """
     update club 
-    set club_name = %s, description=%s, location=%s, upi_id=%s, updated_by=%s
+    set club_name = %s, logo = %s, description=%s, location=%s, upi_id=%s, updated_by=%s
     where club_id = %s
 """
 
@@ -66,30 +75,20 @@ MARK_CLUB_FOR_DELETION = """
 """
 
 GET_TRANSACTIONS = """
-    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, 
+    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, t.club_transaction_category_type_id,
         t.club_transaction_category, t.club_transaction_comment, t.created_by, to_char(t.club_transaction_date, 'YYYY-mm-dd') club_transaction_date,
-        coalesce(caf.club_adhoc_fee_name, coalesce(cft.club_fee_type, t.club_transaction_category, concat(cft.club_fee_type, '(', cfc.club_fee_type_period, ')'))) fee_name,
-        coalesce(m.first_name || ' ' || m.last_name, am.first_name || ' ' || am.last_name) member_name,
-        t.updated_by
+        t.club_transaction_category fee_name, t.updated_by
     from club_transaction t
-        left join club_fee_payment cfp on cfp.club_fee_payment_id = t.club_fee_payment_id
-        left join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id 
-        left join club_fee_type cft on cft.club_fee_type_id = cfc.club_fee_type_id 
-        left join membership ms on ms.membership_id = cfp.membership_id
-        left join "member" m on m.member_id = ms.member_id
-        left join club_adhoc_fee_payment cafp on cafp.club_adhoc_fee_payment_id = t.club_adhoc_fee_payment_id
-        left join club_adhoc_fee caf on caf.club_adhoc_fee_id = cafp.club_adhoc_fee_id
-        left join membership ams on ams.membership_id = cafp.membership_id 
-        left join member am on am.member_id = ams.member_id
     where t.club_id = %s
 	    and t.club_fee_payment_id is null and t.club_adhoc_fee_payment_id is null
         and (%s = 'ALL' OR t.club_transcation_type = %s)
-    order by t.club_transaction_date desc
+        and (%s = '-1' OR t.club_transaction_category_type_id = %s)
+    order by t.club_transaction_date desc, t.club_transaction_id desc
     limit %s offset %s
 """
 
 GET_TRANSACTIONS_ALL = """
-    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, 
+    select t.club_transaction_id, t.club_transaction_amount::REAL, t.club_transcation_type, t.club_transaction_category_type_id,
         t.club_transaction_category, t.club_transaction_comment, t.created_by, to_char(t.club_transaction_date, 'YYYY-mm-dd') club_transaction_date,
         coalesce(caf.club_adhoc_fee_name, coalesce(cft.club_fee_type, t.club_transaction_category, concat(cft.club_fee_type, '(', cfc.club_fee_type_period, ')'))) fee_name,
         coalesce(m.first_name || ' ' || m.last_name, am.first_name || ' ' || am.last_name) member_name,
@@ -105,20 +104,20 @@ GET_TRANSACTIONS_ALL = """
         left join membership ams on ams.membership_id = cafp.membership_id 
         left join member am on am.member_id = ams.member_id
     where t.club_id = %s
-    order by t.club_transaction_date desc
+    order by t.club_transaction_date desc, t.club_transaction_id desc
     limit %s offset %s
 """
 
 ADD_TRANSACTION = """
     insert into club_transaction(club_transaction_id, club_id, club_transaction_amount, club_transcation_type, 
-        club_transaction_category, club_transaction_comment, club_transaction_date, created_by, updated_by)
-    values(nextval('club_transaction_id_seq'), %s, %s, %s, %s, %s, %s, %s, %s)
+        club_transaction_category_type_id, club_transaction_category, club_transaction_comment, club_transaction_date, created_by, updated_by)
+    values(nextval('club_transaction_id_seq'), %s, %s, %s, %s, %s, %s, %s, %s, %s)
 """
 
 UPDATE_TRANSACTION = """
     update club_transaction 
     set club_transaction_amount = %s, club_transcation_type = %s, club_transaction_category = %s, club_transaction_comment = %s, 
-    club_transaction_date = %s, updated_by = %s, updated_ts = now()
+    club_transaction_category_type_id = %s, club_transaction_date = %s, updated_by = %s, updated_ts = now()
     where club_transaction_id = %s
 """
 
@@ -161,7 +160,7 @@ TOTAL_DUE = """
 
 
 GET_DUES = """
-   select a.member_id, a.first_name, a.last_name, sum(a.amount)::REAL total_due, 
+   select a.member_id, a.first_name, a.last_name, a.photo, sum(a.amount)::REAL total_due, 
       json_agg(jsonb_build_object(	
          'fee', a.fee,
          'fee_desc', a.fee_desc,
@@ -170,14 +169,14 @@ GET_DUES = """
          'fee_type', a.fee_type
       )) dues
    from (
-      select m.member_id, m.first_name, m.last_name , caf.club_adhoc_fee_name fee, caf.club_adhoc_fee_desc fee_desc, cafp.club_adhoc_fee_payment_amount amount, cafp.club_adhoc_fee_payment_id payment_id, 'ADHOC-FEE' fee_type
+      select m.member_id, m.first_name, m.last_name, m.photo, caf.club_adhoc_fee_name fee, caf.club_adhoc_fee_desc fee_desc, cafp.club_adhoc_fee_payment_amount amount, cafp.club_adhoc_fee_payment_id payment_id, 'ADHOC-FEE' fee_type
       from club_adhoc_fee_payment cafp 
          join club_adhoc_fee caf on caf.club_adhoc_fee_id =cafp.club_adhoc_fee_id
          join membership ms on ms.membership_id = cafp.membership_id
          join "member" m on m.member_id = ms.member_id
       where cafp.paid =0 and ms.club_id = %s    
       union 
-      select m.member_id, m.first_name, m.last_name , cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type
+      select m.member_id, m.first_name, m.last_name, m.photo, cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type
       from club_fee_payment cfp 
          join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id
          join club_fee_type cft on cft.club_fee_type_id =cfc.club_fee_type_id
@@ -185,8 +184,8 @@ GET_DUES = """
          join "member" m on m.member_id = ms.member_id
       where cfp.paid = 0 and ms.club_id = %s
    ) a
-   group by a.member_id, a.first_name, a.last_name
-   order by 4 desc, 2
+   group by a.member_id, a.first_name, a.last_name, a.photo
+   order by 5 desc, 2
 """
 
 GET_MEMBERSHIP_REQUESTS = """
@@ -195,7 +194,8 @@ GET_MEMBERSHIP_REQUESTS = """
     from membership_requests mr
     	join member m on mr.member_id = m.member_id
     where club_id = %s
-    order by 7
+    order by 9, 4, 5
+    LIMIT %s OFFSET %s
 """
 
 UPDATE_MEMBERSHIP_REQUEST_STATUS = """
@@ -205,8 +205,13 @@ UPDATE_MEMBERSHIP_REQUEST_STATUS = """
         and member_id = %s
 """
 
+GET_MEMBERSHIP_REQUEST_ATTRIBUTES = """
+    select attributes from membership_requests
+    where club_id = %s and member_id = %s
+"""
+
 DELETE_MEMBERSHIP = """
-    delete from membership where club_id = %s and member_id = %s
+    update membership set is_active = 0 where club_id = %s and member_id = %s
 """
 
 GET_CLUB_COUNTS = """
@@ -215,8 +220,26 @@ GET_CLUB_COUNTS = """
     where mr.club_id = %s and mr.status = 'REQUESTED'
 """
 
-REMOVE_MEMBERSHIP = """
-    update membership
-    set is_active = 0, updated_by = %s, updated_ts = now()
-    where club_id = %s and member_id = %s
+GET_TRANSACTIONS_CATEGORIES_SEQ_NEXT_VAL="select nextval('transaction_category_type_id_seq')"
+
+GET_TRANSACTIONS_CATEGORIES = """
+    select category_type_id category_id, category_name from transaction_category_types where club_id = %s
+"""
+
+ADD_TRANSACTIONS_CATEGORY = """
+    INSERT INTO transaction_category_types (club_id, category_name, created_by) VALUES  (%s, %s, %s);
+"""
+
+ADD_TRANSACTIONS_CATEGORY_WITH_ID = """
+    INSERT INTO transaction_category_types (category_type_id, club_id, category_name, created_by) VALUES  (%s, %s, %s, %s);
+"""
+
+UPDATE_TRANSACTIONS_CATEGORY = """
+    UPDATE transaction_category_types
+    SET category_name = %s
+    WHERE category_type_id = %s;
+"""
+
+DELETE_TRANSACTIONS_CATEGORY = """
+    DELETE FROM transaction_category_types WHERE category_type_id = %s;
 """

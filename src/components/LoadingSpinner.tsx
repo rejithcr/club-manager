@@ -1,6 +1,5 @@
-import { View, ActivityIndicator } from 'react-native'
+import { ActivityIndicator } from 'react-native'
 import React, { useRef, useEffect, useState } from 'react'
-import { appStyles } from '../utils/styles'
 import { useTheme } from '../hooks/use-theme';
 
 const spinnerColors = ['#FF9800', '#2196F3', '#4CAF50', '#E91E63', '#FFC107'];

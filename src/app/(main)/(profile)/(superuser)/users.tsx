@@ -7,7 +7,7 @@ import Spacer from "@/src/components/Spacer";
 
 import { useGetMembersQuery } from "@/src/services/memberApi";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
-import UserInfoView from "../(clubs)/(members)/UserInfoView";
+import UserInfoView from "../../(clubs)/(members)/UserInfoView";
 import { router } from "expo-router";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
@@ -21,7 +21,7 @@ const users = () => {
   );
 
   const handleUserEdit = (user: any) => {
-    router.push(`/(main)/(profile)/superuser-editmember?memberId=${user.memberId}`);
+    router.push(`/(main)/(profile)/(superuser)/superuser-editmember?memberId=${user.memberId}`);
   };
 
   return (

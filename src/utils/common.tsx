@@ -92,7 +92,10 @@ export const jsonToCSV = (jsonArray: any[]) => {
   return csvRows.join("\n");
 };
 
-export const handleTimeChange = (text: string, setState: React.Dispatch<React.SetStateAction<string>>) => {
+export const handleTimeChange = (text: string | null, setState: React.Dispatch<React.SetStateAction<string|null>>) => {
+  if(text == null){
+    return null;
+  }
   const raw = text.replace(/[^0-9]/g, "");
   let formatted = "";
   if (raw.length <= 2) {
@@ -103,7 +106,10 @@ export const handleTimeChange = (text: string, setState: React.Dispatch<React.Se
   setState(formatted);
 };
 
-export const to24HourFormat = (time12h: string) => {
+export const to24HourFormat = (time12h: string | null) => {
+  if(time12h == null || !time12h){
+    return null;
+  }
   const [time, modifier] = time12h.split(" ");
   let [hours, minutes] = time.split(":").map(Number);
 

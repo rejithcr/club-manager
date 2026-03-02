@@ -1,10 +1,8 @@
 import { View, ScrollView, TouchableOpacity } from 'react-native'
-import React, { useCallback, useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { appStyles } from '@/src/utils/styles'
-import { getFeeStructure, getAdhocFee } from '@/src/helpers/fee_helper'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
-import { router, useFocusEffect } from 'expo-router'
+import { router } from 'expo-router'
 import TouchableCard from '@/src/components/TouchableCard'
 import { ClubContext } from '@/src/context/ClubContext'
 import { ROLE_ADMIN } from '@/src/utils/constants'
@@ -15,6 +13,7 @@ import Spacer from '@/src/components/Spacer'
 import { useTheme } from '@/src/hooks/use-theme'
 import ThemedHeading from '@/src/components/themed-components/ThemedHeading'
 import { useGetFeesQuery } from '@/src/services/feeApi'
+import RoundedContainer from '@/src/components/RoundedContainer'
 
 const Fees = () => {
   const { clubInfo } = useContext(ClubContext)
@@ -46,20 +45,20 @@ const Fees = () => {
         {isLoadingCurrent && <LoadingSpinner />}
         {!isLoadingCurrent && currentFeeStructure?.length == 0 && <ThemedText style={{ alignSelf: "center", width: "80%"}}>No fees defined. To define a fee type (eg. Membership fee), press the + icon.</ThemedText>}
         {!isLoadingCurrent && currentFeeStructure?.map((fee: any) => {
-          return <View key={fee.clubFeeTypeId}><TouchableCard onPress={showFeeTypeDetails} id={fee}>
+          return <><RoundedContainer key={fee.clubFeeTypeId}><TouchableCard onPress={showFeeTypeDetails} id={fee}>
             <View style={{
               flexDirection: "row", width: "90%",
               justifyContent: "space-between", alignItems: "center", flexWrap: "wrap"
             }}>
               <View>
                 <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
-                <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
+                <ThemedText style={{ fontSize: 10, marginTop: 5, color: colors.subText }}>{fee.clubFeeTypeInterval}</ThemedText>
               </View>
-                <ThemedText style={{ marginRight: 10 }}>Rs. {fee.clubFeeAmount}</ThemedText>
+                <ThemedText style={{ marginRight: 10 }}>₹ {fee.clubFeeAmount}</ThemedText>
             </View>
           </TouchableCard>
-          <Spacer space={4}/> 
-          </View>
+          </RoundedContainer>
+          <Spacer space={4}/> </>
         })}
       </ScrollView>
     </GestureHandlerRootView>

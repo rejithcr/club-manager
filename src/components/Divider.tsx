@@ -14,12 +14,13 @@ const Divider: React.FC<DividerProps> = ({style, children}) => {
   )
 }
 
-export default Divider
+export default Divider;
 
 const styles = StyleSheet.create({  
   divider: {
     borderBottomColor: 'rgba(136, 136, 136, 0.2)',
     borderBottomWidth: .75,
-    width: "100%"
+    width: "100%",
+    alignSelf: "center"
   }
 })

@@ -16,6 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import Alert, { AlertProps } from '@/src/components/Alert';
 import { showSnackbar } from '@/src/components/snackbar/snackbarService';
+import DatePicker from '@/src/components/DatePicker';
 
 import { useAddMemberMutation as useAddMember, useLazyGetMembersQuery } from "@/src/services/memberApi";
 import { useAddMemberMutation as useAddMemberToClub } from "@/src/services/clubApi";
@@ -31,7 +32,8 @@ const AddMember = () => {
     const [firstName, setFirstName] = useState<string | null>("");
     const [lastName, setLastName] = useState("");
     const [phone, setPhone] = useState("");
-    const [email, setEmail] = useState("")
+    const [email, setEmail] = useState("");
+    const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
 
     const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
@@ -43,6 +45,7 @@ const AddMember = () => {
         setPhone('')
         setEmail('')
         setSearchNumber('')
+        setDateOfBirth(null)
         setShowAddNewMemberForm(false)
     }
 
@@ -50,31 +53,31 @@ const AddMember = () => {
     const [addMemberToClub, { isLoading: isAddingMemberToClub }] = useAddMemberToClub();
 
     const handleAddMemberToClub = (member: any | undefined) => {
-      setAlertConfig({
-        visible: true,
-        title: "Are you sure!",
-        message: "Clck 'OK' to add the member to club.",
-        buttons: [
-          {
-            text: "OK",
-            onPress: async () => {
-              setAlertConfig({ visible: false });
-              try {
-                await addMemberToClub({
-                  memberId: member.memberId,
-                  clubId: Number(params.get("clubId") || clubInfo.clubId),
-                  addToClub: "true",
-                  email: member.email,
-                }).unwrap();
-                clearForm();
-              } catch (error) {
-                console.log(error);
-              }
-            },
-          },
-          { text: "Cancel", onPress: () => setAlertConfig({ visible: false }) },
-        ],
-      });
+        setAlertConfig({
+            visible: true,
+            title: "Are you sure!",
+            message: "Clck 'OK' to add the member to club.",
+            buttons: [
+                {
+                    text: "OK",
+                    onPress: async () => {
+                        setAlertConfig({ visible: false });
+                        try {
+                            await addMemberToClub({
+                                memberId: member.memberId,
+                                clubId: Number(params.get("clubId") || clubInfo.clubId),
+                                addToClub: "true",
+                                email: member.email,
+                            }).unwrap();
+                            clearForm();
+                        } catch (error) {
+                            console.log(error);
+                        }
+                    },
+                },
+                { text: "Cancel", onPress: () => setAlertConfig({ visible: false }) },
+            ],
+        });
     };
 
     const createAndAddToClub = async () => {
@@ -84,13 +87,14 @@ const AddMember = () => {
                 "lastName": lastName,
                 "email": email,
                 "phone": phone,
+                "dateOfBirth": dateOfBirth,
                 "createdBy": userInfo.email,
                 "clubId": params.get("clubId") || clubInfo.clubId
             }
-            try{
+            try {
                 await addMemberToClub(payload).unwrap();
                 clearForm();
-            } catch(error){
+            } catch (error) {
                 console.log(error)
             }
         }
@@ -113,6 +117,10 @@ const AddMember = () => {
             showSnackbar("Please enter valid email", 'error')
             return false
         }
+        if (!dateOfBirth) {
+            showSnackbar("Please select date of birth", 'error')
+            return false
+        }
         return true
     }
     const createMember = async () => {
@@ -124,7 +132,8 @@ const AddMember = () => {
                 "createdBy": userInfo.email,
                 "photo": userInfo.photo,
                 "isRegistered": 1,
-                "phone": phone
+                "phone": phone,
+                "dateOfBirth": dateOfBirth
             }
             try {
                 const response = await addMember(payload).unwrap();
@@ -136,10 +145,10 @@ const AddMember = () => {
                             memberId: response['memberId']
                         })).then(() => router.replace('/(auth)'));
                     })
-            } catch(error){
+            } catch (error) {
                 console.log(error);
             }
-        } 
+        }
     }
 
     useEffect(() => {
@@ -151,15 +160,15 @@ const AddMember = () => {
         }
     }, [])
 
-    const [saerchTrigger,{ isFetching: isMemberSearchLoading }] = useLazyGetMembersQuery();
-    
+    const [saerchTrigger, { isFetching: isMemberSearchLoading }] = useLazyGetMembersQuery();
+
     const searchMember = async () => {
         if (!isValidPhoneNumber(searchNumber)) {
             showSnackbar("Invalid Phone number", 'error')
             return false
         }
-        try{
-            const response = await saerchTrigger({phone: searchNumber});
+        try {
+            const response = await saerchTrigger({ phone: searchNumber });
             if (response?.data?.memberId) {
                 setShowAddNewMemberForm(false)
                 setShowExistingPlayer(true);
@@ -168,13 +177,13 @@ const AddMember = () => {
                 setShowExistingPlayer(false);
                 setShowAddNewMemberForm(true)
             }
-        } catch (error){
+        } catch (error) {
             setShowExistingPlayer(false);
             setShowAddNewMemberForm(true)
         }
     }
     const handleCancel = async () => {
-        if(showRegisterForm){            
+        if (showRegisterForm) {
             await AsyncStorage.removeItem("userInfo")
             await AsyncStorage.removeItem("accessToken")
             await AsyncStorage.removeItem("resfreshToken")
@@ -208,14 +217,15 @@ const AddMember = () => {
                         <InputText label="Last Name" onChangeText={setLastName} defaultValue={lastName} />
                         <InputText label="Phone" onChangeText={setPhone} defaultValue={searchNumber} keyboardType={"numeric"} />
                         {!showRegisterForm && <InputText label="Email" onChangeText={setEmail} defaultValue={email} keyboardType={"email-address"} />}
+                        <DatePicker label="Date of Birth" date={dateOfBirth} setDate={setDateOfBirth} />
                         <Spacer space={10} />
-                        {(isAddingMember || isAddingMemberToClub)? <LoadingSpinner /> :
-                        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                            {showRegisterForm && <ThemedButton title="Register" onPress={createMember} />}
-                            {!showRegisterForm && showAddNewMemberForm && <ThemedButton title="Add Member" onPress={createAndAddToClub} />}
-                            <Spacer space={10} />
-                            <ThemedButton title="Cancel" onPress={handleCancel} />
-                        </View>}
+                        {(isAddingMember || isAddingMemberToClub) ? <LoadingSpinner /> :
+                            <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                                {showRegisterForm && <ThemedButton title="Register" onPress={createMember} />}
+                                {!showRegisterForm && showAddNewMemberForm && <ThemedButton title="Add Member" onPress={createAndAddToClub} />}
+                                <Spacer space={10} />
+                                <ThemedButton title="Cancel" onPress={handleCancel} />
+                            </View>}
                     </>}
                 </ScrollView>
                 }

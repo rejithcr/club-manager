@@ -4,23 +4,23 @@ import { useRouter } from "expo-router/build/hooks";
 import TouchableCard from "@/src/components/TouchableCard";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedView from "@/src/components/themed-components/ThemedView";
-import Spacer from "@/src/components/Spacer";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
+import Divider from "@/src/components/Divider";
+import RoundedContainer from "@/src/components/RoundedContainer";
+import { useContext } from "react";
+import { ClubContext } from "@/src/context/ClubContext";
 
 const MyClubs = (props: { clubs: [] }) => {
   const router = useRouter();
+  const { setClubInfo } = useContext(ClubContext);
 
-  const showDetails = (
+  const showDetails = async (
     clubId: number,
     clubName: string,
-    clubDesc: string,
-    clubLocation: string,
-    role: string,
-    upiId: string
+    role: string
   ) => {
-    router.push(
-      `/(main)/(clubs)?clubId=${clubId}&clubName=${clubName}&clubDesc=${clubDesc}&clubLocation=${clubLocation}&role=${role}&UpiId=${upiId}`
-    );
+    await setClubInfo({ clubId, clubName, role });
+    router.push('/(main)/(clubs)');
   };
 
   return (
@@ -37,21 +37,25 @@ const MyClubs = (props: { clubs: [] }) => {
           <ThemedIcon name="MaterialIcons:add-circle" size={50} onPress={() => router.push(`/(main)/createclub`)} />
         </ThemedView>
       )}
-      {props.clubs?.map((item: any, idx: number) => (
-        <View key={item.clubId}>
-          <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
-            <TouchableCard
-              onPress={() =>
-                showDetails(item.clubId, item.clubName, item.description, item.location, item.roleName, item.upiId)
-              }
-              id={item.clubId}
-            >
-              <ThemedText>{item.clubName}</ThemedText>
-            </TouchableCard>
-            <Spacer space={4} />
-          </Animated.View>
-        </View>
-      ))}
+      <RoundedContainer visible={props.clubs?.length !== 0}>
+        {props.clubs?.map((item: any, idx: number) => (
+          <View key={item.clubId}>
+            <View style={{ marginVertical: 5 }}>
+              <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
+                <TouchableCard
+                  onPress={() =>
+                    showDetails(item.clubId, item.clubName, item.roleName)
+                  }
+                  id={item.clubId}
+                >
+                  <ThemedText>{item.clubName}</ThemedText>
+                </TouchableCard>
+              </Animated.View>
+            </View>
+            {idx < props.clubs.length - 1 && <Divider />}
+          </View>
+        ))}
+      </RoundedContainer>
     </ThemedView>
   );
 };

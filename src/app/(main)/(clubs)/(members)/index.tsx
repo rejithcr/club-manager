@@ -13,6 +13,7 @@ import { useGetClubMembersQuery } from "@/src/services/clubApi";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import Animated, { FadeInUp } from "react-native-reanimated";
+import Divider from "@/src/components/Divider";
 
 const limit = 20;
 
@@ -36,17 +37,7 @@ export default function Home() {
       ) : (
         <FlatList
           style={{ width: "100%" }}
-          ItemSeparatorComponent={() => (
-            <View
-              style={{
-                marginVertical: 7,
-                borderBottomWidth: 0.3,
-                borderBottomColor: "grey",
-                width: "85%",
-                alignSelf: "center",
-              }}
-            />
-          )}
+          ItemSeparatorComponent={() => <Divider style={{width: "85%", alignSelf: "center", marginVertical: 5}} />}
           ListFooterComponent={() =>
             (isFetching && (
               <>

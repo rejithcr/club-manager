@@ -1,4 +1,4 @@
-import { RefreshControl, ScrollView } from "react-native";
+import { RefreshControl, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router/build/hooks";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import FeeSummary from "./dues";
@@ -7,23 +7,35 @@ import { UserContext } from "../../context/UserContext";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MyClubs from "./myclubs";
-import { router } from "expo-router";
+import { router, useGlobalSearchParams } from "expo-router";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
 import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import UpcomingEvents from "./upcoming_events";
+import UnifiedFeed from "./unified_feed";
 import { clearTokens } from "@/src/helpers/auth_helper";
 import {
+  useGetClubEventsQuery,
   useGetClubMembersQuery,
   useGetClubQuery,
-  useLazyGetClubEventsQuery,
 } from "@/src/services/clubApi";
+import { useGetUpcomingBirthdaysQuery } from "@/src/services/memberApi";
+import { useTheme } from "@/src/hooks/use-theme";
+import { ClubContext } from "@/src/context/ClubContext";
+import MultiButton from "@/src/components/MultiButton";
+import { useAsyncStorage } from "@/src/hooks/use-async-storage";
+import ThemedText from "@/src/components/themed-components/ThemedText";
+import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 
 const Main = () => {
   const router = useRouter();
+  const searchParams = useGlobalSearchParams();
   const { userInfo } = useContext(UserContext);
+  const { colors } = useTheme();
+  const { setClubInfo } = useContext(ClubContext);
+  const [selectedClubId, setSelectedClubId] = useAsyncStorage<number>("selectedClubId", -1); // -1 means "All"
+
   const {
     data: clubs,
     isLoading: isLoadingMyClubs,
@@ -37,11 +49,29 @@ const Main = () => {
     isLoading: isLoadingMemberDues,
     isFetching: isFetchingMemberDues,
     refetch: refetchMemberDues,
-  } = useGetClubMembersQuery({ memberId: userInfo?.memberId, duesByMember: "true" });
+  } = useGetClubMembersQuery({ clubId: "-1", memberId: userInfo?.memberId, duesByMember: "true" });
+
+  const {
+    data: upcomingBirthdays,
+    isLoading: isBirthdaysLoading,
+    isFetching: isFetchingBirthdays,
+    refetch: refetchBirthdays,
+  } = useGetUpcomingBirthdaysQuery({
+    memberId: userInfo?.memberId,
+    clubId: selectedClubId // Filter by selected club
+  });
+
+  const { data: events, isLoading: isLoadingEvents, isFetching: isFetchingEvents, refetch: refetchEvents
+  } = useGetClubEventsQuery({
+    memberId: userInfo?.memberId,
+    clubId: selectedClubId // Filter by selected club
+  });
 
   const onRefresh = () => {
     refetchMemberDues();
     refetchClubs();
+    refetchBirthdays();
+    refetchEvents();
   };
   const handleLogout = async () => {
     await AsyncStorage.removeItem("userInfo");
@@ -49,38 +79,114 @@ const Main = () => {
     router.replace("/(auth)");
   };
 
-  const [triggerGetEvents, { data: events, isLoading: isLoadingEvents }] = useLazyGetClubEventsQuery();
-
   useEffect(() => {
-    if (clubs) {
-      const clubIds = clubs.map((c: { clubId: any }) => c.clubId);
-      triggerGetEvents({clubIds, limit: 10, offset:0});
+    if (searchParams.showClubDues) {
+      router.push(`/(main)/(profile)/duesbyclub?clubId=${searchParams.showClubDues}&memberId=${userInfo?.memberId}`);
     }
-  }, [clubs]);
-    
+  }, [searchParams.showClubDues, userInfo?.memberId]);
+
+  const handleClubSelect = (clubId: number) => {
+    setSelectedClubId(clubId);
+  };
+
+  const handleGoToClubHome = async (club: any) => {
+    await setClubInfo({ clubId: club.clubId, clubName: club.clubName, role: club.roleName, logo: club.logo });
+    router.push(`/(main)/(clubs)`);
+  };
+
+  // Filter dues based on selected club
+  const filteredDues = selectedClubId === -1
+    ? duesByMember
+    : duesByMember?.filter((due: any) => due.clubId === selectedClubId);
+
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
-        <Spacer space={5} />
-        <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues} onRefresh={onRefresh} />}>
-          <ThemedHeading>My Clubs</ThemedHeading>
+        <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues || isFetchingBirthdays || isFetchingEvents} onRefresh={onRefresh} />}>
           {isLoadingMyClubs && <LoadingSpinner />}
-          {!isLoadingMemberDues && <MyClubs clubs={clubs} />}
+          {clubs?.length == 0 && (
+            <ThemedView style={{ alignSelf: "center", width: "80%", justifyContent: "center", alignItems: "center" }}>
+              <ThemedText style={{ marginTop: 20 }}>Request to join a club</ThemedText>
+              <ThemedIcon
+                name="MaterialIcons:add-home"
+                size={50}
+                onPress={() => router.push(`/(main)/(members)/joinclub`)}
+              />
+              <ThemedText style={{ marginTop: 20 }}>Create a new club</ThemedText>
+              <ThemedIcon name="MaterialIcons:add-circle" size={50} onPress={() => router.push(`/(main)/createclub`)} />
+            </ThemedView>
+          )}
+          {/* Club Filter Selector */}
+          {clubs && clubs.length > 0 && (
+            <>
+              <ThemedHeading>My Clubs</ThemedHeading>
+              <View
+                style={{ width: '85%', alignSelf: 'center' }}
+              >
+                <View style={{ flexDirection: 'row', gap: 15, flexWrap: 'wrap', }}>
+                  {/* All Clubs Option */}
+                  <MultiButton
+                    label="All"
+                    icon="MaterialIcons:select-all"
+                    isSelected={selectedClubId === -1}
+                    onSelect={() => handleClubSelect(-1)}
+                    colors={colors}
+                  />
 
+                  {/* Individual Club Options */}
+                  {clubs.map((club: any) => (
+                    <MultiButton
+                      key={club.clubId}
+                      club={club}
+                      isSelected={selectedClubId === club.clubId}
+                      onSelect={() => handleClubSelect(club.clubId)}
+                      onGoToHome={() => handleGoToClubHome(club)}
+                      colors={colors}
+                    />
+                  ))}
+                </View>
+              </View>
+            </>
+          )}
+
+          {/* {!isLoadingMyClubs && <MyClubs clubs={clubs} />} */}
+          <Spacer space={10} />
           {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
           {isLoadingMemberDues && <LoadingSpinner />}
-          {!isLoadingMemberDues && clubs?.length > 0 && <FeeSummary duesByMember={duesByMember} />}
+          {!isLoadingMemberDues && clubs?.length > 0 && (
+            <FeeSummary
+              duesByMember={filteredDues}
+              isAllSelected={selectedClubId === -1}
+            />
+          )}
 
-          {isLoadingEvents && (
+          {/* Unified Events and Birthdays Feed */}
+          {(isLoadingEvents || isBirthdaysLoading) && (
             <>
               <Spacer space={10} />
               <LoadingSpinner />
             </>
           )}
-          {events?.length > 0 && (
+          <Spacer space={10} />
+          {events && events.length > 0 && (
             <>
               <ThemedHeading>Upcoming Events</ThemedHeading>
-              <UpcomingEvents events={events} clubs={clubs} />
+              <UnifiedFeed
+                events={events}
+                birthdays={[]}
+                clubs={clubs || []}
+              />
+            </>
+          )}
+          <Spacer space={10} />
+          {upcomingBirthdays && upcomingBirthdays.length > 0 && (
+            <>
+              <ThemedHeading>Upcoming Birthdays</ThemedHeading>
+              <UnifiedFeed
+                events={[]}
+                birthdays={upcomingBirthdays}
+                clubs={clubs || []}
+              />
             </>
           )}
           {/*<UpcomingMatches memberEmail={userInfo?.email} />*/}
@@ -109,6 +215,8 @@ const handleMenuPress = (name: string | undefined, handleLogout: { (): void }) =
     router.push(`/(main)/(profile)`);
   } else if (name == "joinclub") {
     router.push(`/(main)/(members)/joinclub`);
+  } else if (name == "cricket") {
+    router.push(`/(main)/(cricket)/schedule-match`);
   } else {
     throw "Error";
   }
@@ -141,6 +249,13 @@ const actions = [
     text: "Profile",
     icon: <MaterialCommunityIcons name={"face-man-profile"} size={15} color={"white"} />,
     name: "profile",
+    position: 1,
+  },
+  {
+    color: "black",
+    text: "Cricket",
+    icon: <MaterialCommunityIcons name={"face-man-profile"} size={15} color={"white"} />,
+    name: "cricket",
     position: 1,
   },
 ];

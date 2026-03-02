@@ -1,9 +1,8 @@
-import { View, TouchableOpacity, FlatList, RefreshControl } from "react-native";
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { View, TouchableOpacity, FlatList} from "react-native";
+import React, { useContext } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { getAdhocFee } from "@/src/helpers/fee_helper";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
-import { router, useFocusEffect } from "expo-router";
+import { router } from "expo-router";
 import TouchableCard from "@/src/components/TouchableCard";
 import { ClubContext } from "@/src/context/ClubContext";
 import { ROLE_ADMIN } from "@/src/utils/constants";
@@ -16,6 +15,7 @@ import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import ProgressBar from "@/src/components/charts/ProgressBar";
 import { useGetFeesAdhocQuery } from "@/src/services/feeApi";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
+import RoundedContainer from "@/src/components/RoundedContainer";
 
 const limit = 20;
 
@@ -58,12 +58,13 @@ const AdocFeesHome = () => {
             )}
           </View>
         </View>
+        <Spacer space={7} />
         {isLoading ? (
           <LoadingSpinner />
         ) : (
           <FlatList
             style={{ flex: 1 }}
-            ItemSeparatorComponent={() => <Spacer space={4} />}
+            ItemSeparatorComponent={() => <Spacer space={7} />}
             ListFooterComponent={() =>
               (isFetching && (
                 <>
@@ -75,7 +76,7 @@ const AdocFeesHome = () => {
             data={items}
             initialNumToRender={limit}
             ListEmptyComponent={() => (
-              <ThemedText style={{ alignSelf: "center", width: "80%" }}>
+              <ThemedText style={{ alignSelf: "center", width: "80%", color: colors.subText }}>
                 No splits defined. This will be a one time collection from selected members. For eg. splitting expense
                 among members who participated in an event. Press the + icon to define collection
               </ThemedText>
@@ -85,29 +86,32 @@ const AdocFeesHome = () => {
             onRefresh={onRefresh}
             refreshing={refreshing}
             renderItem={({ item }) => (
-              <TouchableCard onPress={showAdhocFeeDetails} id={item}>
-                <View
-                  style={{
-                    flexDirection: "row",
-                    width: "90%",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <View style={{ width: "75%" }}>
-                    <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
-                    <ThemedText style={{ fontSize: 10, marginTop: 5 }}>
-                      {item.clubAdhocFeeDate} {item.clubAdhocFeeDesc}
-                    </ThemedText>
+              <RoundedContainer>
+                <TouchableCard onPress={showAdhocFeeDetails} id={item}>
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      width: "90%",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <View style={{ width: "70%" }}>
+                      <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
+                      <ThemedText style={{ fontSize: 12, color: colors.subText}}>{item.clubAdhocFeeDesc}</ThemedText>
+                      <ThemedText style={{ fontSize: 10, marginTop: 5 }}>
+                        {item.clubAdhocFeeDate} 
+                      </ThemedText>
+                    </View>
+                    <View style={{ width: "30%" }}>
+                      <ThemedText style={{ textAlign: "right" }}>₹ {item.clubAdhocFeePaymentAmount}</ThemedText>
+                      <Spacer space={2} />
+                      <ProgressBar height={8} value={Math.round(item.completionPercentage)} />
+                    </View>
                   </View>
-                  <View style={{ width: "25%" }}>
-                    <ThemedText style={{ textAlign: "right" }}>Rs. {item.clubAdhocFeePaymentAmount}</ThemedText>
-                    <Spacer space={2} />
-                    <ProgressBar height={8} value={Math.round(item.completionPercentage)} />
-                  </View>
-                </View>
-              </TouchableCard>
+                </TouchableCard>
+              </RoundedContainer>
             )}
           />
         )}

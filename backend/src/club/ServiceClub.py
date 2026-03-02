@@ -18,6 +18,8 @@ class ClubService():
         clubName = params.get('clubName')
         membershipRequests = params.get('membershipRequests')
         counts = params.get('counts')
+        limit = params.get("limit")
+        offset = params.get("offset")
 
         if memberId:
             clubs = db.fetch(conn, queries_club.GET_CLUBS_BY_MEMBER, (memberId,))
@@ -32,11 +34,17 @@ class ClubService():
             clubs = db.fetch(conn, queries_club.SEARCH_CLUB, (f"%{clubName.upper()}%",))
             return [helper.convert_to_camel_case(club) for club in clubs]
         elif membershipRequests:
-            requests = db.fetch(conn, queries_club.GET_MEMBERSHIP_REQUESTS, (clubId,))
+            # Support pagination for membership requests
+            req_limit = limit if limit else 20  # Default to 20 if not specified
+            req_offset = offset if offset else 0  # Default to 0 if not specified
+            requests = db.fetch(conn, queries_club.GET_MEMBERSHIP_REQUESTS, (clubId, req_limit, req_offset))
             return [helper.convert_to_camel_case(request) for request in requests]
         elif counts:
             counts = db.fetch(conn, queries_club.GET_CLUB_COUNTS, (clubId,))
             return [helper.convert_to_camel_case(count) for count in counts]
+        elif offset and offset:
+            clubs = db.fetch(conn, queries_club.GET_CLUBS, (limit, offset))
+            return [helper.convert_to_camel_case(club) for club in clubs]
         else:
             club = db.fetch_one(conn, queries_club.GET_CLUB, (clubId,))
             return helper.convert_to_camel_case(club) if club else {}
@@ -48,14 +56,19 @@ class ClubService():
         email = params.get('email')
         member_id = params.get('memberId')
         upi_id = params.get('upiId')
+        logo = params.get('logo')
         event_types = params.get('eventTypes', [])
+        txn_category_types = constants.TXN_CATEGORY_TYPES
 
         club_id = db.fetch_one(conn, queries_club.GET_CLUB_SEQ_NEXT_VAL, None)['nextval']
-        db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, club_description, location, upi_id, email, email))
+        db.execute(conn, queries_club.SAVE_CLUB, (club_id, club_name, logo, club_description, location, upi_id, email, email))
         db.execute(conn, queries_member.SAVE_MEMBERSHIP, (club_id, member_id, '1', email, email))
         for event in event_types:
             if event["isSelected"]:
                 db.execute(conn, queries_events.INSERT_EVENT_TYPES, (club_id, event["name"]))
+        for cat_type in txn_category_types:
+            db.execute(conn, queries_club.ADD_TRANSACTIONS_CATEGORY, (club_id, cat_type, email))
+
         conn.commit()
 
         return {"clubId": club_id}
@@ -71,14 +84,28 @@ class ClubService():
         club_description = params.get('clubDescription')
         location = params.get('location')
         upi_id = params.get('upiId')
+        logo = params.get('logo')
         if club_name:
-            db.execute(conn, queries_club.UPDATE_CLUB, (club_name, club_description, location, upi_id, email,clubId))
+            db.execute(conn, queries_club.UPDATE_CLUB, (club_name, logo, club_description, location, upi_id, email,clubId))
             conn.commit()
             return {"message": "Club details updated"}
 
         if status == "APPROVED":
+            # Fetch attributes from membership_requests
+            request_attrs = db.fetch_one(conn, queries_club.GET_MEMBERSHIP_REQUEST_ATTRIBUTES, (clubId, memberId))
+            attributes = request_attrs['attributes'] if request_attrs and request_attrs['attributes'] else {}
+
             db.execute(conn, queries_club.UPDATE_MEMBERSHIP_REQUEST_STATUS, (status, comments, email, clubId, memberId))
-            db.execute(conn, queries_member.SAVE_MEMBERSHIP, (clubId, memberId, constants.ROLE_MEMBER, email, email))
+            # Use UPSERT to insert new membership or reactivate existing one
+            db.execute(conn, queries_member.UPSERT_MEMBERSHIP, (clubId, memberId, constants.ROLE_MEMBER, email, email))
+
+            # Save attributes to club_member_attribute_value
+            if attributes:
+                for attr_id, attr_value in attributes.items():
+                    if attr_value and str(attr_value).strip() != "":
+                        db.execute(conn, queries_member.ADD_MEMBER_ATTRIBUTE_VALUE,
+                                   (attr_id, clubId, memberId, attr_value, email, email))
+
             conn.commit()
             return {"message": "Membership " + status}
         elif status == "REJECTED":

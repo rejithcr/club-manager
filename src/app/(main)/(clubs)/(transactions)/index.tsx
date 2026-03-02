@@ -1,4 +1,4 @@
-import { View, FlatList, Switch, TouchableOpacity, RefreshControl, Platform } from 'react-native'
+import { View, FlatList, Switch, TouchableOpacity, Platform } from 'react-native'
 import React, { useContext, useEffect, useState } from 'react'
 import { ClubContext } from '@/src/context/ClubContext'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
@@ -19,22 +19,30 @@ import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
 import { ROLE_ADMIN } from '@/src/utils/constants'
 import DatePicker from '@/src/components/DatePicker'
 import Alert, { AlertProps } from '@/src/components/Alert'
-import { useAddTransactionMutation, useDeleteTransactionMutation, useGetTransactionsQuery, useUpdateTransactionMutation } from '@/src/services/feeApi'
+import { useAddTransactionMutation, useDeleteTransactionMutation, useGetTransactionsQuery, useUpdateTransactionMutation, useGetTransactionCategoriesQuery, useAddTransactionCategoryMutation } from '@/src/services/feeApi'
 import usePaginatedQuery from '@/src/hooks/usePaginatedQuery'
 import Spacer from '@/src/components/Spacer'
+import Divider from '@/src/components/Divider'
+import RoundedContainer from '@/src/components/RoundedContainer'
+import { router } from 'expo-router'
+import InputSelect from '@/src/components/InputSelect'
 
-const limit = 20;
+const limit = 50;
 
 const Transactions = () => {
   const [isAddTxnVisible, setIsAddTxnVisible] = useState(false);
   const [isFeeDetailsVisible, setIsFeeDetailsVisible] = useState(false);
   const [txnTypeFilter, setTxnTypeFilter] = useState("ALL");
+  const [txnCategoryFilter, setTxnCategoryFilter] = useState("-1");
   const [showFees, setShowFees] = useState(false);
   const [alertConfig, setAlertConfig] = useState<AlertProps>();
-  const [txnValues, setTxnValues] = useState<any>({ txnId: null, txnType: "DEBIT", txnDate: new Date(), txnCategory: "", txnComment: "", txnAmount: "" });
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
   const { colors } = useTheme();
+  const { data: categories = [], refetch: refetchCategories } = useGetTransactionCategoriesQuery({ clubId: clubInfo.clubId });
+  const [addCategory, { isLoading: isAddingCategory }] = useAddTransactionCategoryMutation();
+  const [isAddCategoryVisible, setIsAddCategoryVisible] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState("");
 
   const {
     items,
@@ -43,26 +51,35 @@ const Transactions = () => {
     isFetching: isTxnsFetching,
     refreshing,
     onRefresh,
-  } = usePaginatedQuery(useGetTransactionsQuery, { clubId: clubInfo.clubId, txnType: txnTypeFilter, showFees }, limit);
+  } = usePaginatedQuery(useGetTransactionsQuery, { clubId: clubInfo.clubId, txnType: txnTypeFilter, txnCategoryId: txnCategoryFilter, showFees }, limit);
 
-  
   useEffect(() => {
     onRefresh();
-  }, [txnTypeFilter, showFees]);
+  }, [txnTypeFilter, showFees, txnCategoryFilter]);
   
-
   const [addTransaction, {isLoading: isAddingTxn}] = useAddTransactionMutation();
   const [updateTransaction, {isLoading: isUpdatingTxn}] = useUpdateTransactionMutation();
   const [deleteTransaction] = useDeleteTransactionMutation();
 
+  const [txnValues, setTxnValues] = useState<any>({
+    txnId: null,
+    txnType: "DEBIT",
+    txnDate: new Date(),
+    txnCategory: null,
+    txnCategoryId: null,
+    txnComment: "",
+    txnAmount: "",
+  });
+
   const handleSave = async () => {
-    if (validate(txnValues?.txnCategory, txnValues?.txnComment, txnValues?.txnAmount)) {
+    if (validate(txnValues?.txnCategoryId, txnValues?.txnComment, txnValues?.txnAmount)) {
       if (txnValues?.txnId) {
         await updateTransaction({
           txnId: txnValues.txnId,
           txnType: txnValues.txnType,
           txnDate: txnValues.txnDate,
-          txnCategory: txnValues.txnCategory,
+          txnCategory: getCategory(txnValues.txnCategoryId),
+          txnCategoryId: txnValues.txnCategoryId,
           txnComment: txnValues.txnComment,
           txnAmount: Number(txnValues.txnAmount),
           email: userInfo.email
@@ -72,7 +89,8 @@ const Transactions = () => {
           clubId: clubInfo.clubId,
           txnDate: txnValues.txnDate || new Date(),
           txnType: txnValues.txnType,
-          txnCategory: txnValues.txnCategory,
+          txnCategory: getCategory(txnValues.txnCategoryId),
+          txnCategoryId: txnValues.txnCategoryId,
           txnComment: txnValues.txnComment,
           txnAmount: Number(txnValues.txnAmount),
           email: userInfo.email,
@@ -99,12 +117,12 @@ const Transactions = () => {
       ],
     });
   };
-
+  
   const handleEdit = (item: any) => {
     if(item.clubTransactionCategory != 'FEE' && item.clubTransactionCategory != 'ADHOC-FEE' && clubInfo.role === ROLE_ADMIN){
       setTxnValues({ txnId: item.clubTransactionId, txnType: item.clubTranscationType, txnDate: new Date(item.clubTransactionDate), 
         txnCategory: item.clubTransactionCategory, txnComment: item.clubTransactionComment, txnAmount: item.clubTransactionAmount,
-        lastUpdatedBy: item.updatedBy });
+        txnCategoryId: item.clubTransactionCategoryTypeId, lastUpdatedBy: item.updatedBy });
       setIsAddTxnVisible(true);
     } else if (clubInfo.role === ROLE_ADMIN){
       setTxnValues({ lastUpdatedBy: item.updatedBy, feeType: item.clubTransactionCategory });
@@ -115,27 +133,60 @@ const Transactions = () => {
     setTxnValues((prev: any) => ({ ...prev, txnType: value }))
   }
 
+  const getCategory = (id: number) => {
+    return categories.find((c: any)=> c.categoryId == id)?.categoryName;
+  }
+  
   return (
     <GestureHandlerRootView>
-      <ThemedView style={{ flex: 1 }}>
-        <View style={{
-          width: "80%", alignSelf: "center", flexDirection: "row", justifyContent: "space-between",
-          marginVertical: Platform.OS === 'web' ? 20 : 0
-        }}>
-          <Picker style={{ width: "50%" }} enabled={!showFees} onValueChange={setTxnTypeFilter}>
-            <Picker.Item value={'ALL'} label='ALL' />
-            <Picker.Item value={'DEBIT'} label='DEBIT' />
-            <Picker.Item value={'CREDIT'} label='CREDIT' />
-          </Picker>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <ThemedView style={{ flex: 1 }}> 
+         <Spacer space={Platform.OS === 'web' ? 5 : 0} />                        
+          <View style={{ flexDirection: "row", alignSelf:"center",  justifyContent:"flex-end", alignItems: "center",  width: "85%"}}>
             <ThemedText>Show Fees</ThemedText>
             <Switch onValueChange={() => setShowFees(prev => !prev)} value={showFees} />
           </View>
-        </View>
+          {Platform.OS === 'web' && !showFees && <Spacer space={5} />}
+          {!showFees &&
+          <RoundedContainer>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between',alignSelf:"center",  width: "85%",
+              marginVertical: Platform.OS === 'web' ? 10 : 0
+          }}>
+            <Picker style={{ width: 125 }} enabled={!showFees} onValueChange={setTxnTypeFilter} selectedValue={txnTypeFilter}>
+              <Picker.Item value={'ALL'} label='ALL' />
+              <Picker.Item value={'DEBIT'} label='DEBIT' />
+              <Picker.Item value={'CREDIT'} label='CREDIT' />
+            </Picker>
+            <Picker style={{ width: 125 }} enabled={!showFees} onValueChange={(val)=>{
+              if (val === "__EDIT_CATEGORIES__") {
+                // navigate to categories management page
+                (router as any).push?.(`/(main)/(clubs)/(transactions)/categories`);
+              } else {
+                setTxnCategoryFilter(val);
+              }
+            }} selectedValue={txnCategoryFilter}>
+              <Picker.Item value={"-1"} label={'ALL'} />
+              {categories.map((c: any) => (
+                <Picker.Item key={c.categoryId} value={c.categoryId} label={c.categoryName.toUpperCase()} />
+              ))}
+              <Picker.Item value={'__EDIT_CATEGORIES__'} label={'+/- Edit Categories'} />
+            </Picker>   
+          </View></RoundedContainer>}
+          <Spacer space={10} />
         {isTxnsLoading ? <LoadingSpinner /> :
-          <FlatList style={{ width: "100%" }}
-            ItemSeparatorComponent={() => <View style={{ marginVertical: 7, borderBottomWidth: .3, borderBottomColor: "grey", width: "85%", alignSelf: "center" }} />}
-            ListFooterComponent={() => isTxnsFetching && <LoadingSpinner /> || <Spacer space={50} />}
+          <FlatList
+            ItemSeparatorComponent={() => <Divider style={{width: "85%", alignSelf: "center", marginVertical: 10}} />}
+            ListFooterComponent={() =>
+            (isTxnsFetching && (
+              <>
+                <Spacer space={10} />
+                <LoadingSpinner />
+              </>
+            )) || items?.length !== 0 && (
+              <ThemedText style={{ alignSelf: "center", paddingBottom: 60, paddingTop: 10 }}>
+                No more transactions
+              </ThemedText>
+            )
+          }
             data={items}
             initialNumToRender={limit}
             onEndReached={loadMore}
@@ -144,7 +195,7 @@ const Transactions = () => {
             onRefresh={onRefresh}
             refreshing={refreshing}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => handleEdit(item)} style={{
+              <TouchableOpacity disabled={clubInfo.role !== ROLE_ADMIN} onPress={() => handleEdit(item)} style={{
                 width: "85%", alignSelf: "center", alignItems: "center",
                 flexDirection: "row", justifyContent: "space-between"
               }}>
@@ -158,7 +209,7 @@ const Transactions = () => {
                     <MaterialCommunityIcons name='square-edit-outline' size={12} color={"#546E7A"} /> : <Spacer hspace={5} />}
                 </View>
                 <View style={{ alignItems: "flex-end"}}>
-                  <ThemedText style={{ fontWeight: 'bold', color: item.clubTranscationType === 'CREDIT' ? colors.success : colors.error }}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} Rs. {item.clubTransactionAmount}</ThemedText>
+                  <ThemedText style={{ fontWeight: 'bold', color: item.clubTranscationType === 'CREDIT' ? colors.success : colors.error }}>{item.clubTranscationType === 'CREDIT' ? '+' : '-'} ₹ {item.clubTransactionAmount}</ThemedText>
                   <ThemedText style={{ fontSize: 8 }}>{item.clubTransactionDate}</ThemedText>
                 </View>
               </TouchableOpacity>
@@ -167,18 +218,32 @@ const Transactions = () => {
         }
       </ThemedView>
       <Modal isVisible={isAddTxnVisible}>
-        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}> 
+        <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}> 
           <ThemedText style={appStyles.heading}>{txnValues?.txnId ? "Edit" : "Add"} Tansaction</ThemedText>
-          <Picker style={{ width: "80%", alignSelf: "center" }}
+          <InputSelect label={"Type"}
             onValueChange={handleTxnTypeChange} selectedValue={txnValues?.txnType}>
             <Picker.Item value={'DEBIT'} label='DEBIT' />
             <Picker.Item value={'CREDIT'} label='CREDIT' />
-          </Picker>
+          </InputSelect>
           <DatePicker date={txnValues?.txnDate || new Date()} setDate={(value: Date) => setTxnValues((prev: any) => ({ ...prev, txnDate: value }))} label='Date'/>
-          <InputText label="Category" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnCategory: value }))} defaultValue={txnValues?.txnCategory} />
+          <InputSelect label={"Category"}
+            selectedValue={txnValues?.txnCategoryId}
+            onValueChange={(val:any) => {
+              if (val === "__ADD_NEW__") {
+                setIsAddCategoryVisible(true);
+              } else {
+                setTxnValues((prev: any) => ({ ...prev, txnCategory: getCategory(val), txnCategoryId: val }));
+              }
+            }}>
+            <Picker.Item value={""} label={"Select category"} />
+            {categories.map((c: any) => (
+              <Picker.Item key={c.categoryId} value={c.categoryId} label={c.categoryName} />
+            ))}
+            <Picker.Item value={"__ADD_NEW__"} label={"+ Add Category"} />
+          </InputSelect>
           <InputText label="Details" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnComment: value }))} defaultValue={txnValues?.txnComment} />
           <InputText label="Amount" onChangeText={(value: string) => setTxnValues((prev: any) => ({ ...prev, txnAmount: value }))} keyboardType={"numeric"} defaultValue={txnValues?.txnAmount?.toString()} />
-          {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
+          {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center", fontSize: 12, color: colors.subText }}>Updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 30, alignItems: "center" }}>
             {isAddingTxn || isUpdatingTxn ? <LoadingSpinner />
             : <ThemedButton title={"   Save   "} onPress={() => handleSave()} />}
@@ -187,8 +252,33 @@ const Transactions = () => {
           </View>
         </ThemedView>
       </Modal>
+      <Modal isVisible={isAddCategoryVisible} onBackdropPress={() => setIsAddCategoryVisible(false)}>
+        <ThemedView style={{ borderRadius: 25, padding: 20 }}>
+          <ThemedText style={appStyles.heading}>Add category</ThemedText>
+          <InputText label="Category name" onChangeText={(v: string) => setNewCategoryName(v)} defaultValue={newCategoryName} />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 20 }}>
+            {isAddingCategory ? <LoadingSpinner /> : <ThemedButton title="Save" onPress={async () => {
+              if (!newCategoryName || newCategoryName.trim().length < 2) {
+                alert('Enter at least 2 characters');
+                return;
+              }
+              const res: any = await addCategory({ clubId: clubInfo.clubId, categoryName: newCategoryName.trim(), email: userInfo.email });
+              // API expected to return { categoryId, categoryName }
+              const createdId = res?.data?.categoryId || res?.categoryId || null;
+              const createdName = res?.data?.createdName || res?.createdName || null;
+              setIsAddCategoryVisible(false);
+              // refresh categories and set selection
+              await refetchCategories();
+              if (createdId) {
+                setTxnValues((prev: any) => ({ ...prev, txnCategory: createdName, txnCategoryId: createdId }));
+              }
+            }} />}
+            <ThemedButton title="Cancel" onPress={() => setIsAddCategoryVisible(false)} />
+          </View>
+        </ThemedView>
+      </Modal>
       <Modal isVisible={isFeeDetailsVisible}>
-        <ThemedView style={{ borderRadius: 5, padding: 20 }}>
+        <ThemedView style={{ borderRadius: 25, padding: 20 }}>
           <ThemedText style={{ width: "80%", alignSelf: "center" }}>Go to {txnValues?.feeType == 'FEE' ? 'fees' : 'expense splits'} page to update this transaction.</ThemedText>
           <Spacer space={10} />
           {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center" }}>Last updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
@@ -208,13 +298,13 @@ const Transactions = () => {
 export default Transactions
 
 
-const validate = (txnTypeCategory: string | null, txnTypeComment: string | null, txnAmount: string) => {
-  if (!isValidLength(txnTypeCategory, 2)) {
-    alert("Enter atleast 2 characters for category")
+const validate = (txnCategoryId: string | null, txnTypeComment: string | null, txnAmount: string) => {
+  if (!txnCategoryId || txnCategoryId === "") {
+    alert("Select a category")
     return false
   }
   if (!isValidLength(txnTypeComment, 2)) {
-    alert("Enter atleast 2 characters for comment")
+    alert("Enter atleast 2 characters for details")
     return false
   }
   if (!isCurrency(txnAmount)) {

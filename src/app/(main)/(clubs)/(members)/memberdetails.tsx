@@ -17,7 +17,7 @@ import Alert, { AlertProps } from "@/src/components/Alert";
 import { ClubMemberAttribute } from "@/src/types/member";
 import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import Divider from "@/src/components/Divider";
-import { appStyles } from "@/src/utils/styles";
+import Card from "@/src/components/Card";
 import {
   useGetClubMemberAttributesQuery,
   useGetClubMembersQuery,
@@ -75,54 +75,95 @@ const Profile = () => {
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
-        <ScrollView>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
           {isMemberLoading && <LoadingSpinner />}
           {!isMemberLoading && memberDetails && (
-            <>
-              <ThemedView style={styles.photoContainer}>
+            <View style={styles.mainCard}>
+              {/* Profile Section */}
+              <Card style={styles.profileSection}>
                 {memberDetails?.photo ? (
                   <Image
                     source={{ uri: memberDetails?.photo }}
-                    style={{ width: 100, height: 100, borderRadius: 100 }}
+                    style={styles.profileImage}
                   />
                 ) : (
-                  <ThemedIcon name={"MaterialIcons:account-circle"} size={100} />
+                  <View style={{ ...styles.placeholderPhoto, backgroundColor: colors.secondary }}>
+                    <ThemedIcon name="MaterialIcons:account-circle" size={50} color={colors.text} />
+                  </View>
                 )}
-              </ThemedView>
-              <ThemedText style={appStyles.heading}>
-                {memberDetails?.firstName} {memberDetails?.lastName}
-              </ThemedText>
-              <KeyValueUI data={memberDetails} hideKeys={["photo", "firstName", "lastName", "isRegistered"]} />
-            </>
-          )}
-          <Spacer space={10} />
-          <ThemedText style={appStyles.heading}>Club level attributes</ThemedText>
-          {isLoadingCMA && <LoadingSpinner />}
-          {!isLoadingCMA &&
-            cmaList &&
-            cmaList.length > 0 &&
-            cmaList.map((cma: ClubMemberAttribute, index: number) => (
-              <Divider key={index} style={styles.detailsTable}>
-                <ThemedText>{cma.attribute}</ThemedText>
-                <ThemedText>{cma.attributeValue}</ThemedText>
-              </Divider>
-            ))}
-          <Spacer space={10} />
-          {isRemoving && <LoadingSpinner />}
-          {clubInfo.role === ROLE_ADMIN && !isRemoving && (
-            <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-              <ThemedButton
-                title="    Edit    "
-                onPress={() => router.push(`/(main)/(members)/editmember?memberId=${params.get("memberId")}`)}
+                
+                <View style={styles.profileInfo}>
+                  <ThemedText style={{ ...styles.memberName, color: colors.info }}>
+                    {memberDetails?.firstName} {memberDetails?.lastName}
+                  </ThemedText>
+
+                  <View style={{ ...styles.statusBadge, backgroundColor: memberDetails?.isRegistered ? colors.success : colors.warning }}>
+                    <ThemedText style={styles.statusText}>
+                      {memberDetails?.isRegistered ? 'REGISTERED' : 'REGISTRATION PENDING'}
+                    </ThemedText>
+                  </View>
+                </View>
+              </Card>
+
+              {/* Member Information */}
+              <Card>
+              <KeyValueUI 
+                data={memberDetails} 
+                hideKeys={["photo", "firstName", "lastName", "isRegistered", "isActive"]} 
               />
-              <Spacer space={10} />
-              <ThemedButton title="Remove" onPress={() => handleRemove()} style={{ backgroundColor: colors.error }} />
+
+              {/* Club Attributes */}
+              {(!isLoadingCMA && cmaList && cmaList.length > 0) && (
+                <>
+                  <Divider style={styles.sectionDivider} />
+                  <ThemedText style={{ ...styles.sectionTitle, color: colors.heading }}>
+                    Club Attributes
+                  </ThemedText>
+                  
+                  {cmaList.map((cma: ClubMemberAttribute, index: number) => (
+                    <View key={index} style={styles.attributeItem}>
+                      <ThemedText style={{ ...styles.attributeLabel, color: colors.subText }}>
+                        {cma.attribute}
+                      </ThemedText>
+                      <ThemedText style={{ ...styles.attributeValue, color: colors.text }}>
+                        {cma.attributeValue}
+                      </ThemedText>
+                    </View>
+                  ))}
+                </>
+              )}
+              </Card>
+              {/* Admin Actions */}
+              {clubInfo.role === ROLE_ADMIN && (
+                <>
+                <Spacer space={5} />
+                  {isRemoving ? (
+                    <LoadingSpinner />
+                  ) : (
+                    <View style={styles.buttonContainer}>
+                      <ThemedButton
+                        title="Edit"
+                        onPress={() => router.push(`/(main)/(members)/editmember?memberId=${params.get("memberId")}`)}
+                        style={{ backgroundColor: colors.button }}
+                      />
+                      
+                      <ThemedButton 
+                        title="Remove" 
+                        onPress={() => handleRemove()} 
+                        style={{ backgroundColor: colors.error }}
+                      />
+                    </View>
+                  )}
+                </>
+              )}
             </View>
           )}
-          <Spacer space={10} />
-          {alertConfig?.visible && <Alert {...alertConfig} />}
+
+          {isLoadingCMA && <LoadingSpinner />}
         </ScrollView>
       </GestureHandlerRootView>
+      
+      {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
   );
 };
@@ -130,23 +171,76 @@ const Profile = () => {
 export default Profile;
 
 const styles = StyleSheet.create({
-  photoContainer: {
-    minHeight: 120,
-    marginTop: 20,
-    width: 120,
-    borderRadius: 100,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "center",
-    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+  scrollContainer: {
+    paddingBottom: 40,
   },
-  title: {
-    margin: 20,
-    fontWeight: "bold",
-    fontSize: 25,
-    width: "80%",
-    alignSelf: "center",
+  mainCard: {
+    padding: 20,
   },
+  profileSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  profileImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    marginRight: 16,
+  },
+  placeholderPhoto: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    marginRight: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  memberName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 6,
+  },
+  statusBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  statusText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  sectionDivider: {
+    marginVertical: 16,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 12,
+  },
+  attributeItem: {
+    paddingVertical: 6,
+  },
+  attributeLabel: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  attributeValue: {
+    fontSize: 15,
+    fontWeight: '400',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 8,
+  },
+  // Legacy styles for compatibility
   detailsTable: {
     width: "85%",
     alignSelf: "center",

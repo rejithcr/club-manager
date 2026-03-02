@@ -22,3 +22,25 @@ export interface Member {
     lastAccessedOn?: string,
     roleName?: string;
 }
+
+export interface BirthdayMember {
+    memberId: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    photo?: string;
+    dateOfBirth: string;
+    birthday: string;
+    daysUntilBirthday: number;
+    clubNames: string; // Comma-separated club names
+    clubCount: number; // Number of clubs
+    primaryClubId: number; // For potential navigation
+}
+
+export interface FeedItem {
+    type: 'event' | 'birthday';
+    date: Date;
+    sortKey: number; // For sorting (days until for birthdays, date for events)
+    data: any; // Event or BirthdayMember data
+}

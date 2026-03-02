@@ -22,8 +22,8 @@ const styles = StyleSheet.create({
         borderColor: "#eee",
         alignItems: "center",
         alignSelf: "center",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+        //boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
         borderRadius: 5,
-        padding: 10
+        paddingVertical: 10
     }
 });

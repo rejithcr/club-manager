@@ -9,15 +9,15 @@ export default function ReportsLayout() {
   const { colors } = useTheme();
 
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text }}>
-      <Stack.Screen name="index" options={{title: 'Reports', headerShown:true}}/>         
+    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background }, headerTintColor: colors.text }}>
+      <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Reports"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />, headerShown: true }} />
       <Stack.Screen
-          name="memberattributesexport" // This is the name of the page and must match the url from root
-          options={{
-            headerTitle: () => <StackHeader header={"Member Attributes Export"} rightText={clubInfo?.clubName} />,
-            headerShown: true
-          }}
-        /> 
+        name="memberattributesexport" // This is the name of the page and must match the url from root
+        options={{
+          headerTitle: () => <StackHeader header={"Member Attributes Export"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />,
+          headerShown: true
+        }}
+      />
     </Stack>
   )
 }

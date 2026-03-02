@@ -1,0 +1,1 @@
+ALTER TABLE membership_requests ADD CONSTRAINT unique_club_member_request UNIQUE (club_id, member_id);

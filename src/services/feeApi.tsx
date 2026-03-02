@@ -1,11 +1,10 @@
-// src/services/api.js
 import { createApi } from "@reduxjs/toolkit/query/react";
 import { baseQueryWithReauth } from "./baseQuery";
 
 export const feeApi = createApi({
   reducerPath: "feeApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["adhoc", "fee", "transaction", "exception"],
+  tagTypes: ["adhoc", "fee", "transaction", "exception", "transactionCategory", "eventTransaction", "eventTransactionCategory"],
   endpoints: (builder) => ({
     getFundBalance: builder.query({
       query: (params) => `/club?${new URLSearchParams(params).toString()}`,
@@ -27,6 +26,90 @@ export const feeApi = createApi({
       query: (params) => `/club/member?${new URLSearchParams(params).toString()}`,
       providesTags: ["fee", "adhoc"],
     }), 
+    // transaction categories
+    getTransactionCategories: builder.query({
+      query: (params) => `/club/transaction/category?${new URLSearchParams(params).toString()}`,
+      providesTags: ["transactionCategory"],
+    }),
+    addTransactionCategory: builder.mutation({
+      query: (body) => ({
+        url: "/club/transaction/category",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["transactionCategory"],
+    }),
+    updateTransactionCategory: builder.mutation({
+      query: (body) => ({
+        url: "/club/transaction/category",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["transactionCategory"],
+    }),
+    deleteTransactionCategory: builder.mutation({
+      query: (params) => ({
+        url: `/club/transaction/category?${new URLSearchParams(params).toString()}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["transactionCategory"],
+    }),
+    // event transactions
+    getEventTransactions: builder.query({
+      query: (params) => `/club/event/transaction?${new URLSearchParams(params).toString()}`,
+      providesTags: ["eventTransaction", "transaction"],
+    }),
+    addEventTransaction: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/transaction",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["eventTransaction"],
+    }),
+    updateEventTransaction: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/transaction",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["eventTransaction"],
+    }),
+    deleteEventTransaction: builder.mutation({
+      query: (params) => ({
+        url: `/club/event/transaction?${new URLSearchParams(params).toString()}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["eventTransaction"],
+    }),
+    // event transaction categories
+    getEventTransactionCategories: builder.query({
+      query: (params) => `/club/event/transaction/category?${new URLSearchParams(params).toString()}`,
+      providesTags: ["eventTransactionCategory"],
+    }),
+    addEventTransactionCategory: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/transaction/category",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["eventTransactionCategory"],
+    }),
+    updateEventTransactionCategory: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/transaction/category",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["eventTransactionCategory"],
+    }),
+    deleteEventTransactionCategory: builder.mutation({
+      query: (params) => ({
+        url: `/club/event/transaction/category?${new URLSearchParams(params).toString()}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["eventTransactionCategory"],
+    }),
     addFee: builder.mutation({
       query: (body) => ({
         url: "/fee",
@@ -163,6 +246,10 @@ export const {
   useSaveFeesAdhocMutation,
   useDeleteFeesAdhocMutation,
   useGetTransactionsQuery,
+  useGetTransactionCategoriesQuery,
+  useAddTransactionCategoryMutation,
+  useUpdateTransactionCategoryMutation,
+  useDeleteTransactionCategoryMutation,
   useAddTransactionMutation,
   useUpdateTransactionMutation,
   useDeleteTransactionMutation,
@@ -177,6 +264,14 @@ export const {
   useGetFeeCollectionsQuery,
   useLazyGetFeeCollectionsQuery,
   useSaveFeeCollectionMutation,
-  useDeleteFeeCollectionMutation
-  ,useMarkDuesPaidMutation
+  useDeleteFeeCollectionMutation,
+  useMarkDuesPaidMutation,
+  useGetEventTransactionCategoriesQuery,
+  useAddEventTransactionCategoryMutation,
+  useUpdateEventTransactionCategoryMutation,
+  useDeleteEventTransactionCategoryMutation,
+  useDeleteEventTransactionMutation,
+  useUpdateEventTransactionMutation,
+  useGetEventTransactionsQuery,
+  useAddEventTransactionMutation
 } = feeApi;

@@ -10,6 +10,7 @@ import ThemedIcon from "./themed-components/ThemedIcon";
 import ShadowBox from "./ShadowBox";
 import Spacer from "./Spacer";
 import { useTheme } from "../hooks/use-theme";
+import RoundedContainer from "./RoundedContainer";
 
 const MemberItem = (props: {
   showDetails?: any;
@@ -22,6 +23,7 @@ const MemberItem = (props: {
   const { colors } = useTheme();
 
   return (
+    <RoundedContainer>
     <TouchableOpacity onPress={() => props.showDetails(props.memberId)}>
       <ShadowBox style={styles.container}>
         {props?.photo ? <Image source={{ uri: props?.photo }} style={{ height: 32, width: 32, borderRadius: 100, }} />
@@ -35,6 +37,7 @@ const MemberItem = (props: {
         </View>
       </ShadowBox>
     </TouchableOpacity>
+    </RoundedContainer>
   );
 };
 

@@ -16,7 +16,6 @@ import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import Card from "@/src/components/Card";
 import CircularProgress from "@/src/components/charts/CircularProgress";
 import FloatingMenu from "@/src/components/FloatingMenu";
-import { EventCard } from "../upcoming_events";
 import { router } from "expo-router";
 import { useGetClubEventsQuery } from "@/src/services/clubApi";
 import {
@@ -25,12 +24,16 @@ import {
   useGetFundBalanceQuery,
   useGetTotalDueQuery,
 } from "@/src/services/feeApi";
-import Animated, { FadeInLeft, FadeInRight, FadeInUp } from "react-native-reanimated";
+import Animated, { FadeInRight, FadeInUp } from "react-native-reanimated";
+import RoundedContainer from "@/src/components/RoundedContainer";
+import Divider from "@/src/components/Divider";
+import Banner from "@/src/components/Banner";
+import NumberTicker from "@/src/components/NumberTicker";
 
 const ClubHome = () => {
   const router = useRouter();
   const params = useSearchParams();
-  const { setClubInfo } = useContext(ClubContext);
+  const { clubInfo, setClubInfo } = useContext(ClubContext);
 
   const { colors } = useTheme();
 
@@ -39,35 +42,35 @@ const ClubHome = () => {
     isLoading: isLoadingEvents,
     isFetching: isFetchingEvents,
     refetch: fetchEvents,
-  } = useGetClubEventsQuery({ clubId: params.get("clubId"), limit: 5, offset: 0 });
+  } = useGetClubEventsQuery({ clubId:  clubInfo.clubId, limit: 5, offset: 0 });
 
   const {
     data: fbr,
     isLoading: isFundBalanceLoading,
     isFetching: isFetchingFundBalance,
     refetch: fetchFundBalance,
-  } = useGetFundBalanceQuery({ clubId: params.get("clubId"), fundBalance: "true" });
+  } = useGetFundBalanceQuery({ clubId: clubInfo.clubId, fundBalance: "true" });
 
   const {
     data: expenseSplits,
     isLoading: isLoadingSplits,
     isFetching: isFetchingSplits,
     refetch: fetchSplits,
-  } = useGetFeesAdhocQuery({ clubId: Number(params.get("clubId")), limit: 5, offset: 0 });
+  } = useGetFeesAdhocQuery({ clubId: Number(clubInfo.clubId), limit: 5, offset: 0 });
 
   const {
     data: clubDue,
     isLoading: isTotalDueLoading,
     isFetching: isFetchingTotalDue,
     refetch: fetchTotalDue,
-  } = useGetTotalDueQuery({ clubId: params.get("clubId"), totalDue: "true" });
+  } = useGetTotalDueQuery({ clubId:  clubInfo.clubId, totalDue: "true" });
 
   const {
     data: currentFeeStructure,
     isLoading: isLoadingCurrent,
     isFetching: isFetchingCurrent,
     refetch: fetchFees,
-  } = useGetFeesQuery({ clubId: params.get("clubId") });
+  } = useGetFeesQuery({ clubId: clubInfo.clubId });
 
   const showFeeTypeDetails = (fee: any) => {
     router.push({
@@ -75,10 +78,6 @@ const ClubHome = () => {
       params: { fee: JSON.stringify(fee) },
     });
   };
-
-  useEffect(() => {
-    setClubInfo({ clubId: params.get("clubId"), clubName: params.get("clubName"), role: params.get("role") });
-  }, []);
 
   const showClubDues = (_: GestureResponderEvent): void => {
     router.push(`/(main)/(clubs)/(fees)/clubdues`);
@@ -102,27 +101,7 @@ const ClubHome = () => {
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
-        <Spacer space={5} />
-        <View
-          style={{
-            flexDirection: "row",
-            width: "90%",
-            alignSelf: "center",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <ThemedHeading style={{ width: 200 }}>Fund Balance</ThemedHeading>
-          {isFundBalanceLoading && <LoadingSpinner />}
-          {!isFundBalanceLoading && (
-            <ThemedText
-              style={{ fontWeight: "bold", fontSize: 16, color: fbr?.fundBalance > 0 ? colors.success : colors.error }}
-            >
-              Rs. {fbr?.fundBalance || 0}
-            </ThemedText>
-          )}
-        </View>
-        <Spacer space={5} />
+      <Spacer space={10} />
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
@@ -133,33 +112,39 @@ const ClubHome = () => {
               onRefresh={onRefresh}
             />
           }
-        >
-          <TouchableCard onPress={Number(clubDue?.totalDue) > 0 ? showClubDues : null}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%" }}>
-              <ThemedText style={{ fontSize: 15 }}>Total Due</ThemedText>
-              {isTotalDueLoading && <LoadingSpinner />}
-              {!isTotalDueLoading && (
-                <ThemedText
-                  style={{
-                    fontWeight: "bold",
-                    fontSize: 15,
-                    position: "absolute",
-                    right: Number(clubDue?.totalDue) > 0 ? 30 : 5,
-                  }}
-                >
-                  Rs. {clubDue?.totalDue}
-                </ThemedText>
-              )}
-            </View>
-          </TouchableCard>
-          <Spacer space={4} />
-          <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(transactions)`)}>
-            <ThemedText>Transactions</ThemedText>
-          </TouchableCard>
-          <Spacer space={4} />
-          <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(members)`)}>
-            <ThemedText>Members</ThemedText>
-          </TouchableCard>
+        >          
+        <Banner backgroundColor={fbr?.fundBalance < 1 ? colors.error : colors.success} onPress={() => router.push(`/(main)/(clubs)/(transactions)`)}>
+          <View>
+            <ThemedText style={{ color: colors.background }}>Fund Balance</ThemedText>
+            <NumberTicker
+              value={fbr?.fundBalance || 0}
+              isLoading={isFundBalanceLoading}
+              style={{ fontSize: 30, fontWeight: 'bold', color: colors.background }}
+            />
+          </View>
+          <ThemedIcon name="MaterialCommunityIcons:wallet" size={50} color={colors.background} />
+        </Banner>
+        <Spacer space={10} />
+          <RoundedContainer>
+            <TouchableCard
+              onPress={showClubDues}
+              rightComponent={isTotalDueLoading ? <LoadingSpinner /> : <ThemedText>₹ {clubDue?.totalDue}</ThemedText>}
+            >
+              <ThemedText>Dues</ThemedText>
+            </TouchableCard>
+            <Spacer space={2} />
+            <Divider />
+            <Spacer space={2} />
+            <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(transactions)`)}>
+              <ThemedText>Transactions</ThemedText>
+            </TouchableCard>
+            <Spacer space={2} />
+            <Divider />
+            <Spacer space={2} />
+            <TouchableCard onPress={() => router.push(`/(main)/(clubs)/(members)`)}>
+              <ThemedText>Members</ThemedText>
+            </TouchableCard>
+          </RoundedContainer>
           <Spacer space={4} />
           <View
             style={{
@@ -172,7 +157,7 @@ const ClubHome = () => {
           >
             <ThemedHeading style={{ width: 200 }}>Fees</ThemedHeading>
             <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
-              {params.get("role") == ROLE_ADMIN && (
+              {clubInfo.role == ROLE_ADMIN && (
                 <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
                   <ThemedIcon size={25} name={"MaterialCommunityIcons:plus-circle"} color={colors.add} />
                 </TouchableOpacity>
@@ -181,39 +166,35 @@ const ClubHome = () => {
           </View>
           {isLoadingCurrent && <LoadingSpinner />}
           {!isLoadingCurrent && currentFeeStructure?.length == 0 && (
-            <ThemedText style={{ alignSelf: "center", width: "80%" }}>
+            <ThemedText style={{ alignSelf: "center", width: "80%", color: colors.subText }}>
               No fees defined. To define a fee type (eg. Membership fee), press the + icon.
             </ThemedText>
           )}
+          {currentFeeStructure && currentFeeStructure?.length !== 0 && <RoundedContainer>
           {!isLoadingCurrent &&
             currentFeeStructure?.map((fee: any, idx: number) => {
               return (
                 <View key={fee.clubFeeTypeId}>
-                  <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
-                    <TouchableCard onPress={showFeeTypeDetails} id={fee}>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          width: "100%",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                        }}
+                  {idx > 0 && <Divider />}
+                    <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
+                      <TouchableCard
+                        onPress={showFeeTypeDetails}
+                        id={fee}
+                        rightComponent={<ThemedText>₹ {fee.clubFeeAmount}</ThemedText>}
                       >
                         <View>
-                          <ThemedText style={{ fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
-                          <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{fee.clubFeeTypeInterval}</ThemedText>
+                          <ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
+                          <ThemedText style={{ fontSize: 10, marginTop: 5, color: colors.disabled }}>
+                            {fee.clubFeeTypeInterval}
+                          </ThemedText>
                         </View>
-                        <ThemedText style={{ fontWeight: "bold", fontSize: 15, position: "absolute", right: 30 }}>
-                          Rs. {fee.clubFeeAmount}
-                        </ThemedText>
-                      </View>
-                    </TouchableCard>
-                    <Spacer space={4} />
-                  </Animated.View>
+                      </TouchableCard>
+                    </Animated.View>
                 </View>
               );
             })}
-          <Spacer space={4} />
+            </RoundedContainer>}
+          {/* <Spacer space={4} />
           <View
             style={{
               flexDirection: "row",
@@ -234,7 +215,7 @@ const ClubHome = () => {
           </View>
           {isLoadingEvents && <LoadingSpinner />}
           {!isLoadingEvents && events?.length === 0 && (
-            <ThemedText style={{ alignSelf: "center", width: "80%" }}>
+            <ThemedText style={{ alignSelf: "center", width: "80%", color: colors.subText }}>
               No events defined. To create an event, press the + icon.
             </ThemedText>
           )}
@@ -267,7 +248,7 @@ const ClubHome = () => {
                 horizontal
               />
             </View>
-          )}
+          )} */}
 
           <Spacer space={4} />
           <View
@@ -281,7 +262,7 @@ const ClubHome = () => {
           >
             <ThemedHeading style={{ width: 200 }}>Expense Splits</ThemedHeading>
             <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
-              {params.get("role") == ROLE_ADMIN && (
+              { clubInfo.role == ROLE_ADMIN && (
                 <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
                   <ThemedIcon size={25} name={"MaterialCommunityIcons:plus-circle"} color={colors.add} />
                 </TouchableOpacity>
@@ -290,7 +271,7 @@ const ClubHome = () => {
           </View>
           {isLoadingSplits && <LoadingSpinner />}
           {!isLoadingSplits && expenseSplits?.length === 0 && (
-            <ThemedText style={{ alignSelf: "center", width: "80%" }}>
+            <ThemedText style={{ alignSelf: "center", width: "80%", color: colors.subText }}>
               No splits defined. To split an expense, press the + icon.
             </ThemedText>
           )}
@@ -299,42 +280,34 @@ const ClubHome = () => {
               <FlatList
                 data={expenseSplits}
                 onEndReachedThreshold={0.2}
-                ItemSeparatorComponent={() => <Spacer hspace={4} />}
+                ItemSeparatorComponent={() => <Spacer hspace={6} />}
                 renderItem={({ item, index }) => (
                   <TouchableOpacity onPress={() => showAdhocFeeDetails(item)}>
                     <Animated.View
                       entering={FadeInRight.duration(380).delay(index * 80)}
                       style={{ overflow: "hidden" }}
                     >
-                      <Card style={{ minHeight: 100 }}>
-                        <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
-                        <ThemedText style={{ fontSize: 10 }}>{item.clubAdhocFeeDesc}</ThemedText>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            marginTop: 10,
-                            alignItems: "center",
-                            minWidth: 100,
-                          }}
-                        >
-                          <CircularProgress value={Math.round(item.completionPercentage)} strokeWidth={6} size={35} />
-                          <View>
-                            <ThemedText style={{ fontSize: 12, textAlign: "right", fontWeight: "bold" }}>
-                              Rs. {item.clubAdhocFeePaymentAmount}
+                      <Card style={{ height: 180, paddingHorizontal: 30 }}>
+                        <ThemedText style={{ fontSize: 15, fontWeight: "bold", alignSelf: "center", maxWidth: 80 }} numberOfLines={1} ellipsizeMode="tail">{item.clubAdhocFeeName}</ThemedText>
+                        <ThemedText style={{ fontSize: 12, alignSelf: "center", color: colors.subText, maxWidth: 80 }} numberOfLines={1} ellipsizeMode="tail">{item.clubAdhocFeeDesc}</ThemedText>
+                         <Spacer hspace={10} />
+                         <CircularProgress value={Math.round(item.completionPercentage)} strokeWidth={6} size={50} />
+                         <Spacer hspace={10} />
+                          <View style={{ alignSelf: "center" }}>
+                            <ThemedText style={{ fontSize: 15, textAlign: "center", fontWeight: "bold" }}>
+                              ₹ {item.clubAdhocFeePaymentAmount}
                             </ThemedText>
-                            <ThemedText style={{ fontSize: 10, textAlign: "right" }}>
+                            <ThemedText style={{ fontSize: 12, textAlign: "center", color: colors.subText }}>
                               {item.clubAdhocFeeDate}
                             </ThemedText>
                           </View>
-                        </View>
                       </Card>
                       <Spacer hspace={0} />
                     </Animated.View>
                   </TouchableOpacity>
                 )}
                 ListFooterComponent={() => (
-                  <View style={{ width: 100, height: 100, alignItems: "center", justifyContent: "center" }}>
+                  <View style={{marginLeft: 20, height: 180,  alignItems: "center", alignSelf: "center", justifyContent: "center" }}>
                     <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
                       <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
                     </TouchableOpacity>
@@ -348,11 +321,11 @@ const ClubHome = () => {
         </ScrollView>
       </GestureHandlerRootView>
       <FloatingMenu
-        actions={actions.filter((action) => (params.get("role") != ROLE_ADMIN ? action.role != ROLE_ADMIN : true))}
+        actions={actions.filter((action) => (clubInfo.role != ROLE_ADMIN ? action.role != ROLE_ADMIN : true))}
         position={"left"}
         color="black"
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-        onPressItem={(name: string | undefined) => handleMenuPress(name, params.get("clubId") || "")}
+        onPressItem={(name: string | undefined) => handleMenuPress(name, clubInfo.clubId || "")}
       />
     </ThemedView>
   );

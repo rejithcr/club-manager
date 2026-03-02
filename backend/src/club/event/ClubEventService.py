@@ -5,6 +5,7 @@ from src.club.event import queries_events
 
 
 class ClubEventService():
+
     def get_event_types(self, conn, params):
         club_id = params.get('clubId')
 
@@ -18,7 +19,7 @@ class ClubEventService():
         offset = params.get('offset')
         status = params.get('status')
         club_id = params.get('clubId')
-        club_ids = params.get('clubIds')
+        member_id = params.get('memberId')
 
         if event_id:
             event = db.fetch_one(conn, queries_events.GET_EVENT_BY_ID, (event_id,))
@@ -26,9 +27,8 @@ class ClubEventService():
         elif status:
             events = db.fetch(conn, queries_events.GET_EVENTS_BY_STATUS, (status, club_id, limit,offset))
             return helper.convert_to_camel_case(events if events else [])
-        elif club_ids:
-            club_id_list = list(map(int, club_ids.split(',')))
-            events = db.fetch(conn, queries_events.GET_EVENTS_BY_MEMBER, (club_id_list, limit,offset))
+        elif member_id:
+            events = db.fetch(conn, queries_events.GET_EVENTS_BY_MEMBER, (club_id, club_id, member_id, limit,offset))
             return helper.convert_to_camel_case(events if events else [])
         else:
             events = db.fetch(conn, queries_events.GET_EVENTS, (club_id, event_type_id, event_type_id, limit,offset))
@@ -43,7 +43,9 @@ class ClubEventService():
             params.get('endTime'),
             params.get('location'),
             params['eventTypeId'],
-            params.get('createdBy')
+            params.get('createdBy'),
+            params.get('isTransactionEnabled'),
+            params.get('isAttendanceEnabled')
         ))
         conn.commit()
         return jsonify({'message': 'Event created'})
@@ -55,7 +57,8 @@ class ClubEventService():
 
         keys = {'title': 'title', 'description':'description', 'eventDate':'event_date', 'startTime':'start_time',
                    'endTime': 'end_time', 'location': 'location', 'eventTypeId': 'event_type_id',
-                   'status': 'status', 'cancellationReason': 'cancellation_reason'}
+                   'status': 'status', 'cancellationReason': 'cancellation_reason', "isTransactionEnabled": "is_transaction_enabled",
+                'isAttendanceEnabled': 'is_attendance_enabled'}
 
         for paramField, dbField in keys.items():
             if paramField in params:
@@ -78,6 +81,47 @@ class ClubEventService():
         db.execute(conn, queries_events.DELETE_EVENT, (event_id,event_id,event_id))
         conn.commit()
         return jsonify({'message': 'Event deleted'})
+
+    def add_event_type(self, conn, params):
+        club_id = params.get('clubId')
+        name = params.get('name')
+        if not name or len(name.strip()) < 2:
+            return ({'error': 'Invalid name'}, 400)
+        db.execute(conn, queries_events.INSERT_EVENT_TYPES, (club_id, name.strip()))
+        conn.commit()
+        return {'message': 'Event type added', 'name': name.strip()}
+
+    def update_event_type(self, conn, params):
+        club_id = params.get('clubId')
+        event_type_id = params.get('eventTypeId')
+        name = params.get('name')
+        
+        if not event_type_id:
+            return ({'error': 'Event type ID is required'}, 400)
+        if not name or len(name.strip()) < 2:
+            return ({'error': 'Invalid name'}, 400)
+            
+        db.execute(conn, queries_events.UPDATE_EVENT_TYPES, (name.strip(), club_id, event_type_id))
+        conn.commit()
+        return {'message': 'Event type updated', 'name': name.strip()}
+
+    def delete_event_type(self, conn, params):
+        club_id = params.get('clubId')
+        event_type_id = params.get('eventTypeId')
+        
+        if not event_type_id:
+            return ({'error': 'Event type ID is required'}, 400)
+            
+        try:
+            db.execute(conn, queries_events.DELETE_EVENT_TYPES, (club_id, event_type_id))
+            conn.commit()
+            return {'message': 'Event type deleted'}
+        except Exception as e:
+            # Handle foreign key constraint violations
+            if 'foreign key constraint' in str(e).lower() or 'violates foreign key' in str(e).lower():
+                return ({'error': 'Cannot delete event type. It is being used by existing events.'}, 400)
+            else:
+                raise e
 
 
     def filtered_events(self, conn, params):
@@ -218,6 +262,7 @@ class ClubEventService():
                             m.member_id,
                             m.first_name,
                             m.last_name,
+                            m.photo,
                             COUNT(e.event_id) AS total_events,
                             COUNT(a.event_id) FILTER (WHERE a.present IS TRUE) AS attended_events,
                             ROUND(
@@ -237,3 +282,82 @@ class ClubEventService():
         results = db.fetch(conn, query, tuple(values))
         return helper.convert_to_camel_case(results if results else [])
 
+
+    def get_transaction(self, conn, params):
+        eventId = params.get("eventId")
+        limit = params.get("limit")
+        offset = params.get("offset")
+        txnType = params.get("txnType")
+        txnCategoryId = params.get("txnCategoryId")
+        fund_balance = params.get("fundBalance")
+
+        if fund_balance:
+            txn = db.fetch_one(conn, queries_events.GET_EVENT_FUND_BALANCE,(eventId,))
+            return helper.convert_to_camel_case(txn)
+        else:
+            txns = db.fetch(conn, queries_events.GET_EVENT_TRANSACTIONS,
+                            (eventId, txnType, txnType, txnCategoryId, txnCategoryId, limit, offset))
+
+            return [helper.convert_to_camel_case(txn) for txn in txns]
+
+    def post_transaction(self, conn, params):
+        eventId = params.get("eventId")
+        txnAmount = params.get("txnAmount")
+        txnComment = params.get("txnComment")
+        txnType = params.get("txnType")
+        txnCategoryId = params.get("txnCategoryId")
+        txnDate = params.get("txnDate")
+        email = params.get("email")
+
+        db.execute(conn, queries_events.ADD_EVENT_TRANSACTION,
+                   (eventId, txnAmount, txnType, txnCategoryId, txnComment, txnDate, email, email))
+        conn.commit()
+        return {"message": "txn added"}
+
+    def put_transaction(self, conn, params):
+        txnId = params.get("txnId")
+        txnAmount = params.get("txnAmount")
+        txnComment = params.get("txnComment")
+        txnType = params.get("txnType")
+        txnCategoryId = params.get("txnCategoryId")
+        email = params.get("email")
+        txnDate = params.get("txnDate")
+
+        db.execute(conn, queries_events.UPDATE_EVENT_TRANSACTION,
+                   (txnAmount, txnType, txnComment, txnCategoryId, txnDate, email, txnId))
+        conn.commit()
+        return {"message": "txn updated"}
+
+    def delete_transaction(self, conn, params):
+        txnId = params.get("txnId")
+        db.execute(conn, queries_events.DELETE_EVENT_TRANSACTION, (txnId,))
+        conn.commit()
+        return {"message": f"Txn deleted"}
+
+    def add_category(self, conn, params):
+        clubId = params.get("clubId")
+        categoryName = params.get("categoryName").upper().strip()
+        email = params.get("email")
+        categoryId = db.fetch_one(conn, queries_events.GET_EVENT_TRANSACTIONS_CATEGORIES_SEQ_NEXT_VAL, None)['nextval']
+        db.execute(conn, queries_events.ADD_EVENT_TRANSACTIONS_CATEGORY_WITH_ID, (categoryId, clubId, categoryName, email))
+        conn.commit()
+        return {"categoryId": categoryId, "categoryName": categoryName}
+
+    def get_categories(self, conn, params):
+        club_id = params.get("clubId")
+        cats = db.fetch(conn, queries_events.GET_EVENT_TRANSACTIONS_CATEGORIES, (club_id,))
+        return [helper.convert_to_camel_case(cat) for cat in cats]
+
+    def update_category(self, conn, params):
+        categoryId = params.get("categoryId")
+        categoryName = params.get("categoryName").upper().strip()
+        email = params.get("email")
+        db.execute(conn, queries_events.UPDATE_EVENT_TRANSACTIONS_CATEGORY, (categoryName, categoryId))
+        conn.commit()
+        return {"categoryId": categoryId, "categoryName": categoryName, "message": "Category updated"}
+
+    def delete_category(self, conn, params):
+        categoryId = params.get("categoryId")
+        db.execute(conn, queries_events.DELETE_EVENT_TRANSACTIONS_CATEGORY, (categoryId,))
+        conn.commit()
+        return {"categoryId": categoryId, "message": "Category deleted"}

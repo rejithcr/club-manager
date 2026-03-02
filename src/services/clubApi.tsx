@@ -4,7 +4,7 @@ import { baseQueryWithReauth } from "./baseQuery";
 export const clubApi = createApi({
   reducerPath: "clubApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["club", "member", "event", "attendance", "memberAttribute"],
+  tagTypes: ["club", "member", "event", "attendance", "memberAttribute", "eventType"],
   endpoints: (builder) => ({
     getClub: builder.query({
       query: (params) => `/club?${new URLSearchParams(params).toString()}`,
@@ -20,15 +20,16 @@ export const clubApi = createApi({
     }),
     getClubEventTypes: builder.query({
       query: (params) => `/club/event/types?${new URLSearchParams(params).toString()}`,
+      providesTags: ["eventType"],
     }),
     getAttendanceReport: builder.query({
       query: (params) => `/club/event/attendance?${new URLSearchParams(params).toString()}`,
       providesTags: ["attendance"],
-    }),    
+    }),
     getClubMemberAttributes: builder.query({
       query: (params) => `/club/member/attribute?${new URLSearchParams(params).toString()}`,
       providesTags: ["memberAttribute"]
-    }),    
+    }),
     getClubMemberReportableAttributes: builder.query({
       query: (params) => `/club/report/memberattribute?${new URLSearchParams(params).toString()}`,
       providesTags: ["memberAttribute"]
@@ -44,6 +45,30 @@ export const clubApi = createApi({
         body,
       }),
       invalidatesTags: ["memberAttribute"]
+    }),
+    addClubEventType: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/types",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["eventType"],
+    }),
+    updateClubEventType: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/types",
+        method: "PUT",
+        body,
+      }),
+      invalidatesTags: ["eventType"],
+    }),
+    deleteClubEventType: builder.mutation({
+      query: (body) => ({
+        url: "/club/event/types",
+        method: "DELETE",
+        body,
+      }),
+      invalidatesTags: ["eventType"],
     }),
     deleteClubMemberAttribute: builder.mutation({
       query: (body) => ({
@@ -71,7 +96,7 @@ export const clubApi = createApi({
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["attendance"],
+      invalidatesTags: ["attendance", "event"],
     }),
     addEvent: builder.mutation({
       query: (body) => ({
@@ -127,7 +152,7 @@ export const clubApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["member"],
+      invalidatesTags: ["member", "club"],
     }),
     addClub: builder.mutation({
       query: (body) => ({
@@ -143,7 +168,7 @@ export const clubApi = createApi({
         method: "PUT",
         body,
       }),
-      invalidatesTags: ["club"],
+      invalidatesTags: ["club", "member"],
     }),
     deleteClub: builder.mutation({
       query: (body) => ({
@@ -175,6 +200,7 @@ export const {
   useUpdateMemberMutation,
   useRequestMembershipMutation,
   useGetClubMemberReportableAttributesQuery,
+  useLazyGetClubMemberAttributesQuery,
   useLazyGetClubMemberAttributesReportQuery,
   useAddClubMemberAttributeMutation,
   useDeleteClubMemberAttributeMutation,
@@ -183,5 +209,8 @@ export const {
   useDeleteClubMutation,
   useGetEventMembersQuery,
   useLazyGetEventMembersQuery,
-  useLazyGetClubMembersQuery
+  useLazyGetClubMembersQuery,
+  useAddClubEventTypeMutation,
+  useUpdateClubEventTypeMutation,
+  useDeleteClubEventTypeMutation
 } = clubApi;

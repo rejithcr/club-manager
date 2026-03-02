@@ -4,6 +4,7 @@ import ThemedView from './themed-components/ThemedView';
 import ThemedText from './themed-components/ThemedText';
 import Modal from 'react-native-modal'
 import ThemedButton from './ThemedButton';
+import { useTheme } from '../hooks/use-theme';
 
 type AlertButton = {
     text: string;
@@ -26,11 +27,12 @@ const Alert: React.FC<AlertProps> = ({
     buttons = [{ text: 'OK' }],
     onRequestClose,
 }) => {
+    const { colors } = useTheme();
     return (
         <Modal isVisible={visible}>
             <ThemedView style={styles.container}>
                 {title ? <ThemedText style={styles.title}>{title}</ThemedText> : null}
-                {message ? <ThemedText style={styles.message}>{message}</ThemedText> : null}
+                {message ? <ThemedText style={{...styles.message, color: colors.subText}}>{message}</ThemedText> : null}
                 <View style={styles.buttonRow}>
                     {buttons.map((btn, idx) => (
                         <ThemedButton
@@ -59,7 +61,7 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     message: {
-        fontSize: 16,
+        fontSize: 14,
         marginBottom: 20,
     },
     buttonRow: {

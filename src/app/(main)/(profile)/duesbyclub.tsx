@@ -1,0 +1,111 @@
+import React, { useContext, useEffect, useState } from "react";
+import { View, ScrollView, RefreshControl } from "react-native";
+import ThemedView from "@/src/components/themed-components/ThemedView";
+import ThemedText from "@/src/components/themed-components/ThemedText";
+import { router, useLocalSearchParams } from "expo-router";
+import { useGetClubDuesQuery } from "@/src/services/feeApi";
+import Banner from "@/src/components/Banner";
+import RoundedContainer from "@/src/components/RoundedContainer";
+import Spacer from "@/src/components/Spacer";
+import LoadingSpinner from "@/src/components/LoadingSpinner";
+import Divider from "@/src/components/Divider";
+import { useTheme } from "@/src/hooks/use-theme";
+import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
+import ThemedButton from "@/src/components/ThemedButton";
+import { makeUpiPayment } from "@/src/utils/payment";
+import { UserContext } from "@/src/context/UserContext";
+
+const DuesByClub = () => {
+  const params = useLocalSearchParams();
+    const { userInfo } = useContext(UserContext);
+  const clubId = params?.clubId as string | undefined;
+  const memberId = params?.memberId as string | undefined;
+  const { colors } = useTheme();
+  const {
+    data: duesByMembers,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useGetClubDuesQuery({ clubId, memberId, duesByMember: "true" }, { skip: !clubId });
+  const [clubDues, setClubDues] = useState<any>();
+
+  useEffect(() => {
+    if (duesByMembers?.length > 0) {
+      setClubDues(duesByMembers[0]);
+    }
+  }, [duesByMembers]);
+
+  return (
+    <ThemedView style={{ flex: 1 }}>
+      <Spacer space={10} />
+      <Banner backgroundColor={clubDues?.dueAmount === 0 ? colors.success : colors.info}>
+        <View>
+          <ThemedText style={{ fontSize: 14, color: colors.background }}>Total Due</ThemedText>
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <ThemedText style={{ fontSize: 28, fontWeight: "700", color: colors.background }}>
+              ₹ {clubDues?.dueAmount || "0"}
+            </ThemedText>
+          )}
+           <ThemedText style={{ fontSize: 14, color: colors.background }}>{clubDues?.clubName}</ThemedText>
+        </View>
+        <View style={{alignItems:"flex-end"}}>
+            <ThemedIcon name="MaterialCommunityIcons:account-cash" size={50} color={colors.background} />
+            <ThemedText style={{ fontSize: 14, color: colors.background }}>{userInfo.name}</ThemedText>
+        </View>
+      </Banner>
+
+      <Spacer space={10} />
+
+      <ScrollView refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : clubDues && clubDues.dues.length > 0 ? (
+          <View>
+            <RoundedContainer>
+              {clubDues.dues.map((d: any, idx: number) => (
+                <View key={d.paymentId?.toString() + d.feeType}>
+                  {idx > 0 && <Divider />}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      paddingHorizontal: 20,
+                      paddingVertical: 10,
+                    }}
+                  >
+                    <View style={{width: 200}}>
+                      <ThemedText>{d.fee}</ThemedText>
+                      <ThemedText style={{ color: colors.subText, fontSize: 12 }}>{d.feeDesc}</ThemedText>
+                    </View>
+                    <ThemedText>₹ {d.amount}</ThemedText>
+                  </View>
+                </View>
+              ))}
+            </RoundedContainer>            
+            {clubDues?.upiId && <><Spacer space={5} /><ThemedText style={{ textAlign: "center", marginTop: 12, width: "80%", alignSelf: "center" }}>Payments should be done to the vpa: {clubDues.upiId}</ThemedText></>}
+            <Spacer space={50} />
+          </View>
+        ) : (
+          <>
+            <ThemedText style={{ textAlign: "center", marginTop: 12, width: "80%", alignSelf: "center" }}>Yay!! you don't have any outstanding dues with the club 👏</ThemedText>
+            <Spacer space={10} />
+          </>
+        )}
+      </ScrollView>     
+      {clubDues?.dues?.length > 0 ? 
+        <ThemedButton style={{bottom: 40, position: "absolute"}}
+            title={"Pay Now"}
+            onPress={() => makeUpiPayment(clubDues.dueAmount, clubDues.clubName, clubDues.upiId)}
+        /> :
+        <ThemedButton style={{bottom: 40, position: "absolute"}}
+            title={"Home"}
+            onPress={() => router.replace('/(main)')}
+        />}
+    </ThemedView>
+  );
+};
+
+export default DuesByClub;

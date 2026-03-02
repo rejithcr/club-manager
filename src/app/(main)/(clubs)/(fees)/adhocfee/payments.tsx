@@ -1,4 +1,4 @@
-import { View, FlatList, TouchableOpacity } from 'react-native'
+import { View, FlatList, TouchableOpacity, Image } from 'react-native'
 import React, { useContext, useState } from 'react'
 import { useSearchParams } from 'expo-router/build/hooks';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
@@ -23,6 +23,9 @@ import CircularProgress from '@/src/components/charts/CircularProgress';
 import InputText from '@/src/components/InputText';
 import DatePicker from '@/src/components/DatePicker';
 import { useDeleteFeesAdhocMutation, useGetFeesAdhocQuery, useSaveFeesAdhocMutation } from '@/src/services/feeApi';
+import RoundedContainer from '@/src/components/RoundedContainer';
+import Divider from '@/src/components/Divider';
+import { showSnackbar } from '@/src/components/snackbar/snackbarService';
 
 const Payments = () => {
     const [isConfirmVisible, setIsConfirmVisible] = useState(false)
@@ -30,6 +33,7 @@ const Payments = () => {
         clubFeePaymentId: number;
         paid: boolean;
         firstName?: string;
+        photo?: string;
         paymentDate: Date
     }[]>([])
     const [alertConfig, setAlertConfig] = useState<AlertProps>();
@@ -44,7 +48,7 @@ const Payments = () => {
 
     const updatePaymentStatus = () => {
         if (paymentStatusUpdates.length == 0) {
-            alert("No updates selected")
+            showSnackbar("No updates selected")
         } else {
             setIsConfirmVisible(true)
         }
@@ -111,88 +115,113 @@ const Payments = () => {
     };
 
     return (
-        <ThemedView style={{ flex: 1 }}>
-            <GestureHandlerRootView>
-                <Spacer space={5} />
-                <View style={{
-                    flexDirection: "row", width: "85%", alignItems: "center",
-                    justifyContent: "space-between", alignSelf: "center"
-                }}>
-                    <View>
-                        <TouchableOpacity style={{ flexDirection: "row"}} onPress={() => setIsEditVisible(true)}>
-                            <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>{feeName}</ThemedText>
-                            <Spacer hspace={2} />
-                            <ThemedIcon name='MaterialCommunityIcons:square-edit-outline' size={12}/>                   
-                        </TouchableOpacity>    
-                        <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeDescription}</ThemedText>
-                    </View>
-                    <View>
-                        <ThemedText style={{ textAlign: "right" }}>Rs. {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
-                        <ThemedText style={{ fontSize: 10, marginTop: 5 }}>{feeDate.toDateString()}</ThemedText>
-                    </View>
+      <ThemedView style={{ flex: 1 }}>
+        <GestureHandlerRootView>
+          <Spacer space={5} />
+          <View
+            style={{
+              flexDirection: "row",
+              width: "85%",
+              alignItems: "center",
+              justifyContent: "space-between",
+              alignSelf: "center",
+            }}
+          >
+            <View>
+              <TouchableOpacity style={{ flexDirection: "row" }} onPress={() => setIsEditVisible(true)}>
+                <ThemedText style={{ fontSize: 18, fontWeight: "bold" }}>{feeName}</ThemedText>
+                <Spacer hspace={2} />
+                <ThemedIcon name="MaterialCommunityIcons:square-edit-outline" size={12} />
+              </TouchableOpacity>
+              <ThemedText style={{ fontSize: 12, marginTop: 5, maxWidth: 200, color: colors.subText }}>{feeDescription}</ThemedText>
+            </View>
+            <View>
+              <ThemedText style={{ textAlign: "right" , fontWeight: 500}}>₹ {feeObj?.clubAdhocFeePaymentAmount}</ThemedText>
+              <ThemedText style={{ fontSize: 12, marginTop: 5 }}>{feeDate.toDateString()}</ThemedText>
+            </View>
+          </View>
+          <Spacer space={5} />
+          <View style={{ flexDirection: "row", alignItems: "center", width: "85%", alignSelf: "center" }}>
+            <CircularProgress value={Math.round(feeObj?.completionPercentage)} strokeWidth={8} size={50} />
+            <Spacer hspace={4} />
+            <ThemedText style={{ fontSize: 12, color: colors.subText }}>Select the member to update payment status</ThemedText>
+          </View>
+          <Spacer space={5} />
+          <RoundedContainer style={{ flex: 1 }}>
+            {getIsLoading() && <LoadingSpinner />}
+            {!getIsLoading() && (
+              <FlatList
+                data={data?.memberAdhocFees}
+                ItemSeparatorComponent={() => <Divider />}
+                initialNumToRender={8}
+                renderItem={({ item }) => (
+                  <MemberFeeItem
+                    {...item}
+                    key={item.clubAdhocFeePaymentId}
+                    feeByMembers={data?.memberAdhocFees}
+                    setpaymentStatusUpdates={setpaymentStatusUpdates}
+                  />
+                )}
+              />
+            )}
+          </RoundedContainer>
+          <Spacer space={50} />
+          <Modal isVisible={isConfirmVisible}>
+            <ScrollView>
+              <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
+                <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
+                <Spacer space={10} />
+                <RoundedContainer>
+                  {paymentStatusUpdates.map((item, idx) => (
+                    <>
+                      {idx > 0 && <Divider />}
+                      <PaymentUpdates key={item.clubFeePaymentId} {...item} />
+                    </>
+                  ))}
+                </RoundedContainer>
+                <Spacer space={10} />
+                <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                  <ThemedButton title="Update" onPress={() => savePaymentUpdates()} />
+                  <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
                 </View>
-                <Spacer space={5} />
-                <View style={{ flexDirection: "row", alignItems: "center", width: "85%", alignSelf: "center" }}>
-                    <CircularProgress value={Math.round(feeObj?.completionPercentage)} strokeWidth={6} size={35} />
-                    <Spacer hspace={4} />
-                    <ThemedText style={{ fontSize: 10 }}>Select the member to update payment status</ThemedText>
-                </View>
-                <Spacer space={5} />
-                <View style={{ height: "90%" }}>
-                    {getIsLoading() && <LoadingSpinner />}
-                    {!getIsLoading() &&
-                        <FlatList style={{ width: "100%" }}
-                            data={data?.memberAdhocFees}
-                            ListFooterComponent={() => <Spacer space={60} />}
-                            ItemSeparatorComponent={() => <Spacer space={4} />}
-                            initialNumToRender={8}
-                            renderItem={({ item }) => (
-                                <MemberFeeItem {...item} key={item.clubAdhocFeePaymentId} feeByMembers={data?.memberAdhocFees} setpaymentStatusUpdates={setpaymentStatusUpdates} />
-                            )}
-                        />}
-                </View>
-                <Modal isVisible={isConfirmVisible}>
-                    <ScrollView>
-                        <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
-                            <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
-                            {paymentStatusUpdates.map((item) => {
-                                return <PaymentUpdates key={item.clubFeePaymentId} {...item} />
-                            })}
-                            <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                                <ThemedButton title="Update" onPress={() => savePaymentUpdates()} />
-                                <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
-                            </View>
-                        </ThemedView>
-                    </ScrollView>
-                </Modal>
-                <Modal isVisible={isEditVisible}>
-                    <ThemedView style={{ borderRadius: 5, paddingBottom: 20 }}>
-                        <ThemedText style={appStyles.heading}>Update Split Details</ThemedText>
-                        <InputText
-                            onChangeText={(text: string) => setFeeName(text)}
-                            label={`Fee Name`}
-                            defaultValue={feeName}
-                        />
-                        <InputText
-                            onChangeText={(text: string) => setFeeDescription(text)}
-                            label={`Description`}
-                            defaultValue={feeDescription}
-                        />
-                        <DatePicker date={feeDate} setDate={setFeeDate} label='Date'/>
-                        <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                            <ThemedButton title="Update" onPress={() => handleEdit()} />
-                            <ThemedButton title="Cancel" onPress={() => setIsEditVisible(false)} />
-                        </View>
-                    </ThemedView>
-                </Modal>
-                {clubInfo.role === ROLE_ADMIN && <View style={{ width: "100%", flexDirection: "row", justifyContent: "space-around", alignItems: "center", position: "absolute", bottom: 30 }}>
-                    <ThemedButton title='Update Payment Status' onPress={() => updatePaymentStatus()} />
-                    <MaterialCommunityIcons name='delete' size={30} onPress={() => deleteCollection()} color={colors.error} />
-                </View>}
-                {alertConfig?.visible && <Alert {...alertConfig} />}
-            </GestureHandlerRootView>
-        </ThemedView>
-    )
+              </ThemedView>
+            </ScrollView>
+          </Modal>
+          <Modal isVisible={isEditVisible}>
+            <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
+              <ThemedText style={appStyles.heading}>Update Split Details</ThemedText>
+              <InputText onChangeText={(text: string) => setFeeName(text)} label={`Fee Name`} defaultValue={feeName} />
+              <InputText
+                onChangeText={(text: string) => setFeeDescription(text)}
+                label={`Description`}
+                defaultValue={feeDescription}
+              />
+              <DatePicker date={feeDate} setDate={setFeeDate} label="Date" />
+              <View style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                <ThemedButton title="Update" onPress={() => handleEdit()} />
+                <ThemedButton title="Cancel" onPress={() => setIsEditVisible(false)} />
+              </View>
+            </ThemedView>
+          </Modal>
+          {clubInfo.role === ROLE_ADMIN && (
+            <View
+              style={{
+                width: "100%",
+                flexDirection: "row",
+                justifyContent: "space-around",
+                alignItems: "center",
+                position: "absolute",
+                bottom: 40,
+              }}
+            >
+              <ThemedButton title="Update Payment Status" onPress={() => updatePaymentStatus()} />
+              <MaterialCommunityIcons name="delete" size={30} onPress={() => deleteCollection()} color={colors.error} />
+            </View>
+          )}
+          {alertConfig?.visible && <Alert {...alertConfig} />}
+        </GestureHandlerRootView>
+      </ThemedView>
+    );
 }
 
 export default Payments
@@ -200,21 +229,21 @@ export default Payments
 const MemberFeeItem = (props: {
     clubAdhocFeePaymentId: number; firstName: string | undefined; lastName: string | undefined; paymentDate: Date
     paid: number; clubAdhocFeePaymentAmount: number; setpaymentStatusUpdates: any;
-    feeByMembers: any | undefined
+    feeByMembers: any | undefined, photo: string
 }) => {
     const [isSelected, setIsSelected] = useState(props?.paid != 0)
 
     const selectItem = () => {
         setIsSelected(prev => !prev)
 
-        props.setpaymentStatusUpdates((prev: ({ clubAdhocFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName: string | undefined; clubAdhocFeePaymentAmount: number; paymentDate: Date })[]) => {
+        props.setpaymentStatusUpdates((prev: ({ photo: string; clubAdhocFeePaymentId: number; paid: Boolean; firstName?: string | undefined; lastName: string | undefined; clubAdhocFeePaymentAmount: number; paymentDate: Date })[]) => {
 
             let item = prev.find(item => item.clubAdhocFeePaymentId == props.clubAdhocFeePaymentId)
             const initialPaymentStatus = props.feeByMembers?.find((item: { clubAdhocFeePaymentId: number; }) => item.clubAdhocFeePaymentId == props.clubAdhocFeePaymentId)
             if (item) {
                 item.paid = !isSelected
             } else {
-                item = { clubAdhocFeePaymentId: props.clubAdhocFeePaymentId, paid: !isSelected, firstName: props.firstName, lastName: props.lastName, clubAdhocFeePaymentAmount: props.clubAdhocFeePaymentAmount, paymentDate: new Date() }
+                item = { photo: props.photo,  clubAdhocFeePaymentId: props.clubAdhocFeePaymentId, paid: !isSelected, firstName: props.firstName, lastName: props.lastName, clubAdhocFeePaymentAmount: props.clubAdhocFeePaymentAmount, paymentDate: new Date() }
                 prev.push(item)
             }
             if (initialPaymentStatus?.paid == !isSelected) {
@@ -223,13 +252,22 @@ const MemberFeeItem = (props: {
             return prev
         })
     }
-
+    const { clubInfo } = useContext(ClubContext);
     return (
-        <TouchableOpacity onPress={selectItem}>
-            <ShadowBox style={{ ...appStyles.shadowBox, width: "85%", justifyContent:"space-between" }}>
-                <ThemedText style={{ fontSize: 15 }}>{props?.firstName} {props?.lastName}</ThemedText>                
+        <TouchableOpacity onPress={selectItem} disabled={clubInfo.role !== ROLE_ADMIN}>
+            <ShadowBox style={{ justifyContent:"space-between" }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                    {props?.photo ? (
+                    <Image source={{ uri: props?.photo }} style={{ height: 32, width: 32, borderRadius: 100 }} />
+                    ) : (
+                    <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
+                    )}
+                    <ThemedText style={{ maxWidth: 125  }}>
+                    {props?.firstName} {props?.lastName}
+                    </ThemedText>
+                </View>           
                 <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    <ThemedText style={{ fontSize: 15, paddingLeft: 15 }}>{props?.clubAdhocFeePaymentAmount}</ThemedText>
+                    <ThemedText style={{ fontSize: 15, paddingLeft: 15 }}>₹ {props?.clubAdhocFeePaymentAmount}</ThemedText>
                     <Spacer hspace={3}/>
                     <ThemedCheckBox checked={isSelected} />
                 </View>
@@ -239,10 +277,19 @@ const MemberFeeItem = (props: {
 }
 
 
-const PaymentUpdates = (props: { clubFeePaymentId: number | undefined; firstName?: string | null | undefined; lastName?: string | null | undefined; paid: boolean | undefined; }) => {
+const PaymentUpdates = (props: { photo?: string; clubFeePaymentId: number | undefined; firstName?: string | null | undefined; lastName?: string | null | undefined; paid: boolean | undefined; }) => {
     return (
-         <ShadowBox style={{ ...appStyles.shadowBox, width: "85%", marginBottom: 15, flexWrap: "wrap", justifyContent: "space-between" }}>
-            <ThemedText numberOfLines={1} style={{ fontSize: 15, paddingLeft: 5, textAlign: "left" }}>{props?.firstName} {props?.lastName}</ThemedText>
+         <ShadowBox style={{ width: "85%", flexWrap: "wrap", justifyContent: "space-between" }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                {props?.photo ? (
+                <Image source={{ uri: props?.photo }} style={{ height: 32, width: 32, borderRadius: 100 }} />
+                ) : (
+                <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
+                )}
+                <ThemedText style={{ maxWidth: 150 }}>
+                {props?.firstName} {props?.lastName}
+                </ThemedText>
+            </View>       
             <ThemedCheckBox checked={props?.paid} />
         </ShadowBox>
     )

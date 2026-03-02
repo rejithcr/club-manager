@@ -22,7 +22,7 @@ def get_club_report():
 
 
 @club_report_bp.route('/memberattribute', methods=['GET'], strict_slashes=False)
-@role_required([constants.ROLE_MAINTAINER])
+@role_required([constants.ROLE_MEMBER])
 @jwt_required()
 def get_club_member_attribute():
     service = ClubReportService()

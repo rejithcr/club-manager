@@ -33,21 +33,42 @@ const DatePicker = (props: { date: Date | null; setDate: any, label?: string }) 
     if (Platform.OS == 'web') {
         return (
             <View style={styles.webContainer}>
-                <div style={{ color: colors.text, fontFamily:"Roboto" }}>{props.label}</div>
-                <input style={{ ...styles.webInput, backgroundColor: colors.background, color: colors.text }}
-                    type='date' value={getWebFormattedDate(props.date)}
-                    onChange={(e) => props.setDate(new Date(e.target.value))} />
+                {props.label && (
+                    <ThemedText style={{ ...styles.label, color: colors.subText }}>
+                        {props.label}
+                    </ThemedText>
+                )}
+                <View style={{ ...styles.webInputContainer, backgroundColor: colors.primary, borderColor: colors.border }}>
+                    <input 
+                        style={{ 
+                            ...styles.webInput, 
+                            backgroundColor: 'transparent', 
+                            color: colors.text,
+                            border: 'none',
+                            outline: 'none',
+                        }}
+                        type='date' 
+                        value={getWebFormattedDate(props.date)}
+                        onChange={(e) => props.setDate(new Date(e.target.value))} 
+                    />
+                </View>
             </View>
         )
     }
     return (
         <>
             <Pressable onPress={() => showDatepicker()}>
-                <View style={{marginVertical: 10}}>
-                    <ThemedText style={styles.label}>{props.label || ""}</ThemedText>
-                    <View style={styles.container}>
-                        <ThemedText>{props.date?.toLocaleDateString()} </ThemedText>
-                        <ThemedIcon name={"MaterialIcons:edit-calendar"} size={32} />
+                <View style={styles.mobileContainer}>
+                    {props.label && (
+                        <ThemedText style={{ ...styles.label, color: colors.subText }}>
+                            {props.label}
+                        </ThemedText>
+                    )}
+                    <View style={{...styles.container, backgroundColor: colors.primary, borderColor: colors.border}}>
+                        <ThemedText style={{ color: colors.text, fontSize: 16 }}>
+                            {props.date ? props.date.toLocaleDateString() : 'Select date'}
+                        </ThemedText>
+                        <ThemedIcon name={"MaterialIcons:edit-calendar"} size={24} color={colors.subText} />
                     </View>
                 </View>
             </Pressable>
@@ -67,32 +88,60 @@ const DatePicker = (props: { date: Date | null; setDate: any, label?: string }) 
 export default DatePicker
 
 const styles = StyleSheet.create({
+    mobileContainer: {
+        width: "90%",
+        alignSelf: "center",
+        marginVertical: 8,
+    },
     container: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        width: "80%",
-        alignSelf: "center",
-        fontSize: 15,
-        height: 40,
-        borderBottomColor: "grey",
-        borderBottomWidth: 1,
-        paddingLeft: 5
+        borderWidth: 2,
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        // React Native shadow properties
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        // Android shadow
+        elevation: 1,
     },
     webContainer: {
-        flexDirection: "row",
-        width: "80%",
+        width: "90%",
         alignSelf: "center",
-        alignItems: "center",
-        justifyContent: "space-between",
-        paddingVertical: 20,
+        marginVertical: 8,
+    },
+    webInputContainer: {
+        borderWidth: 2,
+        borderRadius: 12,
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        // React Native shadow properties
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 1,
+        },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
+        // Android shadow
+        elevation: 1,
     },
     webInput: {
-        padding: 10
+        width: "100%",
+        fontSize: 16,
+        paddingVertical: 8,
+        fontFamily: "inherit",
     },
     label: {
-        fontSize: 10,
-        width: "80%",
-        alignSelf: "center",
+        fontSize: 14,
+        fontWeight: '500',
+        marginBottom: 6,
     },
 })

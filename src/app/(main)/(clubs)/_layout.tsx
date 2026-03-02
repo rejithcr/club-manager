@@ -9,14 +9,14 @@ export default function ClubLayout() {
   const { colors } = useTheme();
   return (
     <Stack screenOptions={{
+      headerShadowVisible: false,
       headerStyle: { backgroundColor: colors.background },
-     // headerTitleContainerStyle: { padding: 0 },
       headerTintColor: colors.text
     }}>
       <Stack.Screen
         name="index" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: () => <StackHeader header={"Club Home"} rightText={clubInfo?.clubName} />,
+          headerTitle: () => <StackHeader header={"Club Home"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />,
           headerShown: true
         }}
       />
@@ -44,7 +44,7 @@ export default function ClubLayout() {
       <Stack.Screen
         name="(members)" // This is the name of the page and must match the url from root
         options={{
-          headerTitle: () => <StackHeader header={"Members"} rightText={clubInfo?.clubName} />,
+          headerTitle: () => <StackHeader header={"Members"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />,
           headerShown: false
         }}
       />
@@ -55,27 +55,27 @@ export default function ClubLayout() {
           headerShown: false
         }}
       />
-        <Stack.Screen
-          name="membershiprequests" // This is the name of the page and must match the url from root
-          options={{
-            headerTitle: () => <StackHeader header={"Membership Requests"} rightText={clubInfo?.clubName} />,
-            headerShown: true
-          }}
-        />
-        <Stack.Screen
-          name="(events)" // This is the name of the page and must match the url from root
-          options={{
-            headerTitle: () => <StackHeader header={"Events"} rightText={clubInfo?.clubName} />,
-            headerShown: false
-          }}
-        />        
-          <Stack.Screen
-            name="edit-club" // This is the name of the page and must match the url from root
-            options={{
-              headerTitle: () => <StackHeader header={"Edit Club"} rightText={clubInfo?.clubName} />,
-              headerShown: true
-            }}
-          />
+      <Stack.Screen
+        name="membershiprequests" // This is the name of the page and must match the url from root
+        options={{
+          headerTitle: () => <StackHeader header={"Membership Requests"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />,
+          headerShown: true
+        }}
+      />
+      <Stack.Screen
+        name="(events)" // This is the name of the page and must match the url from root
+        options={{
+          headerTitle: () => <StackHeader header={"Events"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />,
+          headerShown: false
+        }}
+      />
+      <Stack.Screen
+        name="edit-club" // This is the name of the page and must match the url from root
+        options={{
+          headerTitle: () => <StackHeader header={"Edit Club"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />,
+          headerShown: true
+        }}
+      />
     </Stack>
   )
 }

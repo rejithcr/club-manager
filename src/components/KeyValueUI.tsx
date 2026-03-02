@@ -1,22 +1,31 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, StyleSheet } from 'react-native'
 import React from 'react'
 import { camelCaseToWords } from '../utils/string'
 import ThemedView from './themed-components/ThemedView';
 import ThemedText from './themed-components/ThemedText';
 import Divider from './Divider';
+import { useTheme } from '../hooks/use-theme';
 
 const KeyValueUI = (props: { data: any; hideKeys?: string[] }) => {
+    const { colors } = useTheme();
     const list = Object.keys(props?.data || {})
         .filter(key => !props?.hideKeys?.includes(key))
         .map((key: string, _index) => { return { "key": key, "value": props?.data[key] } })
+    
     return (
-        <ThemedView style={styles.detailsTable}>
-            {list.map(item =>
-                <View key={item.key} style={styles.item}>
-                    <ThemedText style={styles.label}>{camelCaseToWords(item.key)}</ThemedText>
-                    <ThemedText style={styles.value}>{item.value}</ThemedText>
-                    <Divider/>
-                </View>
+        <ThemedView style={{...styles.container}}>
+            {list.map((item, index) =>
+                <ThemedView key={item.key} style={{...styles.item, backgroundColor: colors.primary}}>
+                    <View style={styles.row}>
+                        <ThemedText style={{ ...styles.label, color: colors.subText }}>
+                            {camelCaseToWords(item.key)}
+                        </ThemedText>
+                        <ThemedText style={{ ...styles.value, color: colors.text }}>
+                            {item.value || 'Not specified'}
+                        </ThemedText>
+                    </View>
+                    {index < list.length - 1 && <Divider style={styles.divider}/>}
+                </ThemedView>
             )}
         </ThemedView>
     )
@@ -24,30 +33,27 @@ const KeyValueUI = (props: { data: any; hideKeys?: string[] }) => {
 
 export default KeyValueUI
 
-
 const styles = StyleSheet.create({
-    detailsTable: {
-        width: "85%",
-        alignSelf: "center",
-        borderRadius: 5
+    container: {
+        width: "100%",
     },
     item: {
-        width: "100%",
-        flexDirection: "row",
-        flexWrap: "wrap",
-        justifyContent: "space-between"
+        paddingVertical: 8,
+    },
+    row: {
+        flexDirection: "column",
+        gap: 4,
     },
     label: {
-       // width: "30%",
-        padding: 10,
+        fontSize: 14,
+        fontWeight: '500',
     },
     value: {
-       // width: "70%",
-        padding: 10,
+        fontSize: 16,
+        fontWeight: '400',
     },
     divider: {
-        borderBottomColor: 'rgba(136, 136, 136, 0.2)',
-        borderBottomWidth: StyleSheet.hairlineWidth,
-        width: "100%"
+        marginTop: 8,
+        opacity: 0.3,
     }
 });
