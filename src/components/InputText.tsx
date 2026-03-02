@@ -4,14 +4,14 @@ import ThemedText from './themed-components/ThemedText';
 import { useTheme } from '../hooks/use-theme';
 import ThemedView from './themed-components/ThemedView';
 
-const InputText = (props: { 
-  label?: string; 
-  placeholder?: string; 
-  defaultValue?: any; 
+const InputText = (props: {
+  label?: string;
+  placeholder?: string;
+  defaultValue?: any;
   value?: any;
   keyboardType?: any;
-  ref?: any; 
-  onSubmitEditing?: any; 
+  ref?: any;
+  onSubmitEditing?: any;
   editable?: boolean;
   onChangeText?: any;
   blurOnSubmit?: any;
@@ -19,11 +19,11 @@ const InputText = (props: {
   error?: string;
   secureTextEntry?: boolean;
 }) => {
-    
+
   const { colors } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
   const animatedBorder = useRef(new Animated.Value(0)).current;
-  
+
   const handleFocus = () => {
     setIsFocused(true);
     Animated.timing(animatedBorder, {
@@ -32,7 +32,7 @@ const InputText = (props: {
       useNativeDriver: false,
     }).start();
   };
-  
+
   const handleBlur = () => {
     setIsFocused(false);
     Animated.timing(animatedBorder, {
@@ -41,33 +41,35 @@ const InputText = (props: {
       useNativeDriver: false,
     }).start();
   };
-  
+
   const borderColor = animatedBorder.interpolate({
     inputRange: [0, 1],
     outputRange: [colors.border, colors.button],
   });
-  
+
   const isDisabled = props.editable === false;
-  
+
   return (
     <ThemedView style={styles.container}>
       {props.label && (
-        <ThemedText style={{...styles.label, color: colors.subText}}>
+        <ThemedText style={{ ...styles.label, color: colors.subText }}>
           {props.label}
         </ThemedText>
       )}
-      
+
       <Animated.View style={{
         ...styles.inputContainer,
         backgroundColor: colors.primary,
         borderColor: props.error ? colors.error : borderColor,
         opacity: isDisabled ? 0.6 : 1,
       }}>
-        <TextInput 
-          style={{...styles.input, 
-              color: isDisabled ? colors.disabled : colors.text,
-              height: props.multiline ? 80 : 50}} 
-          {...props} 
+        <TextInput
+          style={{
+            ...styles.input,
+            color: isDisabled ? colors.disabled : colors.text,
+            height: props.multiline ? 80 : 50
+          }}
+          {...props}
           onChangeText={props.onChangeText}
           onFocus={handleFocus}
           onBlur={handleBlur}
@@ -77,9 +79,9 @@ const InputText = (props: {
           secureTextEntry={props.secureTextEntry}
         />
       </Animated.View>
-      
+
       {props.error && (
-        <ThemedText style={{...styles.errorText, color: colors.error}}>
+        <ThemedText style={{ ...styles.errorText, color: colors.error }}>
           {props.error}
         </ThemedText>
       )}

@@ -8,7 +8,7 @@ import { UserContext } from '@/src/context/UserContext';
 import { router } from 'expo-router';
 import React, { useContext, useState } from 'react';
 import { FlatList, StyleSheet } from 'react-native';
-import Alert, {AlertProps} from '@/src/components/Alert'
+import Alert, { AlertProps } from '@/src/components/Alert'
 import { useLazyGetClubQuery, useRequestMembershipMutation } from '@/src/services/clubApi';
 import RoundedContainer from '@/src/components/RoundedContainer';
 
@@ -20,7 +20,7 @@ const JoinClub = () => {
 
     const { userInfo } = useContext(UserContext)
 
-    const [searchClubsByName, {data: filteredClubs, isFetching: isClubsLoading}] = useLazyGetClubQuery();
+    const [searchClubsByName, { data: filteredClubs, isFetching: isClubsLoading }] = useLazyGetClubQuery();
 
     const handleSearch = (query: string) => {
         setQueryLength(query.length);
@@ -33,8 +33,8 @@ const JoinClub = () => {
         }
 
         const timeout = setTimeout(() => {
-            searchClubsByName({clubName: query, search: true});
-        }, 500); 
+            searchClubsByName({ clubName: query, search: true });
+        }, 500);
 
         setDebounceTimeout(timeout);
     };
@@ -47,19 +47,19 @@ const JoinClub = () => {
             buttons: [
                 {
                     text: 'OK', onPress: async () => {
-                        setAlertConfig({visible: false}); 
+                        setAlertConfig({ visible: false });
                         setIsLoading(true);
                         try {
-                            await requestMembership({memberId: userInfo.memberId, clubId: club.clubId, membershipRequest: true, email: userInfo.email}).unwrap();
+                            await requestMembership({ memberId: userInfo.memberId, clubId: club.clubId, membershipRequest: true, email: userInfo.email }).unwrap();
                             router.back();
                         } catch (error) {
                             console.log(error);
-                        }finally {
+                        } finally {
                             setIsLoading(false);
                         }
                     }
                 },
-                { text: 'Cancel', style: 'cancel', onPress: () => setAlertConfig({visible: false}) },
+                { text: 'Cancel', style: 'cancel', onPress: () => setAlertConfig({ visible: false }) },
             ]
         })
     }
@@ -80,15 +80,15 @@ const JoinClub = () => {
                 keyExtractor={(item) => item.clubId.toString()}
                 renderItem={({ item }) => (
                     <RoundedContainer>
-                    <TouchableCard onPress={() => handleSelectClub(item)}>
-                        <ThemedText>{item.clubName}</ThemedText>
-                    </TouchableCard>
+                        <TouchableCard onPress={() => handleSelectClub(item)}>
+                            <ThemedText>{item.clubName}</ThemedText>
+                        </TouchableCard>
                     </RoundedContainer>
                 )}
                 ListEmptyComponent={<ThemedText style={styles.emptyText}>No clubs found</ThemedText>}
                 ItemSeparatorComponent={() => <Spacer space={2} />}
             />}
-            {alertConfig?.visible && <Alert {...alertConfig}/>}
+            {alertConfig?.visible && <Alert {...alertConfig} />}
         </ThemedView>
     );
 };

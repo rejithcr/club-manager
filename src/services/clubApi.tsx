@@ -25,11 +25,11 @@ export const clubApi = createApi({
     getAttendanceReport: builder.query({
       query: (params) => `/club/event/attendance?${new URLSearchParams(params).toString()}`,
       providesTags: ["attendance"],
-    }),    
+    }),
     getClubMemberAttributes: builder.query({
       query: (params) => `/club/member/attribute?${new URLSearchParams(params).toString()}`,
       providesTags: ["memberAttribute"]
-    }),    
+    }),
     getClubMemberReportableAttributes: builder.query({
       query: (params) => `/club/report/memberattribute?${new URLSearchParams(params).toString()}`,
       providesTags: ["memberAttribute"]
@@ -45,7 +45,7 @@ export const clubApi = createApi({
         body,
       }),
       invalidatesTags: ["memberAttribute"]
-    }),    
+    }),
     addClubEventType: builder.mutation({
       query: (body) => ({
         url: "/club/event/types",
