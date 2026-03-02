@@ -18,6 +18,8 @@ const InputText = (props: {
   multiline?: boolean;
   error?: string;
   secureTextEntry?: boolean;
+  style?: any;
+  containerStyle?: any;
 }) => {
 
   const { colors } = useTheme();
@@ -50,19 +52,22 @@ const InputText = (props: {
   const isDisabled = props.editable === false;
 
   return (
-    <ThemedView style={styles.container}>
+    <ThemedView style={{ ...styles.container, ...props.containerStyle }}>
       {props.label && (
         <ThemedText style={{ ...styles.label, color: colors.subText }}>
           {props.label}
         </ThemedText>
       )}
 
-      <Animated.View style={{
-        ...styles.inputContainer,
-        backgroundColor: colors.primary,
-        borderColor: props.error ? colors.error : borderColor,
-        opacity: isDisabled ? 0.6 : 1,
-      }}>
+      <Animated.View style={[
+        styles.inputContainer,
+        {
+          backgroundColor: colors.primary,
+          borderColor: props.error ? colors.error : borderColor,
+          opacity: isDisabled ? 0.6 : 1,
+        },
+        props.style
+      ]}>
         <TextInput
           style={{
             ...styles.input,
