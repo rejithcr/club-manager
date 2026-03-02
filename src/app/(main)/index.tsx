@@ -56,14 +56,14 @@ const Main = () => {
     isLoading: isBirthdaysLoading,
     isFetching: isFetchingBirthdays,
     refetch: refetchBirthdays,
-  } = useGetUpcomingBirthdaysQuery({ 
-    memberId: userInfo?.memberId, 
+  } = useGetUpcomingBirthdaysQuery({
+    memberId: userInfo?.memberId,
     clubId: selectedClubId // Filter by selected club
   });
 
-  const {data: events, isLoading: isLoadingEvents, isFetching: isFetchingEvents, refetch: refetchEvents
-  } = useGetClubEventsQuery({ 
-    memberId: userInfo?.memberId, 
+  const { data: events, isLoading: isLoadingEvents, isFetching: isFetchingEvents, refetch: refetchEvents
+  } = useGetClubEventsQuery({
+    memberId: userInfo?.memberId,
     clubId: selectedClubId // Filter by selected club
   });
 
@@ -95,16 +95,16 @@ const Main = () => {
   };
 
   // Filter dues based on selected club
-  const filteredDues = selectedClubId === -1 
-    ? duesByMember 
+  const filteredDues = selectedClubId === -1
+    ? duesByMember
     : duesByMember?.filter((due: any) => due.clubId === selectedClubId);
 
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
         <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues || isFetchingBirthdays || isFetchingEvents} onRefresh={onRefresh} />}>
-           {isLoadingMyClubs && <LoadingSpinner />}
-           {clubs?.length == 0 && (
+          {isLoadingMyClubs && <LoadingSpinner />}
+          {clubs?.length == 0 && (
             <ThemedView style={{ alignSelf: "center", width: "80%", justifyContent: "center", alignItems: "center" }}>
               <ThemedText style={{ marginTop: 20 }}>Request to join a club</ThemedText>
               <ThemedIcon
@@ -120,7 +120,7 @@ const Main = () => {
           {clubs && clubs.length > 0 && (
             <>
               <ThemedHeading>My Clubs</ThemedHeading>
-              <View 
+              <View
                 style={{ width: '85%', alignSelf: 'center' }}
               >
                 <View style={{ flexDirection: 'row', gap: 15, flexWrap: 'wrap', }}>
@@ -154,12 +154,12 @@ const Main = () => {
           {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
           {isLoadingMemberDues && <LoadingSpinner />}
           {!isLoadingMemberDues && clubs?.length > 0 && (
-            <FeeSummary 
-              duesByMember={filteredDues} 
-              isAllSelected={selectedClubId === -1} 
+            <FeeSummary
+              duesByMember={filteredDues}
+              isAllSelected={selectedClubId === -1}
             />
           )}
-          
+
           {/* Unified Events and Birthdays Feed */}
           {(isLoadingEvents || isBirthdaysLoading) && (
             <>
@@ -168,13 +168,24 @@ const Main = () => {
             </>
           )}
           <Spacer space={10} />
-          {((events && events.length > 0) || (upcomingBirthdays && upcomingBirthdays.length > 0)) && (
+          {events && events.length > 0 && (
             <>
               <ThemedHeading>Upcoming Events</ThemedHeading>
-              <UnifiedFeed 
-                events={events || []} 
-                birthdays={upcomingBirthdays || []} 
-                clubs={clubs || []} 
+              <UnifiedFeed
+                events={events}
+                birthdays={[]}
+                clubs={clubs || []}
+              />
+            </>
+          )}
+          <Spacer space={10} />
+          {upcomingBirthdays && upcomingBirthdays.length > 0 && (
+            <>
+              <ThemedHeading>Upcoming Birthdays</ThemedHeading>
+              <UnifiedFeed
+                events={[]}
+                birthdays={upcomingBirthdays}
+                clubs={clubs || []}
               />
             </>
           )}
@@ -204,6 +215,8 @@ const handleMenuPress = (name: string | undefined, handleLogout: { (): void }) =
     router.push(`/(main)/(profile)`);
   } else if (name == "joinclub") {
     router.push(`/(main)/(members)/joinclub`);
+  } else if (name == "cricket") {
+    router.push(`/(main)/(cricket)/schedule-match`);
   } else {
     throw "Error";
   }
@@ -236,6 +249,13 @@ const actions = [
     text: "Profile",
     icon: <MaterialCommunityIcons name={"face-man-profile"} size={15} color={"white"} />,
     name: "profile",
+    position: 1,
+  },
+  {
+    color: "black",
+    text: "Cricket",
+    icon: <MaterialCommunityIcons name={"face-man-profile"} size={15} color={"white"} />,
+    name: "cricket",
     position: 1,
   },
 ];
