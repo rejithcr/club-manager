@@ -26,7 +26,7 @@ export const colors = {
     statusbar: "light",
     primary: "#333333",
     secondary: "#252526",
-    background: "#111827", // Deep navy/black
+    background: "#252526", // Deep navy/black
     text: "#ffffff",
     error: "#ff6b6b",
     warning: "#fdb924",

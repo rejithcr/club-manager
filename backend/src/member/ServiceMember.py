@@ -51,6 +51,18 @@ class MemberService():
         dateOfBirth = params.get('dateOfBirth')
         createdBy = params.get('createdBy')
         isRegistered = params.get('isRegistered')
+        sendNotification = params.get('sendNotification')
+
+        if sendNotification:
+            member_ids = params.get('memberIds')
+            title = params.get('title')
+            message = params.get('message')
+            target_type = params.get('targetType', 'GENERAL')
+            target_id = params.get('targetId')
+            
+            db.execute(conn, queries_member.SEND_NOTIFICATIONS, (member_ids, title, message, target_type, target_id))
+            conn.commit()
+            return {"message": "Notifications sent successfully"}
 
         db.execute(conn, queries_member.SAVE_MEMBER,
                    (first_name, last_name, email, phone, photo, dateOfBirth, isRegistered, createdBy, createdBy))

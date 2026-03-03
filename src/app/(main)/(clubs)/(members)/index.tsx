@@ -1,6 +1,6 @@
-import { useContext } from "react";
-import { View, FlatList, RefreshControl, TouchableOpacity } from "react-native";
-import { router, useRouter } from "expo-router";
+import { useContext, useState } from "react";
+import { View, FlatList, TouchableOpacity, StyleSheet } from "react-native";
+import { useRouter } from "expo-router";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import { AntDesign, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { ROLE_ADMIN } from "@/src/utils/constants";
@@ -14,11 +14,15 @@ import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import Divider from "@/src/components/Divider";
+import { useTheme } from "@/src/hooks/use-theme";
+import { appStyles } from "@/src/utils/styles";
+
 
 const limit = 20;
 
 export default function Home() {
   const { clubInfo } = useContext(ClubContext);
+  const { colors } = useTheme();
   const router = useRouter();
 
   const { items, isLoading, loadMore, isFetching, refreshing, onRefresh } = usePaginatedQuery(
@@ -26,6 +30,7 @@ export default function Home() {
     { clubId: clubInfo.clubId },
     limit
   );
+
 
   const showDetails = (memberId: number) => router.push(`/(main)/(clubs)/(members)/memberdetails?memberId=${memberId}`);
 
@@ -37,7 +42,7 @@ export default function Home() {
       ) : (
         <FlatList
           style={{ width: "100%" }}
-          ItemSeparatorComponent={() => <Divider style={{width: "85%", alignSelf: "center", marginVertical: 5}} />}
+          ItemSeparatorComponent={() => <Divider style={{ width: "85%", alignSelf: "center", marginVertical: 5 }} />}
           ListFooterComponent={() =>
             (isFetching && (
               <>
@@ -57,7 +62,7 @@ export default function Home() {
           onEndReachedThreshold={0.5}
           onRefresh={onRefresh}
           refreshing={refreshing}
-          renderItem={({ item, index }) => (
+          renderItem={({ item, index }: { item: any; index: number }) => (
             <Animated.View entering={FadeInUp.duration(380).delay(index * 40)} style={{ overflow: "hidden", margin: 0 }}>
               <TouchableOpacity onPress={() => showDetails(item.memberId)}>
                 <UserInfoView {...item} />
@@ -75,40 +80,49 @@ export default function Home() {
       )}
     </ThemedView>
   );
+
+  function handleMenuPress(name: string | undefined) {
+    if (name == "attributes") {
+      router.push(`/(main)/(clubs)/(members)/memberattributes`);
+    } else if (name == "add") {
+      router.push(`/(main)/(clubs)/(members)/addmember`);
+    } else if (name == "requests") {
+      router.push(`/(main)/(clubs)/membershiprequests`);
+    } else if (name == "notify") {
+      router.push(`/(main)/(clubs)/(members)/send-notification`);
+    }
+  }
 }
 
-const handleMenuPress = (name: string | undefined) => {
-  if (name == "attributes") {
-    router.push(`/(main)/(clubs)/(members)/memberattributes`);
-  } else if (name == "add") {
-    router.push(`/(main)/(clubs)/(members)/addmember`);
-  } else if (name == "requests") {
-    router.push(`/(main)/(clubs)/membershiprequests`);
-  } else {
-    throw "Error";
-  }
-};
-
 const actions = [
+  {
+    color: "black",
+    text: "Notify Members",
+    icon: <MaterialIcons name="notifications" size={15} color="white" />,
+    name: "notify",
+    position: 1,
+  },
   {
     color: "black",
     text: "Member Attributes",
     icon: <MaterialCommunityIcons name={"account-details"} size={15} color={"white"} />,
     name: "attributes",
-    position: 1,
+    position: 2,
   },
   {
     color: "black",
     text: "Membership Requests",
-    icon: <MaterialCommunityIcons name={"account-details"} size={15} color={"white"} />,
+    icon: <MaterialIcons name="person-add" size={15} color="white" />,
     name: "requests",
-    position: 1,
+    position: 3,
   },
   {
     color: "black",
-    text: "Add Memeber",
+    text: "Add Member",
     icon: <AntDesign name={"user-add"} size={15} color={"white"} />,
     name: "add",
-    position: 1,
+    position: 4,
   },
 ];
+
+const styles = StyleSheet.create({});

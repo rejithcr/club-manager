@@ -240,3 +240,8 @@ MARK_NOTIFICATION_AS_READ = """
     set is_read = 1
     where notification_id = ANY(%s)
 """
+
+SEND_NOTIFICATIONS = """
+    insert into notification (member_id, title, message, target_type, target_id)
+    select unnest(%s), %s, %s, %s, %s
+"""

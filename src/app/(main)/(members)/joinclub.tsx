@@ -3,14 +3,12 @@ import LoadingSpinner from '@/src/components/LoadingSpinner';
 import Spacer from '@/src/components/Spacer';
 import ThemedText from '@/src/components/themed-components/ThemedText';
 import ThemedView from '@/src/components/themed-components/ThemedView';
-import TouchableCard from '@/src/components/TouchableCard';
 import { UserContext } from '@/src/context/UserContext';
 import { router } from 'expo-router';
 import React, { useContext, useState } from 'react';
 import { FlatList, StyleSheet, View, TouchableOpacity, Modal, ScrollView, Image as RNImage } from 'react-native';
 import Alert, { AlertProps } from '@/src/components/Alert'
 import { useLazyGetClubQuery, useRequestMembershipMutation, useLazyGetClubMemberAttributesQuery } from '@/src/services/clubApi';
-import RoundedContainer from '@/src/components/RoundedContainer';
 import Divider from '@/src/components/Divider';
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import { useTheme } from '@/src/hooks/use-theme';
@@ -154,12 +152,12 @@ const JoinClub = () => {
 
     return (
         <ThemedView style={{ flex: 1, padding: 16 }}>
-            <View style={styles.searchContainer}>
+            <View style={[styles.searchContainer, { backgroundColor: colors.muted, borderColor: colors.border }]}>
                 <ThemedIcon name="MaterialIcons:search" size={24} color={colors.subText} style={styles.searchIcon} />
                 <InputText
                     placeholder="Search clubs by name"
                     onChangeText={handleSearch}
-                    style={styles.searchInputOverride}
+                    style={[styles.searchInputOverride, { color: colors.text }]}
                     containerStyle={styles.inputContainerStyle}
                 />
             </View>
@@ -168,12 +166,12 @@ const JoinClub = () => {
 
             {!(isLoading || isClubsLoading) && filteredClubs?.length === 0 && queryLength >= 2 && (
                 <ThemedView style={styles.emptyContainer}>
-                    <ThemedText style={styles.emptyText}>No clubs found</ThemedText>
+                    <ThemedText style={[styles.emptyText, { color: colors.subText }]}>No clubs found</ThemedText>
                 </ThemedView>
             )}
 
             {!(isLoading || isClubsLoading) && filteredClubs?.length > 0 && queryLength >= 2 && (
-                <View style={styles.resultsContainer}>
+                <View style={[styles.resultsContainer, { backgroundColor: colors.background }]}>
                     <FlatList
                         data={filteredClubs}
                         keyExtractor={(item) => item.clubId.toString()}
@@ -183,7 +181,7 @@ const JoinClub = () => {
                                 onPress={() => handleSelectClub(item)}
                             >
                                 <View style={styles.resultContent}>
-                                    <View style={styles.clubIconContainer}>
+                                    <View style={[styles.clubIconContainer, { backgroundColor: colors.muted }]}>
                                         {item.logo ? (
                                             <RNImage source={{ uri: item.logo }} style={{ width: 30, height: 30, borderRadius: 15 }} />
                                         ) : (
@@ -192,11 +190,11 @@ const JoinClub = () => {
                                     </View>
                                     <View style={{ flex: 1 }}>
                                         <ThemedText style={styles.clubNameText}>{item.clubName}</ThemedText>
-                                        <ThemedText style={styles.clubSubText}>Tap to join club</ThemedText>
+                                        <ThemedText style={[styles.clubSubText, { color: colors.subText }]}>Tap to join club</ThemedText>
                                     </View>
                                     <ThemedIcon name="MaterialIcons:chevron-right" size={24} color={colors.subText} />
                                 </View>
-                                {index < filteredClubs.length - 1 && <Divider style={styles.divider} />}
+                                {index < filteredClubs.length - 1 && <Divider style={[styles.divider, { backgroundColor: colors.border }]} />}
                             </TouchableOpacity>
                         )}
                         showsVerticalScrollIndicator={false}
@@ -219,7 +217,7 @@ const JoinClub = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <ThemedText style={styles.modalSubheading}>
+                    <ThemedText style={[styles.modalSubheading, { color: colors.subText }]}>
                         In order to join club fill up your details
                     </ThemedText>
 
@@ -258,13 +256,11 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f5f5f5',
         borderRadius: 12,
         paddingHorizontal: 15,
         marginBottom: 20,
         height: 55,
         borderWidth: 1,
-        borderColor: '#e0e0e0',
     },
     searchIcon: {
         marginRight: 10,
@@ -282,7 +278,6 @@ const styles = StyleSheet.create({
         elevation: 0,
     },
     resultsContainer: {
-        backgroundColor: '#fff',
         borderRadius: 15,
         maxHeight: '75%',
         elevation: 10,
@@ -304,7 +299,6 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: '#e8f0fe',
         justifyContent: 'center',
         alignItems: 'center',
         marginRight: 15,
@@ -315,12 +309,10 @@ const styles = StyleSheet.create({
     },
     clubSubText: {
         fontSize: 13,
-        color: '#757575',
         marginTop: 2,
     },
     divider: {
         height: 1,
-        backgroundColor: '#f0f0f0',
     },
     emptyContainer: {
         marginTop: 50,
@@ -328,7 +320,6 @@ const styles = StyleSheet.create({
     },
     emptyText: {
         fontSize: 16,
-        color: '#9e9e9e',
     },
     modalOverlay: {
         margin: 0,
@@ -347,7 +338,6 @@ const styles = StyleSheet.create({
     },
     modalSubheading: {
         fontSize: 14,
-        color: '#757575',
         marginBottom: 20,
     },
     modalFooter: {

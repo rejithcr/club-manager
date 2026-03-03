@@ -50,6 +50,16 @@ export const memberApi = createApi({
       }),
       invalidatesTags: ["notificationCount"],
     }),
+    sendNotification: builder.mutation({
+      query: (body) => ({
+        url: "/member",
+        method: "POST",
+        body: {
+          ...body,
+          sendNotification: 'true'
+        },
+      }),
+    }),
   }),
 });
 
@@ -64,4 +74,5 @@ export const {
   useLazyGetNotificationsQuery,
   useGetUnreadNotificationCountQuery,
   useMarkNotificationAsReadMutation,
+  useSendNotificationMutation,
 } = memberApi;

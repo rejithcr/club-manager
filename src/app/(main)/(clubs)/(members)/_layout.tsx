@@ -48,6 +48,13 @@ export default function RootLayout() {
           headerShown: true
         }}
       />
+      <Stack.Screen
+        name="send-notification"
+        options={{
+          headerTitle: () => <StackHeader header={"Send Notification"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />,
+          headerShown: true
+        }}
+      />
     </Stack>
   )
 }
