@@ -11,20 +11,20 @@ const KeyValueUI = (props: { data: any; hideKeys?: string[] }) => {
     const list = Object.keys(props?.data || {})
         .filter(key => !props?.hideKeys?.includes(key))
         .map((key: string, _index) => { return { "key": key, "value": props?.data[key] } })
-    
+
     return (
-        <ThemedView style={{...styles.container}}>
+        <ThemedView style={styles.container}>
             {list.map((item, index) =>
-                <ThemedView key={item.key} style={{...styles.item, backgroundColor: colors.primary}}>
+                <ThemedView key={item.key} style={StyleSheet.flatten([styles.item, { backgroundColor: colors.primary }])}>
                     <View style={styles.row}>
-                        <ThemedText style={{ ...styles.label, color: colors.subText }}>
+                        <ThemedText style={StyleSheet.flatten([styles.label, { color: colors.subText }])}>
                             {camelCaseToWords(item.key)}
                         </ThemedText>
-                        <ThemedText style={{ ...styles.value, color: colors.text }}>
+                        <ThemedText style={StyleSheet.flatten([styles.value, { color: colors.text }])}>
                             {item.value || 'Not specified'}
                         </ThemedText>
                     </View>
-                    {index < list.length - 1 && <Divider style={styles.divider}/>}
+                    {index < list.length - 1 && <Divider style={styles.divider} />}
                 </ThemedView>
             )}
         </ThemedView>

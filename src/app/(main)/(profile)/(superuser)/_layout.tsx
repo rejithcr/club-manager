@@ -6,7 +6,10 @@ import { Stack } from 'expo-router'
 const SuperUserStack = () => {
   const { colors } = useTheme();
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text }}>
+    <Stack screenOptions={{ 
+      headerShadowVisible: false,
+      headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text 
+      }}>
       <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Super User"} />, headerShown: false }} />
       <Stack.Screen name="clubs" options={{ headerTitle: () => <StackHeader header={"Clubs"} />, headerShown: true }} />
       <Stack.Screen name="users" options={{ headerTitle: () => <StackHeader header={"Users"} />, headerShown: true }} />

@@ -17,7 +17,7 @@ const TouchableCard = (props: {
 
   return (
     <TouchableOpacity onPress={() => props.onPress && props.onPress(props.id)}>
-      <ShadowBox style={{ ...styles.container, ...props.style }}>
+      <ShadowBox style={[styles.container, props.style]}>
         {props.children}
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           {props.rightComponent}

@@ -2,11 +2,10 @@ import { RefreshControl, ScrollView, View } from "react-native";
 import { useRouter } from "expo-router/build/hooks";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import FeeSummary from "./dues";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { UserContext } from "../../context/UserContext";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import MyClubs from "./myclubs";
 import { router, useGlobalSearchParams } from "expo-router";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import ThemedView from "@/src/components/themed-components/ThemedView";
@@ -215,8 +214,6 @@ const handleMenuPress = (name: string | undefined, handleLogout: { (): void }) =
     router.push(`/(main)/(profile)`);
   } else if (name == "joinclub") {
     router.push(`/(main)/(members)/joinclub`);
-  } else if (name == "cricket") {
-    router.push(`/(main)/(cricket)/schedule-match`);
   } else {
     throw "Error";
   }

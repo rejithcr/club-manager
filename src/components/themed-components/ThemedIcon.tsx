@@ -21,7 +21,7 @@ const iconMap: Record<string, any> = {
   AntDesign
 };
 
-function getIconComponent(name: string) {  
+function getIconComponent(name: string) {
   const [lib, iconName] = name.split(':');
   const IconComponent = iconMap[lib] || MaterialIcons;
   return { IconComponent, iconName: iconName || name };
@@ -32,7 +32,7 @@ const ThemedIcon: React.FC<IconProps & { text?: string, style?: any }> = ({ name
   const { IconComponent, iconName } = getIconComponent(name);
 
   return (
-    <View style={{display:"flex", flexDirection:"row", ...style}}>
+    <View style={[{ display: "flex", flexDirection: "row" }, style]}>
       <IconComponent name={iconName} size={size} color={color || colors.text} onPress={onPress} />
       <Spacer hspace={2} />
       {text && <ThemedText>{text}</ThemedText>}

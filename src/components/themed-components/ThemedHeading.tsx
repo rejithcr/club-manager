@@ -1,14 +1,14 @@
-import { View, Text } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import { useTheme } from '@/src/hooks/use-theme'
 import { appStyles } from '@/src/utils/styles'
 
 const ThemedHeading = (props: any) => {
-    const { colors } = useTheme()
+  const { colors } = useTheme()
 
   return (
     <View>
-      <Text style={{...appStyles.heading, color: colors.text, ...props.style}}>{props.children}</Text>
+      <Text style={StyleSheet.flatten([appStyles.heading, { color: colors.text }, props.style])}>{props.children}</Text>
     </View>
   )
 }

@@ -5,7 +5,7 @@ import { useTheme } from '../hooks/use-theme';
 const Card = (props: any) => {
     const { colors } = useTheme();
     return (
-        <View style={{backgroundColor: colors.primary, ...styles.container, ...props.style}}>
+        <View style={StyleSheet.flatten([{ backgroundColor: colors.primary }, styles.container, props.style])}>
             {props.children}
         </View>
     )

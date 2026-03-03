@@ -11,7 +11,7 @@ const Chip = (props: {
 }) => {
     const { colors } = useTheme();
     return (
-        <TouchableOpacity style={{ ...styles.chip, backgroundColor: colors.primary, ...props.style }} onPress={props.onPress}>
+        <TouchableOpacity style={StyleSheet.flatten([styles.chip, { backgroundColor: colors.primary }, props.style])} onPress={props.onPress}>
             {props.children}
             {props.selected && <><Spacer hspace={5} /><ThemedCheckBox checked={true} /></>}
         </TouchableOpacity>

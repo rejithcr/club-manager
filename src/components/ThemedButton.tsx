@@ -7,11 +7,16 @@ const ThemedButton = (props: { title: string; onPress: any; disabled?: boolean; 
     const { colors } = useTheme();
     return (
         <TouchableOpacity disabled={props?.disabled}
-            style={{...styles.button, backgroundColor: props?.disabled ? colors.disabled : colors.button, ...(props.icon && { paddingLeft: 18 }), ...props.style}}
+            style={StyleSheet.flatten([
+                styles.button,
+                { backgroundColor: props?.disabled ? colors.disabled : colors.button },
+                props.icon && { paddingLeft: 18 },
+                props.style
+            ])}
             onPress={!props?.disabled ? props?.onPress : undefined}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 {props.icon && <ThemedIcon name={props.icon} size={20} color="white" />}
-                <Text style={{...styles.text}}>{props.title}</Text>
+                <Text style={styles.text}>{props.title}</Text>
             </View>
         </TouchableOpacity>
     )
@@ -21,13 +26,13 @@ export default ThemedButton;
 
 const styles = StyleSheet.create({
     button: {
-        minWidth:80,
+        minWidth: 80,
         alignSelf: "center",
         justifyContent: "center",
         alignItems: "center",
         paddingHorizontal: 25,
         paddingVertical: 10,
-        borderRadius: 25,        
+        borderRadius: 25,
         // Shadow for iOS
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },

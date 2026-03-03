@@ -9,7 +9,10 @@ export default function EventsLayout() {
   const { colors } = useTheme();
 
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background }, headerTintColor: colors.text }}>
+    <Stack screenOptions={{ 
+      headerShadowVisible: false,
+      headerStyle: { backgroundColor: colors.background }, headerTintColor: colors.text 
+      }}>
       <Stack.Screen name="index" options={{ headerTitle: () => <StackHeader header={"Events"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />, headerShown: true }} />
       <Stack.Screen name="addevent" options={{ headerTitle: () => <StackHeader header={"Add Event"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />, headerShown: true }} />
       <Stack.Screen name="editevent" options={{ headerTitle: () => <StackHeader header={"Edit Event"} rightText={clubInfo?.clubName} logo={clubInfo?.logo} />, headerShown: true }} />

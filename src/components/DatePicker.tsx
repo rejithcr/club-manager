@@ -34,22 +34,22 @@ const DatePicker = (props: { date: Date | null; setDate: any, label?: string }) 
         return (
             <View style={styles.webContainer}>
                 {props.label && (
-                    <ThemedText style={{ ...styles.label, color: colors.subText }}>
+                    <ThemedText style={[styles.label, { color: colors.subText }]}>
                         {props.label}
                     </ThemedText>
                 )}
-                <View style={{ ...styles.webInputContainer, backgroundColor: colors.primary, borderColor: colors.border }}>
-                    <input 
-                        style={{ 
-                            ...styles.webInput, 
-                            backgroundColor: 'transparent', 
+                <View style={[styles.webInputContainer, { backgroundColor: colors.primary, borderColor: colors.border }]}>
+                    <input
+                        style={{
+                            ...styles.webInput,
+                            backgroundColor: 'transparent',
                             color: colors.text,
                             border: 'none',
                             outline: 'none',
                         }}
-                        type='date' 
+                        type='date'
                         value={getWebFormattedDate(props.date)}
-                        onChange={(e) => props.setDate(new Date(e.target.value))} 
+                        onChange={(e) => props.setDate(new Date(e.target.value))}
                     />
                 </View>
             </View>
@@ -60,11 +60,11 @@ const DatePicker = (props: { date: Date | null; setDate: any, label?: string }) 
             <Pressable onPress={() => showDatepicker()}>
                 <View style={styles.mobileContainer}>
                     {props.label && (
-                        <ThemedText style={{ ...styles.label, color: colors.subText }}>
+                        <ThemedText style={[styles.label, { color: colors.subText }]}>
                             {props.label}
                         </ThemedText>
                     )}
-                    <View style={{...styles.container, backgroundColor: colors.primary, borderColor: colors.border}}>
+                    <View style={[styles.container, { backgroundColor: colors.primary, borderColor: colors.border }]}>
                         <ThemedText style={{ color: colors.text, fontSize: 16 }}>
                             {props.date ? props.date.toLocaleDateString() : 'Select date'}
                         </ThemedText>
@@ -77,7 +77,7 @@ const DatePicker = (props: { date: Date | null; setDate: any, label?: string }) 
                     testID="dateTimePicker"
                     value={props.date || new Date()}
                     mode={"date"}
-                    neutralButton = {{ label: "Clear"}}
+                    neutralButton={{ label: "Clear" }}
                     onChange={onChange}
                 />
             )}

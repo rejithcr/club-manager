@@ -6,17 +6,17 @@ interface DividerProps {
   children?: React.ReactNode;
 }
 
-const Divider: React.FC<DividerProps> = ({style, children}) => {
+const Divider: React.FC<DividerProps> = ({ style, children }) => {
   return (
-    <View style={{...styles.divider, ...style}}>
-        {children}
+    <View style={StyleSheet.flatten([styles.divider, style])}>
+      {children}
     </View>
   )
 }
 
 export default Divider;
 
-const styles = StyleSheet.create({  
+const styles = StyleSheet.create({
   divider: {
     borderBottomColor: 'rgba(136, 136, 136, 0.2)',
     borderBottomWidth: .75,

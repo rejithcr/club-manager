@@ -52,9 +52,9 @@ const InputText = (props: {
   const isDisabled = props.editable === false;
 
   return (
-    <ThemedView style={{ ...styles.container, ...props.containerStyle }}>
+    <ThemedView style={StyleSheet.flatten([styles.container, props.containerStyle])}>
       {props.label && (
-        <ThemedText style={{ ...styles.label, color: colors.subText }}>
+        <ThemedText style={StyleSheet.flatten([styles.label, { color: colors.subText }])}>
           {props.label}
         </ThemedText>
       )}
@@ -69,11 +69,13 @@ const InputText = (props: {
         props.style
       ]}>
         <TextInput
-          style={{
-            ...styles.input,
-            color: isDisabled ? colors.disabled : colors.text,
-            height: props.multiline ? 80 : 50
-          }}
+          style={StyleSheet.flatten([
+            styles.input,
+            {
+              color: isDisabled ? colors.disabled : colors.text,
+              height: props.multiline ? 80 : 50
+            }
+          ])}
           {...props}
           onChangeText={props.onChangeText}
           onFocus={handleFocus}
@@ -86,7 +88,7 @@ const InputText = (props: {
       </Animated.View>
 
       {props.error && (
-        <ThemedText style={{ ...styles.errorText, color: colors.error }}>
+        <ThemedText style={StyleSheet.flatten([styles.errorText, { color: colors.error }])}>
           {props.error}
         </ThemedText>
       )}

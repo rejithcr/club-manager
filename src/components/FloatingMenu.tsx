@@ -29,32 +29,32 @@ const FloatingMenu = (props: {
     }
     return (
         <>
-        {isActionsVisible && <Pressable style={styles.backdrop} onPress={()=>  setIsActionsVisible(prev => !prev)}
+            {isActionsVisible && <Pressable style={styles.backdrop} onPress={() => setIsActionsVisible(prev => !prev)}
             />}
-        <View style={styles.container}>
-            {
-                !props?.onPressMain && isActionsVisible && actionsItems?.map(
-                    (action: { icon: any | undefined; text: string | undefined; name: string | undefined}) => {
-                        return (
-                            <TouchableOpacity
-                                key={action.name}    
-                                style={styles.menuItem} 
-                                onPress={() => onActionItemsPress(action?.name)}>
-                                <View style={styles.menuIcon} >
-                                    { action.icon }
-                                </View>
-                                <ThemedView style={{...styles.menuText, backgroundColor: colors.primary}}>
-                                    <ThemedText>{action.text}</ThemedText>
-                                </ThemedView>
-                            </TouchableOpacity>
-                        )
-                    }
-                )
-            }
-            <TouchableOpacity style={styles.button} onPress={ props.onPressMain ||  onMainButtonPress}>
-                {props.icon}
-            </TouchableOpacity>
-        </View>
+            <View style={styles.container}>
+                {
+                    !props?.onPressMain && isActionsVisible && actionsItems?.map(
+                        (action: { icon: any | undefined; text: string | undefined; name: string | undefined }) => {
+                            return (
+                                <TouchableOpacity
+                                    key={action.name}
+                                    style={styles.menuItem}
+                                    onPress={() => onActionItemsPress(action?.name)}>
+                                    <View style={styles.menuIcon} >
+                                        {action.icon}
+                                    </View>
+                                    <ThemedView style={StyleSheet.flatten([styles.menuText, { backgroundColor: colors.primary }])}>
+                                        <ThemedText>{action.text}</ThemedText>
+                                    </ThemedView>
+                                </TouchableOpacity>
+                            )
+                        }
+                    )
+                }
+                <TouchableOpacity style={styles.button} onPress={props.onPressMain || onMainButtonPress}>
+                    {props.icon}
+                </TouchableOpacity>
+            </View>
         </>
     )
 }
@@ -62,7 +62,7 @@ const FloatingMenu = (props: {
 export default FloatingMenu
 
 const styles = StyleSheet.create({
-    backdrop:{
+    backdrop: {
         position: "absolute",
         backgroundColor: "rgba(0, 0, 0, 0.25)",
         width: "100%",

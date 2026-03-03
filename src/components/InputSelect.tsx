@@ -7,31 +7,33 @@ import ThemedView from './themed-components/ThemedView';
 
 const InputSelect = (props: any) => {
   const { colors } = useTheme();
-  
+
   return (
-    <ThemedView style={{...styles.container, marginVertical: props.style?.marginVertical || 8, width: props.style?.width || "90%"}}>
+    <ThemedView style={StyleSheet.flatten([styles.container, { marginVertical: props.style?.marginVertical || 8, width: props.style?.width || "90%" }])}>
       {props.label && (
-        <ThemedText style={{...styles.label, color: colors.subText }}>
+        <ThemedText style={StyleSheet.flatten([styles.label, { color: colors.subText }])}>
           {props.label}
         </ThemedText>
       )}
-      
-      <View style={{
-        ...styles.pickerContainer,
+
+      <View style={StyleSheet.flatten([
+        styles.pickerContainer,
+        {
           backgroundColor: colors.primary,
           borderColor: colors.border,
-      }}>
-        <Picker 
+        }
+      ])}>
+        <Picker
           {...props}
-          style={{...styles.picker, backgroundColor: colors.primary, color: colors.text, height: props.style?.height || 50}}
+          style={[styles.picker, { backgroundColor: colors.primary, color: colors.text, height: props.style?.height || 50 }]}
           dropdownIconColor={colors.subText}
         >
           {props.children}
         </Picker>
       </View>
-      
+
       {props.error && (
-        <ThemedText style={{...styles.errorText, color: colors.error }}>
+        <ThemedText style={StyleSheet.flatten([styles.errorText, { color: colors.error }])}>
           {props.error}
         </ThemedText>
       )}

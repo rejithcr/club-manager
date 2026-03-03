@@ -8,7 +8,11 @@ export default function RootLayout() {
   const { clubInfo } = useContext(ClubContext)
   const { colors } = useTheme();
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background }, headerTintColor: colors.text }}>
+    <Stack screenOptions={{
+      headerShadowVisible: false,
+      headerStyle: { backgroundColor: colors.background },
+      headerTintColor: colors.text
+    }}>
       <Stack.Screen
         name="index" // This is the name of the page and must match the url from root
         options={{

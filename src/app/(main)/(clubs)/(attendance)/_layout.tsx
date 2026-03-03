@@ -5,7 +5,10 @@ import React from "react";
 export default function AttendanceLayout() {
   const { colors } = useTheme();
   return (
-    <Stack screenOptions={{ headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text }}>
+    <Stack screenOptions={{ 
+      headerShadowVisible: false,
+      headerStyle: { backgroundColor: colors.background}, headerTintColor: colors.text 
+      }}>
       <Stack.Screen name="index" options={{title: 'Attendance', headerShown:true}}/>      
     </Stack>
   )
