@@ -220,4 +220,23 @@ GET_UPCOMING_BIRTHDAYS = """
      m.first_name
 """
 
-## Auto created for member attrts
+
+GET_NOTIFICATIONS = """
+    select notification_id, title, message, is_read, target_type, target_id, to_char(created_ts, 'YYYY-MM-DD HH24:MI:SS') created_ts
+    from notification
+    where member_id = %s
+    order by created_ts desc
+    limit %s offset %s
+"""
+
+GET_UNREAD_NOTIFICATION_COUNT = """
+    select count(*) as unread_count
+    from notification
+    where member_id = %s and is_read = 0
+"""
+
+MARK_NOTIFICATION_AS_READ = """
+    update notification
+    set is_read = 1
+    where notification_id = ANY(%s)
+"""

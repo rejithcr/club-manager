@@ -1,8 +1,13 @@
 @echo off
 setlocal EnableDelayedExpansion
 
+:: Initialize variables
+set TASK=%1
+if "%TASK%"=="" set TASK=all
+
 echo ========================================
 echo     🚀 Starting Deployment Script       
+echo     🎯 Task: %TASK%
 echo ========================================
 
 :: Check for required commands
@@ -28,24 +33,29 @@ set S3_BUCKET=s3://sportsclubsmanager.com
 set CLOUDFRONT_DIST_ID="EFOOV3JU3MD4X" 
 
 :: 1. Database Migrations
+if /i "%TASK%"=="backend" goto SkipMigrations
+if /i "%TASK%"=="frontend" goto SkipMigrations
+
 echo 📦 Running Flyway Database Migrations...
 if "%FLYWAY_URL%"=="" goto SkipMigrations
 if "%FLYWAY_USER%"=="" goto SkipMigrations
 if "%FLYWAY_PASSWORD%"=="" goto SkipMigrations
 
-pushd .\db
-flyway migrate -url="%FLYWAY_URL%" -user="%FLYWAY_USER%" -password="%FLYWAY_PASSWORD%"
-popd
+call flyway migrate -url="%FLYWAY_URL%" -user="%FLYWAY_USER%" -password="%FLYWAY_PASSWORD%" -locations=filesystem:db
 echo ✅ Migrations completed successfully.
 goto MigrationsDone
 
 :SkipMigrations
+if /i "%TASK%"=="flyway" goto MigrationsDone
 echo ⚠️ Flyway credentials not found in environment (FLYWAY_URL, FLYWAY_USER, FLYWAY_PASSWORD).
 echo ⚠️ Skipping migrations. Please export these variables if migrations are needed.
 
 :MigrationsDone
 
 :: 2. Build the React Native web app
+if /i "%TASK%"=="flyway" goto SkipFrontend
+if /i "%TASK%"=="backend" goto SkipFrontend
+
 echo 🏗️ Building Expo Web App...
 echo Running npx expo export -p web
 call npx expo export -p web
@@ -56,7 +66,20 @@ echo ☁️ Uploading artifacts to S3 Bucket (%S3_BUCKET%)...
 call aws s3 sync .\dist %S3_BUCKET% --delete --region %AWS_REGION%
 echo ✅ Upload completed.
 
+:: 5. (Optional) Invalidate CloudFront Cache
+if defined CLOUDFRONT_DIST_ID (
+    echo 🔄 Invalidating CloudFront Cache for Distribution %CLOUDFRONT_DIST_ID%...
+    call aws cloudfront create-invalidation --distribution-id %CLOUDFRONT_DIST_ID% --paths "/*"
+    echo ✅ Cache invalidation triggered.
+) else (
+    echo ℹ️ No CLOUDFRONT_DIST_ID provided, skipping cache invalidation.
+)
+:SkipFrontend
+
 :: 4. Bundle and Upload Backend App
+if /i "%TASK%"=="flyway" goto SkipBackend
+if /i "%TASK%"=="frontend" goto SkipBackend
+
 echo 🐍 Bundling Python Backend...
 pushd .\backend
 if exist app.zip del app.zip
@@ -67,15 +90,7 @@ echo ☁️ Uploading backend to S3 (ccm-common-storage)...
 call aws s3 cp .\app.zip s3://ccm-common-storage/deploy/backend-app.zip --region %AWS_REGION%
 popd
 echo ✅ Backend uploaded successfully.
-
-:: 5. (Optional) Invalidate CloudFront Cache
-if defined CLOUDFRONT_DIST_ID (
-    echo 🔄 Invalidating CloudFront Cache for Distribution %CLOUDFRONT_DIST_ID%...
-    call aws cloudfront create-invalidation --distribution-id %CLOUDFRONT_DIST_ID% --paths "/*"
-    echo ✅ Cache invalidation triggered.
-) else (
-    echo ℹ️ No CLOUDFRONT_DIST_ID provided, skipping cache invalidation.
-)
+:SkipBackend
 
 echo ========================================
 echo     🎉 Deployment Complete!            

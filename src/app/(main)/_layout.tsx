@@ -10,7 +10,7 @@ const MainStack = () => {
   const [clubInfo, setClubInfo] = useState<any | undefined>(undefined)
   return (
     <ClubContext.Provider value={{ clubInfo, setClubInfo }}>
-      <Stack screenOptions={{headerShadowVisible: false}}>
+      <Stack screenOptions={{ headerShadowVisible: false }}>
         <Stack.Screen name="index" options={{
           headerTitle: () => <StackHeader header={"Club Manager"} />,
           headerShown: true,
@@ -19,13 +19,22 @@ const MainStack = () => {
         }} />
         <Stack.Screen name="(members)" options={{ title: "Member", headerShown: false }} />
         <Stack.Screen name="(clubs)" options={{ title: "Club", headerShown: false }} />
-        <Stack.Screen name="(profile)" options={{ title: "Profile", headerShown: false }} />      
+        <Stack.Screen name="(profile)" options={{ title: "Profile", headerShown: false }} />
         <Stack.Screen
           name="createclub" // This is the name of the page and must match the url from root
           options={{
             title: 'Create Club',
-            headerShown: true,headerTintColor: colors.text,
+            headerShown: true, headerTintColor: colors.text,
             headerStyle: { backgroundColor: colors.background },
+          }}
+        />
+        <Stack.Screen
+          name="notifications"
+          options={{
+            headerTitle: () => <StackHeader header={"Notifications"} hideNotificationIcon={true} />,
+            headerShown: true,
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.text,
           }}
         />
       </Stack>

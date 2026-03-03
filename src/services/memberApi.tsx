@@ -4,14 +4,14 @@ import { baseQueryWithReauth } from "./baseQuery";
 export const memberApi = createApi({
   reducerPath: "memberApi",
   baseQuery: baseQueryWithReauth,
-  tagTypes: ["member"],
+  tagTypes: ["member", "notificationCount"],
   endpoints: (builder) => ({
     getMembers: builder.query({
       query: (params) => `/member?${new URLSearchParams(params).toString()}`,
       providesTags: ["member"],
     }),
     getUpcomingBirthdays: builder.query({
-      query: (params) => `/member?${new URLSearchParams({...params, upcomingBirthdays: 'true'}).toString()}`,
+      query: (params) => `/member?${new URLSearchParams({ ...params, upcomingBirthdays: 'true' }).toString()}`,
       providesTags: ["member"],
     }),
     updateMember: builder.mutation({
@@ -30,6 +30,26 @@ export const memberApi = createApi({
       }),
       invalidatesTags: ["member"],
     }),
+    getNotifications: builder.query({
+      query: (params) => `/member?${new URLSearchParams({ ...params, notifications: 'true' }).toString()}`,
+      providesTags: ["notificationCount"],
+    }),
+    getUnreadNotificationCount: builder.query({
+      query: (params) => `/member?${new URLSearchParams({ ...params, unreadCount: 'true' }).toString()}`,
+      providesTags: ["notificationCount"],
+    }),
+    markNotificationAsRead: builder.mutation({
+      query: (body) => ({
+        url: "/member",
+        method: "PUT",
+        body: {
+          notificationIds: body.notificationIds,
+          notificationId: body.notificationId,
+          markAsRead: 'true'
+        },
+      }),
+      invalidatesTags: ["notificationCount"],
+    }),
   }),
 });
 
@@ -40,4 +60,8 @@ export const {
   useLazyGetUpcomingBirthdaysQuery,
   useUpdateMemberMutation,
   useAddMemberMutation,
+  useGetNotificationsQuery,
+  useLazyGetNotificationsQuery,
+  useGetUnreadNotificationCountQuery,
+  useMarkNotificationAsReadMutation,
 } = memberApi;

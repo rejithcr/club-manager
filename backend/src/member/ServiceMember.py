@@ -14,6 +14,8 @@ class MemberService():
         offset = params.get("offset")
         upcomingBirthdays = params.get('upcomingBirthdays')
         clubId = params.get('clubId')
+        notifications = params.get('notifications')
+        unreadCount = params.get('unreadCount')
 
         member = None
         if email:
@@ -23,10 +25,16 @@ class MemberService():
         elif requests:
             requests = db.fetch(conn, queries_member.GET_REQUESTS, (member_id,))
             return [helper.convert_to_camel_case(request) for request in requests]
+        elif notifications:
+            notifications = db.fetch(conn, queries_member.GET_NOTIFICATIONS, (member_id, limit, offset))
+            return [helper.convert_to_camel_case(notification) for notification in notifications]
+        elif unreadCount:
+            result = db.fetch_one(conn, queries_member.GET_UNREAD_NOTIFICATION_COUNT, (member_id,))
+            return helper.convert_to_camel_case(result)
         elif upcomingBirthdays:
             birthdays = db.fetch(conn, queries_member.GET_UPCOMING_BIRTHDAYS, (clubId, clubId, member_id, member_id))
             return [helper.convert_to_camel_case(birthday) for birthday in birthdays]
-        elif offset and offset:
+        elif offset and limit:
             users = db.fetch(conn, queries_member.GET_USERS, (limit, offset))
             return [helper.convert_to_camel_case(user) for user in users]
         else:
@@ -62,8 +70,16 @@ class MemberService():
         photo = params.get('photo')
         isRegistered = params.get('isRegistered')
         verify = params.get('verify')
+        markAsRead = params.get('markAsRead')
+        notificationId = params.get('notificationId')
+        notificationIds = params.get('notificationIds')
 
-        if verify:
+        if markAsRead:
+            ids_to_update = notificationIds if notificationIds else [notificationId]
+            db.execute(conn, queries_member.MARK_NOTIFICATION_AS_READ, (ids_to_update,))
+            conn.commit()
+            return {"message": "Notifications marked as read"}
+        elif verify:
             db.execute(conn, queries_member.VERIFY_MEMBER,
                        (first_name, last_name, email, phone, photo, dateOfBirth, isRegistered, updatedBy, memberId))
             conn.commit()

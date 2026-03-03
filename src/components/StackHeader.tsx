@@ -2,15 +2,29 @@ import { View, Image, TouchableOpacity, Dimensions } from "react-native";
 import ThemedText from "./themed-components/ThemedText";
 import { useTheme } from "../hooks/use-theme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import { useGetUnreadNotificationCountQuery } from "../services/memberApi";
+import { useContext } from "react";
+import { UserContext } from "../context/UserContext";
+import { useRouter } from "expo-router";
 
 const { width } = Dimensions.get('window');
 
 export const StackHeader = (props: {
   header: string | undefined;
   rightText?: string | null | undefined;
-  logo?: string | null | undefined
+  logo?: string | null | undefined;
+  hideNotificationIcon?: boolean;
 }) => {
   const { colors } = useTheme();
+  const { userInfo } = useContext(UserContext);
+  const router = useRouter();
+
+  const { data: unreadData } = useGetUnreadNotificationCountQuery(
+    { memberId: userInfo?.memberId },
+    { skip: !userInfo?.memberId }
+  );
+
+  const unreadCount = unreadData?.unreadCount || 0;
 
   return (
     <View style={{
@@ -19,7 +33,7 @@ export const StackHeader = (props: {
       alignItems: "center",
       height: 60,
       backgroundColor: colors.background,
-      width: width - 32
+      width: width - (props.header == 'Club Manager' ? 35 : 75)
     }}>
       {/* Left side: Breadcrumbs */}
       <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
@@ -44,9 +58,36 @@ export const StackHeader = (props: {
 
       {/* Right side: Utilities */}
       <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
-        <TouchableOpacity>
-          <MaterialCommunityIcons name="bell-outline" size={22} color={colors.text} />
-        </TouchableOpacity>
+        {!props.hideNotificationIcon && (
+          <TouchableOpacity onPress={() => router.push("/(main)/notifications")}>
+            <View>
+              <MaterialCommunityIcons name="bell-outline" size={22} color={colors.text} />
+              {unreadCount > 0 && (
+                <View style={{
+                  position: 'absolute',
+                  right: -6,
+                  top: -6,
+                  backgroundColor: colors.error,
+                  borderRadius: 10,
+                  width: 18,
+                  height: 18,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  borderWidth: 2,
+                  borderColor: colors.background
+                }}>
+                  <ThemedText style={{
+                    color: 'white',
+                    fontSize: 10,
+                    fontWeight: 'bold',
+                  }}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </ThemedText>
+                </View>
+              )}
+            </View>
+          </TouchableOpacity>
+        )}
         {/* <TouchableOpacity>
           <MaterialIcons name="menu" size={24} color={colors.text} />
         </TouchableOpacity>*/}
