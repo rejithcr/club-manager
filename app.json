@@ -11,7 +11,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "cr.dev.clubmanager",
       "associatedDomains": [
-        "applinks:club-manager-33a8c.web.app"
+        "applinks:sportsclubsmanager.com"
       ]
     },
     "android": {
@@ -29,7 +29,21 @@
           "data": [
             {
               "scheme": "https",
-              "host": "club-manager-33a8c.web.app",
+              "host": "sportsclubsmanager.com",
+              "pathPattern": ".*"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "https",
+              "host": "sportsclubsmanager.com",
               "pathPattern": ".*"
             }
           ],
@@ -64,7 +78,8 @@
         }
       ],
       "expo-font",
-      "expo-web-browser"
+      "expo-web-browser",
+      "@react-native-community/datetimepicker"
     ],
     "experiments": {
       "typedRoutes": true
@@ -77,6 +92,12 @@
         "projectId": "e900387d-92d2-49e3-986c-971a404e194d"
       }
     },
-    "owner": "rejithcr"
+    "owner": "rejithcr",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/e900387d-92d2-49e3-986c-971a404e194d"
+    }
   }
 }

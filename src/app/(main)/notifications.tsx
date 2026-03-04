@@ -7,7 +7,6 @@ import { UserContext } from '@/src/context/UserContext';
 import { useGetNotificationsQuery, useMarkNotificationAsReadMutation } from '@/src/services/memberApi';
 import LoadingSpinner from '@/src/components/LoadingSpinner';
 import Divider from '@/src/components/Divider';
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 const PAGE_SIZE = 40;
@@ -99,7 +98,7 @@ const NotificationsScreen = () => {
 
     return (
         <ThemedView style={styles.container}>
-            <FlatList
+            {isLoading && offset === 0 ? <LoadingSpinner /> : <FlatList
                 data={notifications}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.notificationId.toString()}
@@ -120,7 +119,7 @@ const NotificationsScreen = () => {
                         <ActivityIndicator color={colors.primary} style={{ margin: 16 }} />
                     ) : null
                 }
-            />
+            />}
         </ThemedView>
     );
 };

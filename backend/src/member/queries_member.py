@@ -245,3 +245,16 @@ SEND_NOTIFICATIONS = """
     insert into notification (member_id, title, message, target_type, target_id)
     select unnest(%s), %s, %s, %s, %s
 """
+
+UPSERT_PUSH_TOKEN = """
+    insert into member_push_token (member_id, push_token, updated_ts)
+    values (%s, %s, now())
+    on conflict (member_id, push_token)
+    do update set updated_ts = now()
+"""
+
+GET_PUSH_TOKENS_FOR_MEMBERS = """
+    select push_token
+    from member_push_token
+    where member_id = any(%s)
+"""

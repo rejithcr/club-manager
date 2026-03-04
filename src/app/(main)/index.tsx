@@ -247,12 +247,5 @@ const actions = [
     icon: <MaterialCommunityIcons name={"face-man-profile"} size={15} color={"white"} />,
     name: "profile",
     position: 1,
-  },
-  {
-    color: "black",
-    text: "Cricket",
-    icon: <MaterialCommunityIcons name={"face-man-profile"} size={15} color={"white"} />,
-    name: "cricket",
-    position: 1,
-  },
+  }
 ];

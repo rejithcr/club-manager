@@ -13,7 +13,7 @@ def get_members():
     params = util.get_params(request)
     conn = db.get_connection()
     try:
-        return service.get(conn, params), 200
+        return service.get(conn, params)
     finally:
         db.close_connection(conn)
 
@@ -24,7 +24,7 @@ def post_members():
     params = util.get_params(request)
     conn = db.get_connection()
     try:
-        return service.post(conn, params), 200
+        return service.post(conn, params)
     finally:
         db.close_connection(conn)
 
@@ -36,6 +36,6 @@ def put_members():
     params = util.get_params(request)
     conn = db.get_connection()
     try:
-        return service.put(conn, params), 200
+        return service.put(conn, params)
     finally:
         db.close_connection(conn)

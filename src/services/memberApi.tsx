@@ -60,6 +60,16 @@ export const memberApi = createApi({
         },
       }),
     }),
+    registerPushToken: builder.mutation({
+      query: (body) => ({
+        url: "/member",
+        method: "POST",
+        body: {
+          ...body,
+          registerPushToken: 'true'
+        },
+      }),
+    }),
   }),
 });
 
@@ -75,4 +85,5 @@ export const {
   useGetUnreadNotificationCountQuery,
   useMarkNotificationAsReadMutation,
   useSendNotificationMutation,
+  useRegisterPushTokenMutation,
 } = memberApi;
