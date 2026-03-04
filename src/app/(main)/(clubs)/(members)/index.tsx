@@ -15,7 +15,6 @@ import ThemedText from "@/src/components/themed-components/ThemedText";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import Divider from "@/src/components/Divider";
 import { useTheme } from "@/src/hooks/use-theme";
-import { appStyles } from "@/src/utils/styles";
 
 
 const limit = 20;
