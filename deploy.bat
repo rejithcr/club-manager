@@ -82,9 +82,31 @@ if /i "%TASK%"=="frontend" goto SkipBackend
 
 echo 🐍 Bundling Python Backend for AWS Lambda (Linux)...
 pushd .\backend
-if exist app.zip del app.zip
 
-python build.py
+:: 1. Cleanup old build artifacts
+if exist build rd /s /q build
+if exist app.zip del app.zip
+mkdir build
+
+:: 2. Install dependencies (Pass 1: Generic)
+echo 📦 Installing dependencies...
+pip install --isolated --target build -r requirements.txt
+
+:: 3. Install Linux-native binaries (Pass 2: Python 3.13)
+echo 📦 Installing Linux-native binaries (Python 3.13)...
+set "BINARY_PKGS=psycopg2-binary sqlalchemy cryptography serverless-wsgi gunicorn Brotli zstandard"
+pip install --isolated --target build ^
+    --platform manylinux2014_x86_64 --only-binary=:all: ^
+    --python-version 3.13 --implementation cp --abi cp313 ^
+    --upgrade %BINARY_PKGS%
+
+:: 4. Copy Source Code and main.py
+echo 📄 Copying source code and entry point...
+xcopy /E /I /Y src build\src\
+
+:: 5. Zip for Lambda using PowerShell
+echo 🤐 Zipping build directory into app.zip...
+powershell -Command "Compress-Archive -Path 'build\*' -DestinationPath 'app.zip' -Force"
 
 if not exist app.zip (
     echo ❌ Failed to create app.zip.
@@ -92,12 +114,11 @@ if not exist app.zip (
     exit /b 1
 )
 
-
-echo ☁️ Uploading backend to S3 (ccm-common-storage)...
-call aws s3 cp .\app.zip s3://ccm-common-storage/deploy/backend-app.zip --region %AWS_REGION%
+::echo ☁️ Uploading backend to S3 (ccm-common-storage)...
+:: call aws s3 cp .\app.zip s3://ccm-common-storage/deploy/backend-app.zip --region %AWS_REGION%
 
 :: Cleanup
-rd /s /q package
+rd /s /q build
 popd
 echo ✅ Backend uploaded successfully.
 :SkipBackend

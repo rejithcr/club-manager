@@ -17,7 +17,7 @@ resource "aws_lambda_function" "lambda" {
     filename      = "../main.zip"
     function_name = "ccm-api"
     role          = aws_iam_role.role.arn
-    handler       = "main.handler"
+    handler       = "src/app.lambda_handler"
     runtime       = "python3.13"
 
     source_code_hash = filebase64sha256("../main.zip")
