@@ -68,7 +68,7 @@ def _send_push_notifications(tokens: list, title: str, body: str, data: dict = N
     """
     client = PushClient()
     messages = [
-        PushMessage(to=token, title=title, body=body, data=data or {})
+        PushMessage(to=token, title=title, body=body, data=data or {}, channel_id="default")
         for token in tokens
     ]
     try:

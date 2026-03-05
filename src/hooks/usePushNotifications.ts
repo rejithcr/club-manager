@@ -53,31 +53,47 @@ async function registerForPushNotificationsAsync(): Promise<string | null> {
     if (Platform.OS === 'web') return null;
 
     if (Platform.OS === 'android') {
-        await Notifications.setNotificationChannelAsync('default', {
-            name: 'default',
-            importance: Notifications.AndroidImportance.MAX,
-            vibrationPattern: [0, 250, 250, 250],
-            lightColor: '#FF231F7C',
-        });
+        try {
+            await Notifications.setNotificationChannelAsync('default', {
+                name: 'default',
+                importance: Notifications.AndroidImportance.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                lightColor: '#FF231F7C',
+            });
+        } catch (error) {
+            console.error('Error setting notification channel:', error);
+        }
     }
 
     if (!Device.isDevice) {
+        console.warn('Must use physical device for Push Notifications');
         return null;
     }
 
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
-    let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
-        finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-        Alert.alert('Permission required', 'Failed to get push token for push notifications!');
+    try {
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+        }
+        if (finalStatus !== 'granted') {
+            Alert.alert('Permission required', 'Failed to get push token for push notifications!');
+            console.error('Failed to get push token for push notifications - permission not granted');
+            return null;
+        }
+
+        const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
+        if (!projectId) {
+            console.error('Project ID not found in Expo config. Check app.json and EAS configuration.');
+            // On some versions of Expo, this might be needed for getExpoPushTokenAsync to work in standalone builds
+        }
+
+        const token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
+        console.log('Push token generated successfully:', token);
+        return token;
+    } catch (error) {
+        console.error('Error getting expo push token:', error);
         return null;
     }
-
-    const projectId = Constants.expoConfig?.extra?.eas?.projectId as string | undefined;
-
-    const token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
-    return token;
 }

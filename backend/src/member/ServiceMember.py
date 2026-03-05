@@ -102,7 +102,7 @@ class MemberService():
     def _send_push_notifications(self, tokens, title, body, data=None):
         client = PushClient()
         messages = [
-            PushMessage(to=token, title=title, body=body, data=data)
+            PushMessage(to=token, title=title, body=body, data=data, channel_id="default")
             for token in tokens
         ]
         try:

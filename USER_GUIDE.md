@@ -72,3 +72,22 @@ Notes:
 
 ## Contact / next steps
 If anything in this guide is out-of-date with your local setup, tell me what changed and I will update this file.
+
+
+
+# Push notification for android prod builds
+To set up your FCM (Firebase Cloud Messaging) Credentials in Expo, follow these detailed steps:
+
+To generate a private key file for your service account:
+
+In the Firebase console, open Settings > Service Accounts.
+
+Click Generate New Private Key, then confirm by clicking Generate Key.
+
+Securely store the JSON file containing the key.
+
+Go to your Expo Dashboard.
+Select your club-manager project.
+Click Credentials in the left sidebar.
+Select Android -> Production.
+Scroll down to FCM Server Key, click Edit or Add, and paste your Firebase Server Key there.
