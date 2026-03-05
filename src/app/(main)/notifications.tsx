@@ -72,11 +72,11 @@ const NotificationsScreen = () => {
         }
 
         // Navigate based on target type
-        if (notification.targetType === 'EVENT' && notification.targetId) {
-            router.push(`/(main)/(clubs)/(events)/eventdetails?eventId=${notification.targetId}`);
-        } else if (notification.targetType === 'DUE') {
-            router.push(`/(main)/(profile)/duesbyclub?memberId=${userInfo?.memberId}`);
-        }
+        // if (notification.targetType === 'EVENT' && notification.targetId) {
+        //     router.push(`/(main)/(clubs)/(events)/eventdetails?eventId=${notification.targetId}`);
+        // } else if (notification.targetType === 'DUE') {
+        //     router.push(`/(main)/(profile)/duesbyclub?memberId=${userInfo?.memberId}`);
+        // }
     };
 
     const renderItem = ({ item }: { item: any }) => (

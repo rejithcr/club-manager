@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
-const usePaginatedQuery = (useGetQuery: any, params: {}, limit: number) => {
+const usePaginatedQuery = (useGetQuery: any, params: {}, limit: number, options: any = {}) => {
   const [offset, setOffset] = useState(0);
   const [items, setItems] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: currentPageData, isLoading, isFetching, refetch } = useGetQuery({ ...params, limit, offset });
+  const { data: currentPageData, isLoading, isFetching, refetch } = useGetQuery({ ...params, limit, offset }, options);
 
   useEffect(() => {
     if (currentPageData) {
