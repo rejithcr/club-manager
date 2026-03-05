@@ -80,14 +80,24 @@ if defined CLOUDFRONT_DIST_ID (
 if /i "%TASK%"=="flyway" goto SkipBackend
 if /i "%TASK%"=="frontend" goto SkipBackend
 
-echo 🐍 Bundling Python Backend...
+echo 🐍 Bundling Python Backend for AWS Lambda (Linux)...
 pushd .\backend
 if exist app.zip del app.zip
-:: Use PowerShell to zip the src folder and requirements
-powershell -Command "Compress-Archive -Path '.\src' -DestinationPath '.\app.zip'"
-powershell -Command "Compress-Archive -Path '.\requirements.txt' -DestinationPath '.\app.zip' -Update"
+
+python build.py
+
+if not exist app.zip (
+    echo ❌ Failed to create app.zip.
+    popd
+    exit /b 1
+)
+
+
 echo ☁️ Uploading backend to S3 (ccm-common-storage)...
 call aws s3 cp .\app.zip s3://ccm-common-storage/deploy/backend-app.zip --region %AWS_REGION%
+
+:: Cleanup
+rd /s /q package
 popd
 echo ✅ Backend uploaded successfully.
 :SkipBackend

@@ -91,3 +91,14 @@ Select your club-manager project.
 Click Credentials in the left sidebar.
 Select Android -> Production.
 Scroll down to FCM Server Key, click Edit or Add, and paste your Firebase Server Key there.
+
+## Web push
+
+To finish the setup, you need to provide your VAPID Public Key (Web Push certificate):
+
+Get the key from Firebase Console -> Project Settings -> Cloud Messaging -> Web configuration.
+Open 
+
+usePushNotifications.ts
+.
+Replace 'BC_PLACEHOLDER_VAPID_KEY_PLEASE_REPLACE_ME' with your actual key.

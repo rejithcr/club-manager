@@ -50,8 +50,10 @@ troubleshooting.txt
 #backend
 backend/build
 backend/.env
+backend/.venv
 backend/__pycache__
-
+backend/app.zip
+backend/package
 
 # java inprogress
 backend-java
