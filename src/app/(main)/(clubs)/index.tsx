@@ -187,7 +187,7 @@ const ClubHome = () => {
                       >
                         <View>
                           <ThemedText style={{ fontSize: 16, fontWeight: "bold" }}>{fee.clubFeeType}</ThemedText>
-                          <ThemedText style={{ fontSize: 10, marginTop: 5, color: colors.disabled }}>
+                          <ThemedText style={{ fontSize: 10, marginTop: 5, color: colors.subText }}>
                             {fee.clubFeeTypeInterval}
                           </ThemedText>
                         </View>

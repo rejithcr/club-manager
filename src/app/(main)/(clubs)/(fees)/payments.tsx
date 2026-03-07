@@ -55,6 +55,24 @@ const Payments = () => {
     feeCollectionId: params.get("clubFeeCollectionId"),
     listPayments: "true",
   });
+
+  const totals = React.useMemo(() => {
+    if (!feeByMembers) return { total: 0, collected: 0 };
+    return feeByMembers.reduce(
+      (acc: { total: number; collected: number }, curr: any) => {
+        acc.total += curr.amount;
+        if (curr.paid) {
+          acc.collected += curr.amount;
+        }
+        return acc;
+      },
+      { total: 0, collected: 0 }
+    );
+  }, [feeByMembers]);
+
+  const displayTotal = params.get("total") ? Number(params.get("total")) : totals.total;
+  const displayCollected = params.get("collected") ? Number(params.get("collected")) : totals.collected;
+
   const updatePaymentStatus = () => {
     if (paymentStatusUpdates.length == 0) {
       showSnackbar("No updates selected", "error");
@@ -122,11 +140,11 @@ const Payments = () => {
           }}
         >
           <ThemedHeading style={{ width: 200 }}>{params.get("clubFeeTypePeriod")}</ThemedHeading>
-          <ThemedText style={{ textAlign: "right" }}>₹ {params.get("total")}</ThemedText>
+          <ThemedText style={{ textAlign: "right" }}>₹ {displayTotal}</ThemedText>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", width: "85%", alignSelf: "center" }}>
           <CircularProgress
-            value={Math.round((Number(params.get("collected")) / Number(params.get("total"))) * 100)}
+            value={Math.round((displayCollected / displayTotal) * 100) || 0}
             strokeWidth={8}
             size={50}
           />
