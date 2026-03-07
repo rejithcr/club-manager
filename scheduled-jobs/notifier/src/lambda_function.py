@@ -23,7 +23,8 @@ from src import notification_service
 # Use structured logging for CloudWatch
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s – %(message)s"
+    format="%(asctime)s [%(levelname)s] %(name)s – %(message)s",
+    force=True
 )
 logger = logging.getLogger(__name__)
 
@@ -92,9 +93,9 @@ def _process_events(conn, summary: dict):
 
             # Build human-friendly time string
             time_str = start_time.strftime('%I:%M %p') if start_time else ''
-            notification_title = f"📅 Event Tomorrow: {title_text}"
+            notification_title = club_name
             notification_body  = (
-                f"{club_name} – {title_text} is scheduled for tomorrow"
+                f"📅 {title_text} is scheduled for tomorrow"
                 + (f" at {time_str}" if time_str else "")
                 + (f", {location}" if location != 'TBD' else "")
                 + "."
@@ -155,8 +156,8 @@ def _process_birthdays(conn, summary: dict):
                 notification_service.save_and_push(
                     conn,
                     fellow_ids,
-                    title=f"🎂 Birthday Tomorrow!",
-                    message=f"{first_name} {last_name}'s birthday is tomorrow. Wish them a happy birthday!",
+                    title=f"🎂 {first_name} {last_name}'s birthday is tomorrow",
+                    message=f"Wish a happy birthday!",
                     target_type="BIRTHDAY",
                     target_id=str(member_id)
                 )
@@ -167,7 +168,7 @@ def _process_birthdays(conn, summary: dict):
                 conn,
                 [member_id],
                 title="🎉 Your Birthday is Tomorrow!",
-                message=f"Happy early birthday, {first_name}! Wishing you a wonderful day tomorrow.",
+                message=f"Wishing you a wonderful day tomorrow, {first_name}!",
                 target_type="BIRTHDAY",
                 target_id=str(member_id)
             )

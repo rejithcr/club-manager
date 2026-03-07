@@ -1,6 +1,5 @@
 from src.fee import queries_fee
-from src import db
-from src import helper
+from src import db, helper, notification_helper
 
 
 class FeeCollectionService():
@@ -85,11 +84,23 @@ class FeeCollectionService():
             db.execute(conn, queries_fee.ADD_FEE_TYPE_COLLECTION_START,
                        (club_fee_collection_id, feeTypeId, nextPeriodLabel, nextPeriodDate, email, email))
 
-            for nxtFee in nextPeriodFees:
-                paid = 1 if nxtFee["clubFeeAmount"] == 0 else 0
-                db.execute(conn, queries_fee.ADD_FEE_TYPE_PAYMENT,
-                           (club_fee_collection_id, nxtFee["membershipId"], nxtFee["clubFeeAmount"],
-                            nxtFee["clubFeeTypeExceptionMemberId"], paid, email, email))
+            # Notify members
+            membership_ids = [nxtFee["membershipId"] for nxtFee in nextPeriodFees]
+            # Need to get member_ids from membership_ids
+            if membership_ids:
+                m_query = "SELECT member_id FROM membership WHERE membership_id = ANY(%s)"
+                m_rows = db.fetch(conn, m_query, (membership_ids,))
+                member_ids = [r['member_id'] for r in m_rows]
+                
+                notification_helper.send_notification(
+                    conn,
+                    member_ids,
+                    None, # Use club name as title
+                    f"Fee collection for {nextPeriodLabel} has been started.",
+                    'FEE_COLLECTION',
+                    club_fee_collection_id,
+                    club_id=clubId
+                )
 
             conn.commit()
 

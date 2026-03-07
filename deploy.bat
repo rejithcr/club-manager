@@ -55,6 +55,7 @@ echo ⚠️ Skipping migrations. Please export these variables if migrations are
 :: 2. Build the React Native web app
 if /i "%TASK%"=="flyway" goto SkipFrontend
 if /i "%TASK%"=="backend" goto SkipFrontend
+if /i "%TASK%"=="job" goto SkipFrontend
 
 echo 🏗️ Building Expo Web App...
 echo Running npx expo export -p web
@@ -79,6 +80,7 @@ if defined CLOUDFRONT_DIST_ID (
 :: 4. Bundle and Upload Backend App
 if /i "%TASK%"=="flyway" goto SkipBackend
 if /i "%TASK%"=="frontend" goto SkipBackend
+if /i "%TASK%"=="job" goto SkipBackend
 
 echo 🐍 Bundling Python Backend for AWS Lambda (Linux)...
 pushd .\backend
@@ -104,9 +106,9 @@ pip install --isolated --target build ^
 echo 📄 Copying source code and entry point...
 xcopy /E /I /Y src build\src\
 
-:: 5. Zip for Lambda using PowerShell
+:: 5. Zip for Lambda using Python (Ensures forward slashes for AWS console)
 echo 🤐 Zipping build directory into app.zip...
-powershell -Command "Compress-Archive -Path 'build\*' -DestinationPath 'app.zip' -Force"
+python -c "import zipfile, os; z = zipfile.ZipFile('app.zip', 'w', zipfile.ZIP_DEFLATED); [z.write(os.path.join(r, f), os.path.relpath(os.path.join(r, f), 'build').replace('\\', '/')) for r, d, files in os.walk('build') for f in files]; z.close()"
 
 if not exist app.zip (
     echo ❌ Failed to create app.zip.
@@ -122,6 +124,46 @@ rd /s /q build
 popd
 echo ✅ Backend uploaded successfully.
 :SkipBackend
+
+:: 6. Bundle Scheduled Jobs
+if /i "%TASK%"=="flyway" goto SkipJob
+if /i "%TASK%"=="frontend" goto SkipJob
+if /i "%TASK%"=="backend" goto SkipJob
+
+echo 🛠️ Bundling Scheduled Jobs (Notifier) for AWS Lambda (Linux)...
+pushd .\scheduled-jobs\notifier
+
+:: 1. Cleanup old build artifacts
+if exist build rd /s /q build
+if exist job.zip del job.zip
+mkdir build
+
+:: 2. Install dependencies for Linux (Python 3.13)
+echo 📦 Installing dependencies for Linux...
+pip install --isolated --target build ^
+    --platform manylinux2014_x86_64 --only-binary=:all: ^
+    --python-version 3.13 --implementation cp --abi cp313 ^
+    -r requirements.txt
+
+:: 3. Copy Source Code
+echo 📄 Copying source code...
+xcopy /E /I /Y src build\src\
+
+:: 4. Zip for Lambda using Python (Ensures forward slashes for AWS console)
+echo 🤐 Zipping build directory into job.zip...
+python -c "import zipfile, os; z = zipfile.ZipFile('job.zip', 'w', zipfile.ZIP_DEFLATED); [z.write(os.path.join(r, f), os.path.relpath(os.path.join(r, f), 'build').replace('\\', '/')) for r, d, files in os.walk('build') for f in files]; z.close()"
+
+if not exist job.zip (
+    echo ❌ Failed to create job.zip.
+    popd
+    exit /b 1
+)
+
+:: Cleanup
+rd /s /q build
+popd
+echo ✅ Scheduled jobs bundled successfully.
+:SkipJob
 
 echo ========================================
 echo     🎉 Deployment Complete!            

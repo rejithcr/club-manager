@@ -1,5 +1,13 @@
 import datetime
 import os
+import logging
+
+# Configure logging for AWS Lambda
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s – %(message)s",
+    force=True
+)
 
 import serverless_wsgi
 
@@ -26,12 +34,28 @@ from src.member.routes import member_bp
 
 def create_app():
     cm_app = Flask(__name__)
+    
+    # Ensure all Flask loggers use the same root configuration
+    for logger in (cm_app.logger, logging.getLogger('werkzeug')):
+        logger.setLevel(logging.INFO)
+
+    @cm_app.before_request
+    def log_request_info():
+        from flask import request
+        logging.info(f">>> Request: {request.method} {request.path}")
+
+    @cm_app.after_request
+    def log_response_info(response):
+        from flask import request
+        logging.info(f"<<< Response: {request.method} {request.path} - Status: {response.status_code}")
+        return response
+
     # Auth
     cm_app.config["JWT_SECRET_KEY"] = os.getenv('JWT_SECRET_KEY')
     cm_app.config["JWT_ACCESS_TOKEN_EXPIRES"] = datetime.timedelta(days=1)
     cm_app.config["JWT_REFRESH_TOKEN_EXPIRES"] = datetime.timedelta(days=365)
     JWTManager(cm_app)
-    CORS(cm_app, origins=constants.CORS_ORIGINS) #cors not required in aws lambda but required in local
+    # CORS(cm_app, origins=constants.CORS_ORIGINS) #cors not required in aws lambda but required in local
     Compress(cm_app)
     # Register the blueprint with an optional URL prefix
     cm_app.register_blueprint(member_bp)

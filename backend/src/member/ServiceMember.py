@@ -1,14 +1,5 @@
-from src import db
+from src import db, helper, notification_helper
 from src.member import queries_member
-from src import helper
-from exponent_server_sdk import (
-    DeviceNotRegisteredError,
-    PushClient,
-    PushMessage,
-    PushServerError,
-    PushTicketError,
-)
-from requests.exceptions import ConnectionError, HTTPError
 
 
 class MemberService():
@@ -77,17 +68,9 @@ class MemberService():
             message = params.get('message')
             target_type = params.get('targetType', 'GENERAL')
             target_id = params.get('targetId')
+            club_id = params.get('clubId')
             
-            # 1. Save notifications to DB
-            db.execute(conn, queries_member.SEND_NOTIFICATIONS, (member_ids, title, message, target_type, target_id))
-            
-            # 2. Retrieve push tokens for these members
-            token_rows = db.fetch(conn, queries_member.GET_PUSH_TOKENS_FOR_MEMBERS, (member_ids,))
-            push_tokens = [row['push_token'] for row in token_rows]
-            
-            # 3. Send push notifications via Expo
-            if push_tokens:
-                self._send_push_notifications(push_tokens, title, message, {"targetType": target_type, "targetId": target_id})
+            notification_helper.send_notification(conn, member_ids, title, message, target_type, target_id, club_id=club_id)
             
             conn.commit()
             return {"message": "Notifications sent successfully"}
@@ -99,21 +82,6 @@ class MemberService():
 
         return helper.convert_to_camel_case(member)
 
-    def _send_push_notifications(self, tokens, title, body, data=None):
-        client = PushClient()
-        messages = [
-            PushMessage(to=token, title=title, body=body, data=data, channel_id="default")
-            for token in tokens
-        ]
-        try:
-            responses = client.publish_multiple(messages)
-            # Potentially handle responses/tickets here if needed for debugging
-        except (PushServerError, HTTPError, ConnectionError) as exc:
-            # Encountered some network or server error
-            print(f"Error sending push: {exc}")
-        except Exception as exc:
-            # Any other error
-            print(f"Unexpected error sending push: {exc}")
 
     def put(self, conn, params):
         email = params.get('email')

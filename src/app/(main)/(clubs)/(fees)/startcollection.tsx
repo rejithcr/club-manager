@@ -18,6 +18,7 @@ import { useLazyGetFeeCollectionsQuery, useSaveFeeCollectionMutation } from "@/s
 import RoundedContainer from "@/src/components/RoundedContainer";
 import Divider from "@/src/components/Divider";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
+import { ClubContext } from '@/src/context/ClubContext'
 
 const StartNextPeriod = () => {
   const [year, setYear] = useState(new Date().getFullYear().toString());
@@ -30,6 +31,7 @@ const StartNextPeriod = () => {
   const { colors } = useTheme();
   const params = useSearchParams();
   const interval = JSON.parse(params.get("fee") || "").clubFeeTypeInterval;
+  const { clubInfo } = useContext(ClubContext)
 
   const [getNextPeriodFeeMemberList, { data: nextPeriodFee, isLoading: isLoadingPeriods }] =
     useLazyGetFeeCollectionsQuery();
@@ -85,6 +87,7 @@ const StartNextPeriod = () => {
         nextPeriodDate,
         nextPeriodLabel,
         email: userInfo.email,
+        clubId: clubInfo.clubId,
       }).unwrap();
       router.dismissTo({
         pathname: "/(main)/(clubs)/(fees)/feetypedetails",

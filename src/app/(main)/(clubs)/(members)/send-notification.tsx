@@ -90,7 +90,8 @@ export default function SendNotification() {
             await sendNotification({
                 memberIds: targetIds,
                 title: notificationTitle,
-                message: notificationMessage
+                message: notificationMessage,
+                clubId: clubInfo.clubId,
             }).unwrap();
 
             setAlertConfig({

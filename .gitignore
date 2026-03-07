@@ -70,8 +70,11 @@ google-services.json
 scheduled-jobs/notifier/build
 scheduled-jobs/notifier/job.zip
 scheduled-jobs/notifier/.venv
-scheduled-jobs/notifier/.idea
 scheduled-jobs/notifier/venv
 scheduled-jobs/notifier/src/__pycache__
 scheduled-jobs/notifier/__pycache__
 scheduled-jobs/notifier/test.py
+
+
+
+**/.idea/

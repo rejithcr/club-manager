@@ -1,4 +1,5 @@
 from src.club import queries_club
+from src import notification_helper
 
 from src import db
 from src.club.event import queries_events
@@ -105,6 +106,25 @@ class ClubService():
                     if attr_value and str(attr_value).strip() != "":
                         db.execute(conn, queries_member.ADD_MEMBER_ATTRIBUTE_VALUE,
                                    (attr_id, clubId, memberId, attr_value, email, email))
+
+            # Notify all members about the new joining
+            member_rows = db.fetch(conn, "SELECT member_id FROM membership WHERE club_id = %s AND is_active = 1", (clubId,))
+            all_member_ids = [r['member_id'] for r in member_rows]
+            
+            # Get approved member name
+            approved_member = db.fetch_one(conn, "SELECT first_name, last_name FROM member WHERE member_id = %s", (memberId,))
+            member_name = f"{approved_member['first_name']} {approved_member['last_name']}" if approved_member else "A new member"
+
+            if all_member_ids:
+                notification_helper.send_notification(
+                    conn,
+                    all_member_ids,
+                    None, # Use club name as title
+                    f"{member_name} has joined the club! Welcome aboard.",
+                    'MEMBERSHIP_APPROVAL',
+                    memberId,
+                    club_id=clubId
+                )
 
             conn.commit()
             return {"message": "Membership " + status}

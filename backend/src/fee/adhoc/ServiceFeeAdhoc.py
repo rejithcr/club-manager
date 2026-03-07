@@ -1,6 +1,5 @@
 from src.fee import queries_fee
-from src import db
-from src import helper
+from src import db, helper, notification_helper
 
 
 class FeeAdhocService():
@@ -32,6 +31,23 @@ class FeeAdhocService():
         for member in addedMembers:
             db.execute(conn, queries_fee.ADD_FEE_ADHOC_PAYMENT,
                        (clubAdhocFeeId, member["membershipId"], member['clubAdocFeePaymentAmount'], email, email))
+
+        # Notify members
+        membership_ids = [m["membershipId"] for m in addedMembers]
+        if membership_ids:
+            m_query = "SELECT member_id FROM membership WHERE membership_id = ANY(%s)"
+            m_rows = db.fetch(conn, m_query, (membership_ids,))
+            member_ids = [r['member_id'] for r in m_rows]
+            
+            notification_helper.send_notification(
+                conn,
+                member_ids,
+                None, # Use club name as title
+                f"New split payment request for {adhocFeeName} has been added.",
+                'ADHOC_FEE',
+                clubAdhocFeeId,
+                club_id=clubId
+            )
 
         conn.commit()
 

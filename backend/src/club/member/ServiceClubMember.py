@@ -1,8 +1,6 @@
-from src import db
+from src import db, helper, constants, notification_helper
 from src.club import queries_club
 from src.member import queries_member
-from src import helper
-from src import constants
 
 
 class ClubMemberService():
@@ -93,6 +91,30 @@ class ClubMemberService():
         
         # Use UPSERT to insert new request or update rejected request to REQUESTED
         db.execute(conn, queries_member.UPSERT_MEMBERSHIP_REQUEST, (club_id, member_id, email, email, helper.to_json(attributes) if attributes else None))
+        
+        # Notify Admins
+        admin_query = """
+            SELECT ms.member_id 
+            FROM membership ms
+            WHERE ms.club_id = %s AND ms.role_id = %s AND ms.is_active = 1
+        """
+        admin_rows = db.fetch(conn, admin_query, (club_id, constants.ROLE_ADMIN))
+        admin_ids = [r['member_id'] for r in admin_rows]
+        
+        # Get member name for the notification message
+        requesting_member = db.fetch_one(conn, "SELECT first_name, last_name FROM member WHERE member_id = %s", (member_id,))
+        member_name = f"{requesting_member['first_name']} {requesting_member['last_name']}" if requesting_member else "A new user"
+        
+        notification_helper.send_notification(
+            conn,
+            admin_ids,
+            None, # Use club name as title
+            f"{member_name} has requested to join the club.",
+            'MEMBERSHIP_REQUEST',
+            member_id,
+            club_id=club_id
+        )
+
         conn.commit()
         return {"message": f"Membership request submitted successfully"}
 

@@ -1,6 +1,5 @@
 from flask import jsonify
-
-from src import db, helper
+from src import db, helper, notification_helper
 from src.club.event import queries_events
 
 
@@ -35,7 +34,7 @@ class ClubEventService():
             return helper.convert_to_camel_case(events if events else [])
 
     def post(self, conn, params):
-        db.execute(conn,queries_events.ADD_EVENT, (
+        row = db.fetch_one(conn, queries_events.ADD_EVENT, (
             params['title'],
             params.get('description'),
             params['eventDate'],
@@ -47,8 +46,53 @@ class ClubEventService():
             params.get('isTransactionEnabled'),
             params.get('isAttendanceEnabled')
         ))
+        event_id = row['event_id']
+
+        # Get club members to notify
+        club_row = db.fetch_one(conn, "SELECT club_id FROM event_types WHERE event_type_id = %s", (params['eventTypeId'],))
+        if club_row:
+            club_id = club_row['club_id']
+            member_rows = db.fetch(conn, "SELECT member_id FROM membership WHERE club_id = %s AND is_active = 1", (club_id,))
+            member_ids = [r['member_id'] for r in member_rows]
+            
+            # Format date and time
+            event_date_val = params.get('eventDate')
+            formatted_date = str(event_date_val)
+            if event_date_val:
+                from datetime import datetime
+                try:
+                    if isinstance(event_date_val, str):
+                        event_date_obj = datetime.strptime(event_date_val, '%Y-%m-%d')
+                    else:
+                        event_date_obj = event_date_val
+                    formatted_date = event_date_obj.strftime('%d-%b-%Y')
+                except:
+                    pass
+            
+            start_time = params.get('startTime')
+            time_str = ""
+            if start_time:
+                if isinstance(start_time, str):
+                    time_str = f" at {start_time}"
+                else:
+                    time_str = f" at {start_time.strftime('%I:%M %p')}"
+
+            # Get event type name
+            et_row = db.fetch_one(conn, "SELECT name FROM event_types WHERE event_type_id = %s", (params['eventTypeId'],))
+            event_type_name = et_row['name'] if et_row else "Event"
+
+            notification_helper.send_notification(
+                conn, 
+                member_ids, 
+                None, # Use club name as title
+                f"{event_type_name}: {params['title']} has been scheduled for {formatted_date}{time_str}.", 
+                'EVENT', 
+                event_id,
+                club_id=club_id
+            )
+
         conn.commit()
-        return jsonify({'message': 'Event created'})
+        return jsonify({'message': 'Event created', 'eventId': event_id})
 
     def put(self, conn, params):
         event_id = params['eventId']
@@ -71,8 +115,40 @@ class ClubEventService():
         values.append(event_id)
         query = f"UPDATE events SET {', '.join(fields)} WHERE event_id = %s"
         db.execute(conn, query, tuple(values))
-        conn.commit()
 
+        # Notify members about the update
+        updated_event = db.fetch_one(conn, queries_events.GET_EVENT_BY_ID, (event_id,))
+        if updated_event:
+            club_row = db.fetch_one(conn, "SELECT club_id FROM event_types WHERE event_type_id = %s", (updated_event['event_type_id'],))
+            if club_row:
+                club_id = club_row['club_id']
+                member_rows = db.fetch(conn, "SELECT member_id FROM membership WHERE club_id = %s AND is_active = 1", (club_id,))
+                member_ids = [r['member_id'] for r in member_rows]
+
+                # Format date and time
+                event_date_str = updated_event['event_date'] # already formatted by query
+                from datetime import datetime
+                try:
+                    event_date_obj = datetime.strptime(event_date_str, '%Y-%m-%d')
+                    formatted_date = event_date_obj.strftime('%d-%b-%Y')
+                except:
+                    formatted_date = event_date_str
+
+                time_str = ""
+                if updated_event.get('start_time'):
+                    time_str = f" at {updated_event['start_time']}"
+
+                notification_helper.send_notification(
+                    conn,
+                    member_ids,
+                    None, # Use club name as title
+                    f"UPDATE: {updated_event['name']}: {updated_event['title']} is scheduled for {formatted_date}{time_str}.",
+                    'EVENT',
+                    event_id,
+                    club_id=club_id
+                )
+
+        conn.commit()
         return jsonify({'message': 'Event updated'})
 
 
