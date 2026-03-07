@@ -19,13 +19,15 @@ def send_notification(conn, member_ids, title, message, target_type, target_id, 
     if not member_ids:
         return
     
+    club_name = None
     if club_id:
         club_row = db.fetch_one(conn, "SELECT club_name FROM club WHERE club_id = %s", (club_id,))
         if club_row:
+            club_name = club_row['club_name']
             if title:
-                title = f"{club_row['club_name']} - {title}"
+                title = f"{club_name} - {title}"
             else:
-                title = club_row['club_name']
+                title = club_name
     
     unique_member_ids = list(set(member_ids))
     
@@ -46,11 +48,16 @@ def send_notification(conn, member_ids, title, message, target_type, target_id, 
     push_tokens = [row['push_token'] for row in token_rows if row.get('push_token')]
     
     if push_tokens:
+        push_data = {"targetType": target_type, "targetId": str(target_id)}
+        if club_id:
+            push_data["clubId"] = str(club_id)
+        if club_name:
+            push_data["clubName"] = club_name
         _send_push_notifications(
             push_tokens,
             title,
             message,
-            data={"targetType": target_type, "targetId": str(target_id)}
+            data=push_data
         )
 
 def _send_push_notifications(tokens: list, title: str, body: str, data: dict = None):

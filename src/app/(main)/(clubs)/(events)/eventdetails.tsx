@@ -27,6 +27,7 @@ import {
   useLazyGetClubMembersQuery,
   useLazyGetEventMembersQuery,
   useUpdateEventAttendanceMutation,
+  useLazyGetEventQuery,
 } from "@/src/services/clubApi";
 import Banner from "@/src/components/Banner";
 import NumberTicker from "@/src/components/NumberTicker";
@@ -52,8 +53,10 @@ const EventDetails = () => {
 
   const [getClubMembers] = useLazyGetClubMembersQuery();
   const [getAtendedMembers] = useLazyGetEventMembersQuery();
+  const [getEventById, { isFetching: isFetchingEvent }] = useLazyGetEventQuery();
 
   const eventObj = JSON.parse(params.get("event") || "{}");
+  const fallbackEventId = params.get("eventId");
 
   const loadClubMembers = async (eventId: string) => {
     setIsLoadingMembers(true);
@@ -81,9 +84,32 @@ const EventDetails = () => {
   };
 
   useEffect(() => {
-    setEvent(eventObj);
-    loadClubMembers(eventObj.eventId);
-  }, []);
+    const initData = async () => {
+      let currentEvent = eventObj;
+      if (!currentEvent.eventId && fallbackEventId) {
+        try {
+          const resp: any = await getEventById({ eventId: fallbackEventId }).unwrap();
+          // The backend might return an array of 1 item, or the object directly.
+          if (Array.isArray(resp) && resp.length > 0) {
+            currentEvent = resp[0];
+          } else if (resp && resp.eventId) {
+            currentEvent = resp;
+          }
+          console.log("Fetched event remotely:", currentEvent);
+        } catch (error) {
+          console.error("Failed to fetch event:", error);
+          return;
+        }
+      }
+      if (currentEvent && currentEvent.eventId) {
+        setEvent(currentEvent);
+        loadClubMembers(currentEvent.eventId);
+      } else {
+        console.log("currentEvent is missing eventId:", currentEvent);
+      }
+    };
+    initData();
+  }, [fallbackEventId]);
 
   const addToAttended = (member: Member) => {
     setAttendedMembers((prev) => {
@@ -160,138 +186,97 @@ const EventDetails = () => {
 
   const { items: recentTxns = [], isFetching: isTxnsFetching } = usePaginatedQuery(
     useGetEventTransactionsQuery,
-    { eventId: eventObj.eventId, txnType: "ALL", txnCategoryId: -1 },
+    { eventId: eventObj.eventId || fallbackEventId, txnType: "ALL", txnCategoryId: -1 },
     event?.isAttendanceEnabled ? 3 : 5
   );
 
   const { data: fb = { fundBalance: 0 }, isFetching: isFbFetching } = useGetEventTransactionsQuery({
-    eventId: eventObj.eventId,
+    eventId: eventObj.eventId || fallbackEventId,
     fundBalance: true,
   });
 
   return (
     <ThemedView style={{ flex: 1, backgroundColor: colors.background }}>
-      <GestureHandlerRootView>
-        <ScrollView>
-          {event && <EventItemDetails event={event} clubRole={clubInfo.role} />}
-          <Spacer space={8} />
-          {event?.isTransactionEnabled && (
-            <>
-              <Banner
-                backgroundColor={fb?.fundBalance < 0 ? colors.error : colors.success}
-                onPress={() => gotoEventTransactions(event?.eventId)}
-              >
-                <View>
-                  <ThemedText style={{ color: colors.background }}>Event Fund Balance</ThemedText>
-                  <NumberTicker
-                    value={fb.fundBalance}
-                    isLoading={isFbFetching}
-                    style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}
-                  />
-                </View>
-                <ThemedIcon name="MaterialCommunityIcons:wallet" size={50} color={colors.background} />
-              </Banner>
-              <Spacer space={5} />
-            </>
-          )}
-          {event?.isTransactionEnabled && (
-            <ThemedText style={{ color: colors.subText, width: "80%", alignSelf: "center" }}>Recent</ThemedText>
-          )}
-          {event?.isTransactionEnabled && isTxnsFetching && <LoadingSpinner />}
-          {event?.isTransactionEnabled && !isTxnsFetching && (
-            <>
-              {recentTxns.map((item, idx) => (
-                <View key={item.eventTransactionId}>
-                  {idx > 0 && <Divider style={{ width: "80%" }} />}
-                  <View
-                    style={{
-                      width: "80%",
-                      alignSelf: "center",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      paddingVertical: 10,
-                    }}
-                  >
-                    <View>
-                      <ThemedText style={{ fontWeight: "600" }}>{item.eventCategoryName}</ThemedText>
-                      <ThemedText style={{ fontSize: 12 }}>{item.eventTransactionComment}</ThemedText>
-                    </View>
-                    <View style={{ alignItems: "flex-end" }}>
-                      <ThemedText
-                        style={{
-                          fontWeight: "bold",
-                          color: item.eventTransactionType === "CREDIT" ? colors.success : colors.error,
-                        }}
-                      >
-                        {item.eventTransactionType === "CREDIT" ? "+" : "-"} ₹ {item.eventTransactionAmount}
-                      </ThemedText>
-                      <ThemedText style={{ fontSize: 10 }}>{item.eventTransactionDate}</ThemedText>
+      {isFetchingEvent ? (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <LoadingSpinner />
+        </View>
+      ) : (
+        <GestureHandlerRootView>
+          <ScrollView>
+            {event && <EventItemDetails event={event} clubRole={clubInfo?.role} />}
+            <Spacer space={8} />
+            {event?.isTransactionEnabled && (
+              <>
+                <Banner
+                  backgroundColor={fb?.fundBalance < 0 ? colors.error : colors.success}
+                  onPress={() => gotoEventTransactions(event?.eventId)}
+                >
+                  <View>
+                    <ThemedText style={{ color: colors.background }}>Event Fund Balance</ThemedText>
+                    <NumberTicker
+                      value={fb.fundBalance}
+                      isLoading={isFbFetching}
+                      style={{ fontSize: 30, fontWeight: "bold", color: colors.background }}
+                    />
+                  </View>
+                  <ThemedIcon name="MaterialCommunityIcons:wallet" size={50} color={colors.background} />
+                </Banner>
+                <Spacer space={5} />
+              </>
+            )}
+            {event?.isTransactionEnabled && (
+              <ThemedText style={{ color: colors.subText, width: "80%", alignSelf: "center" }}>Recent</ThemedText>
+            )}
+            {event?.isTransactionEnabled && isTxnsFetching && <LoadingSpinner />}
+            {event?.isTransactionEnabled && !isTxnsFetching && (
+              <>
+                {recentTxns.map((item, idx) => (
+                  <View key={item.eventTransactionId}>
+                    {idx > 0 && <Divider style={{ width: "80%" }} />}
+                    <View
+                      style={{
+                        width: "80%",
+                        alignSelf: "center",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        paddingVertical: 10,
+                      }}
+                    >
+                      <View>
+                        <ThemedText style={{ fontWeight: "600" }}>{item.eventCategoryName}</ThemedText>
+                        <ThemedText style={{ fontSize: 12 }}>{item.eventTransactionComment}</ThemedText>
+                      </View>
+                      <View style={{ alignItems: "flex-end" }}>
+                        <ThemedText
+                          style={{
+                            fontWeight: "bold",
+                            color: item.eventTransactionType === "CREDIT" ? colors.success : colors.error,
+                          }}
+                        >
+                          {item.eventTransactionType === "CREDIT" ? "+" : "-"} ₹ {item.eventTransactionAmount}
+                        </ThemedText>
+                        <ThemedText style={{ fontSize: 10 }}>{item.eventTransactionDate}</ThemedText>
+                      </View>
                     </View>
                   </View>
-                </View>
-              ))}
-              <ThemedIcon
-                style={{ alignSelf: "center" }}
-                name={"MaterialIcons:expand-more"}
-                onPress={() => gotoEventTransactions(event?.eventId)}
-                size={32}
-              />
-            </>
-          )}
-          {event?.isAttendanceEnabled && (
-            <>
-              <ThemedText
-                style={{ width: "85%", textAlign: "center", alignSelf: "center", fontSize: 12, color: colors.subText }}
-              >
-                Please select from the below list to mark attendance
-              </ThemedText>
-              <Spacer space={8} />
-              <ThemedView
-                style={{
-                  flexDirection: "row",
-                  flexWrap: "wrap",
-                  gap: 10,
-                  alignSelf: "center",
-                  width: "85%",
-                }}
-              >
-                {isLoadingMembers && <LoadingSpinner />}
-                {!isLoadingMembers &&
-                  attendedMembers.map((item: any) => (
-                    <Chip selected={true} key={item.memberId} onPress={() => removeFromAttended(item)}>
-                      <ThemedText>
-                        {item?.firstName} {item?.lastName}
-                      </ThemedText>
-                    </Chip>
-                  ))}
-
-                {!isLoadingMembers && remainingMembers.length == 0 && (
-                  <ThemedText style={{ textAlign: "center" }}>Yay!! All members attended 👏</ThemedText>
-                )}
-                {!isLoadingMembers &&
-                  remainingMembers.map((item: any) => (
-                    <Chip selected={false} key={item.memberId} onPress={() => addToAttended(item)}>
-                      <ThemedText>
-                        {item?.firstName} {item?.lastName}
-                      </ThemedText>
-                    </Chip>
-                  ))}
-              </ThemedView>
-            </>
-          )}
-          <Spacer space={40} />
-          <Modal isVisible={isConfirmVisible}>
-            <ScrollView>
-              <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
-                <ThemedHeading>Update Status</ThemedHeading>
-                {attendanceChanged ? (
-                  <ThemedText style={{ textAlign: "center" }}>
-                    Review the attendance changes and update event status?
-                  </ThemedText>
-                ) : (
-                  <ThemedText style={{ textAlign: "center" }}>Update event status?</ThemedText>
-                )}
-                <Spacer space={10} />
+                ))}
+                <ThemedIcon
+                  style={{ alignSelf: "center" }}
+                  name={"MaterialIcons:expand-more"}
+                  onPress={() => gotoEventTransactions(event?.eventId)}
+                  size={32}
+                />
+              </>
+            )}
+            {event?.isAttendanceEnabled && (
+              <>
+                <ThemedText
+                  style={{ width: "85%", textAlign: "center", alignSelf: "center", fontSize: 12, color: colors.subText }}
+                >
+                  Please select from the below list to mark attendance
+                </ThemedText>
+                <Spacer space={8} />
                 <ThemedView
                   style={{
                     flexDirection: "row",
@@ -301,46 +286,93 @@ const EventDetails = () => {
                     width: "85%",
                   }}
                 >
-                  {attendanceDiff.added.map((item: any) => (
-                    <Chip selected={true} key={item.memberId}>
-                      <ThemedText>
-                        {item?.firstName} {item?.lastName}
-                      </ThemedText>
-                    </Chip>
-                  ))}
-                  {attendanceDiff.removed.map((item: any) => (
-                    <Chip selected={false} key={item.memberId}>
-                      <ThemedText>
-                        {item?.firstName} {item?.lastName}
-                      </ThemedText>
-                    </Chip>
-                  ))}
+                  {isLoadingMembers && <LoadingSpinner />}
+                  {!isLoadingMembers &&
+                    attendedMembers.map((item: any) => (
+                      <Chip selected={true} key={item.memberId} onPress={() => removeFromAttended(item)}>
+                        <ThemedText>
+                          {item?.firstName} {item?.lastName}
+                        </ThemedText>
+                      </Chip>
+                    ))}
+
+                  {!isLoadingMembers && remainingMembers.length == 0 && (
+                    <ThemedText style={{ textAlign: "center" }}>Yay!! All members attended 👏</ThemedText>
+                  )}
+                  {!isLoadingMembers &&
+                    remainingMembers.map((item: any) => (
+                      <Chip selected={false} key={item.memberId} onPress={() => addToAttended(item)}>
+                        <ThemedText>
+                          {item?.firstName} {item?.lastName}
+                        </ThemedText>
+                      </Chip>
+                    ))}
                 </ThemedView>
-                <Spacer space={10} />
-                <Picker
-                  style={{ width: "80%", alignSelf: "center" }}
-                  onValueChange={setEventStatus}
-                  selectedValue={eventStatus}
-                >
-                  <Picker.Item value={"Scheduled"} label="Scheduled" />
-                  <Picker.Item value={"Completed"} label="Completed" />
-                  <Picker.Item value={"Cancelled"} label="Cancelled" />
-                </Picker>
-                <Spacer space={10} />
-                {eventStatus === "Cancelled" && (
-                  <InputText placeholder="Cancellation Reason" onChangeText={setCancellationReason} />
-                )}
-                <Spacer space={10} />
-                <ThemedView style={{ flexDirection: "row", justifyContent: "space-around" }}>
-                  {isSaving ? <LoadingSpinner /> : <ThemedButton title="Save" onPress={handleSaveChanges} />}
-                  <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
+              </>
+            )}
+            <Spacer space={40} />
+            <Modal isVisible={isConfirmVisible}>
+              <ScrollView>
+                <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
+                  <ThemedHeading>Update Status</ThemedHeading>
+                  {attendanceChanged ? (
+                    <ThemedText style={{ textAlign: "center" }}>
+                      Review the attendance changes and update event status?
+                    </ThemedText>
+                  ) : (
+                    <ThemedText style={{ textAlign: "center" }}>Update event status?</ThemedText>
+                  )}
+                  <Spacer space={10} />
+                  <ThemedView
+                    style={{
+                      flexDirection: "row",
+                      flexWrap: "wrap",
+                      gap: 10,
+                      alignSelf: "center",
+                      width: "85%",
+                    }}
+                  >
+                    {attendanceDiff.added.map((item: any) => (
+                      <Chip selected={true} key={item.memberId}>
+                        <ThemedText>
+                          {item?.firstName} {item?.lastName}
+                        </ThemedText>
+                      </Chip>
+                    ))}
+                    {attendanceDiff.removed.map((item: any) => (
+                      <Chip selected={false} key={item.memberId}>
+                        <ThemedText>
+                          {item?.firstName} {item?.lastName}
+                        </ThemedText>
+                      </Chip>
+                    ))}
+                  </ThemedView>
+                  <Spacer space={10} />
+                  <Picker
+                    style={{ width: "80%", alignSelf: "center" }}
+                    onValueChange={setEventStatus}
+                    selectedValue={eventStatus}
+                  >
+                    <Picker.Item value={"Scheduled"} label="Scheduled" />
+                    <Picker.Item value={"Completed"} label="Completed" />
+                    <Picker.Item value={"Cancelled"} label="Cancelled" />
+                  </Picker>
+                  <Spacer space={10} />
+                  {eventStatus === "Cancelled" && (
+                    <InputText placeholder="Cancellation Reason" onChangeText={setCancellationReason} />
+                  )}
+                  <Spacer space={10} />
+                  <ThemedView style={{ flexDirection: "row", justifyContent: "space-around" }}>
+                    {isSaving ? <LoadingSpinner /> : <ThemedButton title="Save" onPress={handleSaveChanges} />}
+                    <ThemedButton title="Cancel" onPress={() => setIsConfirmVisible(false)} />
+                  </ThemedView>
                 </ThemedView>
-              </ThemedView>
-            </ScrollView>
-          </Modal>
-        </ScrollView>
-      </GestureHandlerRootView>
-      {clubInfo.role === ROLE_ADMIN && (
+              </ScrollView>
+            </Modal>
+          </ScrollView>
+        </GestureHandlerRootView>
+      )}
+      {clubInfo?.role === ROLE_ADMIN && (
         <View
           style={{
             position: "absolute",
@@ -482,28 +514,28 @@ export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: s
                 </ThemedText>
               </View>
             </View>
+          </View>
+          {/* Edit Icon */}
+          {clubRole === ROLE_ADMIN && (
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                paddingLeft: 4,
+                backgroundColor: colors.button + "20",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ThemedIcon
+                name="MaterialCommunityIcons:square-edit-outline"
+                size={20}
+                color={colors.button}
+                onPress={() => router.push(`/(main)/(clubs)/(events)/editevent?event=${JSON.stringify(event)}`)}
+              />
             </View>
-            {/* Edit Icon */}
-            {clubRole === ROLE_ADMIN && (
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  paddingLeft: 4,
-                  backgroundColor: colors.button + "20",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <ThemedIcon
-                  name="MaterialCommunityIcons:square-edit-outline"
-                  size={20}
-                  color={colors.button}
-                  onPress={() => router.push(`/(main)/(clubs)/(events)/editevent?event=${JSON.stringify(event)}`)}
-                />
-              </View>
-            )}
+          )}
         </View>
 
         {/* Description */}
@@ -519,7 +551,7 @@ export const EventItemDetails = ({ event, clubRole }: { event: any; clubRole?: s
             <ThemedText
               style={{
                 fontSize: 14,
-                color: colors.text, 
+                color: colors.text,
                 lineHeight: 20,
               }}
             >

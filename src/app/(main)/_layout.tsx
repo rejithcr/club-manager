@@ -2,14 +2,14 @@ import { useTheme } from '@/src/hooks/use-theme'
 import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { ClubContext } from "../../context/ClubContext";
-import { useState } from 'react';
+import { useContext } from 'react';
 import { StackHeader } from '@/src/components/StackHeader';
 
 const MainStack = () => {
   const { colors } = useTheme()
-  const [clubInfo, setClubInfo] = useState<any | undefined>(undefined)
+  const { clubInfo } = useContext(ClubContext)
   return (
-    <ClubContext.Provider value={{ clubInfo, setClubInfo }}>
+    <>
       <Stack screenOptions={{ headerShadowVisible: false }}>
         <Stack.Screen name="index" options={{
           headerTitle: () => <StackHeader header={"Club Manager"} />,
@@ -21,7 +21,7 @@ const MainStack = () => {
         <Stack.Screen name="(clubs)" options={{ title: "Club", headerShown: false }} />
         <Stack.Screen name="(profile)" options={{ title: "Profile", headerShown: false }} />
         <Stack.Screen
-          name="createclub" // This is the name of the page and must match the url from root
+          name="createclub"
           options={{
             title: 'Create Club',
             headerShown: true, headerTintColor: colors.text,
@@ -39,7 +39,7 @@ const MainStack = () => {
         />
       </Stack>
       <StatusBar style={colors.statusbar == "light" ? "light" : "dark"} />
-    </ClubContext.Provider>
+    </>
   )
 }
 

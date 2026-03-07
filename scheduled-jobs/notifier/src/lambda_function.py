@@ -118,7 +118,9 @@ def _process_events(conn, summary: dict):
                 notification_title,
                 notification_body,
                 target_type="EVENT",
-                target_id=str(event_id)
+                target_id=str(event_id),
+                club_id=club_id,
+                club_name=club_name
             )
 
             summary["events_processed"] += 1

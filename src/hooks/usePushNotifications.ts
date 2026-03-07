@@ -5,7 +5,10 @@ import Constants from 'expo-constants';
 import { Alert, Platform } from 'react-native';
 import { useRegisterPushTokenMutation } from '../services/memberApi';
 
-export const usePushNotifications = (memberId: number | undefined) => {
+export const usePushNotifications = (
+    memberId: number | undefined,
+    onNotificationTap?: (data: { targetType?: string; targetId?: string }) => void
+) => {
     const [expoPushToken, setExpoPushToken] = useState<string | undefined>(undefined);
     const [notification, setNotification] = useState<Notifications.Notification | undefined>(undefined);
     const notificationListener = useRef<ReturnType<typeof Notifications.addNotificationReceivedListener>>(undefined);
@@ -37,7 +40,11 @@ export const usePushNotifications = (memberId: number | undefined) => {
         });
 
         responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-            console.log(response);
+            const data = response.notification.request.content.data as {
+                targetType?: string;
+                targetId?: string;
+            };
+            onNotificationTap?.(data);
         });
 
         return () => {

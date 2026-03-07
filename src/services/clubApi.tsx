@@ -18,6 +18,10 @@ export const clubApi = createApi({
       query: (params) => `/club/event?${new URLSearchParams(params).toString()}`,
       providesTags: ["event"],
     }),
+    getEvent: builder.query({
+      query: (params) => `/club/event?${new URLSearchParams(params).toString()}`,
+      providesTags: ["event"],
+    }),
     getClubEventTypes: builder.query({
       query: (params) => `/club/event/types?${new URLSearchParams(params).toString()}`,
       providesTags: ["eventType"],
@@ -187,6 +191,8 @@ export const {
   useGetClubMembersQuery,
   useGetClubEventsQuery,
   useLazyGetClubEventsQuery,
+  useGetEventQuery,
+  useLazyGetEventQuery,
   useAddMemberMutation,
   useAddClubMutation,
   useGetClubEventTypesQuery,

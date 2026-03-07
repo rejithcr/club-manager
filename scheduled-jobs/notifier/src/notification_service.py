@@ -21,7 +21,8 @@ logger = logging.getLogger(__name__)
 
 
 def save_and_push(conn, member_ids: list, title: str, message: str,
-                  target_type: str, target_id: str):
+                  target_type: str, target_id: str,
+                  club_id: int = None, club_name: str = None):
     """
     Save in-app notifications to the DB for the given member IDs,
     then fetch their push tokens and deliver Expo push notifications.
@@ -33,6 +34,8 @@ def save_and_push(conn, member_ids: list, title: str, message: str,
         message:     Notification body
         target_type: E.g. 'EVENT' or 'BIRTHDAY'
         target_id:   String ID of the target entity (event_id / member_id)
+        club_id:     Optional club ID to include in push payload for ClubContext seeding
+        club_name:   Optional club name to include in push payload for ClubContext seeding
     """
     if not member_ids:
         logger.info(f"No members to notify for {target_type} {target_id}")
@@ -51,11 +54,16 @@ def save_and_push(conn, member_ids: list, title: str, message: str,
 
     if push_tokens:
         logger.info(f"Sending push notifications → {len(push_tokens)} token(s)")
+        push_data = {"targetType": target_type, "targetId": str(target_id)}
+        if club_id:
+            push_data["clubId"] = str(club_id)
+        if club_name:
+            push_data["clubName"] = club_name
         _send_push_notifications(
             push_tokens,
             title,
             message,
-            data={"targetType": target_type, "targetId": str(target_id)}
+            data=push_data
         )
     else:
         logger.info("No push tokens found; skipping push delivery")
