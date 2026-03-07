@@ -87,7 +87,7 @@ function InitialiseApp({
           router.push(`/(main)/(clubs)/(fees)/payments?clubFeeCollectionId=${data.targetId}`);
           break;
         case 'ADHOC_FEE':
-          router.push(`/(main)/(clubs)/(fees)/adhocfee/payments?adhocFeeId=${data.targetId}`);
+          router.push(`/(main)/(clubs)/(fees)/adhocfee/payments?clubAdhocFeeId=${data.targetId}`);
           break;
         case 'MEMBERSHIP_REQUEST':
           router.push('/(main)/(clubs)/membershiprequests');

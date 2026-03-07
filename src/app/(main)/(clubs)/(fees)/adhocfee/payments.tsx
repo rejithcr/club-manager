@@ -23,7 +23,7 @@ import Alert, { AlertProps } from '@/src/components/Alert';
 import CircularProgress from '@/src/components/charts/CircularProgress';
 import InputText from '@/src/components/InputText';
 import DatePicker from '@/src/components/DatePicker';
-import { useDeleteFeesAdhocMutation, useGetFeesAdhocQuery, useSaveFeesAdhocMutation } from '@/src/services/feeApi';
+import { useDeleteFeesAdhocMutation, useGetFeesAdhocQuery, useSaveFeesAdhocMutation, useLazyGetFeesAdhocQuery } from '@/src/services/feeApi';
 import RoundedContainer from '@/src/components/RoundedContainer';
 import Divider from '@/src/components/Divider';
 import { showSnackbar } from '@/src/components/snackbar/snackbarService';
@@ -45,9 +45,39 @@ const Payments = () => {
   const { colors } = useTheme()
 
   const params = useSearchParams()
-  const feeObj = JSON.parse(params.get('adhocFee') || "")
+  const adhocFeeParam = params.get('adhocFee');
+  const clubAdhocFeeIdParam = params.get('clubAdhocFeeId');
 
-  const { data, isLoading } = useGetFeesAdhocQuery({ adhocFeeId: feeObj?.clubAdhocFeeId });
+  const [feeObj, setFeeObj] = useState<any>(adhocFeeParam ? JSON.parse(adhocFeeParam) : null);
+  const [feeName, setFeeName] = useState(feeObj?.clubAdhocFeeName || "");
+  const [feeDescription, setFeeDescription] = useState(feeObj?.clubAdhocFeeDesc || "");
+  const [feeDate, setFeeDate] = useState<Date>(feeObj?.clubAdhocFeeDate ? new Date(feeObj.clubAdhocFeeDate) : new Date());
+
+  const [getAdhocFeeRemote, { isFetching: isFetchingRemote }] = useLazyGetFeesAdhocQuery();
+
+  React.useEffect(() => {
+    const fetchRemote = async () => {
+      if (!feeObj && clubAdhocFeeIdParam) {
+        try {
+          const res: any = await getAdhocFeeRemote({ adhocFeeId: clubAdhocFeeIdParam }).unwrap();
+          // Assuming the remote API returns an object format. Sometimes it might be an array depending on the endpoint implementation.
+          const fetchedFee = Array.isArray(res) ? res[0] : res;
+          setFeeObj(fetchedFee);
+          setFeeName(fetchedFee?.clubAdhocFeeName);
+          setFeeDescription(fetchedFee?.clubAdhocFeeDesc);
+          if (fetchedFee?.clubAdhocFeeDate) setFeeDate(new Date(fetchedFee.clubAdhocFeeDate));
+        } catch (err) {
+          console.error("Failed to fetch adhoc fee remotely", err);
+        }
+      }
+    };
+    fetchRemote();
+  }, [clubAdhocFeeIdParam]);
+
+  const { data, isLoading } = useGetFeesAdhocQuery(
+    { adhocFeeId: feeObj?.clubAdhocFeeId || clubAdhocFeeIdParam },
+    { skip: (!feeObj?.clubAdhocFeeId && !clubAdhocFeeIdParam) }
+  );
 
   const updatePaymentStatus = () => {
     if (paymentStatusUpdates.length == 0) {
@@ -94,12 +124,9 @@ const Payments = () => {
       }, { text: 'Cancel', onPress: () => setAlertConfig({ visible: false }) }]
     });
   }
-  const getIsLoading = () => isLoading || isSaving || isDeleting;
+  const getIsLoading = () => isLoading || isSaving || isDeleting || isFetchingRemote;
 
   const [isEditVisible, setIsEditVisible] = useState(false)
-  const [feeName, setFeeName] = useState(feeObj?.clubAdhocFeeName)
-  const [feeDescription, setFeeDescription] = useState(feeObj?.clubAdhocFeeDesc)
-  const [feeDate, setFeeDate] = useState(new Date(feeObj?.clubAdhocFeeDate))
 
   const handleEdit = async () => {
     try {

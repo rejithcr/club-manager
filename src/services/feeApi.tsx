@@ -25,7 +25,7 @@ export const feeApi = createApi({
     getClubDues: builder.query({
       query: (params) => `/club/member?${new URLSearchParams(params).toString()}`,
       providesTags: ["fee", "adhoc"],
-    }), 
+    }),
     // transaction categories
     getTransactionCategories: builder.query({
       query: (params) => `/club/transaction/category?${new URLSearchParams(params).toString()}`,
@@ -157,11 +157,11 @@ export const feeApi = createApi({
         body,
       }),
       invalidatesTags: ["adhoc"],
-    }),        
+    }),
     getException: builder.query({
       query: (params) => `/fee/exception?${new URLSearchParams(params).toString()}`,
       providesTags: ["exception"],
-    }), 
+    }),
     addFeesException: builder.mutation({
       query: (body) => ({
         url: "/fee/exception",
@@ -242,6 +242,7 @@ export const {
   useGetFundBalanceQuery,
   useGetTotalDueQuery,
   useGetFeesAdhocQuery,
+  useLazyGetFeesAdhocQuery,
   useAddFeesAdhocMutation,
   useSaveFeesAdhocMutation,
   useDeleteFeesAdhocMutation,
