@@ -118,7 +118,15 @@ const StartNextPeriod = () => {
               <Picker
                 style={{ width: "64%" }}
                 selectedValue={nextPeriodDate}
-                onValueChange={(itemValue, _itemIndex) => setNextPeriodDate(itemValue)}
+                onValueChange={(itemValue, _itemIndex) => {
+                  setNextPeriodDate(itemValue);
+                  if (itemValue) {
+                    const selectedYear = itemValue.substring(0, 4);
+                    if (selectedYear !== year) {
+                      setYear(selectedYear);
+                    }
+                  }
+                }}
               >
                 {periods?.map((monthObj) => {
                   return <Picker.Item key={monthObj.period} label={monthObj.period} value={monthObj.startDate} />;
@@ -127,7 +135,7 @@ const StartNextPeriod = () => {
             )}
             <TextInput
               keyboardType="numeric"
-              defaultValue={"2025"}
+              value={year}
               onChangeText={(text) => setYear(text)}
               style={{
                 color: colors.text,
@@ -142,19 +150,19 @@ const StartNextPeriod = () => {
           </View>
         </View>
         <Spacer space={5} />
-          <RoundedContainer style={{ flex: 1 }}>
-            {isLoadingPeriods && <LoadingSpinner />}
-            {!isLoadingPeriods && (
-              <FlatList
-                style={{ width: "100%" }}
-                data={nextPeriodFee}
-                initialNumToRender={8}
-                ItemSeparatorComponent={() => <Divider />}
-                renderItem={({ item }) => <MemberFeeItem {...item} key={item.memberId} />}
-              />
-            )}
-          </RoundedContainer>
-          <Spacer space={50} />
+        <RoundedContainer style={{ flex: 1 }}>
+          {isLoadingPeriods && <LoadingSpinner />}
+          {!isLoadingPeriods && (
+            <FlatList
+              style={{ width: "100%" }}
+              data={nextPeriodFee}
+              initialNumToRender={8}
+              ItemSeparatorComponent={() => <Divider />}
+              renderItem={({ item }) => <MemberFeeItem {...item} key={item.memberId} />}
+            />
+          )}
+        </RoundedContainer>
+        <Spacer space={50} />
         <Modal isVisible={isConfirmVisible}>
           <View style={{ backgroundColor: "white" }}>
             <Text>Test</Text>
@@ -204,7 +212,7 @@ const MemberFeeItem = (props: {
         ) : (
           <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
         )}
-        <ThemedText style={{maxWidth: 140}}>
+        <ThemedText style={{ maxWidth: 140 }}>
           {props?.firstName} {props?.lastName}
         </ThemedText>
       </View>

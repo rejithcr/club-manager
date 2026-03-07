@@ -84,6 +84,12 @@ class FeeCollectionService():
             db.execute(conn, queries_fee.ADD_FEE_TYPE_COLLECTION_START,
                        (club_fee_collection_id, feeTypeId, nextPeriodLabel, nextPeriodDate, email, email))
 
+            for nxtFee in nextPeriodFees:
+                paid = 1 if nxtFee["clubFeeAmount"] == 0 else 0
+                db.execute(conn, queries_fee.ADD_FEE_TYPE_PAYMENT,
+                    (club_fee_collection_id, nxtFee["membershipId"], nxtFee["clubFeeAmount"],
+                         nxtFee["clubFeeTypeExceptionMemberId"], paid, email, email))
+
             # Notify members
             membership_ids = [nxtFee["membershipId"] for nxtFee in nextPeriodFees]
             # Need to get member_ids from membership_ids
