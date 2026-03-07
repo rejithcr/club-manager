@@ -42,6 +42,8 @@ def handler(event, context):
         "event_notifications_sent": 0,
         "birthdays_processed": 0,
         "birthday_notifications_sent": 0,
+        "old_read_notifications_deleted": 0,
+        "expired_notifications_deleted": 0,
         "errors": []
     }
 
@@ -50,6 +52,7 @@ def handler(event, context):
         conn = db.get_connection()
         _process_events(conn, summary)
         _process_birthdays(conn, summary)
+        _cleanup_read_notifications(conn, summary)
         conn.commit()
         logger.info(f"Job completed successfully. Summary: {summary}")
 
@@ -184,3 +187,33 @@ def _process_birthdays(conn, summary: dict):
             err_msg = f"Error processing birthday for member {bday_member.get('member_id')}: {exc}"
             logger.error(err_msg, exc_info=True)
             summary["errors"].append(err_msg)
+
+
+# ---------------------------------------------------------------------------
+# Cleanup: Delete read notifications
+# ---------------------------------------------------------------------------
+
+def _cleanup_read_notifications(conn, summary: dict):
+    """
+    Two-pass notification cleanup:
+      1. Delete read notifications older than 3 days.
+      2. Delete ALL notifications older than 30 days (regardless of read status).
+    Both counts are recorded in the summary for CloudWatch visibility.
+    """
+    try:
+        old_read = db.execute_returning_count(conn, queries.DELETE_OLD_READ_NOTIFICATIONS)
+        summary["old_read_notifications_deleted"] = old_read
+        logger.info(f"Deleted {old_read} read notification(s) older than 3 days")
+    except Exception as exc:
+        err_msg = f"Error deleting old read notifications: {exc}"
+        logger.error(err_msg, exc_info=True)
+        summary["errors"].append(err_msg)
+
+    try:
+        expired = db.execute_returning_count(conn, queries.DELETE_EXPIRED_NOTIFICATIONS)
+        summary["expired_notifications_deleted"] = expired
+        logger.info(f"Deleted {expired} notification(s) older than 30 days")
+    except Exception as exc:
+        err_msg = f"Error deleting expired notifications: {exc}"
+        logger.error(err_msg, exc_info=True)
+        summary["errors"].append(err_msg)

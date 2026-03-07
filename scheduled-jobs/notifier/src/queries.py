@@ -83,3 +83,20 @@ SAVE_NOTIFICATIONS = """
     INSERT INTO notification (member_id, title, message, target_type, target_id)
     SELECT unnest(%s::int[]), %s, %s, %s, %s
 """
+
+# -------------------------------------------------------------------
+# Notifications: Delete read notifications older than 3 days
+# -------------------------------------------------------------------
+DELETE_OLD_READ_NOTIFICATIONS = """
+    DELETE FROM notification
+    WHERE is_read = 1
+      AND created_ts < NOW() - INTERVAL '3 days'
+"""
+
+# -------------------------------------------------------------------
+# Notifications: Delete ALL notifications older than 30 days
+# -------------------------------------------------------------------
+DELETE_EXPIRED_NOTIFICATIONS = """
+    DELETE FROM notification
+    WHERE created_ts < NOW() - INTERVAL '30 days'
+"""

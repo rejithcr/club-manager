@@ -45,3 +45,10 @@ def execute(conn, query, params=None):
     """Execute a DML query (INSERT/UPDATE)."""
     with conn.cursor() as cursor:
         cursor.execute(query, params)
+
+
+def execute_returning_count(conn, query, params=None) -> int:
+    """Execute a DML query (DELETE/UPDATE) and return the number of rows affected."""
+    with conn.cursor() as cursor:
+        cursor.execute(query, params)
+        return cursor.rowcount
