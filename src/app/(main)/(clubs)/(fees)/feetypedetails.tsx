@@ -15,6 +15,7 @@ import Spacer from "@/src/components/Spacer";
 import { useTheme } from "@/src/hooks/use-theme";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import ProgressBar from "@/src/components/charts/ProgressBar";
 import { useGetFeeCollectionsQuery, useGetExceptionQuery } from "@/src/services/feeApi";
 import usePaginatedQuery from "@/src/hooks/usePaginatedQuery";
@@ -26,6 +27,8 @@ const FeeTypeDetails = () => {
   const [fee, setFee] = useState<any>();
   const { colors } = useTheme();
   const { clubInfo } = useContext(ClubContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
   const params = useSearchParams();
 
   const feeObj = JSON.parse(params.get("fee") || "");
@@ -89,7 +92,7 @@ const FeeTypeDetails = () => {
         <RoundedContainer>
           <TouchableCard
             id={fee?.clubFeeTypeId}
-            onPress={clubInfo.role === ROLE_ADMIN && editFeeType}
+            onPress={currentRole === ROLE_ADMIN ? editFeeType : undefined}
             icon={<ThemedIcon name={"MaterialCommunityIcons:square-edit-outline"} color={colors.warning} />}
           >
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "90%" }}>
@@ -130,7 +133,7 @@ const FeeTypeDetails = () => {
               />
               <ThemedText style={{ ...appStyles.heading, paddingLeft: 5 }}>Exceptions</ThemedText>
             </TouchableOpacity>
-            {clubInfo.role === ROLE_ADMIN && (
+            {currentRole === ROLE_ADMIN && (
               <TouchableOpacity style={{ width: 50, alignItems: "center" }} onPress={() => gotoAddFeeExceptions()}>
                 <ThemedIcon size={25} name={"MaterialCommunityIcons:plus-circle"} color={colors.add} />
               </TouchableOpacity>
@@ -152,7 +155,7 @@ const FeeTypeDetails = () => {
                     <View key={et.clubFeeTypeExceptionId}>
                       {idx > 0 && <Divider />}
                       <KeyValueTouchableBox
-                        edit={clubInfo.role === ROLE_ADMIN}
+                        edit={currentRole === ROLE_ADMIN}
                         onPress={() => gotoEditFeeExceptions(et.clubFeeTypeExceptionId)}
                         keyName={et.clubFeeTypeExceptionReason}
                         keyValue={`₹ ${et.clubFeeExceptionAmount}`}
@@ -191,35 +194,35 @@ const FeeTypeDetails = () => {
               ItemSeparatorComponent={() => <Spacer space={4} />}
               renderItem={({ item }) => (
                 <RoundedContainer>
-                <TouchableCard
-                  onPress={() =>
-                    gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod, item.collected, item.total)
-                  }
-                  id={item}
-                >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      width: "90%",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      flexWrap: "wrap",
-                    }}
+                  <TouchableCard
+                    onPress={() =>
+                      gotoPayments(item.clubFeeCollectionId, item.clubFeeTypePeriod, item.collected, item.total)
+                    }
+                    id={item}
                   >
-                    <View style={{ width: "50%" }}>
-                      <ThemedText style={{ fontWeight: "bold" }}>{item.clubFeeTypePeriod}</ThemedText>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        width: "90%",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <View style={{ width: "50%" }}>
+                        <ThemedText style={{ fontWeight: "bold" }}>{item.clubFeeTypePeriod}</ThemedText>
+                      </View>
+                      <View style={{ width: "50%", paddingRight: 5 }}>
+                        <ProgressBar height={12} value={Math.round((item.collected / item.total) * 100)} />
+                      </View>
                     </View>
-                    <View style={{ width: "50%", paddingRight: 5 }}>
-                      <ProgressBar height={12} value={Math.round((item.collected / item.total) * 100)} />
-                    </View>
-                  </View>
-                </TouchableCard>
+                  </TouchableCard>
                 </RoundedContainer>
               )}
             />
           )}
         </View>
-        {clubInfo.role === ROLE_ADMIN && (
+        {currentRole === ROLE_ADMIN && (
           <ThemedButton
             style={{ position: "absolute", bottom: 40, alignSelf: "center" }}
             title="Start new collection"

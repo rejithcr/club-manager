@@ -1,10 +1,11 @@
-import { View, TouchableOpacity, FlatList} from "react-native";
+import { View, TouchableOpacity, FlatList } from "react-native";
 import React, { useContext } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { router } from "expo-router";
 import TouchableCard from "@/src/components/TouchableCard";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedView from "@/src/components/themed-components/ThemedView";
@@ -21,6 +22,8 @@ const limit = 20;
 
 const AdocFeesHome = () => {
   const { clubInfo } = useContext(ClubContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
   const { colors } = useTheme();
 
   const { items, isLoading, isFetching, refreshing, onRefresh, loadMore } = usePaginatedQuery(
@@ -51,7 +54,7 @@ const AdocFeesHome = () => {
         >
           <ThemedHeading style={{ width: 200 }}>Expense Splits</ThemedHeading>
           <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
-            {clubInfo.role == ROLE_ADMIN && (
+            {currentRole == ROLE_ADMIN && (
               <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
                 <ThemedIcon size={25} name={"MaterialCommunityIcons:plus-circle"} color={colors.add} />
               </TouchableOpacity>
@@ -99,9 +102,9 @@ const AdocFeesHome = () => {
                   >
                     <View style={{ width: "70%" }}>
                       <ThemedText style={{ fontWeight: "bold" }}>{item.clubAdhocFeeName}</ThemedText>
-                      <ThemedText style={{ fontSize: 12, color: colors.subText}}>{item.clubAdhocFeeDesc}</ThemedText>
+                      <ThemedText style={{ fontSize: 12, color: colors.subText }}>{item.clubAdhocFeeDesc}</ThemedText>
                       <ThemedText style={{ fontSize: 10, marginTop: 5 }}>
-                        {item.clubAdhocFeeDate} 
+                        {item.clubAdhocFeeDate}
                       </ThemedText>
                     </View>
                     <View style={{ width: "30%" }}>

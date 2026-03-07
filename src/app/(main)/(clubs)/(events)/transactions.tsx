@@ -13,6 +13,7 @@ import Divider from "@/src/components/Divider";
 import { appStyles } from "@/src/utils/styles";
 import { useTheme } from "@/src/hooks/use-theme";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import { UserContext } from "@/src/context/UserContext";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import {
@@ -36,6 +37,8 @@ const EventTransactions = () => {
   const params = useSearchParams();
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
   const { colors } = useTheme();
   const eventId = params.get("eventId");
 
@@ -73,7 +76,7 @@ const EventTransactions = () => {
   const [deleteEventTxn, { isLoading: isDeleting }] = useDeleteEventTransactionMutation();
 
   useEffect(() => {
-     onRefresh();
+    onRefresh();
   }, [txnTypeFilter, txnCategoryFilter]);
 
   const openAdd = () => {
@@ -186,7 +189,7 @@ const EventTransactions = () => {
           }
           renderItem={({ item }) => (
             <TouchableOpacity
-              disabled={clubInfo.role !== ROLE_ADMIN}
+              disabled={currentRole !== ROLE_ADMIN}
               onPress={() => {
                 setTxnValues({
                   txnId: item.eventTransactionId,
@@ -204,12 +207,12 @@ const EventTransactions = () => {
               <View style={{ flexDirection: "row", justifyContent: "space-between", paddingVertical: 10 }}>
                 <View>
                   <View style={{ flexDirection: "row", }}>
-                    <ThemedText style={{ fontWeight: "600" }}>{item.eventCategoryName}</ThemedText>    
-                    <Spacer hspace={2} />                
-                    {clubInfo.role === ROLE_ADMIN && <MaterialCommunityIcons name='square-edit-outline' size={12} color={"#546E7A"} /> }
+                    <ThemedText style={{ fontWeight: "600" }}>{item.eventCategoryName}</ThemedText>
+                    <Spacer hspace={2} />
+                    {currentRole === ROLE_ADMIN && <MaterialCommunityIcons name='square-edit-outline' size={12} color={"#546E7A"} />}
                   </View>
                   <ThemedText style={{ fontSize: 12 }}>{item.eventTransactionComment}</ThemedText>
-                </View>                
+                </View>
                 <View style={{ alignItems: "flex-end" }}>
                   <ThemedText
                     style={{
@@ -262,13 +265,13 @@ const EventTransactions = () => {
           <InputText
             label="Details"
             defaultValue={txnValues?.txnComment}
-            onChangeText={(t:any) => setTxnValues((p: any) => ({ ...p, txnComment: t }))}
+            onChangeText={(t: any) => setTxnValues((p: any) => ({ ...p, txnComment: t }))}
           />
           <InputText
             label="Amount"
             defaultValue={txnValues?.txnAmount?.toString()}
             keyboardType="numeric"
-            onChangeText={(t:any) => setTxnValues((p: any) => ({ ...p, txnAmount: t }))}
+            onChangeText={(t: any) => setTxnValues((p: any) => ({ ...p, txnAmount: t }))}
           />
           {txnValues?.lastUpdatedBy && <ThemedText style={{ width: "80%", alignSelf: "center", fontSize: 12, color: colors.subText }}>Updated by: {txnValues?.lastUpdatedBy}</ThemedText>}
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 16 }}>
@@ -288,7 +291,7 @@ const EventTransactions = () => {
       <Modal isVisible={isAddCategoryVisible} onBackdropPress={() => setIsAddCategoryVisible(false)}>
         <ThemedView style={{ borderRadius: 25, padding: 16 }}>
           <ThemedText style={appStyles.heading}>Add category</ThemedText>
-          <InputText label="Category name" defaultValue={newCategoryName} onChangeText={(t:any) => setNewCategoryName(t)} />
+          <InputText label="Category name" defaultValue={newCategoryName} onChangeText={(t: any) => setNewCategoryName(t)} />
           <View style={{ flexDirection: "row", justifyContent: "space-around", marginTop: 16 }}>
             {isAddingCategory ? (
               <LoadingSpinner />
@@ -314,7 +317,7 @@ const EventTransactions = () => {
         </ThemedView>
       </Modal>
 
-      {clubInfo.role === ROLE_ADMIN && (
+      {currentRole === ROLE_ADMIN && (
         <FloatingMenu
           onPressMain={() => {
             openAdd();

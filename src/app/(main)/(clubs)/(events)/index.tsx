@@ -4,6 +4,7 @@ import Spacer from "@/src/components/Spacer";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import { router } from "expo-router";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import { AntDesign, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
@@ -21,6 +22,8 @@ const limit = 20;
 const EventsHome = () => {
   const [eventTypeId, setEventTypeId] = useState("-1");
   const { clubInfo } = useContext(ClubContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
 
   const { data: eventTypes, isLoading: isLoadingEventTypes } = useGetClubEventTypesQuery({ clubId: clubInfo.clubId });
 
@@ -91,7 +94,7 @@ const EventsHome = () => {
           />
         )}
       </ThemedView>
-      {clubInfo.role === ROLE_ADMIN && (
+      {currentRole === ROLE_ADMIN && (
         <FloatingMenu
           actions={actions}
           position={"left"}
@@ -137,8 +140,10 @@ export const EventItem = ({ event }: { event: any }) => {
   const { colors } = useTheme();
   return (
     <RoundedContainer>
-      <View style={{ flexDirection: "row", width: "100%", justifyContent: "space-between", 
-                    paddingVertical: 10, paddingHorizontal: 15 }}>
+      <View style={{
+        flexDirection: "row", width: "100%", justifyContent: "space-between",
+        paddingVertical: 10, paddingHorizontal: 15
+      }}>
         <View style={{ rowGap: 5 }}>
           <ThemedText style={{ fontWeight: "bold" }}>{event.title}</ThemedText>
           <View style={{ flexDirection: "row", alignItems: "center" }}>
@@ -149,30 +154,31 @@ export const EventItem = ({ event }: { event: any }) => {
         </View>
         <View style={{ rowGap: 5 }}>
           <ThemedText
-            style={{textAlign: "right",
+            style={{
+              textAlign: "right",
               fontSize: 12,
               fontWeight: "bold",
               color:
                 event.status === "Completed"
                   ? colors.success
                   : event.status === "Scheduled"
-                  ? colors.warning
-                  : colors.error,
+                    ? colors.warning
+                    : colors.error,
             }}
           >
             {event.status}
           </ThemedText>
-         
+
           <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
-             {event.startTime && (
-            <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
-              <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
-              <Spacer hspace={2} />
-              <ThemedText style={{ fontSize: 12 }}>
-                {event.startTime} {event.endTime && " - " + event.endTime}
-              </ThemedText>
-            </View>
-          )}
+            {event.startTime && (
+              <View style={{ flexDirection: "row", alignItems: "center", alignSelf: "flex-end" }}>
+                <ThemedIcon name={"MaterialIcons:access-time"} size={15} />
+                <Spacer hspace={2} />
+                <ThemedText style={{ fontSize: 12 }}>
+                  {event.startTime} {event.endTime && " - " + event.endTime}
+                </ThemedText>
+              </View>
+            )}
           </View>
         </View>
       </View>

@@ -11,6 +11,7 @@ import ThemedButton from "@/src/components/ThemedButton";
 import { router } from "expo-router";
 import { useTheme } from "@/src/hooks/use-theme";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import { UserContext } from "@/src/context/UserContext";
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import Alert, { AlertProps } from "@/src/components/Alert";
@@ -31,6 +32,8 @@ const Profile = () => {
   const [isRemoving, setIsRemoving] = useState(false);
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
 
   const { data: memberDetails, isLoading: isMemberLoading } = useGetClubMembersQuery({
     clubId: clubInfo.clubId,
@@ -91,7 +94,7 @@ const Profile = () => {
                     <ThemedIcon name="MaterialIcons:account-circle" size={50} color={colors.text} />
                   </View>
                 )}
-                
+
                 <View style={styles.profileInfo}>
                   <ThemedText style={{ ...styles.memberName, color: colors.info }}>
                     {memberDetails?.firstName} {memberDetails?.lastName}
@@ -107,36 +110,36 @@ const Profile = () => {
 
               {/* Member Information */}
               <Card>
-              <KeyValueUI 
-                data={memberDetails} 
-                hideKeys={["photo", "firstName", "lastName", "isRegistered", "isActive"]} 
-              />
+                <KeyValueUI
+                  data={memberDetails}
+                  hideKeys={["photo", "firstName", "lastName", "isRegistered", "isActive"]}
+                />
 
-              {/* Club Attributes */}
-              {(!isLoadingCMA && cmaList && cmaList.length > 0) && (
-                <>
-                  <Divider style={styles.sectionDivider} />
-                  <ThemedText style={{ ...styles.sectionTitle, color: colors.heading }}>
-                    Club Attributes
-                  </ThemedText>
-                  
-                  {cmaList.map((cma: ClubMemberAttribute, index: number) => (
-                    <View key={index} style={styles.attributeItem}>
-                      <ThemedText style={{ ...styles.attributeLabel, color: colors.subText }}>
-                        {cma.attribute}
-                      </ThemedText>
-                      <ThemedText style={{ ...styles.attributeValue, color: colors.text }}>
-                        {cma.attributeValue}
-                      </ThemedText>
-                    </View>
-                  ))}
-                </>
-              )}
+                {/* Club Attributes */}
+                {(!isLoadingCMA && cmaList && cmaList.length > 0) && (
+                  <>
+                    <Divider style={styles.sectionDivider} />
+                    <ThemedText style={{ ...styles.sectionTitle, color: colors.heading }}>
+                      Club Attributes
+                    </ThemedText>
+
+                    {cmaList.map((cma: ClubMemberAttribute, index: number) => (
+                      <View key={index} style={styles.attributeItem}>
+                        <ThemedText style={{ ...styles.attributeLabel, color: colors.subText }}>
+                          {cma.attribute}
+                        </ThemedText>
+                        <ThemedText style={{ ...styles.attributeValue, color: colors.text }}>
+                          {cma.attributeValue}
+                        </ThemedText>
+                      </View>
+                    ))}
+                  </>
+                )}
               </Card>
               {/* Admin Actions */}
-              {clubInfo.role === ROLE_ADMIN && (
+              {currentRole === ROLE_ADMIN && (
                 <>
-                <Spacer space={5} />
+                  <Spacer space={5} />
                   {isRemoving ? (
                     <LoadingSpinner />
                   ) : (
@@ -146,10 +149,10 @@ const Profile = () => {
                         onPress={() => router.push(`/(main)/(members)/editmember?memberId=${params.get("memberId")}`)}
                         style={{ backgroundColor: colors.button }}
                       />
-                      
-                      <ThemedButton 
-                        title="Remove" 
-                        onPress={() => handleRemove()} 
+
+                      <ThemedButton
+                        title="Remove"
+                        onPress={() => handleRemove()}
                         style={{ backgroundColor: colors.error }}
                       />
                     </View>
@@ -162,7 +165,7 @@ const Profile = () => {
           {isLoadingCMA && <LoadingSpinner />}
         </ScrollView>
       </GestureHandlerRootView>
-      
+
       {alertConfig?.visible && <Alert {...alertConfig} />}
     </ThemedView>
   );

@@ -10,6 +10,7 @@ import { appStyles } from '@/src/utils/styles'
 import LoadingSpinner from '@/src/components/LoadingSpinner'
 import ShadowBox from '@/src/components/ShadowBox'
 import { ClubContext } from '@/src/context/ClubContext'
+import { MemberRoleContext } from '@/src/context/MemberRoleContext'
 import ThemedView from '@/src/components/themed-components/ThemedView'
 import ThemedText from '@/src/components/themed-components/ThemedText'
 import ThemedIcon from '@/src/components/themed-components/ThemedIcon'
@@ -29,6 +30,8 @@ const EditFeeException = () => {
     const [members, setMembers] = useState<any>([]);
     const { userInfo } = useContext(UserContext)
     const { clubInfo } = useContext(ClubContext)
+    const { memberRoles } = useContext(MemberRoleContext);
+    const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
     const { colors } = useTheme();
 
     const params = useSearchParams()
@@ -36,45 +39,45 @@ const EditFeeException = () => {
     const [updateExceptionType, { isLoading: isSaving }] = useUpdateFeesExceptionMutation();
 
     const handleSaveException = async () => {
-      const changes = exceptionMembers.filter(
-        (item: { endDateAdded: any; clubFeeTypeExceptionMemberId: any }) =>
-          item.endDateAdded || !item.clubFeeTypeExceptionMemberId
-      );
-      if (validate(exceptionType, exceptionAmount)) {
-        setIsLoadingMembers(true);
-        try {
-          await updateExceptionType({
-            feeTypeExceptionId: params.get("clubFeeTypeExceptionId"),
-            exceptionType,
-            exceptionAmount,
-            exceptionMembers: changes,
-            email: userInfo.email,
-          });
-          router.back();
-        } catch (error) {
-          console.log(error);
+        const changes = exceptionMembers.filter(
+            (item: { endDateAdded: any; clubFeeTypeExceptionMemberId: any }) =>
+                item.endDateAdded || !item.clubFeeTypeExceptionMemberId
+        );
+        if (validate(exceptionType, exceptionAmount)) {
+            setIsLoadingMembers(true);
+            try {
+                await updateExceptionType({
+                    feeTypeExceptionId: params.get("clubFeeTypeExceptionId"),
+                    exceptionType,
+                    exceptionAmount,
+                    exceptionMembers: changes,
+                    email: userInfo.email,
+                });
+                router.back();
+            } catch (error) {
+                console.log(error);
+            }
         }
-      }
     };
 
     const loadExceptionDetails = async () => {
-      setIsLoadingMembers(true);
-      try {
-        const exceptionType = await getExceptionDetails({
-          clubFeeTypeExceptionId: params.get("clubFeeTypeExceptionId"),
-        }).unwrap();
-        setExceptionType(exceptionType.clubFeeTypeExceptionReason);
-        setExceptionAmount(exceptionType.clubFeeExceptionAmount.toString());
-        setExceptionMembers(exceptionType.members);
-        const members = await getClubMembers({ clubId: clubInfo.clubId }).unwrap();
-        const activeExceptions = exceptionType.members.filter((e: any) => !e.endDate);
-        const difference = members.filter((m: any) => !activeExceptions.some((e: any) => e.memberId == m.memberId));
-        setMembers(difference);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoadingMembers(false);
-      }
+        setIsLoadingMembers(true);
+        try {
+            const exceptionType = await getExceptionDetails({
+                clubFeeTypeExceptionId: params.get("clubFeeTypeExceptionId"),
+            }).unwrap();
+            setExceptionType(exceptionType.clubFeeTypeExceptionReason);
+            setExceptionAmount(exceptionType.clubFeeExceptionAmount.toString());
+            setExceptionMembers(exceptionType.members);
+            const members = await getClubMembers({ clubId: clubInfo.clubId }).unwrap();
+            const activeExceptions = exceptionType.members.filter((e: any) => !e.endDate);
+            const difference = members.filter((m: any) => !activeExceptions.some((e: any) => e.memberId == m.memberId));
+            setMembers(difference);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoadingMembers(false);
+        }
     };
 
     const [getClubMembers] = useLazyGetClubMembersQuery();
@@ -119,12 +122,12 @@ const EditFeeException = () => {
                 </View>
 
                 <RoundedContainer>
-                {isLoadingMembers && <LoadingSpinner />}
-                {!isLoadingMembers && exceptionMembers && exceptionMembers.length > 0 && exceptionMembers[0].memberId &&
-                    exceptionMembers?.map((member: {
-                        memberId: number, lastName: string, firstName: string | undefined, startDate: string,
-                        clubFeeTypeExceptionMemberId: number, endDate: string | undefined, endDateAdded: string | undefined
-                    }, idx: number) => <><View key={member?.memberId?.toString() + member?.endDate}>{idx > 0 && <Divider />}
+                    {isLoadingMembers && <LoadingSpinner />}
+                    {!isLoadingMembers && exceptionMembers && exceptionMembers.length > 0 && exceptionMembers[0].memberId &&
+                        exceptionMembers?.map((member: {
+                            memberId: number, lastName: string, firstName: string | undefined, startDate: string,
+                            clubFeeTypeExceptionMemberId: number, endDate: string | undefined, endDateAdded: string | undefined
+                        }, idx: number) => <><View key={member?.memberId?.toString() + member?.endDate}>{idx > 0 && <Divider />}
                             <ShadowBox style={{
                                 flexDirection: "row", justifyContent: "space-between",
                             }}>
@@ -132,33 +135,33 @@ const EditFeeException = () => {
                                     <ThemedText style={{ fontSize: 15, textDecorationLine: getStrikeOut(member.endDate || member.endDateAdded) }}>{member.firstName} {member.lastName}</ThemedText>
                                     <ThemedText style={{ fontSize: 12, marginTop: 5, color: colors.subText }}>{member.startDate} {(member.endDate || member.endDateAdded) && " to "} {member.endDate || member.endDateAdded}</ThemedText>
                                 </View>
-                                {clubInfo.role === ROLE_ADMIN &&
-                                !member.endDate && (member.endDateAdded ? <ThemedIcon name="MaterialIcons:undo" size={20} onPress={() => endException(member)} />
-                                    : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} color={colors.error}/>)
+                                {currentRole === ROLE_ADMIN &&
+                                    !member.endDate && (member.endDateAdded ? <ThemedIcon name="MaterialIcons:undo" size={20} onPress={() => endException(member)} />
+                                        : <ThemedIcon name="MaterialIcons:remove-circle" size={20} onPress={() => endException(member)} color={colors.error} />)
                                 }
                             </ShadowBox>
                         </View></>
-                    )
-                }</RoundedContainer>
-                {clubInfo.role === ROLE_ADMIN && <>
-                <ThemedText style={{ ...appStyles.heading }}>Add Members</ThemedText>
-                <RoundedContainer>
-                {isLoadingMembers && <LoadingSpinner />}
-                {!isLoadingMembers &&
-                    members.map((item: any, idx: number) =><View key={item.memberId}>
-                        {idx > 0 && <Divider />}
-                        <TouchableOpacity onPress={() => addToException(item)} disabled={clubInfo.role !== ROLE_ADMIN}>
-                            <ShadowBox>
-                                <ThemedIcon name="MaterialIcons:add-circle" size={20} color={colors.add}/>
-                                <ThemedText style={{ fontSize: 15, paddingLeft: 10}}>{item?.firstName} {item?.lastName}</ThemedText>
-                            </ShadowBox>
-                        </TouchableOpacity></View>                        
-                    )
-                }</RoundedContainer>
-            <View style={{marginVertical:40}} /></>}
+                        )
+                    }</RoundedContainer>
+                {currentRole === ROLE_ADMIN && <>
+                    <ThemedText style={{ ...appStyles.heading }}>Add Members</ThemedText>
+                    <RoundedContainer>
+                        {isLoadingMembers && <LoadingSpinner />}
+                        {!isLoadingMembers &&
+                            members.map((item: any, idx: number) => <View key={item.memberId}>
+                                {idx > 0 && <Divider />}
+                                <TouchableOpacity onPress={() => addToException(item)} disabled={currentRole !== ROLE_ADMIN}>
+                                    <ShadowBox>
+                                        <ThemedIcon name="MaterialIcons:add-circle" size={20} color={colors.add} />
+                                        <ThemedText style={{ fontSize: 15, paddingLeft: 10 }}>{item?.firstName} {item?.lastName}</ThemedText>
+                                    </ShadowBox>
+                                </TouchableOpacity></View>
+                            )
+                        }</RoundedContainer>
+                    <View style={{ marginVertical: 40 }} /></>}
             </ScrollView>
-            
-            {clubInfo.role === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 40, alignSelf: "center" }} >
+
+            {currentRole === ROLE_ADMIN && <View style={{ position: "absolute", bottom: 40, alignSelf: "center" }} >
                 {isSaving ? <LoadingSpinner /> : <ThemedButton title='Update Exception' onPress={handleSaveException} />}
             </View>}
         </ThemedView>

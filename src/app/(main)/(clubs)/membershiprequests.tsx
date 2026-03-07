@@ -1,6 +1,7 @@
 import { FlatList, TouchableOpacity, View, RefreshControl } from "react-native";
 import React, { useContext, useState } from "react";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -25,6 +26,9 @@ const MembershipRequests = () => {
   const { colors } = useTheme();
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
+
   const [isUpdating, setIsUpdating] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [comments, setComments] = useState("");
@@ -68,7 +72,7 @@ const MembershipRequests = () => {
     <GestureHandlerRootView>
       <ThemedView style={{ flex: 1 }}>
         <Spacer space={5} />
-        <ThemedText style={{ fontSize: 12, width: "80%", alignSelf: "center" , color: colors.subText}}>
+        <ThemedText style={{ fontSize: 12, width: "80%", alignSelf: "center", color: colors.subText }}>
           Press the item to approve or reject
         </ThemedText>
         <Spacer space={10} />
@@ -99,7 +103,7 @@ const MembershipRequests = () => {
                 style={{ alignSelf: "center", width: "80%" }}
                 onPress={() => showApproveModal(item.memberId, item.clubId, item.phone, item.email, item.firstName, item.lastName)}
               >
-                <View style={{ flexDirection: "row", alignItems: "center", width: "100%"}}>
+                <View style={{ flexDirection: "row", alignItems: "center", width: "100%" }}>
                   <View style={{ marginRight: 10 }}>
                     <ThemedIcon
                       size={25}
@@ -107,15 +111,15 @@ const MembershipRequests = () => {
                         item.status === "APPROVED"
                           ? "MaterialIcons:check-circle"
                           : item.status === "REJECTED"
-                          ? "MaterialIcons:cancel"
-                          : "FontAwesome:question-circle"
+                            ? "MaterialIcons:cancel"
+                            : "FontAwesome:question-circle"
                       }
                       color={
                         item.status === "APPROVED"
                           ? colors.success
                           : item.status === "REJECTED"
-                          ? colors.error
-                          : colors.warning
+                            ? colors.error
+                            : colors.warning
                       }
                     />
                   </View>
@@ -131,7 +135,7 @@ const MembershipRequests = () => {
           />
         )}
       </ThemedView>
-      {clubInfo.role === ROLE_ADMIN && (
+      {currentRole === ROLE_ADMIN && (
         <Modal isVisible={isModalVisible}>
           <ThemedView style={{ borderRadius: 25, paddingBottom: 20 }}>
             <ThemedText style={{ ...appStyles.heading }}>Approve Request?</ThemedText>

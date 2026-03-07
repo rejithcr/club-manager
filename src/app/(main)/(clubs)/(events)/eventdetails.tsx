@@ -6,6 +6,7 @@ import LoadingSpinner from "@/src/components/LoadingSpinner";
 import Spacer from "@/src/components/Spacer";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import { Member } from "@/src/types/member";
 import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import Chip from "@/src/components/Chip";
@@ -49,6 +50,8 @@ const EventDetails = () => {
   const [event, setEvent] = useState<Event>();
   const params = useSearchParams();
   const { clubInfo } = useContext(ClubContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
   const { colors } = useTheme();
 
   const [getClubMembers] = useLazyGetClubMembersQuery();
@@ -204,7 +207,7 @@ const EventDetails = () => {
       ) : (
         <GestureHandlerRootView>
           <ScrollView>
-            {event && <EventItemDetails event={event} clubRole={clubInfo?.role} />}
+            {event && <EventItemDetails event={event} clubRole={currentRole} />}
             <Spacer space={8} />
             {event?.isTransactionEnabled && (
               <>
@@ -372,7 +375,7 @@ const EventDetails = () => {
           </ScrollView>
         </GestureHandlerRootView>
       )}
-      {clubInfo?.role === ROLE_ADMIN && (
+      {currentRole === ROLE_ADMIN && (
         <View
           style={{
             position: "absolute",

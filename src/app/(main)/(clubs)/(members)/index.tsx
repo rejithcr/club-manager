@@ -6,6 +6,7 @@ import { AntDesign, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-i
 import { ROLE_ADMIN } from "@/src/utils/constants";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
 import UserInfoView from "./UserInfoView";
@@ -21,6 +22,8 @@ const limit = 20;
 
 export default function Home() {
   const { clubInfo } = useContext(ClubContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
   const { colors } = useTheme();
   const router = useRouter();
 
@@ -70,7 +73,7 @@ export default function Home() {
           )}
         />
       )}
-      {clubInfo.role == ROLE_ADMIN && (
+      {currentRole == ROLE_ADMIN && (
         <FloatingMenu
           actions={actions}
           onPressItem={(name: string | undefined) => handleMenuPress(name)}

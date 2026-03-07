@@ -9,6 +9,8 @@ import Modal from "react-native-modal";
 import { UserContext } from "@/src/context/UserContext";
 import { router } from "expo-router";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
+import { Member } from "@/src/types/member";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import ShadowBox from "@/src/components/ShadowBox";
@@ -43,6 +45,8 @@ const Payments = () => {
   >([]);
   const { userInfo } = useContext(UserContext);
   const { clubInfo } = useContext(ClubContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
   const { colors } = useTheme();
 
   const params = useSearchParams();
@@ -146,6 +150,7 @@ const Payments = () => {
                   key={item.clubFeePaymentId}
                   feeByMembers={feeByMembers}
                   setpaymentStatusUpdates={setpaymentStatusUpdates}
+                  currentRole={currentRole}
                 />
               )}
             />
@@ -158,11 +163,11 @@ const Payments = () => {
               <ThemedText style={appStyles.heading}>Confirm Updates</ThemedText>
               <Spacer space={10} />
               <RoundedContainer>
-              {paymentStatusUpdates.map((item, idx) => (
-                <View key={item.clubFeePaymentId}>
+                {paymentStatusUpdates.map((item, idx) => (
+                  <View key={item.clubFeePaymentId}>
                     {idx > 0 && <Divider />}
                     <PaymentUpdates {...item} />
-                </View>
+                  </View>
                 ))}
               </RoundedContainer>
               <Spacer space={10} />
@@ -177,7 +182,7 @@ const Payments = () => {
             </ThemedView>
           </ScrollView>
         </Modal>
-        {clubInfo.role === ROLE_ADMIN && (
+        {currentRole === ROLE_ADMIN && (
           <View
             style={{
               width: "100%",
@@ -214,8 +219,8 @@ const MemberFeeItem = (props: {
   setpaymentStatusUpdates: any;
   feeByMembers: any | undefined;
   photo?: string;
+  currentRole?: string;
 }) => {
-  const { clubInfo } = useContext(ClubContext);
   const [isSelected, setIsSelected] = useState(props?.paid != 0);
 
   const selectItem = () => {
@@ -260,7 +265,7 @@ const MemberFeeItem = (props: {
   };
 
   return (
-    <TouchableOpacity onPress={selectItem} disabled={clubInfo.role !== ROLE_ADMIN}>
+    <TouchableOpacity onPress={selectItem} disabled={props.currentRole !== ROLE_ADMIN}>
       <ShadowBox style={{ justifyContent: "space-between", padingLeft: 5 }}>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
           {props?.photo ? (
@@ -302,7 +307,7 @@ const PaymentUpdates = (props: {
         ) : (
           <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
         )}
-        <ThemedText style={{ fontSize: 15, maxWidth: 140  }}>
+        <ThemedText style={{ fontSize: 15, maxWidth: 140 }}>
           {props?.firstName} {props?.lastName}
         </ThemedText>
       </View>

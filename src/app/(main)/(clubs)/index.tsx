@@ -5,6 +5,7 @@ import { FlatList, GestureHandlerRootView, ScrollView } from "react-native-gestu
 import { MaterialCommunityIcons, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
@@ -34,6 +35,8 @@ const ClubHome = () => {
   const router = useRouter();
   const params = useSearchParams();
   const { clubInfo, setClubInfo } = useContext(ClubContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
 
   const { colors } = useTheme();
 
@@ -42,35 +45,35 @@ const ClubHome = () => {
     isLoading: isLoadingEvents,
     isFetching: isFetchingEvents,
     refetch: fetchEvents,
-  } = useGetClubEventsQuery({ clubId:  clubInfo.clubId, limit: 5, offset: 0 });
+  } = useGetClubEventsQuery({ clubId: clubInfo?.clubId, limit: 5, offset: 0 });
 
   const {
     data: fbr,
     isLoading: isFundBalanceLoading,
     isFetching: isFetchingFundBalance,
     refetch: fetchFundBalance,
-  } = useGetFundBalanceQuery({ clubId: clubInfo.clubId, fundBalance: "true" });
+  } = useGetFundBalanceQuery({ clubId: clubInfo?.clubId, fundBalance: "true" });
 
   const {
     data: expenseSplits,
     isLoading: isLoadingSplits,
     isFetching: isFetchingSplits,
     refetch: fetchSplits,
-  } = useGetFeesAdhocQuery({ clubId: Number(clubInfo.clubId), limit: 5, offset: 0 });
+  } = useGetFeesAdhocQuery({ clubId: Number(clubInfo?.clubId), limit: 5, offset: 0 });
 
   const {
     data: clubDue,
     isLoading: isTotalDueLoading,
     isFetching: isFetchingTotalDue,
     refetch: fetchTotalDue,
-  } = useGetTotalDueQuery({ clubId:  clubInfo.clubId, totalDue: "true" });
+  } = useGetTotalDueQuery({ clubId: clubInfo?.clubId, totalDue: "true" });
 
   const {
     data: currentFeeStructure,
     isLoading: isLoadingCurrent,
     isFetching: isFetchingCurrent,
     refetch: fetchFees,
-  } = useGetFeesQuery({ clubId: clubInfo.clubId });
+  } = useGetFeesQuery({ clubId: clubInfo?.clubId });
 
   const showFeeTypeDetails = (fee: any) => {
     router.push({
@@ -101,7 +104,7 @@ const ClubHome = () => {
   return (
     <ThemedView style={{ flex: 1 }}>
       <GestureHandlerRootView>
-      <Spacer space={10} />
+        <Spacer space={10} />
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           refreshControl={
@@ -112,19 +115,19 @@ const ClubHome = () => {
               onRefresh={onRefresh}
             />
           }
-        >          
-        <Banner backgroundColor={fbr?.fundBalance < 1 ? colors.error : colors.success} onPress={() => router.push(`/(main)/(clubs)/(transactions)`)}>
-          <View>
-            <ThemedText style={{ color: colors.background }}>Fund Balance</ThemedText>
-            <NumberTicker
-              value={fbr?.fundBalance || 0}
-              isLoading={isFundBalanceLoading}
-              style={{ fontSize: 30, fontWeight: 'bold', color: colors.background }}
-            />
-          </View>
-          <ThemedIcon name="MaterialCommunityIcons:wallet" size={50} color={colors.background} />
-        </Banner>
-        <Spacer space={10} />
+        >
+          <Banner backgroundColor={fbr?.fundBalance < 1 ? colors.error : colors.success} onPress={() => router.push(`/(main)/(clubs)/(transactions)`)}>
+            <View>
+              <ThemedText style={{ color: colors.background }}>Fund Balance</ThemedText>
+              <NumberTicker
+                value={fbr?.fundBalance || 0}
+                isLoading={isFundBalanceLoading}
+                style={{ fontSize: 30, fontWeight: 'bold', color: colors.background }}
+              />
+            </View>
+            <ThemedIcon name="MaterialCommunityIcons:wallet" size={50} color={colors.background} />
+          </Banner>
+          <Spacer space={10} />
           <RoundedContainer>
             <TouchableCard
               onPress={showClubDues}
@@ -157,7 +160,7 @@ const ClubHome = () => {
           >
             <ThemedHeading style={{ width: 200 }}>Fees</ThemedHeading>
             <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
-              {clubInfo.role == ROLE_ADMIN && (
+              {currentRole == ROLE_ADMIN && (
                 <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/definefee`)}>
                   <ThemedIcon size={25} name={"MaterialCommunityIcons:plus-circle"} color={colors.add} />
                 </TouchableOpacity>
@@ -171,11 +174,11 @@ const ClubHome = () => {
             </ThemedText>
           )}
           {currentFeeStructure && currentFeeStructure?.length !== 0 && <RoundedContainer>
-          {!isLoadingCurrent &&
-            currentFeeStructure?.map((fee: any, idx: number) => {
-              return (
-                <View key={fee.clubFeeTypeId}>
-                  {idx > 0 && <Divider />}
+            {!isLoadingCurrent &&
+              currentFeeStructure?.map((fee: any, idx: number) => {
+                return (
+                  <View key={fee.clubFeeTypeId}>
+                    {idx > 0 && <Divider />}
                     <Animated.View entering={FadeInUp.duration(380).delay(idx * 80)} style={{ overflow: "hidden" }}>
                       <TouchableCard
                         onPress={showFeeTypeDetails}
@@ -190,10 +193,10 @@ const ClubHome = () => {
                         </View>
                       </TouchableCard>
                     </Animated.View>
-                </View>
-              );
-            })}
-            </RoundedContainer>}
+                  </View>
+                );
+              })}
+          </RoundedContainer>}
           {/* <Spacer space={4} />
           <View
             style={{
@@ -262,7 +265,7 @@ const ClubHome = () => {
           >
             <ThemedHeading style={{ width: 200 }}>Expense Splits</ThemedHeading>
             <View style={{ width: "20%", flexDirection: "row", justifyContent: "flex-end" }}>
-              { clubInfo.role == ROLE_ADMIN && (
+              {currentRole == ROLE_ADMIN && (
                 <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee/definefee`)}>
                   <ThemedIcon size={25} name={"MaterialCommunityIcons:plus-circle"} color={colors.add} />
                 </TouchableOpacity>
@@ -290,24 +293,24 @@ const ClubHome = () => {
                       <Card style={{ height: 180, paddingHorizontal: 30 }}>
                         <ThemedText style={{ fontSize: 15, fontWeight: "bold", alignSelf: "center", maxWidth: 80 }} numberOfLines={1} ellipsizeMode="tail">{item.clubAdhocFeeName}</ThemedText>
                         <ThemedText style={{ fontSize: 12, alignSelf: "center", color: colors.subText, maxWidth: 80 }} numberOfLines={1} ellipsizeMode="tail">{item.clubAdhocFeeDesc}</ThemedText>
-                         <Spacer hspace={10} />
-                         <CircularProgress value={Math.round(item.completionPercentage)} strokeWidth={6} size={50} />
-                         <Spacer hspace={10} />
-                          <View style={{ alignSelf: "center" }}>
-                            <ThemedText style={{ fontSize: 15, textAlign: "center", fontWeight: "bold" }}>
-                              ₹ {item.clubAdhocFeePaymentAmount}
-                            </ThemedText>
-                            <ThemedText style={{ fontSize: 12, textAlign: "center", color: colors.subText }}>
-                              {item.clubAdhocFeeDate}
-                            </ThemedText>
-                          </View>
+                        <Spacer hspace={10} />
+                        <CircularProgress value={Math.round(item.completionPercentage)} strokeWidth={6} size={50} />
+                        <Spacer hspace={10} />
+                        <View style={{ alignSelf: "center" }}>
+                          <ThemedText style={{ fontSize: 15, textAlign: "center", fontWeight: "bold" }}>
+                            ₹ {item.clubAdhocFeePaymentAmount}
+                          </ThemedText>
+                          <ThemedText style={{ fontSize: 12, textAlign: "center", color: colors.subText }}>
+                            {item.clubAdhocFeeDate}
+                          </ThemedText>
+                        </View>
                       </Card>
                       <Spacer hspace={0} />
                     </Animated.View>
                   </TouchableOpacity>
                 )}
                 ListFooterComponent={() => (
-                  <View style={{marginLeft: 20, height: 180,  alignItems: "center", alignSelf: "center", justifyContent: "center" }}>
+                  <View style={{ marginLeft: 20, height: 180, alignItems: "center", alignSelf: "center", justifyContent: "center" }}>
                     <TouchableOpacity onPress={() => router.push(`/(main)/(clubs)/(fees)/adhocfee`)}>
                       <ThemedIcon size={25} name={"MaterialCommunityIcons:chevron-right-circle"} />
                     </TouchableOpacity>
@@ -321,11 +324,11 @@ const ClubHome = () => {
         </ScrollView>
       </GestureHandlerRootView>
       <FloatingMenu
-        actions={actions.filter((action) => (clubInfo.role != ROLE_ADMIN ? action.role != ROLE_ADMIN : true))}
+        actions={actions.filter((action) => (currentRole != ROLE_ADMIN ? action.role != ROLE_ADMIN : true))}
         position={"left"}
         color="black"
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-        onPressItem={(name: string | undefined) => handleMenuPress(name, clubInfo.clubId || "")}
+        onPressItem={(name: string | undefined) => handleMenuPress(name, clubInfo?.clubId || "")}
       />
     </ThemedView>
   );

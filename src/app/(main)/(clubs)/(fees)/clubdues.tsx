@@ -2,6 +2,7 @@ import { TouchableOpacity, View, StyleSheet, ScrollView, RefreshControl, Image, 
 import React, { useContext, useState } from "react";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import { ClubContext } from "@/src/context/ClubContext";
+import { MemberRoleContext } from "@/src/context/MemberRoleContext";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
@@ -23,6 +24,8 @@ import NumberTicker from "@/src/components/NumberTicker";
 const ClubDues = () => {
   const { clubInfo } = useContext(ClubContext);
   const { userInfo } = useContext(UserContext);
+  const { memberRoles } = useContext(MemberRoleContext);
+  const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
   const { colors } = useTheme();
   const {
     data: duesByMembers,
@@ -33,10 +36,10 @@ const ClubDues = () => {
 
   const totalDue = duesByMembers
     ? duesByMembers.reduce(
-        (sum: number, member: any) =>
-          sum + (member.dues ? member.dues.reduce((mSum: number, due: any) => mSum + (due.amount || 0), 0) : 0),
-        0
-      )
+      (sum: number, member: any) =>
+        sum + (member.dues ? member.dues.reduce((mSum: number, due: any) => mSum + (due.amount || 0), 0) : 0),
+      0
+    )
     : 0;
 
   const [selectedItems, setSelectedItems] = useState<{ paymentId: number; feeType: string; amount?: number }[]>([]);
@@ -58,8 +61,8 @@ const ClubDues = () => {
       selectedItems.length > 0
         ? selectedItems
         : (duesByMembers || []).flatMap((m: any) =>
-            (m.dues || []).map((d: any) => ({ paymentId: d.paymentId, feeType: d.feeType, amount: d.amount }))
-          );
+          (m.dues || []).map((d: any) => ({ paymentId: d.paymentId, feeType: d.feeType, amount: d.amount }))
+        );
 
     if (paymentsToMark.length === 0) {
       showSnackbar("Please select any dues to mark as paid.");
@@ -101,7 +104,7 @@ const ClubDues = () => {
       <Spacer space={10} />
       <Banner backgroundColor={totalDue == 0 ? colors.success : colors.warning}>
         <View>
-          <ThemedText style={{color: colors.background }}>Total Due</ThemedText>          
+          <ThemedText style={{ color: colors.background }}>Total Due</ThemedText>
           <NumberTicker
             value={totalDue?.toFixed(0)}
             isLoading={isLoading}
@@ -126,6 +129,7 @@ const ClubDues = () => {
                       member={item}
                       selectedItems={selectedItems}
                       toggle={toggleSelected}
+                      currentRole={currentRole}
                     />
                   </Animated.View>
                 </View>
@@ -137,7 +141,7 @@ const ClubDues = () => {
         )}
         <Spacer space={50} />
       </ScrollView>
-      {clubInfo.role === ROLE_ADMIN && (
+      {currentRole === ROLE_ADMIN && (
         <>
           <View
             style={{
@@ -202,7 +206,7 @@ const SharePreviewModal = (props: {
   React.useEffect(() => {
     if (visible) {
       const lines: string[] = [];
-      
+
       if (includeMemberDues) {
         (duesByMembers || []).forEach((member: any) => {
           const name = [member.firstName, member.lastName].filter(Boolean).join(" ") || member.email || "Member";
@@ -228,7 +232,7 @@ const SharePreviewModal = (props: {
     }
 
     const webUrl = `https://wa.me/?text=${encodeURIComponent(editableMessage)}`;
-    
+
     try {
       // Try native Share API first (better for iOS)
       if (Platform.OS === 'ios') {
@@ -262,15 +266,15 @@ const SharePreviewModal = (props: {
   };
 
   return (
-    <Modal 
-      isVisible={visible} 
-      onBackdropPress={onClose} 
+    <Modal
+      isVisible={visible}
+      onBackdropPress={onClose}
       onBackButtonPress={onClose}
       style={{ margin: 0, justifyContent: 'flex-end' }}
     >
-      <ThemedView style={{ 
-        borderTopLeftRadius: 20, 
-        borderTopRightRadius: 20, 
+      <ThemedView style={{
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         paddingTop: 20,
         paddingHorizontal: 16,
         paddingBottom: 30,
@@ -285,11 +289,11 @@ const SharePreviewModal = (props: {
         </View>
 
         {/* Checkbox for including member dues */}
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => setIncludeMemberDues(!includeMemberDues)}
-          style={{ 
-            flexDirection: 'row', 
-            alignItems: 'center', 
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
             marginBottom: 16,
             paddingVertical: 8
           }}
@@ -302,10 +306,10 @@ const SharePreviewModal = (props: {
         <ThemedText style={{ fontSize: 12, color: colors.subText, marginBottom: 8 }}>
           Preview & Edit Message:
         </ThemedText>
-        <ScrollView style={{ 
-          borderWidth: 1, 
-          borderColor: colors.border, 
-          borderRadius: 8, 
+        <ScrollView style={{
+          borderWidth: 1,
+          borderColor: colors.border,
+          borderRadius: 8,
           padding: 12,
           backgroundColor: colors.background,
           maxHeight: 350,
@@ -330,7 +334,7 @@ const SharePreviewModal = (props: {
         {/* Share button */}
         <View style={{ flexDirection: 'row', gap: 12 }}>
           <View style={{ flex: 1 }}>
-            <ThemedButton 
+            <ThemedButton
               title="Share to whatsapp"
               onPress={handleShareToWhatsApp}
               icon="MaterialCommunityIcons:whatsapp"
@@ -372,6 +376,7 @@ const MemberDue = (props: {
   member: any;
   selectedItems: { paymentId: number; feeType: string; amount?: number }[];
   toggle: (id: number, feeType: string, amount?: number) => void;
+  currentRole?: string;
 }) => {
   const { selectedItems, toggle } = props;
   const [showDues, setShowDues] = React.useState(false);
@@ -386,7 +391,7 @@ const MemberDue = (props: {
           justifyContent: "space-between",
           alignItems: "center",
           paddingVertical: 10,
-          paddingHorizontal:18,
+          paddingHorizontal: 18,
         }}
       >
         <View style={{ width: "100%", flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -403,7 +408,7 @@ const MemberDue = (props: {
             ) : (
               <ThemedIcon name={"MaterialIcons:account-circle"} size={32} />
             )}
-            <ThemedText style={{ marginLeft: 3, maxWidth: 135}}>
+            <ThemedText style={{ marginLeft: 3, maxWidth: 135 }}>
               {props?.member.firstName} {props?.member.lastName}
             </ThemedText>
           </View>
@@ -414,25 +419,26 @@ const MemberDue = (props: {
       </TouchableOpacity>
       {showDues &&
         <>
-        {props?.member.dues.map((item: any, idx: number) => {
-          const checked = !!selectedItems.find((p) => p.paymentId === item.paymentId && p.feeType === item.feeType);
-          return (
-            <View key={item.paymentId.toString() + item.feeType}>
-              {idx > 0 && <Divider style={{ width: "75%" }} />}
-              <MemberFeeItem
-                paymentId={item.paymentId}
-                fee={item.fee}
-                feeType={item.feeType}
-                feeDesc={item.feeDesc}
-                amount={item.amount}
-                checked={checked}
-                onToggle={() => toggle(item.paymentId, item.feeType, item.amount)}
-                key={item.paymentId.toString() + item.feeType}
-              />
-            </View>
-          );
-        })}
-        <Spacer space={10} />
+          {props?.member.dues.map((item: any, idx: number) => {
+            const checked = !!selectedItems.find((p) => p.paymentId === item.paymentId && p.feeType === item.feeType);
+            return (
+              <View key={item.paymentId.toString() + item.feeType}>
+                {idx > 0 && <Divider style={{ width: "75%" }} />}
+                <MemberFeeItem
+                  paymentId={item.paymentId}
+                  fee={item.fee}
+                  feeType={item.feeType}
+                  feeDesc={item.feeDesc}
+                  amount={item.amount}
+                  checked={checked}
+                  onToggle={() => toggle(item.paymentId, item.feeType, item.amount)}
+                  key={item.paymentId.toString() + item.feeType}
+                  currentRole={props.currentRole}
+                />
+              </View>
+            );
+          })}
+          <Spacer space={10} />
         </>}
     </>
   );
@@ -448,19 +454,19 @@ const MemberFeeItem = (props: {
   amount: number;
   checked?: boolean;
   onToggle?: () => void;
+  currentRole?: string;
 }) => {
-  const { clubInfo } = useContext(ClubContext);
   const { paymentId, fee, feeDesc, amount, checked = false, onToggle } = props;
   const { colors } = useTheme();
   return (
     <TouchableOpacity
-      disabled={clubInfo.role !== ROLE_ADMIN}
+      disabled={props.currentRole !== ROLE_ADMIN}
       key={paymentId.toString() + props.feeType}
       style={styles.item}
       onPress={() => onToggle && onToggle()}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        {clubInfo.role === ROLE_ADMIN && <ThemedCheckBox checked={checked} />}
+        {props.currentRole === ROLE_ADMIN && <ThemedCheckBox checked={checked} />}
         <View style={{ paddingVertical: 5, maxWidth: 150 }}>
           <ThemedText style={styles.label}>{fee} </ThemedText>
           <ThemedText style={{ ...styles.subLabel, color: colors.disabled }}>{feeDesc} </ThemedText>
