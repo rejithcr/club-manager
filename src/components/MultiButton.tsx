@@ -47,11 +47,11 @@ const MultiButton: React.FC<MultiButtonProps> = ({ club, label, icon, isSelected
     outputRange: [1, 1.2],
   });
 
-  const displayText = label || club?.clubName || '';
+  const displayText = label || club?.clubName?.replace('Cricket Club', '') || '';
   const showArrow = !!onGoToHome && !!club;
 
   return (
-    <View style={{ 
+    <View style={{
       flexDirection: 'row',
       borderRadius: 20,
       overflow: 'hidden',
@@ -79,13 +79,13 @@ const MultiButton: React.FC<MultiButtonProps> = ({ club, label, icon, isSelected
         }}
       >
         {icon && (
-          <ThemedIcon 
+          <ThemedIcon
             name={icon}
-            size={16} 
+            size={16}
             color={isSelected ? 'white' : colors.text}
           />
         )}
-        <ThemedText style={{ 
+        <ThemedText style={{
           fontWeight: isSelected ? 'bold' : 'normal',
           color: isSelected ? 'white' : colors.text
         }}>
@@ -115,9 +115,9 @@ const MultiButton: React.FC<MultiButtonProps> = ({ club, label, icon, isSelected
               ]
             }}
           >
-            <ThemedIcon 
-              name="MaterialIcons:arrow-forward" 
-              size={18} 
+            <ThemedIcon
+              name="MaterialIcons:arrow-forward"
+              size={18}
               color={colors.text}
             />
           </Animated.View>

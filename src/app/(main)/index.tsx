@@ -1,4 +1,4 @@
-import { RefreshControl, ScrollView, View } from "react-native";
+import { RefreshControl, ScrollView, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router/build/hooks";
 import FloatingMenu from "@/src/components/FloatingMenu";
 import FeeSummary from "./dues";
@@ -26,6 +26,12 @@ import MultiButton from "@/src/components/MultiButton";
 import { useAsyncStorage } from "@/src/hooks/use-async-storage";
 import ThemedText from "@/src/components/themed-components/ThemedText";
 import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
+import CardList from "@/src/components/CardList";
+import Animated, { FadeInUp } from "react-native-reanimated";
+import ExpandableCard from "@/src/components/ExpandableCard";
+import Divider from "@/src/components/Divider";
+import { makeUpiPayment } from "@/src/utils/payment";
+import ThemedButton from "@/src/components/ThemedButton";
 
 const Main = () => {
   const router = useRouter();
@@ -100,8 +106,15 @@ const Main = () => {
 
   return (
     <ThemedView style={{ flex: 1 }}>
-      <GestureHandlerRootView>
-        <ScrollView refreshControl={<RefreshControl refreshing={isFetchingClubs || isFetchingMemberDues || isFetchingBirthdays || isFetchingEvents} onRefresh={onRefresh} />}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ScrollView
+          refreshControl={
+            <RefreshControl
+              refreshing={isFetchingClubs || isFetchingMemberDues || isFetchingBirthdays || isFetchingEvents}
+              onRefresh={onRefresh}
+            />
+          }
+        >
           {isLoadingMyClubs && <LoadingSpinner />}
           {clubs?.length == 0 && (
             <ThemedView style={{ alignSelf: "center", width: "80%", justifyContent: "center", alignItems: "center" }}>
@@ -115,14 +128,24 @@ const Main = () => {
               <ThemedIcon name="MaterialIcons:add-circle" size={50} onPress={() => router.push(`/(main)/createclub`)} />
             </ThemedView>
           )}
+
           {/* Club Filter Selector */}
           {clubs && clubs.length > 0 && (
-            <>
-              <ThemedHeading>My Clubs</ThemedHeading>
-              <View
-                style={{ width: '85%', alignSelf: 'center' }}
-              >
-                <View style={{ flexDirection: 'row', gap: 15, flexWrap: 'wrap', }}>
+            <CardList
+              headerTitle="My Clubs"
+              headerIcon="MaterialIcons:groups"
+              headerRight={
+                <TouchableOpacity
+                  onPress={() => router.push(`/(main)/(members)/joinclub`)}
+                  style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+                >
+                  <ThemedIcon name="MaterialIcons:add-circle-outline" size={18} color={colors.button} />
+                  <ThemedText style={{ fontSize: 16, fontWeight: '600', color: colors.button }}>Join</ThemedText>
+                </TouchableOpacity>
+              }
+            >
+              <View style={{ padding: 16 }}>
+                <View style={{ flexDirection: 'row', gap: 12, flexWrap: 'wrap' }}>
                   {/* All Clubs Option */}
                   <MultiButton
                     label="All"
@@ -145,50 +168,103 @@ const Main = () => {
                   ))}
                 </View>
               </View>
-            </>
+            </CardList>
           )}
 
-          {/* {!isLoadingMyClubs && <MyClubs clubs={clubs} />} */}
           <Spacer space={10} />
-          {clubs?.length > 0 && <ThemedHeading>My Dues</ThemedHeading>}
-          {isLoadingMemberDues && <LoadingSpinner />}
-          {!isLoadingMemberDues && clubs?.length > 0 && (
-            <FeeSummary
-              duesByMember={filteredDues}
-              isAllSelected={selectedClubId === -1}
-            />
+          {clubs && clubs.length > 0 && (
+            <CardList
+              headerTitle="My Dues"
+              headerIcon="MaterialIcons:payments"
+              headerRight={
+                <ThemedText style={{ fontSize: 15, fontWeight: '500', color: colors.text }}>
+                  ₹ {Math.round(filteredDues?.reduce((sum: number, club: any) => sum + club.dueAmount, 0) || 0)}
+                </ThemedText>
+              }
+            >
+              {isLoadingMemberDues && <LoadingSpinner />}
+
+              {!isLoadingMemberDues && (!filteredDues || filteredDues.length === 0) && (
+                <View style={{ padding: 24, alignItems: 'center' }}>
+                  <ThemedIcon name="MaterialIcons:check-circle" size={40} color="#4CAF50" />
+                  <Spacer space={8} />
+                  <ThemedText style={{ fontWeight: '600' }}>All Clear! 🎉</ThemedText>
+                  <ThemedText style={{ fontSize: 13, color: colors.subText }}>No pending dues</ThemedText>
+                </View>
+              )}
+
+              {filteredDues?.map((clubDue: any, idx: number) => (
+                <Animated.View
+                  key={clubDue.clubId}
+                  entering={FadeInUp.duration(380).delay(idx * 50)}
+                >
+                  <ExpandableCard
+                    title={clubDue.clubName}
+                    subtitle={`₹ ${clubDue.dueAmount.toFixed(2)} • ${clubDue.dues.length} items`}
+                    statusIconName="MaterialIcons:account-balance-wallet"
+                    statusIconColor={colors.warning}
+                    isExpandable={true}
+                  >
+                    <View style={{ gap: 8 }}>
+                      {clubDue.dues.map((due: any, dueIdx: number) => (
+                        <View key={due.paymentId + due.feeType}>
+                          {dueIdx > 0 && <Divider style={{ marginVertical: 8 }} />}
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                            <View style={{ flex: 1, paddingRight: 8 }}>
+                              <ThemedText style={{ fontSize: 14, fontWeight: '500' }}>{due.fee}</ThemedText>
+                              {due.feeDesc && (
+                                <ThemedText style={{ fontSize: 12, color: colors.subText }}>{due.feeDesc}</ThemedText>
+                              )}
+                            </View>
+                            <ThemedText style={{ fontSize: 14, fontWeight: '600' }}>₹ {due.amount.toFixed(2)}</ThemedText>
+                          </View>
+                        </View>
+                      ))}
+
+                      {clubDue.upiId && (
+                        <>
+                          <Spacer space={8} />
+                          <ThemedButton
+                            onPress={() => makeUpiPayment(clubDue.dueAmount, clubDue.clubName, clubDue.upiId)}
+                            title="Pay Now"
+                            icon="MaterialIcons:payment"
+                            style={{ paddingVertical: 8 }}
+                          />
+                        </>
+                      )}
+                    </View>
+                  </ExpandableCard>
+                </Animated.View>
+              ))}
+            </CardList>
           )}
 
+          <Spacer space={10} />
           {/* Unified Events and Birthdays Feed */}
           {(isLoadingEvents || isBirthdaysLoading) && (
             <>
-              <Spacer space={10} />
               <LoadingSpinner />
+              <Spacer space={10} />
             </>
           )}
-          <Spacer space={10} />
+
           {events && events.length > 0 && (
-            <>
-              <ThemedHeading>Upcoming Events</ThemedHeading>
-              <UnifiedFeed
-                events={events}
-                birthdays={[]}
-                clubs={clubs || []}
-              />
-            </>
+            <UnifiedFeed
+              events={events}
+              birthdays={[]}
+              clubs={clubs || []}
+            />
           )}
+
           <Spacer space={10} />
           {upcomingBirthdays && upcomingBirthdays.length > 0 && (
-            <>
-              <ThemedHeading>Upcoming Birthdays</ThemedHeading>
-              <UnifiedFeed
-                events={[]}
-                birthdays={upcomingBirthdays}
-                clubs={clubs || []}
-              />
-            </>
+            <UnifiedFeed
+              events={[]}
+              birthdays={upcomingBirthdays}
+              clubs={clubs || []}
+            />
           )}
-          {/*<UpcomingMatches memberEmail={userInfo?.email} />*/}
+
           <Spacer space={50} />
         </ScrollView>
       </GestureHandlerRootView>
@@ -197,7 +273,7 @@ const Main = () => {
         position={"left"}
         color="black"
         icon={<MaterialIcons name={"menu"} size={32} color={"white"} />}
-        onPressItem={(name: string | undefined) => handleMenuPress(name, handleLogout)}
+        onPressItem={(name: string | undefined) => handleMenuPress(name, handleLogout, router)}
       />
     </ThemedView>
   );
@@ -205,7 +281,7 @@ const Main = () => {
 
 export default Main;
 
-const handleMenuPress = (name: string | undefined, handleLogout: { (): void }) => {
+const handleMenuPress = (name: string | undefined, handleLogout: () => void, router: any) => {
   if (name == "createclub") {
     router.push(`/(main)/createclub`);
   } else if (name == "logout") {

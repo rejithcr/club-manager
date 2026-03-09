@@ -1,16 +1,16 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { Event } from '@/src/types/event';
 import { BirthdayMember, FeedItem } from '@/src/types/member';
 import BirthdayCard from '@/src/components/BirthdayCard';
-import { EventCard } from './upcoming_events';
 import RoundedContainer from '@/src/components/RoundedContainer';
 import ThemedText from '@/src/components/themed-components/ThemedText';
-import { router } from 'expo-router';
-import { useContext } from 'react';
-import { ClubContext } from '@/src/context/ClubContext';
+import ThemedIcon from '@/src/components/themed-components/ThemedIcon';
 import Spacer from '@/src/components/Spacer';
+import ExpandableCard from '@/src/components/ExpandableCard';
+import CardList from '@/src/components/CardList';
+import { useTheme } from '@/src/hooks/use-theme';
 
 interface UnifiedFeedProps {
   events: Event[];
@@ -19,19 +19,19 @@ interface UnifiedFeedProps {
 }
 
 const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) => {
-  const { setClubInfo } = useContext(ClubContext);
+  const { colors } = useTheme();
 
   // Create unified feed items
   const createFeedItems = (): FeedItem[] => {
     const feedItems: FeedItem[] = [];
-    
+
     // Add events
     events?.forEach((event) => {
       const eventDate = new Date(event.eventDate);
       const today = new Date();
       const diffTime = eventDate.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
+
       feedItems.push({
         type: 'event',
         date: eventDate,
@@ -40,20 +40,17 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
       });
     });
 
-    // Add birthdays (including previous week)
+    // Add birthdays
     birthdays?.forEach((birthday) => {
       const today = new Date();
       const currentYear = today.getFullYear();
-      
-      // Parse birthday (format: MM-DD)
+
       const [month, day] = birthday.birthday.split('-').map(Number);
       const birthdayThisYear = new Date(currentYear, month - 1, day);
-      
-      // Calculate days until birthday
+
       const diffTime = birthdayThisYear.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      
-      // Include birthdays from previous week (-7 days) to future
+
       if (diffDays >= -7) {
         feedItems.push({
           type: 'birthday',
@@ -67,30 +64,24 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
       }
     });
 
-    // Sort with special priority: today=0, tomorrow=1, then by absolute days (past negatives first)
     return feedItems.sort((a, b) => {
-      // Priority for today and tomorrow
       if (a.sortKey === 0) return -1;
       if (b.sortKey === 0) return 1;
       if (a.sortKey === 1) return -1;
       if (b.sortKey === 1) return 1;
-      
-      // Then by days (past dates with negative values come after today/tomorrow)
       return a.sortKey - b.sortKey;
     });
   };
 
   const feedItems = createFeedItems();
 
-  const gotoEventDetails = async (event: Event) => {
-    const roleName = clubs.find((c) => c.clubId == event.clubId)?.roleName;
-    await setClubInfo({ clubId: event.clubId, clubName: event.clubName, role: roleName });
-    router.push(`/(main)/(clubs)/(events)/eventdetails?event=${JSON.stringify(event)}`);
-  };
-
-  const handleBirthdayPress = (birthday: BirthdayMember) => {
-    // Optional: Navigate to member profile or club
-    console.log('Birthday member pressed:', birthday);
+  const getEventIcon = (eventName: string | undefined): { name: string; color: string } => {
+    const name = eventName?.toLowerCase() || '';
+    if (name.includes('birthday')) return { name: "FontAwesome:birthday-cake", color: colors.warning };
+    if (name.includes('meeting')) return { name: "MaterialIcons:event", color: colors.info };
+    if (name.includes('anniversary')) return { name: "MaterialIcons:celebration", color: colors.success };
+    if (name.includes('practice') || name.includes('match')) return { name: "MaterialIcons:sports-cricket", color: '#FF6B35' };
+    return { name: "MaterialIcons:event", color: colors.button };
   };
 
   if (feedItems.length === 0) {
@@ -101,33 +92,96 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
     );
   }
 
-  return (<>
-      {feedItems.map((item, idx) => {
-        const isLastItem = idx === feedItems.length - 1;
-        
-        return (
-          <Animated.View 
-            key={`${item.type}-${item.type === 'event' ? item.data.eventId : item.data.memberId}`}
-            entering={FadeInUp.duration(380).delay(idx * 80)} 
-            style={{ overflow: "hidden" }}
-          >
-            {item.type === 'event' ? (
-              <TouchableOpacity onPress={() => gotoEventDetails(item.data as Event)}>
-                <EventCard event={item.data as Event} />
-              </TouchableOpacity>
-            ) : ( <RoundedContainer>
-              <View style={{ paddingHorizontal: 25, paddingVertical: 10 }}>
-                <BirthdayCard 
-                  member={item.data as BirthdayMember}
-                  //onPress={() => handleBirthdayPress(item.data as BirthdayMember)}
+  const formatBirthdayDate = (birthdayStr: string) => {
+    const [month, day] = birthdayStr.split('-').map(Number);
+    const date = new Date(2000, month - 1, day);
+    const monthName = date.toLocaleString('default', { month: 'long' });
+
+    const getOrdinal = (n: number) => {
+      const s = ["th", "st", "nd", "rd"];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+
+    return `${getOrdinal(day)} ${monthName}`;
+  };
+
+  return (
+    <>
+      {events?.length > 0 && (
+        <CardList
+          headerTitle="Upcoming Events"
+          headerIcon="MaterialIcons:event"
+        >
+          {feedItems.filter(item => item.type === 'event').map((item, idx) => (
+            <Animated.View
+              key={`event-${(item.data as Event).eventId}`}
+              entering={FadeInUp.duration(380).delay(idx * 80)}
+            >
+              <ExpandableCard
+                title={(item.data as Event).title}
+                subtitle={`${(item.data as Event).eventDate} • ${(item.data as Event).clubName}`}
+                statusIconName={getEventIcon((item.data as Event).name).name}
+                statusIconColor={getEventIcon((item.data as Event).name).color}
+                onActionPress={() => console.log('Delete pressed')}
+                isExpandable={true}
+              >
+                <View style={{ gap: 8 }}>
+                  {(item.data as Event).description && (
+                    <ThemedText style={{ fontSize: 14, color: colors.subText, marginBottom: 4 }}>
+                      {(item.data as Event).description}
+                    </ThemedText>
+                  )}
+
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <ThemedIcon name="MaterialIcons:access-time" size={16} color={colors.subText} />
+                    <Spacer hspace={8} />
+                    <ThemedText style={{ fontSize: 13 }}>
+                      {(item.data as Event).startTime}
+                      {(item.data as Event).endTime && ` - ${(item.data as Event).endTime}`}
+                    </ThemedText>
+                  </View>
+
+                  {(item.data as Event).location && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <ThemedIcon name="MaterialIcons:location-pin" size={16} color={colors.subText} />
+                      <Spacer hspace={8} />
+                      <ThemedText style={{ fontSize: 13 }}>
+                        {(item.data as Event).location}
+                      </ThemedText>
+                    </View>
+                  )}
+                </View>
+              </ExpandableCard>
+            </Animated.View>
+          ))}
+        </CardList>
+      )}
+
+      {birthdays?.length > 0 && (
+        <CardList
+          headerTitle="Upcoming Birthdays"
+          headerIcon="FontAwesome:birthday-cake"
+        >
+          {feedItems.filter(item => item.type === 'birthday').map((item, idx) => (
+            <Animated.View
+              key={`birthday-${(item.data as BirthdayMember).memberId}`}
+              entering={FadeInUp.duration(380).delay(idx * 80)}
+            >
+              <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
+                <BirthdayCard
+                  member={{
+                    ...item.data as BirthdayMember,
+                    birthday: formatBirthdayDate((item.data as BirthdayMember).birthday)
+                  }}
                   layout="list"
                 />
-              </View></RoundedContainer>
-            )}
-            {<Spacer space={5} />}
-          </Animated.View>
-        );
-      })}</>
+              </View>
+            </Animated.View>
+          ))}
+        </CardList>
+      )}
+    </>
   );
 };
 
