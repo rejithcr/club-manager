@@ -94,8 +94,6 @@ const NotificationsScreen = () => {
         </TouchableOpacity>
     );
 
-    if (isLoading && offset === 0) return <LoadingSpinner />;
-
     return (
         <ThemedView style={styles.container}>
             {isLoading && offset === 0 ? <LoadingSpinner /> : <FlatList
@@ -129,6 +127,7 @@ export default NotificationsScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        height: '100%',
     },
     notificationItem: {
         padding: 16,
