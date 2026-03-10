@@ -1,16 +1,14 @@
 import { RefreshControl, ScrollView, TouchableOpacity, View } from "react-native";
 import { useRouter } from "expo-router/build/hooks";
 import FloatingMenu from "@/src/components/FloatingMenu";
-import FeeSummary from "./dues";
 import { useContext, useEffect } from "react";
 import { UserContext } from "../../context/UserContext";
 import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useGlobalSearchParams } from "expo-router";
+import { useGlobalSearchParams } from "expo-router";
 import LoadingSpinner from "@/src/components/LoadingSpinner";
 import ThemedView from "@/src/components/themed-components/ThemedView";
 import Spacer from "@/src/components/Spacer";
-import ThemedHeading from "@/src/components/themed-components/ThemedHeading";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import UnifiedFeed from "./unified_feed";
 import { clearTokens } from "@/src/helpers/auth_helper";

@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
-import { View, TouchableOpacity, StyleSheet, LayoutChangeEvent } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Animated, {
     useAnimatedStyle,
     useSharedValue,
     withTiming,
     interpolate,
-    Easing
+    interpolateColor,
+    Easing,
+    FadeIn,
+    FadeOut,
+    LinearTransition
 } from 'react-native-reanimated';
 import { useTheme } from '../hooks/use-theme';
 import ThemedText from './themed-components/ThemedText';
@@ -38,7 +42,6 @@ const ExpandableCard: React.FC<ExpandableCardProps> = ({
 }) => {
     const { colors } = useTheme();
     const [isExpanded, setIsExpanded] = useState(false);
-    const [contentHeight, setContentHeight] = useState(0);
 
     const expansion = useSharedValue(0);
 
@@ -58,16 +61,11 @@ const ExpandableCard: React.FC<ExpandableCardProps> = ({
 
     const animatedContainerStyle = useAnimatedStyle(() => {
         return {
-            backgroundColor: interpolate(expansion.value, [0, 1], [0, 1]) === 1
-                ? (colors.secondary + '40') // Light highlight when expanded
-                : 'transparent'
-        };
-    });
-
-    const animatedContentStyle = useAnimatedStyle(() => {
-        return {
-            height: interpolate(expansion.value, [0, 1], [0, contentHeight]),
-            opacity: interpolate(expansion.value, [0, 0.8, 1], [0, 0, 1]),
+            backgroundColor: interpolateColor(
+                expansion.value,
+                [0, 1],
+                ['transparent', colors.secondary + '40']
+            )
         };
     });
 
@@ -76,13 +74,6 @@ const ExpandableCard: React.FC<ExpandableCardProps> = ({
             transform: [{ rotate: `${interpolate(expansion.value, [0, 1], [0, 90])}deg` }],
         };
     });
-
-    const onLayout = (event: LayoutChangeEvent) => {
-        const { height } = event.nativeEvent.layout;
-        if (height > 0) {
-            setContentHeight(height);
-        }
-    };
 
     return (
         <View style={[
@@ -135,18 +126,14 @@ const ExpandableCard: React.FC<ExpandableCardProps> = ({
                 </TouchableOpacity>
             </Animated.View>
 
-            {isExpandable && (
-                <Animated.View style={[styles.contentWrapper, animatedContentStyle]}>
-                    <View
-                        onLayout={onLayout}
-                        style={[
-                            styles.content,
-                            contentHeight === 0 && { position: 'absolute', opacity: 0 }
-                        ]}
-                        collapsable={false}
-                    >
-                        {children}
-                    </View>
+            {isExpandable && isExpanded && (
+                <Animated.View
+                    entering={FadeIn.duration(300)}
+                    exiting={FadeOut.duration(300)}
+                    layout={LinearTransition.duration(300)}
+                    style={styles.content}
+                >
+                    {children}
                 </Animated.View>
             )}
         </View>
@@ -196,9 +183,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginLeft: 8,
-    },
-    contentWrapper: {
-        overflow: 'hidden',
     },
     content: {
         paddingLeft: 56, // Align with the text
