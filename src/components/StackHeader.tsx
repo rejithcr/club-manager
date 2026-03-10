@@ -1,4 +1,4 @@
-import { View, Image, TouchableOpacity, Dimensions } from "react-native";
+import { View, Image, TouchableOpacity, Dimensions, Platform } from "react-native";
 import ThemedText from "./themed-components/ThemedText";
 import { useTheme } from "../hooks/use-theme";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -26,6 +26,13 @@ export const StackHeader = (props: {
 
   const unreadCount = unreadData?.unreadCount || 0;
 
+  const getHeaderWidth = () => {
+    if (props.header == 'Club Manager') {
+      return width - 35;
+    } else {
+      return Platform.OS == 'web' ? width - 75 : width - 100;
+    }
+  };
   return (
     <View style={{
       flexDirection: "row",
@@ -33,7 +40,7 @@ export const StackHeader = (props: {
       alignItems: "center",
       height: 60,
       backgroundColor: colors.background,
-      width: width - (props.header == 'Club Manager' ? 35 : 75)
+      width: getHeaderWidth()
     }}>
       {/* Left side: Breadcrumbs */}
       <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
