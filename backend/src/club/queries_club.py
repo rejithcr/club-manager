@@ -147,13 +147,13 @@ TOTAL_DUE = """
        select coalesce(sum(club_adhoc_fee_payment_amount),0) adhoc
 		from club_adhoc_fee_payment cafp 
 		join club_adhoc_fee caf on caf.club_adhoc_fee_id =cafp.club_adhoc_fee_id
-		where caf.club_id = %s and cafp.paid = 0            
+		where caf.club_id = %s and cafp.paid = 0 and cafp.is_bad_debt = 0
     ) c, (
       select coalesce(sum(cfp.club_fee_payment_amount),0) regular
 		from club_fee_payment cfp 
 			join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id
 			join club_fee_type cft on cft.club_fee_type_id =cfc.club_fee_type_id
-		where cft.club_id = %s and cfp.paid = 0
+		where cft.club_id = %s and cfp.paid = 0 and cfp.is_bad_debt = 0
 
     ) d
 """
@@ -166,23 +166,25 @@ GET_DUES = """
          'fee_desc', a.fee_desc,
          'amount', a.amount,
          'payment_id', a.payment_id,	
-         'fee_type', a.fee_type
+         'fee_type', a.fee_type,
+         'is_bad_debt', a.is_bad_debt,
+         'bad_debt_reason', a.bad_debt_reason
       )) dues
    from (
-      select m.member_id, m.first_name, m.last_name, m.photo, caf.club_adhoc_fee_name fee, caf.club_adhoc_fee_desc fee_desc, cafp.club_adhoc_fee_payment_amount amount, cafp.club_adhoc_fee_payment_id payment_id, 'ADHOC-FEE' fee_type
+      select m.member_id, m.first_name, m.last_name, m.photo, caf.club_adhoc_fee_name fee, caf.club_adhoc_fee_desc fee_desc, cafp.club_adhoc_fee_payment_amount amount, cafp.club_adhoc_fee_payment_id payment_id, 'ADHOC-FEE' fee_type, cafp.is_bad_debt, cafp.bad_debt_reason
       from club_adhoc_fee_payment cafp 
          join club_adhoc_fee caf on caf.club_adhoc_fee_id =cafp.club_adhoc_fee_id
          join membership ms on ms.membership_id = cafp.membership_id
          join "member" m on m.member_id = ms.member_id
-      where cafp.paid =0 and ms.club_id = %s    
+      where cafp.paid = 0 and ms.club_id = %s and cafp.is_bad_debt = %s
       union 
-      select m.member_id, m.first_name, m.last_name, m.photo, cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type
+      select m.member_id, m.first_name, m.last_name, m.photo, cft.club_fee_type fee, cfc.club_fee_type_period fee_desc,  cfp.club_fee_payment_amount amount, cfp.club_fee_payment_id payment_id, 'FEE' fee_type, cfp.is_bad_debt, cfp.bad_debt_reason
       from club_fee_payment cfp 
          join club_fee_collection cfc on cfc.club_fee_collection_id = cfp.club_fee_collection_id
          join club_fee_type cft on cft.club_fee_type_id =cfc.club_fee_type_id
          join membership ms on ms.membership_id = cfp.membership_id
          join "member" m on m.member_id = ms.member_id
-      where cfp.paid = 0 and ms.club_id = %s
+      where cfp.paid = 0 and ms.club_id = %s and cfp.is_bad_debt = %s
    ) a
    group by a.member_id, a.first_name, a.last_name, a.photo
    order by 5 desc, 2

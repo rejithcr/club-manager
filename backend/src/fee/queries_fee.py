@@ -419,3 +419,15 @@ update club_fee_payment
 set paid = 1, updated_by = %s
 where club_fee_payment_id = %s
 """
+
+MARK_ADHOC_FEE_AS_BAD_DEBT = """
+update club_adhoc_fee_payment
+set is_bad_debt = %s, bad_debt_reason = %s, updated_by = %s
+where club_adhoc_fee_payment_id = %s
+"""
+
+MARK_FEE_AS_BAD_DEBT = """
+update club_fee_payment
+set is_bad_debt = %s, bad_debt_reason = %s, updated_by = %s
+where club_fee_payment_id = %s
+"""

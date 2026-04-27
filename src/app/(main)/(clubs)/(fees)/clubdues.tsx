@@ -9,8 +9,9 @@ import ThemedIcon from "@/src/components/themed-components/ThemedIcon";
 import { useTheme } from "@/src/hooks/use-theme";
 import Spacer from "@/src/components/Spacer";
 import Divider from "@/src/components/Divider";
-import { useGetClubDuesQuery, useMarkDuesPaidMutation } from "@/src/services/feeApi";
+import { useGetClubDuesQuery, useMarkDuesPaidMutation, useMarkBadDebtMutation } from "@/src/services/feeApi";
 import Modal from "react-native-modal";
+import { Switch } from "react-native";
 import ThemedCheckBox from "@/src/components/themed-components/ThemedCheckBox";
 import ThemedButton from "@/src/components/ThemedButton";
 import { ROLE_ADMIN } from "@/src/utils/constants";
@@ -27,12 +28,13 @@ const ClubDues = () => {
   const { memberRoles } = useContext(MemberRoleContext);
   const currentRole = memberRoles?.[clubInfo?.clubId] || clubInfo?.role;
   const { colors } = useTheme();
+  const [showBadDebt, setShowBadDebt] = useState(false);
   const {
     data: duesByMembers,
     isLoading,
     isFetching,
     refetch,
-  } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true" });
+  } = useGetClubDuesQuery({ clubId: clubInfo.clubId, duesByClub: "true", showBadDebt: showBadDebt ? 1 : 0 });
 
   const totalDue = duesByMembers
     ? duesByMembers.reduce(
@@ -42,19 +44,25 @@ const ClubDues = () => {
     )
     : 0;
 
-  const [selectedItems, setSelectedItems] = useState<{ paymentId: number; feeType: string; amount?: number }[]>([]);
+  const [selectedItems, setSelectedItems] = useState<{ paymentId: number; feeType: string; amount?: number; isBadDebt?: number }[]>([]);
   const [markDuesPaid, { isLoading: isMarking }] = useMarkDuesPaidMutation();
+  const [markBadDebt, { isLoading: isMarkingBadDebt }] = useMarkBadDebtMutation();
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
-  const [paymentsPreview, setPaymentsPreview] = useState<{ paymentId: number; feeType: string; amount?: number }[]>([]);
+  const [isReasonModalVisible, setIsReasonModalVisible] = useState(false);
+  const [badDebtReason, setBadDebtReason] = useState("");
+  const [paymentsPreview, setPaymentsPreview] = useState<{ paymentId: number; feeType: string; amount?: number; isBadDebt?: number }[]>([]);
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
 
-  const toggleSelected = (id: number, feeType: string, amount?: number) => {
+  const toggleSelected = (id: number, feeType: string, amount?: number, isBadDebt?: number) => {
     setSelectedItems((prev) => {
       const exists = prev.find((p) => p.paymentId === id && p.feeType === feeType);
       if (exists) return prev.filter((p) => !(p.paymentId === id && p.feeType === feeType));
-      return [...prev, { paymentId: id, feeType, amount }];
+      return [...prev, { paymentId: id, feeType, amount, isBadDebt }];
     });
   };
+
+  const isAllBadDebt = selectedItems.length > 0 && selectedItems.every(p => p.isBadDebt === 1);
+  const isAllNormal = selectedItems.length > 0 && selectedItems.every(p => !p.isBadDebt);
 
   const handleMarkAsPaid = async () => {
     const paymentsToMark =
@@ -78,15 +86,60 @@ const ClubDues = () => {
     setIsConfirmVisible(false);
     if (paymentsPreview.length === 0) {
       showSnackbar("No dues to mark.");
-      setIsConfirmVisible(false);
       return;
     }
     try {
       await markDuesPaid({ clubId: clubInfo.clubId, payments: paymentsPreview, email: userInfo.email }).unwrap();
       setSelectedItems([]);
+      showSnackbar("Dues marked as paid successfully.");
     } catch (err: any) {
       console.error(err);
       showSnackbar("Failed to mark as paid. Try again.", "error");
+    }
+  };
+
+  const handleMarkAsBadDebt = () => {
+    if (selectedItems.length === 0) {
+      showSnackbar("Please select dues to mark as bad debt.");
+      return;
+    }
+    setBadDebtReason("");
+    setIsReasonModalVisible(true);
+  };
+
+  const confirmMarkAsBadDebt = async () => {
+    if (!badDebtReason.trim()) {
+      showSnackbar("Reason is mandatory for bad debt.");
+      return;
+    }
+    setIsReasonModalVisible(false);
+    try {
+      await markBadDebt({
+        payments: selectedItems,
+        isBadDebt: 1,
+        reason: badDebtReason,
+        email: userInfo.email
+      }).unwrap();
+      setSelectedItems([]);
+      showSnackbar("Items marked as bad debt.");
+    } catch (err: any) {
+      console.error(err);
+      showSnackbar("Failed to mark as bad debt.", "error");
+    }
+  };
+
+  const handleReverseBadDebt = async () => {
+    try {
+      await markBadDebt({
+        payments: selectedItems,
+        isBadDebt: 0,
+        email: userInfo.email
+      }).unwrap();
+      setSelectedItems([]);
+      showSnackbar("Bad debt items reversed to normal dues.");
+    } catch (err: any) {
+      console.error(err);
+      showSnackbar("Failed to reverse bad debt.", "error");
     }
   };
 
@@ -113,6 +166,18 @@ const ClubDues = () => {
         </View>
         <ThemedIcon name="MaterialCommunityIcons:account-cash" size={50} color={colors.background} />
       </Banner>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', paddingHorizontal: 16, marginTop: 10 }}>
+        <ThemedText style={{ fontSize: 13, marginRight: 8 }}>Show Bad Debt</ThemedText>
+        <Switch
+          value={showBadDebt}
+          onValueChange={(val) => {
+            setShowBadDebt(val);
+            setSelectedItems([]);
+          }}
+          trackColor={{ false: colors.disabled, true: colors.warning }}
+          thumbColor={Platform.OS === 'ios' ? undefined : colors.background}
+        />
+      </View>
       <Spacer space={10} />
       <ScrollView refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}>
         {isLoading ? (
@@ -151,13 +216,43 @@ const ClubDues = () => {
               alignItems: "center",
               position: "absolute",
               bottom: 40,
+              paddingHorizontal: 20,
             }}
           >
-            <ThemedButton
-              disabled={isMarking || selectedItems.length === 0}
-              title={isMarking ? "Marking..." : "Mark as paid"}
-              onPress={() => handleMarkAsPaid()}
-            />
+            {isAllBadDebt ? (
+              <TouchableOpacity
+                disabled={isMarkingBadDebt || selectedItems.length === 0}
+                onPress={handleReverseBadDebt}
+              >
+                <ThemedText style={{
+                  color: isMarkingBadDebt || selectedItems.length === 0 ? colors.disabled : colors.success,
+                  textDecorationLine: 'underline',
+                  fontWeight: '600'
+                }}>
+                  {isMarkingBadDebt ? "Processing..." : "Reverse Bad Debt"}
+                </ThemedText>
+              </TouchableOpacity>
+            ) : (
+              <>
+                <ThemedButton
+                  disabled={isMarking || selectedItems.length === 0 || !isAllNormal}
+                  title={isMarking ? "Marking..." : "Mark as paid"}
+                  onPress={() => handleMarkAsPaid()}
+                />
+                <TouchableOpacity
+                  disabled={isMarkingBadDebt || selectedItems.length === 0 || !isAllNormal}
+                  onPress={handleMarkAsBadDebt}
+                >
+                  <ThemedText style={{
+                    color: isMarkingBadDebt || selectedItems.length === 0 || !isAllNormal ? colors.disabled : colors.warning,
+                    textDecorationLine: 'underline',
+                    fontWeight: '600'
+                  }}>
+                    {isMarkingBadDebt ? "Marking..." : "Mark as Bad Debt"}
+                  </ThemedText>
+                </TouchableOpacity>
+              </>
+            )}
             <TouchableOpacity
               disabled={isLoading || duesByMembers?.length === 0}
               onPress={handleShareToWhatsApp}
@@ -184,6 +279,39 @@ const ClubDues = () => {
             clubInfo={clubInfo}
             onClose={() => setIsShareModalVisible(false)}
           />
+
+          {/* Reason Modal for Bad Debt */}
+          <Modal isVisible={isReasonModalVisible} onBackdropPress={() => setIsReasonModalVisible(false)}>
+            <ThemedView style={{ padding: 20, borderRadius: 10 }}>
+              <ThemedText style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 15 }}>Mark as Bad Debt</ThemedText>
+              <ThemedText style={{ fontSize: 14, marginBottom: 10 }}>Please provide a reason for marking these dues as bad debt:</ThemedText>
+              <TextInput
+                style={{
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  borderRadius: 5,
+                  padding: 10,
+                  color: colors.text,
+                  minHeight: 80,
+                  textAlignVertical: 'top',
+                  backgroundColor: colors.background
+                }}
+                placeholder="Enter reason..."
+                placeholderTextColor={colors.disabled}
+                multiline
+                value={badDebtReason}
+                onChangeText={setBadDebtReason}
+              />
+              <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 20, gap: 10 }}>
+                <ThemedButton title="Cancel" onPress={() => setIsReasonModalVisible(false)} style={{ backgroundColor: colors.disabled }} />
+                <ThemedButton
+                  title="Confirm"
+                  onPress={confirmMarkAsBadDebt}
+                  disabled={!badDebtReason.trim() || isMarkingBadDebt}
+                />
+              </View>
+            </ThemedView>
+          </Modal>
         </>
       )}
     </ThemedView>
@@ -374,8 +502,8 @@ const ConfirmModal = (props: {
 
 const MemberDue = (props: {
   member: any;
-  selectedItems: { paymentId: number; feeType: string; amount?: number }[];
-  toggle: (id: number, feeType: string, amount?: number) => void;
+  selectedItems: { paymentId: number; feeType: string; amount?: number; isBadDebt?: number }[];
+  toggle: (id: number, feeType: string, amount?: number, isBadDebt?: number) => void;
   currentRole?: string;
 }) => {
   const { selectedItems, toggle } = props;
@@ -430,8 +558,10 @@ const MemberDue = (props: {
                   feeType={item.feeType}
                   feeDesc={item.feeDesc}
                   amount={item.amount}
+                  isBadDebt={item.isBadDebt}
+                  badDebtReason={item.badDebtReason}
                   checked={checked}
-                  onToggle={() => toggle(item.paymentId, item.feeType, item.amount)}
+                  onToggle={() => toggle(item.paymentId, item.feeType, item.amount, item.isBadDebt)}
                   key={item.paymentId.toString() + item.feeType}
                   currentRole={props.currentRole}
                 />
@@ -452,11 +582,13 @@ const MemberFeeItem = (props: {
   feeType: string;
   feeDesc: string;
   amount: number;
+  isBadDebt?: number;
+  badDebtReason?: string;
   checked?: boolean;
   onToggle?: () => void;
   currentRole?: string;
 }) => {
-  const { paymentId, fee, feeDesc, amount, checked = false, onToggle } = props;
+  const { paymentId, fee, feeDesc, amount, isBadDebt, badDebtReason, checked = false, onToggle } = props;
   const { colors } = useTheme();
   return (
     <TouchableOpacity
@@ -467,9 +599,19 @@ const MemberFeeItem = (props: {
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         {props.currentRole === ROLE_ADMIN && <ThemedCheckBox checked={checked} />}
-        <View style={{ paddingVertical: 5, maxWidth: 150 }}>
-          <ThemedText style={styles.label}>{fee} </ThemedText>
+        <View style={{ paddingVertical: 5, maxWidth: "70%" }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <ThemedText style={styles.label}>{fee} </ThemedText>
+            {isBadDebt === 1 && (
+              <View style={{ backgroundColor: colors.warning + '33', paddingHorizontal: 6, borderRadius: 10, marginLeft: 5 }}>
+                <ThemedText style={{ fontSize: 9, color: colors.warning, fontWeight: 'bold' }}>BAD DEBT</ThemedText>
+              </View>
+            )}
+          </View>
           <ThemedText style={{ ...styles.subLabel, color: colors.disabled }}>{feeDesc} </ThemedText>
+          {isBadDebt === 1 && badDebtReason && (
+            <ThemedText style={{ fontSize: 10, color: colors.warning, paddingLeft: 5, fontStyle: 'italic' }}>Reason: {badDebtReason}</ThemedText>
+          )}
         </View>
       </View>
       <ThemedText style={styles.amount}>₹ {amount}</ThemedText>

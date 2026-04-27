@@ -9,6 +9,7 @@ class ClubMemberService():
         club_id = params.get('clubId')
         duesByClub = params.get('duesByClub')
         duesByMember = params.get('duesByMember')
+        showBadDebt = params.get('showBadDebt', 0)
         memberId = params.get('memberId')
         getClubMemberAttribute = params.get('getClubMemberAttribute')
         getClubMemberAttributeValues = params.get('getClubMemberAttributeValues')
@@ -24,7 +25,7 @@ class ClubMemberService():
             return [helper.convert_to_camel_case(attribute) for attribute in member_attribute_values]
 
         if duesByClub:
-            club_dues = db.fetch(conn, queries_club.GET_DUES, (club_id, club_id))
+            club_dues = db.fetch(conn, queries_club.GET_DUES, (club_id, showBadDebt, club_id, showBadDebt))
             return [helper.convert_to_camel_case(member) for member in club_dues]
         if duesByMember:
             member_dues = db.fetch(conn, queries_member.GET_DUES_BY_MEMBER, (memberId, club_id, club_id, memberId, club_id, club_id))

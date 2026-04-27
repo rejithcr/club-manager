@@ -62,3 +62,14 @@ def mark_paid():
         return service.mark_paid(conn, params), 200
     finally:
         db.close_connection(conn)
+
+@fee_bp.route('/baddebt', methods=['POST'], strict_slashes=False)
+@role_required([constants.ROLE_ADMIN])
+def mark_bad_debt():
+    service = FeeService()
+    params = util.get_params(request)
+    conn = db.get_connection()
+    try:
+        return service.mark_bad_debt(conn, params), 200
+    finally:
+        db.close_connection(conn)

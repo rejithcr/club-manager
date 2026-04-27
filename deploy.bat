@@ -116,13 +116,14 @@ if not exist app.zip (
     exit /b 1
 )
 
+echo ✅ Backend app.zip created successfully. Upload the zip manually to aws lambda.
 ::echo ☁️ Uploading backend to S3 (ccm-common-storage)...
 :: call aws s3 cp .\app.zip s3://ccm-common-storage/deploy/backend-app.zip --region %AWS_REGION%
 
 :: Cleanup
 rd /s /q build
 popd
-echo ✅ Backend uploaded successfully.
+echo ✅ Backend completed successfully.
 :SkipBackend
 
 :: 6. Bundle Scheduled Jobs

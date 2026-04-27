@@ -62,3 +62,21 @@ class FeeService():
                                 payment['paymentId'], date.today(), email, email))
         conn.commit()
         return {"message": f"{len(payments)} Payments updated"}
+
+    def mark_bad_debt(self, conn, params):
+        payments = params.get("payments")
+        email = params.get("email")
+        isBadDebt = params.get("isBadDebt", 0)
+        reason = params.get("reason", "")
+        
+        for payment in payments:
+            if payment['feeType'] == constants.FEE_TYPE_ADHOC_FEE:
+                db.execute(conn, queries_fee.MARK_ADHOC_FEE_AS_BAD_DEBT, 
+                          (isBadDebt, reason if isBadDebt else None, email, payment['paymentId']))
+            elif payment['feeType'] == constants.FEE_TYPE_FEE:
+                db.execute(conn, queries_fee.MARK_FEE_AS_BAD_DEBT, 
+                          (isBadDebt, reason if isBadDebt else None, email, payment['paymentId']))
+        
+        conn.commit()
+        status_msg = "marked as bad debt" if isBadDebt else "reversed from bad debt"
+        return {"message": f"{len(payments)} Payments {status_msg}"}

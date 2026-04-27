@@ -234,6 +234,15 @@ export const feeApi = createApi({
       }),
       invalidatesTags: ["fee", "transaction", "adhoc"],
     }),
+    // mark multiple dues as bad debt
+    markBadDebt: builder.mutation({
+      query: (body) => ({
+        url: "/fee/baddebt",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["fee", "transaction", "adhoc"],
+    }),
   }),
 });
 
@@ -267,6 +276,7 @@ export const {
   useSaveFeeCollectionMutation,
   useDeleteFeeCollectionMutation,
   useMarkDuesPaidMutation,
+  useMarkBadDebtMutation,
   useGetEventTransactionCategoriesQuery,
   useAddEventTransactionCategoryMutation,
   useUpdateEventTransactionCategoryMutation,
