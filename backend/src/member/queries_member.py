@@ -220,6 +220,32 @@ GET_UPCOMING_BIRTHDAYS = """
      m.first_name
 """
 
+GET_BIRTHDAYS = """
+   select m.member_id, m.first_name, m.last_name, m.email, m.phone, m.photo,
+          to_char(m.date_of_birth, 'YYYY-MM-DD') as date_of_birth,
+          to_char(m.date_of_birth, 'MM-DD') as birthday,
+          (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE) as days_until_birthday,
+          STRING_AGG(c.club_name, ', ' ORDER BY c.club_name) as club_names,
+          COUNT(DISTINCT c.club_id) as club_count,
+          MIN(c.club_id) as primary_club_id
+   from member m
+   join membership ms on m.member_id = ms.member_id and ms.is_active = 1
+   join club c on ms.club_id = c.club_id
+   where m.date_of_birth is not null 
+     and (c.club_id = %s OR %s = -1) and c.is_active = 1
+     and (
+       -- For all clubs user is member of when memberId is provided
+       %s IS NULL OR EXISTS (
+         SELECT 1 FROM membership ms2 
+         WHERE ms2.member_id = %s 
+         AND ms2.club_id = c.club_id 
+         AND ms2.is_active = 1
+       )
+     )
+   GROUP BY m.member_id, m.first_name, m.last_name, m.email, m.phone, m.photo, 
+            m.date_of_birth, 
+            (DATE(EXTRACT(YEAR FROM CURRENT_DATE) || '-' || to_char(m.date_of_birth, 'MM-DD')) - CURRENT_DATE)
+"""
 
 GET_NOTIFICATIONS = """
     select notification_id, title, message, is_read, target_type, target_id, to_char(created_ts, 'YYYY-MM-DD HH24:MI:SS') created_ts

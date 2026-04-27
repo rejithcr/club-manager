@@ -1,5 +1,6 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import { Event } from '@/src/types/event';
 import { BirthdayMember, FeedItem } from '@/src/types/member';
@@ -20,6 +21,7 @@ interface UnifiedFeedProps {
 
 const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) => {
   const { colors } = useTheme();
+  const router = useRouter();
 
   // Create unified feed items
   const createFeedItems = (): FeedItem[] => {
@@ -162,6 +164,13 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
         <CardList
           headerTitle="Upcoming Birthdays"
           headerIcon="FontAwesome:birthday-cake"
+          headerRight={
+            <TouchableOpacity onPress={() => router.push('/(main)/birthdays')}>
+              <ThemedText style={{ color: colors.button, fontWeight: '600', fontSize: 13 }}>
+                View All
+              </ThemedText>
+            </TouchableOpacity>
+          }
         >
           {feedItems.filter(item => item.type === 'birthday').map((item, idx) => (
             <Animated.View

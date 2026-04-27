@@ -12,6 +12,7 @@ class MemberService():
         limit = params.get("limit")
         offset = params.get("offset")
         upcomingBirthdays = params.get('upcomingBirthdays')
+        all_birthdays = params.get('birthdays')
         clubId = params.get('clubId')
         notifications = params.get('notifications')
         unreadCount = params.get('unreadCount')
@@ -32,6 +33,9 @@ class MemberService():
             return helper.convert_to_camel_case(result)
         elif upcomingBirthdays:
             birthdays = db.fetch(conn, queries_member.GET_UPCOMING_BIRTHDAYS, (clubId, clubId, member_id, member_id))
+            return [helper.convert_to_camel_case(birthday) for birthday in birthdays]
+        elif all_birthdays:
+            birthdays = db.fetch(conn, queries_member.GET_BIRTHDAYS, (clubId, clubId, member_id, member_id))
             return [helper.convert_to_camel_case(birthday) for birthday in birthdays]
         elif offset and limit:
             users = db.fetch(conn, queries_member.GET_USERS, (limit, offset))

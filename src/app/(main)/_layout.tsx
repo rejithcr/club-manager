@@ -37,6 +37,15 @@ const MainStack = () => {
             headerTintColor: colors.text,
           }}
         />
+        <Stack.Screen
+          name="birthdays"
+          options={{
+            headerTitle: () => <StackHeader header={"Birthdays"} />,
+            headerShown: true,
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.text,
+          }}
+        />
       </Stack>
       <StatusBar style={colors.statusbar == "light" ? "light" : "dark"} />
     </>
