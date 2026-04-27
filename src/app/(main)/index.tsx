@@ -255,11 +255,12 @@ const Main = () => {
           )}
 
           <Spacer space={10} />
-          {upcomingBirthdays && upcomingBirthdays.length > 0 && (
+          {upcomingBirthdays && (
             <UnifiedFeed
               events={[]}
               birthdays={upcomingBirthdays}
               clubs={clubs || []}
+              hideIfEmpty={false}
             />
           )}
 

@@ -17,9 +17,10 @@ interface UnifiedFeedProps {
   events: Event[];
   birthdays: BirthdayMember[];
   clubs: any[];
+  hideIfEmpty?: boolean;
 }
 
-const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) => {
+const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs, hideIfEmpty = true }) => {
   const { colors } = useTheme();
   const router = useRouter();
 
@@ -86,7 +87,7 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
     return { name: "MaterialIcons:event", color: colors.button };
   };
 
-  if (feedItems.length === 0) {
+  if (feedItems.length === 0 && hideIfEmpty) {
     return (
       <RoundedContainer>
         <ThemedText style={{ textAlign: "center" }}>No upcoming events or birthdays!</ThemedText>
@@ -160,7 +161,7 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
         </CardList>
       )}
 
-      {birthdays?.length > 0 && (
+      {birthdays && (birthdays.length > 0 || !hideIfEmpty) && (
         <CardList
           headerTitle="Upcoming Birthdays"
           headerIcon="FontAwesome:birthday-cake"
@@ -172,22 +173,30 @@ const UnifiedFeed: React.FC<UnifiedFeedProps> = ({ events, birthdays, clubs }) =
             </TouchableOpacity>
           }
         >
-          {feedItems.filter(item => item.type === 'birthday').map((item, idx) => (
-            <Animated.View
-              key={`birthday-${(item.data as BirthdayMember).memberId}`}
-              entering={FadeInUp.duration(380).delay(idx * 80)}
-            >
-              <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
-                <BirthdayCard
-                  member={{
-                    ...item.data as BirthdayMember,
-                    birthday: formatBirthdayDate((item.data as BirthdayMember).birthday)
-                  }}
-                  layout="list"
-                />
-              </View>
-            </Animated.View>
-          ))}
+          {birthdays.length > 0 ? (
+            feedItems.filter(item => item.type === 'birthday').map((item, idx) => (
+              <Animated.View
+                key={`birthday-${(item.data as BirthdayMember).memberId}`}
+                entering={FadeInUp.duration(380).delay(idx * 80)}
+              >
+                <View style={{ paddingHorizontal: 16, paddingVertical: 12 }}>
+                  <BirthdayCard
+                    member={{
+                      ...item.data as BirthdayMember,
+                      birthday: formatBirthdayDate((item.data as BirthdayMember).birthday)
+                    }}
+                    layout="list"
+                  />
+                </View>
+              </Animated.View>
+            ))
+          ) : (
+            <View style={{ padding: 24, alignItems: 'center' }}>
+              <ThemedIcon name="FontAwesome:birthday-cake" size={40} color={colors.subText} />
+              <Spacer space={8} />
+              <ThemedText style={{ color: colors.subText }}>No recent birthdays</ThemedText>
+            </View>
+          )}
         </CardList>
       )}
     </>
